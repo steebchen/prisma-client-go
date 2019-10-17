@@ -4,13 +4,15 @@ import (
 	"github.com/prisma/photongo/generator/dmmf"
 )
 
-type GeneratorConfig struct {
-	Output             *string
-	Name               string
-	Provider           string
-	Config             []string // Dictionary<string> // help
-	BinaryTargets      []string
-	PinnedBinaryTarget *string
+type Config struct {
+	// Output (optional)
+	Output        string   `json:"output"`
+	Name          string   `json:"name"`
+	Provider      string   `json:"provider"`
+	Config        []string `json:"config"` // formerly Dictionary<string>
+	BinaryTargets []string `json:"binaryTargets"`
+	// PinnedBinaryTarget (optional)
+	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
 }
 
 type ConnectorType string
@@ -23,24 +25,28 @@ const (
 )
 
 type Datasource struct {
-	Name          string
-	ConnectorType ConnectorType
-	Url           string // EnvValue // help
-	Config        interface{}
+	Name          string        `json:"name"`
+	ConnectorType ConnectorType `json:"connectorType"`
+	Url           string        `json:"url"` // formerly EnvValue
+	Config        interface{}   `json:"config"`
 }
 
-type GeneratorOptions struct {
-	Generator       GeneratorConfig
-	OtherGenerators []GeneratorConfig
-	SchemaPath      string
-	DMMF            dmmf.Document
-	Datasources     []Datasource
-	Datamodel       string
-	BinaryPaths     *BinaryPaths
+type Options struct {
+	Generator       Config        `json:"generator"`
+	OtherGenerators []Config      `json:"otherGenerators"`
+	SchemaPath      string        `json:"schemaPath"`
+	DMMF            dmmf.Document `json:"DMMF"`
+	Datasources     []Datasource  `json:"datasources"`
+	Datamodel       string        `json:"datamodel"`
+	// BinaryPaths (optional)
+	BinaryPaths BinaryPaths `json:"binaryPaths"`
 }
 
 type BinaryPaths struct {
-	MigrationEngine     *map[string]string // key target, value path
-	QueryEngine         *map[string]string
-	IntrospectionEngine *map[string]string
+	// MigrationEngine (optional)
+	MigrationEngine map[string]string `json:"migrationEngine"` // key target, value path
+	// QueryEngine (optional)
+	QueryEngine map[string]string `json:"queryEngine"`
+	// IntrospectionEngine (optional)
+	IntrospectionEngine map[string]string `json:"introspectionEngine"`
 }
