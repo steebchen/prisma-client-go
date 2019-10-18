@@ -4,7 +4,7 @@
 package {{.Generator.Config.Package}}
 
 func NewClient() Client {
-return Client{}
+	return Client{}
 }
 
 type Client struct {
