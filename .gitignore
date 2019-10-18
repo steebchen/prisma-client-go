@@ -1,1 +1,5 @@
 prisma
+photongo
+*.db
+*.json
+*_gen.go

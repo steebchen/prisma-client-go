@@ -4,13 +4,25 @@ import (
 	"github.com/prisma/photongo/generator/dmmf"
 )
 
-type Config struct {
+// Root describes the generator output root
+type Root struct {
+	Generator       Generator     `json:"generator"`
+	OtherGenerators []Generator   `json:"otherGenerators"`
+	SchemaPath      string        `json:"schemaPath"`
+	DMMF            dmmf.Document `json:"DMMF"`
+	Datasources     []Datasource  `json:"datasources"`
+	Datamodel       string        `json:"datamodel"`
+	// BinaryPaths (optional)
+	BinaryPaths BinaryPaths `json:"binaryPaths"`
+}
+
+type Generator struct {
 	// Output (optional)
-	Output        string   `json:"output"`
-	Name          string   `json:"name"`
-	Provider      string   `json:"provider"`
-	Config        []string `json:"config"` // formerly Dictionary<string>
-	BinaryTargets []string `json:"binaryTargets"`
+	Output        string            `json:"output"`
+	Name          string            `json:"name"`
+	Provider      string            `json:"provider"`
+	Config        map[string]string `json:"config"`
+	BinaryTargets []string          `json:"binaryTargets"`
 	// PinnedBinaryTarget (optional)
 	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
 }
@@ -27,19 +39,14 @@ const (
 type Datasource struct {
 	Name          string        `json:"name"`
 	ConnectorType ConnectorType `json:"connectorType"`
-	Url           string        `json:"url"` // formerly EnvValue
+	Url           EnvValue      `json:"url"` // formerly EnvValue
 	Config        interface{}   `json:"config"`
 }
 
-type Options struct {
-	Generator       Config        `json:"generator"`
-	OtherGenerators []Config      `json:"otherGenerators"`
-	SchemaPath      string        `json:"schemaPath"`
-	DMMF            dmmf.Document `json:"DMMF"`
-	Datasources     []Datasource  `json:"datasources"`
-	Datamodel       string        `json:"datamodel"`
-	// BinaryPaths (optional)
-	BinaryPaths BinaryPaths `json:"binaryPaths"`
+type EnvValue struct {
+	// FromEnvVar (optional)
+	FromEnvVar string `json:"fromEnvVar"`
+	Value      string `json:"value"`
 }
 
 type BinaryPaths struct {
