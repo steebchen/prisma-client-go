@@ -66,7 +66,10 @@ func main() {
 				log.Fatalf("could not assert params into generator.Options type %s", err)
 			}
 
-			generator.Run(params)
+			err = generator.Run(params)
+			if err != nil {
+				log.Fatalf("could not generate code. %s", err)
+			}
 		}
 
 		err = reply(os.Stderr, jsonrpc.NewResponse(input.ID, response))

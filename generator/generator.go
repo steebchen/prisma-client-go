@@ -16,13 +16,18 @@ type Root struct {
 	BinaryPaths BinaryPaths `json:"binaryPaths"`
 }
 
+// Config is the data structure of what you can define in your schema.prisma file
+type Config struct {
+	Package string `json:"package"`
+}
+
 type Generator struct {
 	// Output (optional)
-	Output        string            `json:"output"`
-	Name          string            `json:"name"`
-	Provider      string            `json:"provider"`
-	Config        map[string]string `json:"config"`
-	BinaryTargets []string          `json:"binaryTargets"`
+	Output        string   `json:"output"`
+	Name          string   `json:"name"`
+	Provider      string   `json:"provider"`
+	Config        Config   `json:"config"`
+	BinaryTargets []string `json:"binaryTargets"`
 	// PinnedBinaryTarget (optional)
 	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
 }
