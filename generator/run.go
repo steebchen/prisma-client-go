@@ -4,11 +4,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
-	"path/filepath"
+	"os/exec"
 	"text/template"
 
 	"github.com/pkg/errors"
+
+	"github.com/prisma/photongo/generator/templates"
 )
 
 func addDefaults(input *Root) {
@@ -20,13 +21,12 @@ func addDefaults(input *Root) {
 func Run(input Root) error {
 	addDefaults(&input)
 
-	exec, err := os.Executable()
-	dir := filepath.Dir(exec)
+	asset, err := templates.Asset("generator/templates/main.gotpl")
 	if err != nil {
-		return errors.Wrap(err, "could not get executable")
+		return errors.Wrap(err, "could not get main template asset")
 	}
 
-	tpl, err := template.ParseGlob(dir + "/generator/templates/*.gotpl")
+	tpl, err := template.New("main").Parse(string(asset))
 	if err != nil {
 		return errors.Wrap(err, "could not parse templates")
 	}
@@ -40,6 +40,11 @@ func Run(input Root) error {
 	err = ioutil.WriteFile(input.Generator.Output, buf.Bytes(), 0644)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
+	}
+
+	err = exec.Command("go", "fmt", input.Generator.Output).Run()
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not format file with go fmt %s", input.Generator.Output))
 	}
 
 	return nil

@@ -1,3 +1,5 @@
+//go:generate go-bindata -nometadata -o generator/templates/templates_gen.go -pkg templates -ignore="templates_gen\.go" generator/templates/...
+
 package main
 
 import (
