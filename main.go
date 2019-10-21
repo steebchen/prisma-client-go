@@ -33,7 +33,7 @@ func reply(w io.Writer, data interface{}) error {
 }
 
 func main() {
-	// make sure to exit when signal is received
+	// make sure to exit when signal triggers
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {

@@ -5,6 +5,7 @@ package {{.Generator.Config.Package}}
 
 import (
 	"time"
+	"database/sql"
 )
 
 func NewClient() Client {

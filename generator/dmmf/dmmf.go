@@ -26,7 +26,7 @@ const (
 	DatamodelFieldKindEnum     DatamodelFieldKind = "enum"
 )
 
-// IncludeInStruct displays an included value in a struct.
+// IncludeInStruct shows whether to include a field in a model struct.
 func (v DatamodelFieldKind) IncludeInStruct() bool {
 	return v == DatamodelFieldKindScalar || v == DatamodelFieldKindEnum
 }
