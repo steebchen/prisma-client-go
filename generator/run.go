@@ -3,13 +3,12 @@ package generator
 import (
 	"bytes"
 	"fmt"
+	"go/build"
 	"io/ioutil"
 	"os/exec"
 	"text/template"
 
 	"github.com/pkg/errors"
-
-	"github.com/prisma/photongo/generator/templates"
 )
 
 func addDefaults(input *Root) {
@@ -23,17 +22,19 @@ func Run(input Root) error {
 
 	var buf bytes.Buffer
 
-	for _, name := range templates.AssetNames() {
-		asset, err := templates.Asset(name)
-		if err != nil {
-			return errors.Wrap(err, "could not get main template asset")
-		}
+	ctx := build.Default
+	pkg, err := ctx.Import("github.com/prisma/photongo", ".", build.FindOnly)
+	if err != nil {
+		return errors.Wrap(err, "could not get main template asset")
+	}
 
-		tpl, err := template.New(name).Parse(string(asset))
-		if err != nil {
-			return errors.Wrap(err, "could not parse templates")
-		}
+	templateDir := pkg.Dir + "/generator/templates/*.gotpl"
+	templates, err := template.ParseGlob(templateDir)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not parse go templates dir %s", templateDir))
+	}
 
+	for _, tpl := range templates.Templates() {
 		err = tpl.Execute(&buf, input)
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
