@@ -7,10 +7,3 @@ import (
 	"time"
 	"database/sql"
 )
-
-func NewClient() Client {
-	return Client{}
-}
-
-type Client struct {
-}

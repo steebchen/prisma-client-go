@@ -1,0 +1,11 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+func NewClient() Client {
+	return Client{}
+}
+
+type Client struct {
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		{{ $model.Name.GoCase }} {{ $model.Name.GoCase }}Actions
+	{{- end }}
+}

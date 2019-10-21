@@ -1,0 +1,24 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{/* Generate a struct for each field. */}}
+	{{ $name := $model.Name.GoCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+	{{ $ns := (print $name "Actions") }}
+	{{ $nsFindOne := (print $name "FindOne") }}
+	{{ $nsParams := (print $name "Params") }}
+
+	type {{ $ns }} struct {}
+
+	func (r {{ $ns }}) FindOne(params ...{{ $nsParams }}) {{ $nsFindOne }} {
+		return {{ $nsFindOne }}{}
+	}
+
+	type {{ $nsFindOne }} struct {}
+
+	func (r {{ $nsFindOne }}) Exec() ({{ $modelName }}, error) {
+		return nil, nil
+	}
+
+	type {{ $nsParams }} struct {}
+{{ end }}

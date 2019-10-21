@@ -2,7 +2,7 @@
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{/* Generate a struct for each field. */}}
-	type {{ $model.Name.GoCase }} struct {
+	type {{ $model.Name.GoCase }}Model struct {
 		{{- range $field := $model.Fields }}
 			{{- if $field.Kind.IncludeInStruct }}
 				{{- if $field.IsRequired -}}
@@ -19,7 +19,7 @@
 	{{/* Attach methods for nullable (non-required) fields. */}}
 	{{- range $field := $model.Fields }}
 		{{- if and ($field.Kind.IncludeInStruct) (not $field.IsRequired) }}
-			func (r {{ $model.Name.GoCase }}) {{ $field.Name.GoCase }}() (value {{ $field.Type.Value }}, ok bool) {
+			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ $field.Type.Value }}, ok bool) {
 				return r.{{ $field.Name.GoLowerCase }}.{{ $field.Type }}, r.{{ $field.Name.GoLowerCase }}.Valid
 			}
 		{{- end }}

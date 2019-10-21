@@ -1,0 +1,30 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{/* Generate a struct for each field. */}}
+	{{ $name := $model.Name.GoCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+	{{ $nsQuery := (print $name "Query") }}
+	{{ $nsParams := (print $name "Params") }}
+	var {{ $name }} = {{ $nsQuery }}{}
+
+	type {{ $nsQuery }} struct {
+		{{- range $field := $model.Fields }}
+			{{/* Filter non-relations only for now */}}
+			{{- if $field.Kind.IncludeInStruct -}}
+				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}
+			{{- end -}}
+		{{- end }}
+	}
+
+	{{- range $field := $model.Fields }}
+		{{/* Filter non-relations only for now */}}
+		{{- if $field.Kind.IncludeInStruct -}}
+			type {{ $nsQuery }}{{ $field.Name.GoCase }} struct {}
+
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}) Equals(value {{ $field.Type.Value }}) {{ $nsParams }} {
+				return nil
+			}
+		{{- end -}}
+	{{- end }}
+{{ end }}
