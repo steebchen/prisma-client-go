@@ -6,6 +6,7 @@ import (
 	"go/build"
 	"go/format"
 	"io/ioutil"
+	"strings"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -17,7 +18,7 @@ func addDefaults(input *Root) {
 	}
 }
 
-// Run invokes the generator which builds the templates and writes to the specified output file.
+// Run invokes the generator, which builds the templates and writes to the specified output file.
 func Run(input Root) error {
 	addDefaults(&input)
 
@@ -35,11 +36,23 @@ func Run(input Root) error {
 		return errors.Wrap(err, fmt.Sprintf("could not parse go templates dir %s", templateDir))
 	}
 
+	// Run header template first
+	header := templates.Lookup("_header.gotpl")
+
+	err = header.Execute(&buf, input)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not write header template %s", input.Generator.Output))
+	}
+
+	// Then process all remaining templates
 	for _, tpl := range templates.Templates() {
+		if strings.Contains(tpl.Name(), "_") {
+			continue
+		}
 		buf.Write([]byte(fmt.Sprintf("// --- template %s ---\n", tpl.Name())))
 		err = tpl.Execute(&buf, input)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
+			return errors.Wrap(err, fmt.Sprintf("could not write template file %s", input.Generator.Output))
 		}
 	}
 
