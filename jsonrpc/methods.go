@@ -1,6 +1,6 @@
 package jsonrpc
 
-// Manifest describes information for the Photon Go generator for the Prisma CLI
+// Manifest describes information for the Photon Go generator for the Prisma CLI.
 type Manifest struct {
 	PrettyName         string   `json:"prettyName"`
 	DefaultOutput      string   `json:"defaultOutput"`
@@ -9,6 +9,7 @@ type Manifest struct {
 	RequiresEngines    []string `json:"requiresEngines"`
 }
 
+// ManifestResponse sets the response Photon Go returns when Prisma asks for the Manifest.
 type ManifestResponse struct {
 	Manifest Manifest `json:"manifest"`
 }

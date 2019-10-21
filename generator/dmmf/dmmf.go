@@ -6,32 +6,39 @@ import (
 	"github.com/prisma/photongo/generator/types"
 )
 
+// FieldKind describes a scalar, object or enum.
 type FieldKind string
 
+// FieldKind values
 const (
 	FieldKindScalar FieldKind = "scalar"
 	FieldKindObject FieldKind = "object"
 	FieldKindEnum   FieldKind = "enum"
 )
 
+// DatamodelFieldKind describes a scalar, object or enum.
 type DatamodelFieldKind string
 
+// DatamodelFieldKind values
 const (
 	DatamodelFieldKindScalar   DatamodelFieldKind = "scalar"
 	DatamodelFieldKindRelation DatamodelFieldKind = "relation"
 	DatamodelFieldKindEnum     DatamodelFieldKind = "enum"
 )
 
+// IncludeInStruct displays an included value in a struct.
 func (v DatamodelFieldKind) IncludeInStruct() bool {
 	return v == DatamodelFieldKindScalar || v == DatamodelFieldKindEnum
 }
 
+// Document describes the root of the AST.
 type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
 	Mappings  []Mapping `json:"mappings"`
 }
 
+// Enum describes an enumerated type.
 type Enum struct {
 	Name   types.String   `json:"name"`
 	Values []types.String `json:"values"`
@@ -39,12 +46,15 @@ type Enum struct {
 	DBName types.String `json:"dBName"`
 }
 
+// Datamodel contains all types of the Prisma Datamodel.
 type Datamodel struct {
 	Models []Model `json:"models"`
 	Enums  []Enum  `json:"enums"`
 }
 
+// Model describes a Prisma type model, which usually maps to a database table or collection.
 type Model struct {
+	// Name describes the singular name of the model.
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
@@ -52,13 +62,14 @@ type Model struct {
 	Fields []Field      `json:"fields"`
 }
 
+// Field describes properties of a single model field.
 type Field struct {
 	Kind       DatamodelFieldKind `json:"kind"`
 	Name       types.String       `json:"name"`
 	IsRequired bool               `json:"isRequired"`
 	IsList     bool               `json:"isList"`
 	IsUnique   bool               `json:"isUnique"`
-	IsId       bool               `json:"isId"`
+	IsID       bool               `json:"isId"`
 	Type       types.Type         `json:"type"`
 	// DBName (optional)
 	DBName      types.String `json:"dBName"`
@@ -71,10 +82,12 @@ type Field struct {
 	RelationName types.String
 }
 
+// Tag returns the struct tag value of a field.
 func (f Field) Tag() string {
 	return fmt.Sprintf("`json:\"%s\"`", f.Name.GoLowerCase())
 }
 
+// Schema provides the GraphQL/PQL AST.
 type Schema struct {
 	// RootQueryType (optional)
 	RootQueryType types.String `json:"rootQueryType"`
@@ -85,12 +98,7 @@ type Schema struct {
 	Enums            []Enum       `json:"enums"`
 }
 
-type QueryOutput struct {
-	Name       types.String `json:"name"`
-	IsRequired bool         `json:"isRequired"`
-	IsList     bool         `json:"isList"`
-}
-
+// SchemaArg provides the arguments of a given field.
 type SchemaArg struct {
 	Name      types.String    `json:"name"`
 	InputType SchemaInputType `json:"inputType"`
@@ -98,6 +106,7 @@ type SchemaArg struct {
 	IsRelationFilter bool `json:"isRelationFilter"`
 }
 
+// SchemaInputType describes an input type of a given field.
 type SchemaInputType struct {
 	IsRequired bool         `json:"isRequired"`
 	IsList     bool         `json:"isList"`
@@ -105,6 +114,7 @@ type SchemaInputType struct {
 	Kind       FieldKind    `json:"kind"`
 }
 
+// OutputType describes a GraphQL/PQL return type.
 type OutputType struct {
 	Name   types.String  `json:"name"`
 	Fields []SchemaField `json:"fields"`
@@ -112,12 +122,14 @@ type OutputType struct {
 	IsEmbedded bool `json:"isEmbedded"`
 }
 
+// SchemaField describes the information of an output type field.
 type SchemaField struct {
 	Name       types.String     `json:"name"`
 	OutputType SchemaOutputType `json:"outputType"`
 	Args       []SchemaArg      `json:"args"`
 }
 
+// SchemaOutputType describes an output type of a given field.
 type SchemaOutputType struct {
 	Type       types.String `json:"type"` // note that in the serialized state we don't have the reference to MergedOutputTypes
 	IsList     bool         `json:"isList"`
@@ -125,10 +137,11 @@ type SchemaOutputType struct {
 	Kind       FieldKind    `json:"kind"`
 }
 
+// InputType describes a GraphQL/PQL input type.
 type InputType struct {
 	Name types.String `json:"name"`
 	// IsWhereType (optional)
-	IsWhereType bool `json:"isWhereType"` // this is needed to transform it back
+	IsWhereType bool `json:"isWhereType"`
 	// IsOrderType (optional)
 	IsOrderType bool `json:"isOrderType"`
 	// AtLeastOne (optional)
@@ -138,6 +151,7 @@ type InputType struct {
 	Fields    []SchemaArg `json:"fields"`
 }
 
+// Mapping provides information for CRUD methods to allow easy mapping to the query engine.
 type Mapping struct {
 	Model types.String `json:"model"`
 	// FindOne (optional)
@@ -158,8 +172,10 @@ type Mapping struct {
 	DeleteMany types.String `json:"deleteMany"`
 }
 
+// ModelAction describes a CRUD operation.
 type ModelAction types.String
 
+// ModelAction values
 const (
 	ModelActionFindOne    ModelAction = "findOne"
 	ModelActionFindMany   ModelAction = "findMany"

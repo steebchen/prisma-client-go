@@ -17,6 +17,7 @@ func addDefaults(input *Root) {
 	}
 }
 
+// Run invokes the generator which builds the templates and writes to the specified output file.
 func Run(input Root) error {
 	addDefaults(&input)
 
