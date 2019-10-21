@@ -1,5 +1,11 @@
 package dmmf
 
+import (
+	"fmt"
+
+	"github.com/prisma/photongo/generator/types"
+)
+
 type FieldKind string
 
 const (
@@ -16,6 +22,10 @@ const (
 	DatamodelFieldKindEnum     DatamodelFieldKind = "enum"
 )
 
+func (v DatamodelFieldKind) IncludeInStruct() bool {
+	return v == DatamodelFieldKindScalar || v == DatamodelFieldKindEnum
+}
+
 type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
@@ -23,10 +33,10 @@ type Document struct {
 }
 
 type Enum struct {
-	Name   string   `json:"name"`
-	Values []string `json:"values"`
+	Name   types.String   `json:"name"`
+	Values []types.String `json:"values"`
 	// DBName (optional)
-	DBName string `json:"dBName"` // can also be undefined
+	DBName types.String `json:"dBName"`
 }
 
 type Datamodel struct {
@@ -35,84 +45,88 @@ type Datamodel struct {
 }
 
 type Model struct {
-	Name       string `json:"name"`
-	IsEmbedded bool   `json:"isEmbedded"`
+	Name       types.String `json:"name"`
+	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName string  `json:"dbName"` // can also be undefined
-	Fields []Field `json:"fields"`
+	DBName types.String `json:"dbName"`
+	Fields []Field      `json:"fields"`
 }
 
 type Field struct {
 	Kind       DatamodelFieldKind `json:"kind"`
-	Name       string             `json:"name"`
+	Name       types.String       `json:"name"`
 	IsRequired bool               `json:"isRequired"`
 	IsList     bool               `json:"isList"`
 	IsUnique   bool               `json:"isUnique"`
 	IsId       bool               `json:"isId"`
-	Type       string             `json:"type"`
+	Type       types.Type         `json:"type"`
 	// DBName (optional)
-	DBName      string `json:"dBName"` // can also be undefined
-	IsGenerated bool   `json:"isGenerated"`
+	DBName      types.String `json:"dBName"`
+	IsGenerated bool         `json:"isGenerated"`
 	// RelationToFields (optional)
 	RelationToFields []interface{} `json:"relationToFields"`
 	// RelationOnDelete (optional)
-	RelationOnDelete string
+	RelationOnDelete types.String
 	// RelationName (optional)
-	RelationName string
+	RelationName types.String
+}
+
+func (f Field) Tag() string {
+	return fmt.Sprintf("`json:\"%s\"`", f.Name.GoLowerCase())
 }
 
 type Schema struct {
 	// RootQueryType (optional)
-	RootQueryType string `json:"rootQueryType"`
+	RootQueryType types.String `json:"rootQueryType"`
 	// RootMutationType (optional)
-	RootMutationType string       `json:"rootMutationType"`
+	RootMutationType types.String `json:"rootMutationType"`
 	InputTypes       []InputType  `json:"inputTypes"`
 	OutputTypes      []OutputType `json:"outputTypes"`
 	Enums            []Enum       `json:"enums"`
 }
 
 type QueryOutput struct {
-	Name       string `json:"name"`
-	IsRequired bool   `json:"isRequired"`
-	IsList     bool   `json:"isList"`
+	Name       types.String `json:"name"`
+	IsRequired bool         `json:"isRequired"`
+	IsList     bool         `json:"isList"`
 }
 
 type SchemaArg struct {
-	Name      string          `json:"name"`
+	Name      types.String    `json:"name"`
 	InputType SchemaInputType `json:"inputType"`
 	// IsRelationFilter (optional)
 	IsRelationFilter bool `json:"isRelationFilter"`
 }
 
 type SchemaInputType struct {
-	IsRequired bool      `json:"isRequired"`
-	IsList     bool      `json:"isList"`
-	Type       string    `json:"type"` // this was declared as ArgType
-	Kind       FieldKind `json:"kind"`
+	IsRequired bool         `json:"isRequired"`
+	IsList     bool         `json:"isList"`
+	Type       types.String `json:"type"` // this was declared as ArgType
+	Kind       FieldKind    `json:"kind"`
 }
 
 type OutputType struct {
-	Name   string        `json:"name"`
+	Name   types.String  `json:"name"`
 	Fields []SchemaField `json:"fields"`
 	// IsEmbedded (optional)
 	IsEmbedded bool `json:"isEmbedded"`
 }
 
 type SchemaField struct {
-	Name       string           `json:"name"`
+	Name       types.String     `json:"name"`
 	OutputType SchemaOutputType `json:"outputType"`
 	Args       []SchemaArg      `json:"args"`
 }
 
 type SchemaOutputType struct {
-	Type       string    `json:"type"` // note that in the serialized state we don't have the reference to MergedOutputTypes
-	IsList     bool      `json:"isList"`
-	IsRequired bool      `json:"isRequired"`
-	Kind       FieldKind `json:"kind"`
+	Type       types.String `json:"type"` // note that in the serialized state we don't have the reference to MergedOutputTypes
+	IsList     bool         `json:"isList"`
+	IsRequired bool         `json:"isRequired"`
+	Kind       FieldKind    `json:"kind"`
 }
 
 type InputType struct {
-	Name string `json:"name"`
+	Name types.String `json:"name"`
 	// IsWhereType (optional)
 	IsWhereType bool `json:"isWhereType"` // this is needed to transform it back
 	// IsOrderType (optional)
@@ -125,26 +139,26 @@ type InputType struct {
 }
 
 type Mapping struct {
-	Model string `json:"model"`
+	Model types.String `json:"model"`
 	// FindOne (optional)
-	FindOne string `json:"findOne"`
+	FindOne types.String `json:"findOne"`
 	// FindMany (optional)
-	FindMany string `json:"findMany"`
+	FindMany types.String `json:"findMany"`
 	// Create (optional)
-	Create string `json:"create"`
+	Create types.String `json:"create"`
 	// Update (optional)
-	Update string `json:"update"`
+	Update types.String `json:"update"`
 	// UpdateMany (optional)
-	UpdateMany string `json:"updateMany"`
+	UpdateMany types.String `json:"updateMany"`
 	// Upsert (optional)
-	Upsert string `json:"upsert"`
+	Upsert types.String `json:"upsert"`
 	// Delete (optional)
-	Delete string `json:"delete"`
+	Delete types.String `json:"delete"`
 	// DeleteMany (optional)
-	DeleteMany string `json:"deleteMany"`
+	DeleteMany types.String `json:"deleteMany"`
 }
 
-type ModelAction string
+type ModelAction types.String
 
 const (
 	ModelActionFindOne    ModelAction = "findOne"

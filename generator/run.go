@@ -35,6 +35,7 @@ func Run(input Root) error {
 	}
 
 	for _, tpl := range templates.Templates() {
+		buf.Write([]byte(fmt.Sprintf("// --- template %s ---\n", tpl.Name())))
 		err = tpl.Execute(&buf, input)
 		if err != nil {
 			return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))

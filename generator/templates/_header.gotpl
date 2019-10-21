@@ -3,6 +3,10 @@
 
 package {{.Generator.Config.Package}}
 
+import (
+	"time"
+)
+
 func NewClient() Client {
 	return Client{}
 }

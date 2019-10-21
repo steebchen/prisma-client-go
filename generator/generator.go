@@ -2,6 +2,7 @@ package generator
 
 import (
 	"github.com/prisma/photongo/generator/dmmf"
+	"github.com/prisma/photongo/generator/types"
 )
 
 // Root describes the generator output root
@@ -18,16 +19,16 @@ type Root struct {
 
 // Config is the data structure of what you can define in your schema.prisma file
 type Config struct {
-	Package string `json:"package"`
+	Package types.String `json:"package"`
 }
 
 type Generator struct {
 	// Output (optional)
-	Output        string   `json:"output"`
-	Name          string   `json:"name"`
-	Provider      string   `json:"provider"`
-	Config        Config   `json:"config"`
-	BinaryTargets []string `json:"binaryTargets"`
+	Output        string       `json:"output"`
+	Name          types.String `json:"name"`
+	Provider      types.String `json:"provider"`
+	Config        Config       `json:"config"`
+	BinaryTargets []string     `json:"binaryTargets"`
 	// PinnedBinaryTarget (optional)
 	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
 }
@@ -42,7 +43,7 @@ const (
 )
 
 type Datasource struct {
-	Name          string        `json:"name"`
+	Name          types.String  `json:"name"`
 	ConnectorType ConnectorType `json:"connectorType"`
 	Url           EnvValue      `json:"url"` // formerly EnvValue
 	Config        interface{}   `json:"config"`

@@ -1,2 +1,11 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
-// models
+
+{{ range $model := .DMMF.Datamodel.Models }}
+	type {{ $model.Name.GoCase }} struct {
+		{{- range $field := $model.Fields }}
+			{{- if $field.Kind.IncludeInStruct }}
+				{{ $field.Name.GoCase }} {{ $field.Type.Value }} {{ $field.Tag }}
+			{{- end }}
+		{{- end }}
+	}
+{{ end }}
