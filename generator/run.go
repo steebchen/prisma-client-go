@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"go/build"
+	"go/format"
 	"io/ioutil"
-	"os/exec"
 	"text/template"
 
 	"github.com/pkg/errors"
@@ -43,12 +43,14 @@ func Run(input Root) error {
 		}
 	}
 
-	if err := ioutil.WriteFile(input.Generator.Output, buf.Bytes(), 0644); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
+	formatted, err := format.Source(buf.Bytes())
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not format source"))
 	}
 
-	if err := exec.Command("go", "fmt", input.Generator.Output).Run(); err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not format file with go fmt %s", input.Generator.Output))
+	err = ioutil.WriteFile(input.Generator.Output, formatted, 0644)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
 	}
 
 	return nil
