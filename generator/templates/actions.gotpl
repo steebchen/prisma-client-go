@@ -10,15 +10,42 @@
 
 	type {{ $ns }} struct {}
 
-	func (r {{ $ns }}) FindOne(params ...{{ $nsParams }}) {{ $nsFindOne }} {
-		return {{ $nsFindOne }}{}
+	func ({{ $ns }}) FindOne(params ...{{ $nsParams }}) {{ $nsFindOne }} {
+		var v {{ $nsFindOne }}
+		var fields []field
+		for _, q := range params {
+			fields = append(fields, q.data)
+		}
+		v.query.inputs = append(v.query.inputs, input{
+			name:   "where",
+			fields: fields,
+		})
+		return v
 	}
 
-	type {{ $nsFindOne }} struct {}
-
-	func (r {{ $nsFindOne }}) Exec() ({{ $modelName }}, error) {
-		return nil, nil
+	type {{ $nsFindOne }} struct {
+		query query
 	}
 
-	type {{ $nsParams }} struct {}
+	var {{ $model.Name.GoLowerCase }}Outputs = []field{
+		{{- range $i := $model.Fields }}
+			{{- if $i.Kind.IncludeInStruct }}
+				{name: "{{ $i.Name.CamelCase }}"},
+			{{- end }}
+		{{- end }}
+	}
+
+	func (r {{ $nsFindOne }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
+		r.query.operation = "query"
+		r.query.method = "findOne"
+		r.query.model = "{{ $name }}"
+		r.query.outputs = {{ $model.Name.GoLowerCase }}Outputs
+		var v {{ $modelName }}
+		err := r.query.exec(ctx, &v)
+		return v, err
+	}
+
+	type {{ $nsParams }} struct {
+		data field
+	}
 {{ end }}

@@ -1,0 +1,85 @@
+type input struct {
+	name   string
+	fields []field
+}
+
+type field struct {
+	// The name of the field.
+	name string
+	// an action for input fields, e.g. `contains` // TODO maybe create separate field struct for input types
+	action string
+	// value contains the field value. if nil, fields will contain a subselection.
+	value interface{}
+	// fields contains a subselection of fields. If not nil, value will be undefined.
+	fields []field
+}
+
+type query struct {
+	// operation describes the PQL operation: query, mutation or subscription
+	operation string
+	// name describes the operation; useful for tracing
+	name string
+	// method describes a crud operation
+	method string
+	// model contains the Prisma model name
+	model string
+	// inputs contains the query
+	inputs []input
+	// outputs contains the return fields
+	outputs []field
+}
+
+func (q query) build() string {
+	var builder strings.Builder
+
+	builder.WriteString(q.operation + " " + q.name)
+	builder.WriteString("{")
+	builder.WriteString(q.method + q.model)
+	builder.WriteString("(")
+
+	for _, i := range q.inputs {
+		builder.WriteString(i.name)
+		builder.WriteString(":")
+		builder.WriteString("{")
+
+		for _, f := range i.fields {
+			builder.WriteString(f.name)
+
+			// `equals` operations map to solely the field name in PQL
+			if f.action != "equals" {
+				builder.WriteString("_" + f.action)
+			}
+
+			builder.WriteString(":")
+
+			switch v := f.value.(type) {
+			case string:
+				builder.WriteString(`"` + v + `"`)
+			default:
+				builder.WriteString(fmt.Sprintf("%s", v))
+			}
+
+			builder.WriteString(",")
+		}
+
+		builder.WriteString("}")
+	}
+
+	builder.WriteString(")")
+	builder.WriteString(" ")
+	builder.WriteString("{")
+
+	for _, o := range q.outputs {
+		builder.WriteString(o.name + " ")
+	}
+
+	builder.WriteString("}")
+	builder.WriteString("}")
+
+	return builder.String()
+}
+
+func (q query) exec(ctx context.Context, v interface{}) error {
+	fmt.Println(q.build() + "\n")
+	return nil
+}

@@ -4,6 +4,9 @@
 package {{.Generator.Config.Package}}
 
 import (
+	"fmt"
 	"time"
+	"context"
+	"strings"
 	"database/sql"
 )

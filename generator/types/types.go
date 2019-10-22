@@ -13,9 +13,14 @@ func (s String) GoCase() string {
 	return gocase.To(strcase.ToCamel(string(s)))
 }
 
-// GoLowerCase transforms strings into Go-style lowercase casing. It's like GoCase but used for private fields.
+// GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (s String) GoLowerCase() string {
 	return gocase.To(strcase.ToLowerCamel(string(s)))
+}
+
+// CamelCase transforms strings into camelCase casing. It is often used for json mappings.
+func (s String) CamelCase() string {
+	return strcase.ToLowerCamel(string(s))
 }
 
 // builtin Go types

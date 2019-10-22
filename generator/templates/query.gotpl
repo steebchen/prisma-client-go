@@ -6,25 +6,96 @@
 	{{ $modelName := (print $model.Name.GoCase "Model") }}
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}
-	var {{ $name }} = {{ $nsQuery }}{}
+
+	var {{ $name }} = {{ $nsQuery }}{
+		{{- range $field := $model.Fields }}
+			{{/* Filter non-relations only for now */}}
+			{{- if $field.Kind.IncludeInStruct -}}
+				{{ $nsQuery }}{{ $field.Type }}{name: "{{ $field.Name.GoLowerCase }}"},
+			{{- end -}}
+		{{- end }}
+	}
 
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}
+				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Type }}
 			{{- end -}}
 		{{- end }}
 	}
 
-	{{- range $field := $model.Fields }}
-		{{/* Filter non-relations only for now */}}
-		{{- if $field.Kind.IncludeInStruct -}}
-			type {{ $nsQuery }}{{ $field.Name.GoCase }} struct {}
+	// {{ $name }} String
+	type {{ $nsQuery }}String struct {
+		// name saves the data to pass between chains
+		name string
+	}
 
-			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}) Equals(value {{ $field.Type.Value }}) {{ $nsParams }} {
-				return nil
-			}
-		{{- end -}}
-	{{- end }}
+	func (r {{ $nsQuery }}String) Equals(value string) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}String) Contains(value string) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "contains",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	// {{ $name }} DateTime
+	type {{ $nsQuery }}DateTime struct {
+		// name saves the data to pass between chains
+		name string
+	}
+
+	func (r {{ $nsQuery }}DateTime) Equals(value time.Time) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	// {{ $name }} Boolean
+	type {{ $nsQuery }}Boolean struct {
+		// name saves the data to pass between chains
+		name string
+	}
+
+	func (r {{ $nsQuery }}Boolean) Equals(value bool) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	// {{ $name }} Int
+	type {{ $nsQuery }}Int struct {
+		// name saves the data to pass between chains
+		name string
+	}
+
+	func (r {{ $nsQuery }}Int) Equals(value int) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
 {{ end }}

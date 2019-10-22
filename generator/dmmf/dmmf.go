@@ -84,7 +84,7 @@ type Field struct {
 
 // Tag returns the struct tag value of a field.
 func (f Field) Tag() string {
-	return fmt.Sprintf("`json:\"%s\"`", f.Name.GoLowerCase())
+	return fmt.Sprintf("`json:\"%s\"`", f.Name.CamelCase())
 }
 
 // Schema provides the GraphQL/PQL AST.
