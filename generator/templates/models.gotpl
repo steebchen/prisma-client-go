@@ -1,26 +1,38 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{/* Generate a struct for each field. */}}
+	// {{ $model.Name.GoCase }}Model is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
+  	{{ $model.Name.GoLowerCase }}
+	}
+
+	// {{ $model.Name.GoLowerCase }} is the internal struct for the json unmarshal
+	type {{ $model.Name.GoLowerCase }} struct {
 		{{- range $field := $model.Fields }}
-			{{- if $field.Kind.IncludeInStruct }}
+			{{ if $field.Kind.IncludeInStruct }}
 				{{- if $field.IsRequired -}}
-					{{/* Use public fields for required fields. */}}
 					{{ $field.Name.GoCase }} {{ $field.Type.Value }} {{ $field.Tag }}
 				{{- else -}}
-					{{/* Use private fields for nullable fields. */}}
-					{{ $field.Name.GoLowerCase }} sql.Null{{ $field.Type }} {{ $field.Tag }}
+					{{ $field.Name.GoCase }} *{{ $field.Type.Value }} {{ $field.Tag }}
 				{{- end -}}
-			{{- end }}
+			{{ end }}
 		{{- end }}
+	}
+
+	type FindOne{{ $model.Name.GoCase }}Response struct {
+		Data struct{
+			FindOne{{ $model.Name.GoCase }} {{ $model.Name.GoLowerCase }} `json:"findOne{{ $model.Name.GoCase }}"`
+		} `json:"data"`
 	}
 
 	{{/* Attach methods for nullable (non-required) fields. */}}
 	{{- range $field := $model.Fields }}
 		{{- if and ($field.Kind.IncludeInStruct) (not $field.IsRequired) }}
 			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ $field.Type.Value }}, ok bool) {
-				return r.{{ $field.Name.GoLowerCase }}.{{ $field.Type }}, r.{{ $field.Name.GoLowerCase }}.Valid
+				if r.{{ $field.Name.GoCase }} == nil {
+					return "", false
+				}
+				return *r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}, true
 			}
 		{{- end }}
 	{{- end }}

@@ -1,7 +1,12 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-func NewClient() Client {
-	return Client{}
+func NewClient(url string) Client {
+	client := gqlclient.New(url)
+	return Client{
+		{{- range $model := $.DMMF.Datamodel.Models }}
+			{{ $model.Name.GoCase }}: {{ $model.Name.GoCase }}Actions{client: client},
+		{{- end }}
+	}
 }
 
 type Client struct {

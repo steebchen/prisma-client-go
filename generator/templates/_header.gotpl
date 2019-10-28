@@ -8,5 +8,5 @@ import (
 	"time"
 	"context"
 	"strings"
-	"database/sql"
+	"github.com/steebchen/gqlclient"
 )

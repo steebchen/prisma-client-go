@@ -15,6 +15,8 @@ type field struct {
 }
 
 type query struct {
+	// client holds the internal PQL client
+	client *gqlclient.Client
 	// operation describes the PQL operation: query, mutation or subscription
 	operation string
 	// name describes the operation; useful for tracing
@@ -80,6 +82,5 @@ func (q query) build() string {
 }
 
 func (q query) exec(ctx context.Context, v interface{}) error {
-	fmt.Println(q.build() + "\n")
-	return nil
+	return q.client.Full(ctx, q.build(), map[string]interface{}{}, &v)
 }

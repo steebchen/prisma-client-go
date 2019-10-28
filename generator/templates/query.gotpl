@@ -3,7 +3,6 @@
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{/* Generate a struct for each field. */}}
 	{{ $name := $model.Name.GoCase }}
-	{{ $modelName := (print $model.Name.GoCase "Model") }}
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}
 
