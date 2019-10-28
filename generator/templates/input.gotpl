@@ -6,10 +6,13 @@ type input struct {
 type field struct {
 	// The name of the field.
 	name string
+
 	// an action for input fields, e.g. `contains` // TODO maybe create separate field struct for input types
 	action string
+
 	// value contains the field value. if nil, fields will contain a subselection.
 	value interface{}
+
 	// fields contains a subselection of fields. If not nil, value will be undefined.
 	fields []field
 }
@@ -17,16 +20,22 @@ type field struct {
 type query struct {
 	// client holds the internal PQL client
 	client *gqlclient.Client
+
 	// operation describes the PQL operation: query, mutation or subscription
 	operation string
+
 	// name describes the operation; useful for tracing
 	name string
+
 	// method describes a crud operation
 	method string
+
 	// model contains the Prisma model name
 	model string
+
 	// inputs contains the query
 	inputs []input
+
 	// outputs contains the return fields
 	outputs []field
 }

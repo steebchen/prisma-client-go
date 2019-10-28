@@ -39,6 +39,9 @@ type Client struct {
 	// cmd holds the prisma binary process
 	cmd *exec.Cmd
 
+	// client holds the internal PQL client
+	client *gqlclient.Client
+
 	// debug notifies whether all query stdout should be outputted and redirected
 	debug bool
 
@@ -59,6 +62,7 @@ func (c *Client) Connect() error {
 	}
 
 	gql := gqlclient.New("http://localhost:" + string(port))
+	c.client = gql
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoCase }}Actions{client: gql}
@@ -96,7 +100,24 @@ func (c *Client) Connect() error {
 		return errors.Wrap(err, "start command")
 	}
 
-	time.Sleep(1 * time.Second)
+	ctx := context.Background()
+
+	// send a basic readiness healthcheck and retry if unsuccessful
+	var connectErr error
+	for i := 0; i < 10; i++ {
+		_, connectErr = c.client.Raw(ctx, "", map[string]interface{}{})
+		if connectErr != nil {
+			c.log.Printf("count not connect; retrying...")
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		connectErr = nil
+		break
+	}
+
+	if connectErr != nil {
+		return errors.Wrap(err, "readiness query error")
+	}
 
 	c.log.Printf("connected.")
 	return nil
