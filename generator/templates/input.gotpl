@@ -91,5 +91,8 @@ func (q query) build() string {
 }
 
 func (q query) exec(ctx context.Context, v interface{}) error {
+	if q.client == nil {
+		panic("client.Connect() needs to be called before sending queries")
+	}
 	return q.client.gql.Full(ctx, q.build(), map[string]interface{}{}, &v)
 }
