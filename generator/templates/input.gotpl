@@ -18,8 +18,8 @@ type field struct {
 }
 
 type query struct {
-	// client holds the internal PQL client
-	client *gqlclient.Client
+	// client holds the photon client
+	client *Client
 
 	// operation describes the PQL operation: query, mutation or subscription
 	operation string
@@ -91,5 +91,5 @@ func (q query) build() string {
 }
 
 func (q query) exec(ctx context.Context, v interface{}) error {
-	return q.client.Full(ctx, q.build(), map[string]interface{}{}, &v)
+	return q.client.gql.Full(ctx, q.build(), map[string]interface{}{}, &v)
 }

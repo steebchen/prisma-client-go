@@ -9,7 +9,8 @@
 	{{ $nsParams := (print $name "Params") }}
 
 	type {{ $ns }} struct {
-		client *gqlclient.Client
+		// client holds the photon client
+		client *Client
 	}
 
 	func (r {{ $ns }}) FindOne(params ...{{ $nsParams }}) {{ $nsFindOne }} {
