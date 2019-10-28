@@ -4,9 +4,17 @@
 package {{.Generator.Config.Package}}
 
 import (
-	"fmt"
-	"time"
 	"context"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net"
+	"os"
+	"os/exec"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/pkg/errors"
 	"github.com/steebchen/gqlclient"
 )

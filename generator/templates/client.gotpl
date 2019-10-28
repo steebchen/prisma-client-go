@@ -1,16 +1,120 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-func NewClient(url string) Client {
-	client := gqlclient.New(url)
-	return Client{
-		{{- range $model := $.DMMF.Datamodel.Models }}
-			{{ $model.Name.GoCase }}: {{ $model.Name.GoCase }}Actions{client: client},
-		{{- end }}
+var schemaPath = "{{ .SchemaPath }}"
+
+var binaries = map[string]string{
+	{{ range $i, $binary := $.BinaryPaths.QueryEngine }}
+		"{{ $i }}": "{{ $binary }}",
+	{{ end }}
+}
+
+func getPort() (string, error) {
+	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	if err != nil {
+		return "", err
 	}
+
+	l, err := net.ListenTCP("tcp", addr)
+	if err != nil {
+		return "", err
+	}
+	defer l.Close()
+
+	port := l.Addr().(*net.TCPAddr).Port
+	return strconv.Itoa(port), nil
+}
+
+func NewClient() Client {
+	var debug = true
+	c := Client{}
+	c.debug = debug
+	c.log = log.New(ioutil.Discard, "", 0)
+	if debug {
+		c.log = log.New(os.Stdout, "", log.Flags())
+	}
+	return c
 }
 
 type Client struct {
-	{{- range $model := $.DMMF.Datamodel.Models }}
+	// cmd holds the prisma binary process
+	cmd *exec.Cmd
+
+	// debug notifies whether all query stdout should be outputted and redirected
+	debug bool
+
+	// logger logs depending on the debug value
+	log *log.Logger
+
+	{{ range $model := $.DMMF.Datamodel.Models }}
 		{{ $model.Name.GoCase }} {{ $model.Name.GoCase }}Actions
 	{{- end }}
+}
+
+func (c *Client) Connect() error {
+	c.log.Printf("connecting...")
+
+	port, err := getPort()
+	if err != nil {
+		return errors.Wrap(err, "get free port")
+	}
+
+	gql := gqlclient.New("http://localhost:" + string(port))
+
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoCase }}Actions{client: gql}
+	{{- end }}
+
+	var path string
+	for _, value := range binaries {
+		path = value
+		break
+	}
+
+	c.cmd = exec.Command(path, "-p", string(port))
+
+	c.cmd.Stdout = os.Stdout
+	c.cmd.Stderr = os.Stderr
+
+	c.cmd.Env = append(
+		os.Environ(),
+		"PRISMA_DML_PATH=" + schemaPath,
+		"RUST_LOG=error",
+		"RUST_LOG_FORMAT=json",
+	)
+
+	if c.debug {
+		c.cmd.Env = append(
+			c.cmd.Env,
+			"PRISMA_DML_PATH=" + schemaPath,
+			"PRISMA_LOG_QUERIES=y",
+			"RUST_LOG=info",
+		)
+	}
+
+	err = c.cmd.Start()
+	if err != nil {
+		return errors.Wrap(err, "start command")
+	}
+
+	time.Sleep(1 * time.Second)
+
+	c.log.Printf("connected.")
+	return nil
+}
+
+func (c *Client) Disconnect() error {
+	c.log.Printf("disconnecting...")
+
+	err := c.cmd.Process.Signal(os.Interrupt)
+	if err != nil {
+		return errors.Wrap(err, "send signal")
+	}
+
+	err = c.cmd.Wait()
+	if err != nil {
+		return errors.Wrap(err, "wait for process")
+	}
+
+	c.log.Printf("disconnected.")
+	return nil
 }
