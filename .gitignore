@@ -1,5 +1,7 @@
 prisma
 photongo
 *.db
+*.sqlite
 *.json
 *_gen.go
+**migrations**
