@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -10,7 +11,6 @@ import (
 	"syscall"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/pkg/errors"
 
 	"github.com/prisma/photongo/generator"
 	"github.com/prisma/photongo/jsonrpc"
@@ -19,15 +19,12 @@ import (
 func reply(w io.Writer, data interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {
-		return errors.Wrap(err, "could not marshal data")
+		return fmt.Errorf("could not marshal data %s", err)
 	}
+	b = append(b, []byte("\n")...)
 	_, err = w.Write(b)
 	if err != nil {
-		return errors.Wrap(err, "could not write data")
-	}
-	_, err = w.Write([]byte("\n"))
-	if err != nil {
-		return errors.Wrap(err, "could not write data")
+		return fmt.Errorf("could not write data %s", err)
 	}
 	return nil
 }

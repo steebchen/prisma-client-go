@@ -4,11 +4,11 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os/exec"
 	"testing"
 
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,10 +21,10 @@ func cmd(name string, args ...string) error {
 	if err != nil {
 		exit, ok := err.(*exec.ExitError)
 		if !ok {
-			return errors.Wrapf(err, "command %s %s failed", name, args)
+			return fmt.Errorf("command %s %s failed: %w", name, args, err)
 		}
 		if !exit.Success() {
-			return errors.Wrapf(err, "%s %s exited with status code %d and output %s", name, args, exit.ExitCode(), string(out))
+			return fmt.Errorf("%s %s exited with status code %d and output %s: %w", name, args, exit.ExitCode(), string(out), err)
 		}
 	}
 	return nil

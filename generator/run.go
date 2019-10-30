@@ -8,8 +8,6 @@ import (
 	"io/ioutil"
 	"strings"
 	"text/template"
-
-	"github.com/pkg/errors"
 )
 
 func addDefaults(input *Root) {
@@ -27,13 +25,13 @@ func Run(input Root) error {
 	ctx := build.Default
 	pkg, err := ctx.Import("github.com/prisma/photongo", ".", build.FindOnly)
 	if err != nil {
-		return errors.Wrap(err, "could not get main template asset")
+		return fmt.Errorf("could not get main template asset: %w", err)
 	}
 
 	templateDir := pkg.Dir + "/generator/templates/*.gotpl"
 	templates, err := template.ParseGlob(templateDir)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not parse go templates dir %s", templateDir))
+		return fmt.Errorf("could not parse go templates dir %s: %w", templateDir, err)
 	}
 
 	// Run header template first
@@ -41,7 +39,7 @@ func Run(input Root) error {
 
 	err = header.Execute(&buf, input)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not write header template %s", input.Generator.Output))
+		return fmt.Errorf("could not write header template %s: %w", input.Generator.Output, err)
 	}
 
 	// Then process all remaining templates
@@ -52,18 +50,18 @@ func Run(input Root) error {
 		buf.Write([]byte(fmt.Sprintf("// --- template %s ---\n", tpl.Name())))
 		err = tpl.Execute(&buf, input)
 		if err != nil {
-			return errors.Wrap(err, fmt.Sprintf("could not write template file %s", input.Generator.Output))
+			return fmt.Errorf("could not write template file %s: %w", input.Generator.Output, err)
 		}
 	}
 
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not format source"))
+		return fmt.Errorf("could not format source: %s", err)
 	}
 
 	err = ioutil.WriteFile(input.Generator.Output, formatted, 0644)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("could not write template data to file writer %s", input.Generator.Output))
+		return fmt.Errorf("could not write template data to file writer %s: %w", input.Generator.Output, err)
 	}
 
 	return nil
