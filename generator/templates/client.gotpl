@@ -25,7 +25,7 @@ func getPort() (string, error) {
 }
 
 func NewClient() Client {
-var debug = false
+	var debug = false
 	c := Client{}
 	c.debug = debug
 	c.log = log.New(ioutil.Discard, "", 0)
@@ -58,7 +58,7 @@ func (c *Client) Connect() error {
 
 	port, err := getPort()
 	if err != nil {
-return fmt.Errorf("get free port: %w", err)
+		return fmt.Errorf("get free port: %w", err)
 	}
 
 	gql := gqlclient.New("http://localhost:" + string(port))
@@ -97,7 +97,7 @@ return fmt.Errorf("get free port: %w", err)
 
 	err = c.cmd.Start()
 	if err != nil {
-return fmt.Errorf("start command: %w", err)
+		return fmt.Errorf("start command: %w", err)
 	}
 
 	ctx := context.Background()
@@ -107,7 +107,7 @@ return fmt.Errorf("start command: %w", err)
 	for i := 0; i < 10; i++ {
 		_, connectErr = c.gql.Raw(ctx, "", map[string]interface{}{})
 		if connectErr != nil {
-c.log.Printf("could not connect; retrying...")
+			c.log.Printf("could not connect; retrying...")
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
@@ -116,7 +116,7 @@ c.log.Printf("could not connect; retrying...")
 	}
 
 	if connectErr != nil {
-return fmt.Errorf("readiness query error: %w", err)
+		return fmt.Errorf("readiness query error: %w", err)
 	}
 
 	c.log.Printf("connected.")
@@ -128,12 +128,12 @@ func (c *Client) Disconnect() error {
 
 	err := c.cmd.Process.Signal(os.Interrupt)
 	if err != nil {
-return fmt.Errorf("send signal: %w", err)
+		return fmt.Errorf("send signal: %w", err)
 	}
 
 	err = c.cmd.Wait()
 	if err != nil {
-return fmt.Errorf("wait for process: %w", err)
+		return fmt.Errorf("wait for process: %w", err)
 	}
 
 	c.log.Printf("disconnected.")
