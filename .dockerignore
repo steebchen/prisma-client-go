@@ -1,6 +1,7 @@
+.github/
 **migrations**/
-prisma
 photongo
+*.db
 *.sqlite
 *.json
 *_gen.go
