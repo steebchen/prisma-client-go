@@ -75,14 +75,14 @@ func TestBasic(t *testing.T) {
 				a: createOneUser(data: {
 					id: "findOne1",
 					email: "john@findOne.com",
-					username: "john_doe"
+					username: "john_doe",
 				}) {
 					id
 				}
 				b: createOneUser(data: {
 					id: "findOne2",
 					email: "jane@findOne.com",
-					username: "jane_doe"
+					username: "jane_doe",
 				}) {
 					id
 				}
@@ -94,7 +94,54 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, actual.ID, "findOne2")
+			assert.Equal(t, "findOne2", actual.ID)
+		},
+	}, {
+		name: "FindMany equals",
+		// language=GraphQL
+		before: `
+				mutation {
+					a: createOneUser(data: {
+						id: "findMany1",
+						email: "1",
+						username: "john",
+						name: "a",
+					}) {
+						id
+					}
+					b: createOneUser(data: {
+						id: "findMany2",
+						email: "2",
+						username: "john",
+						name: "b",
+					}) {
+						id
+					}
+				}
+			`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			a := "a"
+			b := "b"
+			assert.Equal(t, []UserModel{{
+				user{
+					ID:       "findMany1",
+					Email:    "1",
+					Username: "john",
+					Name:     &a,
+				},
+			}, {
+				user{
+					ID:       "findMany2",
+					Email:    "2",
+					Username: "john",
+					Name:     &b,
+				},
+			}}, actual)
 		},
 	}}
 	for _, tt := range tests {

@@ -6,6 +6,8 @@ import (
 	"go/build"
 	"go/format"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 )
@@ -28,14 +30,34 @@ func Run(input Root) error {
 		return fmt.Errorf("could not get main template asset: %w", err)
 	}
 
-	templateDir := pkg.Dir + "/generator/templates/*.gotpl"
-	templates, err := template.ParseGlob(templateDir)
+	var templates []*template.Template
+	templateDir := pkg.Dir + "/generator/templates"
+	err = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
+		if strings.Contains(path, ".gotpl") {
+			tpl, err := template.ParseFiles(path)
+			if err != nil {
+				return err
+			}
+			templates = append(templates, tpl.Templates()...)
+		}
+
+		return err
+	})
+
 	if err != nil {
-		return fmt.Errorf("could not parse go templates dir %s: %w", templateDir, err)
+		return fmt.Errorf("could not walk dir %s: %w", templateDir, err)
 	}
 
+	// templates, err := template.ParseGlob(templateDir)
+	// if err != nil {
+	// 	return fmt.Errorf("could not parse go templates dir %s: %w", templateDir, err)
+	// }
+
 	// Run header template first
-	header := templates.Lookup("_header.gotpl")
+	header, err := template.ParseFiles(templateDir + "/_header.gotpl")
+	if err != nil {
+		return fmt.Errorf("could not find header template %s: %w", templateDir, err)
+	}
 
 	err = header.Execute(&buf, input)
 	if err != nil {
@@ -43,7 +65,7 @@ func Run(input Root) error {
 	}
 
 	// Then process all remaining templates
-	for _, tpl := range templates.Templates() {
+	for _, tpl := range templates {
 		if strings.Contains(tpl.Name(), "_") {
 			continue
 		}
@@ -52,11 +74,16 @@ func Run(input Root) error {
 		if err != nil {
 			return fmt.Errorf("could not write template file %s: %w", input.Generator.Output, err)
 		}
+
+		_, err := format.Source(buf.Bytes())
+		if err != nil {
+			return fmt.Errorf("could not format source %s from file %s: %w", buf.String(), tpl.Name(), err)
+		}
 	}
 
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
-		return fmt.Errorf("could not format source: %s", err)
+		return fmt.Errorf("could not format final source: %w", err)
 	}
 
 	err = ioutil.WriteFile(input.Generator.Output, formatted, 0644)

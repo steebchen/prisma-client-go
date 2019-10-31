@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	"github.com/iancoleman/strcase"
 	"github.com/takuoki/gocase"
 )
@@ -23,8 +25,14 @@ func (s String) CamelCase() string {
 	return strcase.ToLowerCamel(string(s))
 }
 
+// Tag returns the struct tag value of a field.
+func (s String) Tag() string {
+	return fmt.Sprintf("`json:\"%s\"`", s.CamelCase())
+}
+
 // builtin Go types
 var builtin = map[string]string{
+	"ID":       "string",
 	"String":   "string",
 	"Boolean":  "bool",
 	"Int":      "int",

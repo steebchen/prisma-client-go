@@ -1,7 +1,6 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{/* Generate a struct for each field. */}}
 	{{ $name := $model.Name.GoCase }}
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}

@@ -3,7 +3,7 @@
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
-  	{{ $model.Name.GoLowerCase }}
+		{{ $model.Name.GoLowerCase }}
 	}
 
 	// {{ $model.Name.GoLowerCase }} is the internal struct for the json unmarshal
@@ -11,18 +11,12 @@
 		{{- range $field := $model.Fields }}
 			{{ if $field.Kind.IncludeInStruct }}
 				{{- if $field.IsRequired -}}
-					{{ $field.Name.GoCase }} {{ $field.Type.Value }} {{ $field.Tag }}
+					{{ $field.Name.GoCase }} {{ $field.Type.Value }} {{ $field.Name.Tag }}
 				{{- else -}}
-					{{ $field.Name.GoCase }} *{{ $field.Type.Value }} {{ $field.Tag }}
+					{{ $field.Name.GoCase }} *{{ $field.Type.Value }} {{ $field.Name.Tag }}
 				{{- end -}}
 			{{ end }}
 		{{- end }}
-	}
-
-	type FindOne{{ $model.Name.GoCase }}Response struct {
-		Data struct{
-			FindOne{{ $model.Name.GoCase }} {{ $model.Name.GoLowerCase }} `json:"findOne{{ $model.Name.GoCase }}"`
-		} `json:"data"`
 	}
 
 	{{/* Attach methods for nullable (non-required) fields. */}}
