@@ -1,0 +1,11 @@
+name: test all
+on: push
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: run tests
+        run: docker build . -f docker/test.dockerfile

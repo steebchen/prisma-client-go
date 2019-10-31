@@ -1,0 +1,11 @@
+name: lint all
+on: push
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: run linter
+        run: docker build . -f docker/lint.dockerfile
