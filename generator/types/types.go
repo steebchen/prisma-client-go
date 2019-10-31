@@ -50,5 +50,6 @@ func (t Type) Value() string {
 	if !ok {
 		return str
 	}
+
 	return v
 }

@@ -21,11 +21,14 @@ func reply(w io.Writer, data interface{}) error {
 	if err != nil {
 		return fmt.Errorf("could not marshal data %s", err)
 	}
+
 	b = append(b, []byte("\n")...)
+
 	_, err = w.Write(b)
 	if err != nil {
 		return fmt.Errorf("could not write data %s", err)
 	}
+
 	return nil
 }
 
@@ -33,6 +36,7 @@ func main() {
 	// make sure to exit when signal triggers
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
 	go func() {
 		<-c
 		os.Exit(1)
@@ -43,6 +47,7 @@ func main() {
 		content := scanner.Bytes()
 
 		var input jsonrpc.Request
+
 		err := json.Unmarshal(content, &input)
 		if err != nil {
 			log.Fatalf("could not open stdin %s", err)
@@ -58,6 +63,7 @@ func main() {
 			response = nil // success
 
 			var params generator.Root
+
 			err := mapstructure.Decode(input.Params, &params)
 			if err != nil {
 				log.Fatalf("could not assert params into generator.Options type %s", err)

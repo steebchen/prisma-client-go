@@ -24,10 +24,10 @@ type Response struct {
 }
 
 // NewResponse forms a new JSON RPC response to reply to the Prisma CLI commands
-func NewResponse(ID int, result interface{}) Response {
+func NewResponse(id int, result interface{}) Response {
 	return Response{
 		JSONRPC: "2.0",
-		ID:      ID,
+		ID:      id,
 		Result:  result,
 	}
 }

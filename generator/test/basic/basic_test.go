@@ -23,10 +23,12 @@ func cmd(name string, args ...string) error {
 		if !ok {
 			return fmt.Errorf("command %s %s failed: %w", name, args, err)
 		}
+
 		if !exit.Success() {
 			return fmt.Errorf("%s %s exited with status code %d and output %s: %w", name, args, exit.ExitCode(), string(out), err)
 		}
 	}
+
 	return nil
 }
 
@@ -145,6 +147,7 @@ func TestBasic(t *testing.T) {
 		},
 	}}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if err := cmd("rm", "-rf", "dev.sqlite"); err != nil {
 				log.Fatal(err)
@@ -167,11 +170,11 @@ func TestBasic(t *testing.T) {
 			}
 
 			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					// TODO blocked by prisma-engine panicking on disconnect
-					// t.Fatalf("could not disconnect %s", err)
-				}
+				_ = client.Disconnect()
+				// TODO blocked by prisma-engine panicking on disconnect
+				// if err != nil {
+				// 	t.Fatalf("could not disconnect %s", err)
+				// }
 			}()
 
 			ctx := context.Background()
