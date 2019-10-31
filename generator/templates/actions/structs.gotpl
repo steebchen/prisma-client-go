@@ -1,0 +1,15 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $m := $model.Name.GoCase }}
+	{{ $ml := $model.Name.GoLowerCase }}
+	{{ range $action := $.DMMF.Actions }}
+		{{ $a := $action.Name.GoCase }}
+		{{ $an := $action.Name.CamelCase }}
+		type {{ $a }}{{ $m }}Response struct {
+			Data struct{
+				{{- $a }}{{ $m }} {{ if $action.List -}}[]{{- end -}}{{ $m }}Model `json:"{{ $an }}{{ $m }}"`
+			} `json:"data"`
+		}
+	{{ end }}
+{{ end }}

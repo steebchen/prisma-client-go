@@ -1,8 +1,6 @@
 package dmmf
 
 import (
-	"fmt"
-
 	"github.com/prisma/photongo/generator/types"
 )
 
@@ -36,6 +34,61 @@ type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
 	Mappings  []Mapping `json:"mappings"`
+}
+
+// Action describes a CRUD operation.
+type Action struct {
+	Name types.String
+	List bool
+}
+
+// Variations returns "One" and "Many".
+func (Document) Variations() []Action {
+	return []Action{{
+		"One",
+		false,
+	}, {
+		"Many",
+		true,
+	}}
+}
+
+// Actions returns all possible CRUD operations.
+func (Document) Actions() []Action {
+	return []Action{
+		{
+			"FindOne",
+			false,
+		},
+		{
+			"FindMany",
+			true,
+		},
+		{
+			"CreateOne",
+			false,
+		},
+		{
+			"CreateMany",
+			true,
+		},
+		{
+			"UpdateOne",
+			false,
+		},
+		{
+			"UpdateMany",
+			true,
+		},
+		{
+			"DeleteOne",
+			false,
+		},
+		{
+			"DeleteMany",
+			true,
+		},
+	}
 }
 
 // Enum describes an enumerated type.
@@ -82,11 +135,6 @@ type Field struct {
 	RelationName types.String
 }
 
-// Tag returns the struct tag value of a field.
-func (f Field) Tag() string {
-	return fmt.Sprintf("`json:\"%s\"`", f.Name.CamelCase())
-}
-
 // Schema provides the GraphQL/PQL AST.
 type Schema struct {
 	// RootQueryType (optional)
@@ -108,10 +156,10 @@ type SchemaArg struct {
 
 // SchemaInputType describes an input type of a given field.
 type SchemaInputType struct {
-	IsRequired bool         `json:"isRequired"`
-	IsList     bool         `json:"isList"`
-	Type       types.String `json:"type"` // this was declared as ArgType
-	Kind       FieldKind    `json:"kind"`
+	IsRequired bool       `json:"isRequired"`
+	IsList     bool       `json:"isList"`
+	Type       types.Type `json:"type"` // this was declared as ArgType
+	Kind       FieldKind  `json:"kind"`
 }
 
 // OutputType describes a GraphQL/PQL return type.

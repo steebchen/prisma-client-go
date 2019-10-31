@@ -1,0 +1,26 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+	{{ $ns := (print $name "Actions") }}
+	{{ $nsFindOne := (print $name "FindOne") }}
+	{{ $nsParams := (print $name "Params") }}
+
+	type {{ $ns }} struct {
+		// client holds the photon client
+		client *Client
+	}
+
+	var {{ $model.Name.GoLowerCase }}Outputs = []field{
+		{{- range $i := $model.Fields }}
+			{{- if $i.Kind.IncludeInStruct }}
+				{name: "{{ $i.Name.CamelCase }}"},
+			{{- end }}
+		{{- end }}
+	}
+
+	type {{ $nsParams }} struct {
+		data field
+	}
+{{ end }}
