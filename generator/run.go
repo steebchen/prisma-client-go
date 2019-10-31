@@ -31,6 +31,7 @@ func Run(input Root) error {
 	}
 
 	var templates []*template.Template
+
 	templateDir := pkg.Dir + "/generator/templates"
 	err = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
 		if strings.Contains(path, ".gotpl") {
@@ -69,8 +70,11 @@ func Run(input Root) error {
 		if strings.Contains(tpl.Name(), "_") {
 			continue
 		}
+
 		buf.Write([]byte(fmt.Sprintf("// --- template %s ---\n", tpl.Name())))
+
 		err = tpl.Execute(&buf, input)
+
 		if err != nil {
 			return fmt.Errorf("could not write template file %s: %w", input.Generator.Output, err)
 		}
