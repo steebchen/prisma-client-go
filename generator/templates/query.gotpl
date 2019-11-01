@@ -39,6 +39,16 @@
 		}
 	}
 
+	func (r {{ $nsQuery }}String) Set(value string) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
 	func (r {{ $nsQuery }}String) Contains(value string) {{ $nsParams }} {
 		return {{ $nsParams }}{
 			data: field{

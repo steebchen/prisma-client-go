@@ -15,6 +15,10 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client Client, ctx cx)
 
+func str(v string) *string {
+	return &v
+}
+
 func cmd(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	out, err := cmd.CombinedOutput()
@@ -127,23 +131,47 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			a := "a"
-			b := "b"
 			assert.Equal(t, []UserModel{{
 				user{
 					ID:       "findMany1",
 					Email:    "1",
 					Username: "john",
-					Name:     &a,
+					Name:     str("a"),
 				},
 			}, {
 				user{
 					ID:       "findMany2",
 					Email:    "2",
 					Username: "john",
-					Name:     &b,
+					Name:     str("b"),
 				},
 			}}, actual)
+		},
+	}, {
+		name: "Create equals",
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.CreateOne(
+				User.ID.Set("id"),
+				User.Email.Set("email"),
+				User.Username.Set("username"),
+
+				// optional values
+				User.Name.Set("name"),
+				User.Stuff.Set("stuff"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, UserModel{
+				user{
+					ID:       "id",
+					Email:    "email",
+					Username: "username",
+					Name:     str("name"),
+					Stuff:    str("stuff"),
+				},
+			}, actual)
 		},
 	}}
 	for _, tt := range tests {
