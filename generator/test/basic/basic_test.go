@@ -150,7 +150,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Create equals",
 		run: func(t *testing.T, client Client, ctx cx) {
-			actual, err := client.User.CreateOne(
+			created, err := client.User.CreateOne(
 				User.ID.Set("id"),
 				User.Email.Set("email"),
 				User.Username.Set("username"),
@@ -163,7 +163,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, UserModel{
+			expected := UserModel{
 				user{
 					ID:       "id",
 					Email:    "email",
@@ -171,7 +171,16 @@ func TestBasic(t *testing.T) {
 					Name:     str("name"),
 					Stuff:    str("stuff"),
 				},
-			}, actual)
+			}
+
+			assert.Equal(t, expected, created)
+
+			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {
