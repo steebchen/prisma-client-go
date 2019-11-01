@@ -6,15 +6,14 @@
 		{{ $modelName := (print $model.Name.GoCase "Model") }}
 		{{ $ns := (print $name "Actions") }}
 		{{ $result := (print $name "Create" $v.Name) }}
-		{{ $params := (print $name "Params") }}
 
 		func (r {{ $ns }}) Create{{ $v.Name }}(
 			{{ range $field := $model.Fields -}}
 				{{- if $field.IsRequired -}}
-					{{ $field.Name.GoLowerCase }} {{ $params }},
+					{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}Params,
 				{{- end }}
 			{{- end -}}
-			optional ...{{ $params }},
+			optional ...{{ $name }}Params,
 		) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client

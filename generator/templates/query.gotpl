@@ -5,11 +5,16 @@
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}
 
+	{{/* Namespace declaration */}}
 	var {{ $name }} = {{ $nsQuery }}{
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
-				{{ $nsQuery }}{{ $field.Type }}{name: "{{ $field.Name.GoLowerCase }}"},
+				{{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}{
+					{{ $nsQuery }}{{ $field.Type }}: {{ $nsQuery }}{{ $field.Type }}{
+						name: "{{ $field.Name.GoLowerCase }}",
+					},
+				},
 			{{- end -}}
 		{{- end }}
 	}
@@ -18,10 +23,38 @@
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Type }}
+				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{- end -}}
 		{{- end }}
 	}
+
+	{{ range $field := $model.Fields }}
+		{{ $nsField := print $nsQuery $field.Name.GoCase }}
+		{{ $nsFieldParams := (print $name $field.Name.GoCase "Params") }}
+
+		type {{ $nsField }}String struct {
+			{{/* embeds common fields like Equals, etc. which are same regardless the field */}}
+			{{ $nsQuery }}String
+		}
+
+		{{ $setReturnStruct := "" }}
+		{{ if $field.IsRequired }}
+			{{ $setReturnStruct = $nsFieldParams}}
+		{{ else }}
+			{{ $setReturnStruct = $nsParams }}
+		{{ end}}
+
+		// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+		func (r {{ $nsField }}String) Set(value string) {{ $setReturnStruct }} {
+			return {{ $setReturnStruct }}{
+				data: field{
+					action: "equals",
+					name:   r.name,
+					value:  value,
+				},
+			}
+		}
+	{{ end }}
 
 	// {{ $name }} String
 	type {{ $nsQuery }}String struct {
@@ -30,16 +63,6 @@
 	}
 
 	func (r {{ $nsQuery }}String) Equals(value string) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "equals",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
-
-	func (r {{ $nsQuery }}String) Set(value string) {{ $nsParams }} {
 		return {{ $nsParams }}{
 			data: field{
 				action: "equals",

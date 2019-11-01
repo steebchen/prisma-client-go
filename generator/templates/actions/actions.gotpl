@@ -20,7 +20,13 @@
 		{{- end }}
 	}
 
-	type {{ $nsParams }} struct {
+	type {{ $name }}Params struct {
 		data field
 	}
+
+	{{ range $field := $model.Fields }}
+		type {{ $name }}{{ $field.Name.GoCase }}Params struct {
+			data field
+		}
+	{{ end }}
 {{ end }}
