@@ -1,13 +1,13 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ $name := $model.Name.GoCase }}
+	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}
 
 	{{/* Namespace declaration */}}
-	// {{ $name }} acts as a namespaces to access query methods for the {{ $name }} model
-	var {{ $name }} = {{ $nsQuery }}{
+	// {{ $model.Name.GoCase }} acts as a namespaces to access query methods for the {{ $model.Name.GoCase }} model
+	var {{ $model.Name.GoCase }} = {{ $nsQuery }}{
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}

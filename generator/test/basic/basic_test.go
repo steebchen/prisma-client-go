@@ -103,35 +103,6 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
-		name: "FindOne equals",
-		// language=GraphQL
-		before: `
-			mutation {
-				a: createOneUser(data: {
-					id: "findOne1",
-					email: "john@findOne.com",
-					username: "john_doe",
-				}) {
-					id
-				}
-				b: createOneUser(data: {
-					id: "findOne2",
-					email: "jane@findOne.com",
-					username: "jane_doe",
-				}) {
-					id
-				}
-			}
-		`,
-		run: func(t *testing.T, client Client, ctx cx) {
-			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			assert.Equal(t, "findOne2", actual.ID)
-		},
-	}, {
 		name: "FindMany equals",
 		// language=GraphQL
 		before: `

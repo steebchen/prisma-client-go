@@ -1,7 +1,7 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ $name := $model.Name.GoCase }}
+	{{ $name := $model.Name.GoLowerCase }}
 	{{ $modelName := (print $model.Name.GoCase "Model") }}
 	{{ $ns := (print $name "Actions") }}
 	{{ $nsFindOne := (print $name "FindOne") }}
@@ -12,7 +12,7 @@
 		client *Client
 	}
 
-	var {{ $model.Name.GoLowerCase }}Outputs = []field{
+	var {{ $name }}Outputs = []field{
 		{{- range $i := $model.Fields }}
 			{{- if $i.Kind.IncludeInStruct }}
 				{name: "{{ $i.Name.CamelCase }}"},

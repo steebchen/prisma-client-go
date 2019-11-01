@@ -68,7 +68,7 @@ type Client struct {
 
 	{{ range $model := $.DMMF.Datamodel.Models }}
 		// {{ $model.Name.GoCase }} provides access to CRUD methods.
-		{{ $model.Name.GoCase }} {{ $model.Name.GoCase }}Actions
+		{{ $model.Name.GoCase }} {{ $model.Name.GoLowerCase }}Actions
 	{{- end }}
 }
 
@@ -100,7 +100,7 @@ func (c *Client) Connect() error {
 	c.gql = gql
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
-		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoCase }}Actions{client: c}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
 	var path string

@@ -1,7 +1,7 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ $name := $model.Name.GoCase }}
+	{{ $name := $model.Name.GoLowerCase }}
 	{{ $modelName := (print $model.Name.GoCase "Model") }}
 	{{ $ns := (print $name "Actions") }}
 	{{ $result := (print $name "Create" "One") }}
@@ -43,10 +43,10 @@
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
 		r.query.operation = "mutation"
 		r.query.method = "createOne"
-		r.query.model = "{{ $name }}"
-		r.query.outputs = {{ $model.Name.GoLowerCase }}Outputs
-		var v CreateOne{{ $name }}Response
+		r.query.model = "{{ $model.Name.GoCase }}"
+		r.query.outputs = {{ $name }}Outputs
+		var v createOne{{ $model.Name.GoCase }}Response
 		err := r.query.exec(ctx, &v)
-		return v.Data.CreateOne{{ $name }}, err
+		return v.Data.CreateOne{{ $model.Name.GoCase }}, err
 	}
 {{ end }}
