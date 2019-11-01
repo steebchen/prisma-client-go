@@ -24,8 +24,12 @@
 		data field
 	}
 
+	type {{ $name }}SetParams struct {
+		data field
+	}
+
 	{{ range $field := $model.Fields }}
-		type {{ $name }}{{ $field.Name.GoCase }}Params struct {
+		type {{ $name }}{{ $field.Name.GoCase }}SetParams struct {
 			data field
 		}
 	{{ end }}

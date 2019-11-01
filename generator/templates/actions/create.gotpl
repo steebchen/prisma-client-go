@@ -10,10 +10,10 @@
 		func (r {{ $ns }}) Create{{ $v.Name }}(
 			{{ range $field := $model.Fields -}}
 				{{- if $field.IsRequired -}}
-					{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}Params,
+					{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
 				{{- end }}
 			{{- end -}}
-			optional ...{{ $name }}Params,
+			optional ...{{ $name }}SetParams,
 		) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client

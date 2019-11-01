@@ -30,7 +30,7 @@
 
 	{{ range $field := $model.Fields }}
 		{{ $nsField := print $nsQuery $field.Name.GoCase }}
-		{{ $nsFieldParams := (print $name $field.Name.GoCase "Params") }}
+		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
 
 		type {{ $nsField }}String struct {
 			{{/* embeds common fields like Equals, etc. which are same regardless the field */}}
@@ -41,7 +41,7 @@
 		{{ if $field.IsRequired }}
 			{{ $setReturnStruct = $nsFieldParams}}
 		{{ else }}
-			{{ $setReturnStruct = $nsParams }}
+			{{ $setReturnStruct = (print $name "SetParams") }}
 		{{ end}}
 
 		// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
