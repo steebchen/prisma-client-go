@@ -2,12 +2,13 @@
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ range $v := $.DMMF.Variations }}
-		{{ $name := $model.Name.GoCase }}
+		{{ $name := $model.Name.GoLowerCase }}
 		{{ $modelName := (print $model.Name.GoCase "Model") }}
 		{{ $ns := (print $name "Actions") }}
 		{{ $result := (print $name "Find" $v.Name) }}
 		{{ $params := (print $name "Params") }}
 
+		// Find{{ $v.Name }} returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
 		func (r {{ $ns }}) Find{{ $v.Name }}(params ...{{ $params }}) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
@@ -26,14 +27,15 @@
 			query query
 		}
 
+		// Exec runs the Find{{ $v.Name }} query and returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
 		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $modelName }}, error) {
 			r.query.operation = "query"
 			r.query.method = "find{{ $v.Name }}"
-			r.query.model = "{{ $name }}"
-			r.query.outputs = {{ $model.Name.GoLowerCase }}Outputs
-			var v Find{{ $v.Name }}{{ $name }}Response
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $name }}Outputs
+			var v find{{ $v.Name }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
-			return v.Data.Find{{ $v.Name }}{{ $name }}, err
+			return v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
 		}
 	{{ end }}
 {{ end }}

@@ -1,53 +1,52 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ range $v := $.DMMF.Variations }}
-		{{ $name := $model.Name.GoCase }}
-		{{ $modelName := (print $model.Name.GoCase "Model") }}
-		{{ $ns := (print $name "Actions") }}
-		{{ $result := (print $name "Create" $v.Name) }}
+	{{ $name := $model.Name.GoLowerCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+	{{ $ns := (print $name "Actions") }}
+	{{ $result := (print $name "Create" "One") }}
 
-		func (r {{ $ns }}) Create{{ $v.Name }}(
-			{{ range $field := $model.Fields -}}
-				{{- if $field.IsRequired -}}
-					{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
-				{{- end }}
-			{{- end -}}
-			optional ...{{ $name }}SetParams,
-		) {{ $result }} {
-			var v {{ $result }}
-			v.query.client = r.client
-			var fields []field
+	// Creates a single user.
+	func (r {{ $ns }}) CreateOne(
+		{{ range $field := $model.Fields -}}
+			{{- if $field.IsRequired -}}
+				{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
+			{{- end }}
+		{{- end -}}
+		optional ...{{ $name }}SetParams,
+	) {{ $result }} {
+		var v {{ $result }}
+		v.query.client = r.client
+		var fields []field
 
-			{{ range $field := $model.Fields }}
-				{{- if $field.IsRequired -}}
-					fields = append(fields, {{ $field.Name.GoLowerCase }}.data)
-				{{- end }}
-			{{ end }}
+		{{ range $field := $model.Fields }}
+			{{- if $field.IsRequired -}}
+				fields = append(fields, {{ $field.Name.GoLowerCase }}.data)
+			{{- end }}
+		{{ end }}
 
-			for _, q := range optional {
-				fields = append(fields, q.data)
-			}
-
-			v.query.inputs = append(v.query.inputs, input{
-				name:   "data",
-				fields: fields,
-			})
-			return v
+		for _, q := range optional {
+			fields = append(fields, q.data)
 		}
 
-		type {{ $result }} struct {
-			query query
-		}
+		v.query.inputs = append(v.query.inputs, input{
+			name:   "data",
+			fields: fields,
+		})
+		return v
+	}
 
-		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $modelName }}, error) {
-			r.query.operation = "mutation"
-			r.query.method = "create{{ $v.Name }}"
-			r.query.model = "{{ $name }}"
-			r.query.outputs = {{ $model.Name.GoLowerCase }}Outputs
-			var v Create{{ $v.Name }}{{ $name }}Response
-			err := r.query.exec(ctx, &v)
-			return v.Data.Create{{ $v.Name }}{{ $name }}, err
-		}
-	{{ end }}
+	type {{ $result }} struct {
+		query query
+	}
+
+	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
+		r.query.operation = "mutation"
+		r.query.method = "createOne"
+		r.query.model = "{{ $model.Name.GoCase }}"
+		r.query.outputs = {{ $name }}Outputs
+		var v createOne{{ $model.Name.GoCase }}Response
+		err := r.query.exec(ctx, &v)
+		return v.Data.CreateOne{{ $model.Name.GoCase }}, err
+	}
 {{ end }}
