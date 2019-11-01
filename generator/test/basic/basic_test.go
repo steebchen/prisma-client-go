@@ -74,7 +74,7 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, "", stuff)
 		},
 	}, {
-		name: "FindOne equals",
+		name: "FindOne",
 		// language=GraphQL
 		before: `
 			mutation {
@@ -103,7 +103,7 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
-		name: "FindMany equals",
+		name: "FindMany",
 		// language=GraphQL
 		before: `
 				mutation {
@@ -148,7 +148,7 @@ func TestBasic(t *testing.T) {
 			}}, actual)
 		},
 	}, {
-		name: "Create equals",
+		name: "Create",
 		run: func(t *testing.T, client Client, ctx cx) {
 			created, err := client.User.CreateOne(
 				User.ID.Set("id"),
@@ -181,6 +181,46 @@ func TestBasic(t *testing.T) {
 			}
 
 			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "Delete",
+		// language=GraphQL
+		before: `
+			mutation {
+				createOneUser(data: {
+					id: "delete",
+					email: "john@example.com",
+					username: "johndoe",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			email := "john@example.com"
+			deleted, err := client.User.DeleteOne(
+				User.Email.Equals(email),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "delete",
+					Email:    "john@example.com",
+					Username: "johndoe",
+				},
+			}
+
+			assert.Equal(t, expected, deleted)
+
+			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, UserModel{}, actual)
 		},
 	}}
 	for _, tt := range tests {
