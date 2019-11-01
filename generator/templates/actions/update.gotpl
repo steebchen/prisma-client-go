@@ -1,0 +1,61 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ range $v := $.DMMF.Variations }}
+		{{ $name := $model.Name.GoLowerCase }}
+		{{ $modelName := (print $model.Name.GoCase "Model") }}
+		{{ $ns := (print $name "Actions") }}
+		{{ $result := (print $name "Update" $v.Name) }}
+		{{ $params := (print $name "Params") }}
+
+		// Update{{ $v.Name }}
+		func (r {{ $ns }}) Update{{ $v.Name }}(params ...{{ $params }}) {{ $result }}Data {
+			var v {{ $result }}Data
+			v.query.client = r.client
+			var fields []field
+			for _, q := range params {
+				fields = append(fields, q.data)
+			}
+			v.query.inputs = append(v.query.inputs, input{
+				name:   "where",
+				fields: fields,
+			})
+			return v
+		}
+
+		type {{ $result }}Data struct {
+			query query
+		}
+
+		// Data provides the data to update.
+		func (r {{ $result }}Data) Data(params ...{{ (print $name "SetParams") }}) {{ $result }} {
+			var v {{ $result }}
+			v.query = r.query
+			var fields []field
+			for _, q := range params {
+				fields = append(fields, q.data)
+			}
+			v.query.inputs = append(v.query.inputs, input{
+				name:   "data",
+				fields: fields,
+			})
+			return v
+		}
+
+		type {{ $result }} struct {
+			query query
+		}
+
+		// Exec runs the Update{{ $v.Name }} query and returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
+		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $modelName }}, error) {
+			r.query.operation = "mutation"
+			r.query.method = "update{{ $v.Name }}"
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $name }}Outputs
+			var v update{{ $v.Name }}{{ $model.Name.GoCase }}Response
+			err := r.query.exec(ctx, &v)
+			log.Printf("query: %s", r.query.build())
+			return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}, err
+		}
+	{{ end }}
+{{ end }}

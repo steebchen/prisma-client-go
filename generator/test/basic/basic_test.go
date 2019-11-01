@@ -183,6 +183,52 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "Update",
+		// language=GraphQL
+		before: `
+			mutation {
+				createOneUser(data: {
+					id: "update",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			email := "john@example.com"
+			updated, err := client.User.UpdateOne(
+				User.Email.Equals(email),
+			).Data(
+				// TODO required fields do not work
+				// User.Email.Set("id"),
+				User.Name.Set("New Name"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "update",
+					Email:    email,
+					Username: "johndoe",
+					Name:     str("New Name"),
+				},
+			}
+
+			assert.Equal(t, expected, updated)
+
+			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "Delete",
 		// language=GraphQL
 		before: `
