@@ -1,15 +1,18 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
+{{/* This file outputs methods and varations for Find and Delete, because they work similarly. */}}
+{{/* Update and Delete operations live in their own files. */}}
+
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ range $v := $.DMMF.Variations }}
+	{{ range $v := $.DMMF.Basic }}
 		{{ $name := $model.Name.GoLowerCase }}
 		{{ $modelName := (print $model.Name.GoCase "Model") }}
 		{{ $ns := (print $name "Actions") }}
-		{{ $result := (print $name "Find" $v.Name) }}
+		{{ $result := (print $name $v.Name) }}
 		{{ $params := (print $name "Params") }}
 
-		// Find{{ $v.Name }} returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
-		func (r {{ $ns }}) Find{{ $v.Name }}(params ...{{ $params }}) {{ $result }} {
+		// {{ $v.Name }} returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
+			func (r {{ $ns }}) {{ $v.Name }}(params ...{{ $params }}) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
 			var fields []field
@@ -27,15 +30,15 @@
 			query query
 		}
 
-		// Exec runs the Find{{ $v.Name }} query and returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
+		// Exec runs the {{ $v.Name }} query and returns user{{ if $v.List }}a {{ $model.Name.GoLowerCase }}{{ else }}a {{ $model.Name.GoCase }}{{ end }}.
 		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $modelName }}, error) {
-			r.query.operation = "query"
-			r.query.method = "find{{ $v.Name }}"
+			r.query.operation = "{{ $v.Type }}"
+			r.query.method = "{{ $v.Name.CamelCase }}"
 			r.query.model = "{{ $model.Name.GoCase }}"
 			r.query.outputs = {{ $name }}Outputs
-			var v find{{ $v.Name }}{{ $model.Name.GoCase }}Response
+			var v {{ $v.Name.GoLowerCase }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
-			return v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
+			return v.Data.{{ $v.Name }}{{ $model.Name.GoCase }}, err
 		}
 	{{ end }}
 {{ end }}

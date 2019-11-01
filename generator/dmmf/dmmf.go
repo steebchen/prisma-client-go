@@ -38,6 +38,8 @@ type Document struct {
 
 // Action describes a CRUD operation.
 type Action struct {
+	// Type describes a query or a mutation
+	Type string
 	Name types.String
 	List bool
 }
@@ -45,10 +47,33 @@ type Action struct {
 // Variations returns "One" and "Many".
 func (Document) Variations() []Action {
 	return []Action{{
+		"",
 		"One",
 		false,
 	}, {
+		"",
 		"Many",
+		true,
+	}}
+}
+
+// Basic returns basic operations Find and Delete, because they work similarly.
+func (Document) Basic() []Action {
+	return []Action{{
+		"query",
+		"FindOne",
+		false,
+	}, {
+		"query",
+		"FindMany",
+		true,
+	}, {
+		"mutation",
+		"DeleteOne",
+		false,
+	}, {
+		"mutation",
+		"DeleteMany",
 		true,
 	}}
 }
@@ -57,34 +82,42 @@ func (Document) Variations() []Action {
 func (Document) Actions() []Action {
 	return []Action{
 		{
+			"query",
 			"FindOne",
 			false,
 		},
 		{
+			"query",
 			"FindMany",
 			true,
 		},
 		{
+			"mutation",
 			"CreateOne",
 			false,
 		},
 		{
+			"mutation",
 			"CreateMany",
 			true,
 		},
 		{
+			"mutation",
 			"UpdateOne",
 			false,
 		},
 		{
+			"mutation",
 			"UpdateMany",
 			true,
 		},
 		{
+			"mutation",
 			"DeleteOne",
 			false,
 		},
 		{
+			"mutation",
 			"DeleteMany",
 			true,
 		},
