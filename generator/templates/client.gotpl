@@ -24,6 +24,23 @@ func getPort() (string, error) {
 	return strconv.Itoa(port), nil
 }
 
+// NewClient creates a new Photon Go client.
+// The client is not connected to the Prisma engine yet.
+//
+// Example:
+//
+//   client := photon.NewClient()
+//   err := client.Connect()
+//   if err != nil {
+//     handle(err)
+//   }
+//
+//   defer func() {
+//     err := client.Disconnect()
+//     if err != nil {
+//       panic(fmt.Errorf("could not disconnect %w", err))
+//     }
+//   }()
 func NewClient() Client {
 	var debug = false
 	c := Client{}
@@ -35,6 +52,7 @@ func NewClient() Client {
 	return c
 }
 
+// Client is the instance of the Photon Go client.
 type Client struct {
 	// cmd holds the prisma binary process
 	cmd *exec.Cmd
@@ -49,10 +67,27 @@ type Client struct {
 	log *log.Logger
 
 	{{ range $model := $.DMMF.Datamodel.Models }}
+		// {{ $model.Name.GoCase }} provides access to CRUD methods.
 		{{ $model.Name.GoCase }} {{ $model.Name.GoCase }}Actions
 	{{- end }}
 }
 
+// Connects to the Prisma query engine. Required to call before accessing data.
+// It is recommended to immediately defer calling Disconnect.
+//
+// Example:
+//
+//   err := client.Connect()
+//   if err != nil {
+//     handle(err)
+//   }
+//
+//   defer func() {
+//     err := client.Disconnect()
+//     if err != nil {
+//       panic(fmt.Errorf("could not disconnect %w", err))
+//     }
+//   }()
 func (c *Client) Connect() error {
 	c.log.Printf("connecting...")
 
@@ -123,6 +158,20 @@ func (c *Client) Connect() error {
 	return nil
 }
 
+// Disconnects from the Prisma query engine.
+// This is usually invoked on kill signals in long running applications (like webservers),
+// or when no database access is needed anymore (like after executing a CLI command).
+//
+// Should be usually invoked directly after calling client.Connect(), for example as follows:
+//
+//   // after client.Connect()
+//
+//   defer func() {
+//     err := client.Disconnect()
+//     if err != nil {
+//       panic(fmt.Errorf("could not disconnect %w", err))
+//     }
+//   }()
 func (c *Client) Disconnect() error {
 	c.log.Printf("disconnecting...")
 

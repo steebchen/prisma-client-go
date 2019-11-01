@@ -6,6 +6,7 @@
 	{{ $nsParams := (print $name "Params") }}
 
 	{{/* Namespace declaration */}}
+	// {{ $name }} acts as a namespaces to access query methods for the {{ $name }} model
 	var {{ $name }} = {{ $nsQuery }}{
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
@@ -19,12 +20,19 @@
 		{{- end }}
 	}
 
+	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
+				// {{ $field.Name.GoCase }}
+				//
+				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
+				{{- if $field.IsUnique }}
+					// @unique
+				{{- end }}
 				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
-			{{- end -}}
+			{{ end }}
 		{{- end }}
 	}
 

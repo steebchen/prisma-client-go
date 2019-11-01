@@ -8,6 +8,7 @@
 		{{ $result := (print $name "Find" $v.Name) }}
 		{{ $params := (print $name "Params") }}
 
+		// Find{{ $v.Name }} returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
 		func (r {{ $ns }}) Find{{ $v.Name }}(params ...{{ $params }}) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
@@ -26,6 +27,7 @@
 			query query
 		}
 
+		// Exec runs the Find{{ $v.Name }} query and returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
 		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $modelName }}, error) {
 			r.query.operation = "query"
 			r.query.method = "find{{ $v.Name }}"
