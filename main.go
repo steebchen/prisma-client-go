@@ -1,5 +1,7 @@
 package main
 
+//go:generate go build .
+
 import (
 	"bufio"
 	"encoding/json"
