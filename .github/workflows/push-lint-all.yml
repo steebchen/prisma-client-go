@@ -8,4 +8,4 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: run linter
-        run: docker run --rm -v $(pwd):/app -w /app golangci/golangci-lint:v1.21.0 golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
+        run: docker build . -f docker/lint.dockerfile
