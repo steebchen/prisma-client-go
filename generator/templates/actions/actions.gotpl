@@ -28,9 +28,21 @@
 		data field
 	}
 
+	func ({{ $name }}SetParams) isSetParam() {}
+
+	func (p {{ $name }}SetParams) field() field {
+		return p.data
+	}
+
 	{{ range $field := $model.Fields }}
 		type {{ $name }}{{ $field.Name.GoCase }}SetParams struct {
 			data field
+		}
+
+		func ({{ $name }}{{ $field.Name.GoCase }}SetParams) isSetParam() {}
+
+		func (p {{ $name }}{{ $field.Name.GoCase }}SetParams) field() field {
+			return p.data
 		}
 	{{ end }}
 {{ end }}

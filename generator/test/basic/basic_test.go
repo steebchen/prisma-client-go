@@ -202,8 +202,9 @@ func TestBasic(t *testing.T) {
 			updated, err := client.User.UpdateOne(
 				User.Email.Equals(email),
 			).Data(
-				// TODO required fields do not work
-				// User.Email.Set("id"),
+				// set required value
+				User.Username.Set("new-username"),
+				// set optional value
 				User.Name.Set("New Name"),
 			).Exec(ctx)
 			if err != nil {
@@ -214,7 +215,7 @@ func TestBasic(t *testing.T) {
 				user{
 					ID:       "update",
 					Email:    email,
-					Username: "johndoe",
+					Username: "new-username",
 					Name:     str("New Name"),
 				},
 			}

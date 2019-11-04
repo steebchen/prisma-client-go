@@ -1,12 +1,19 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoLowerCase }}
+  {{ $modelName := (print $model.Name.GoCase "Model") }}
+  {{ $ns := (print $name "Actions") }}
+  {{ $params := (print $name "Params") }}
+  {{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
+
+	type {{ $setParams }} interface {
+		field() field
+		isSetParam()
+	}
+
 	{{ range $v := $.DMMF.Variations }}
-		{{ $name := $model.Name.GoLowerCase }}
-		{{ $modelName := (print $model.Name.GoCase "Model") }}
-		{{ $ns := (print $name "Actions") }}
 		{{ $result := (print $name "Update" $v.Name) }}
-		{{ $params := (print $name "Params") }}
 
 		// Update{{ $v.Name }}
 		func (r {{ $ns }}) Update{{ $v.Name }}(params ...{{ $params }}) {{ $result }}Data {
@@ -28,12 +35,12 @@
 		}
 
 		// Data provides the data to update.
-		func (r {{ $result }}Data) Data(params ...{{ (print $name "SetParams") }}) {{ $result }} {
+		func (r {{ $result }}Data) Data(params ...{{ $setParams }}) {{ $result }} {
 			var v {{ $result }}
 			v.query = r.query
 			var fields []field
 			for _, q := range params {
-				fields = append(fields, q.data)
+				fields = append(fields, q.field())
 			}
 			v.query.inputs = append(v.query.inputs, input{
 				name:   "data",
@@ -54,7 +61,6 @@
 			r.query.outputs = {{ $name }}Outputs
 			var v update{{ $v.Name }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
-			log.Printf("query: %s", r.query.build())
 			return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}, err
 		}
 	{{ end }}
