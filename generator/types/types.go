@@ -37,7 +37,7 @@ var builtin = map[string]string{
 	"Boolean":  "bool",
 	"Int":      "int",
 	"Float":    "float64",
-	"DateTime": "time.Time",
+	"DateTime": "DateTime",
 }
 
 // Type acts as a builtin string but provides useful methods for type DMMF values.

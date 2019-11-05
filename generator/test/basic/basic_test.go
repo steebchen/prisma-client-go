@@ -1,4 +1,4 @@
-package test
+package basic
 
 //go:generate prisma2 generate
 

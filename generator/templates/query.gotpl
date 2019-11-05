@@ -40,9 +40,9 @@
 		{{ $nsField := print $nsQuery $field.Name.GoCase }}
 		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
 
-		type {{ $nsField }}String struct {
-			{{/* embeds common fields like Equals, etc. which are same regardless the field */}}
-			{{ $nsQuery }}String
+		type {{ $nsField }}{{ $field.Type }} struct {
+			{{/* embeds common field predicates */}}
+			{{ $nsQuery }}{{ $field.Type }}
 		}
 
 		{{ $setReturnStruct := "" }}
@@ -53,7 +53,7 @@
 		{{ end}}
 
 		// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-		func (r {{ $nsField }}String) Set(value string) {{ $setReturnStruct }} {
+		func (r {{ $nsField }}{{ $field.Type }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
 			return {{ $setReturnStruct }}{
 				data: field{
 					action: "equals",
@@ -64,9 +64,7 @@
 		}
 	{{ end }}
 
-	// {{ $name }} String
 	type {{ $nsQuery }}String struct {
-		// name saves the data to pass between chains
 		name string
 	}
 
@@ -90,9 +88,27 @@
 		}
 	}
 
-	// {{ $name }} DateTime
+	func (r {{ $nsQuery }}String) HasPrefix(value string) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "starts_with",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}String) HasSuffix(value string) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "ends_with",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
 	type {{ $nsQuery }}DateTime struct {
-		// name saves the data to pass between chains
 		name string
 	}
 
@@ -106,9 +122,47 @@
 		}
 	}
 
-	// {{ $name }} Boolean
+	func (r {{ $nsQuery }}DateTime) Before(value time.Time) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "lt",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}DateTime) After(value time.Time) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "gt",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}DateTime) BeforeEquals(value time.Time) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "lte",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}DateTime) AfterEquals(value time.Time) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "gte",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
 	type {{ $nsQuery }}Boolean struct {
-		// name saves the data to pass between chains
 		name string
 	}
 
@@ -122,9 +176,7 @@
 		}
 	}
 
-	// {{ $name }} Int
 	type {{ $nsQuery }}Int struct {
-		// name saves the data to pass between chains
 		name string
 	}
 
@@ -132,6 +184,46 @@
 		return {{ $nsParams }}{
 			data: field{
 				action: "equals",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}Int) GT(value int) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "gt",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}Int) GTE(value int) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "gte",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}Int) LT(value int) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "lt",
+				name:   r.name,
+				value:  value,
+			},
+		}
+	}
+
+	func (r {{ $nsQuery }}Int) LTE(value int) {{ $nsParams }} {
+		return {{ $nsParams }}{
+			data: field{
+				action: "lte",
 				name:   r.name,
 				value:  value,
 			},
