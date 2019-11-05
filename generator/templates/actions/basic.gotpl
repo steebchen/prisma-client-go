@@ -9,15 +9,15 @@
 		{{ $modelName := (print $model.Name.GoCase "Model") }}
 		{{ $ns := (print $name "Actions") }}
 		{{ $result := (print $name $v.Name) }}
-		{{ $params := (print $name "Params") }}
+		{{ $params := (print "i" $model.Name.GoCase "Params") }}
 
 		// {{ $v.Name }} returns {{ $v.Name.CamelCase }} user{{ if $v.List }}s{{ end }}.
-			func (r {{ $ns }}) {{ $v.Name }}(params ...{{ $params }}) {{ $result }} {
+		func (r {{ $ns }}) {{ $v.Name }}(params ...{{ $params }}{{ if not $v.List }}Unique{{ end }}) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
 			var fields []field
 			for _, q := range params {
-				fields = append(fields, q.data)
+				fields = append(fields, q.field())
 			}
 			v.query.inputs = append(v.query.inputs, input{
 				name:   "where",
