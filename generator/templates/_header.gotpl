@@ -17,3 +17,5 @@ import (
 
 	"github.com/steebchen/gqlclient"
 )
+
+var debug = os.Getenv("PHOTON_GO_LOG") != "debug"
