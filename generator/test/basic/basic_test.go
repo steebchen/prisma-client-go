@@ -131,6 +131,51 @@ func TestBasic(t *testing.T) {
 			}}, actual)
 		},
 	}, {
+		name: "FindMany empty",
+		// language=GraphQL
+		before: `
+				mutation {
+					a: createOneUser(data: {
+						id: "findMany1",
+						email: "1",
+						username: "john",
+						name: "a",
+					}) {
+						id
+					}
+					b: createOneUser(data: {
+						id: "findMany2",
+						email: "2",
+						username: "john",
+						name: "b",
+					}) {
+						id
+					}
+				}
+			`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{{
+				user{
+					ID:       "findMany1",
+					Email:    "1",
+					Username: "john",
+					Name:     str("a"),
+				},
+			}, {
+				user{
+					ID:       "findMany2",
+					Email:    "2",
+					Username: "john",
+					Name:     str("b"),
+				},
+			}}, actual)
+		},
+	}, {
 		name: "Create",
 		run: func(t *testing.T, client Client, ctx cx) {
 			created, err := client.User.CreateOne(
@@ -182,9 +227,9 @@ func TestBasic(t *testing.T) {
 		`,
 		run: func(t *testing.T, client Client, ctx cx) {
 			email := "john@example.com"
-			updated, err := client.User.UpdateOne(
+			updated, err := client.User.FindOne(
 				User.Email.Equals(email),
-			).Data(
+			).Update(
 				// set required value
 				User.Username.Set("new-username"),
 				// set optional value
@@ -213,6 +258,66 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "Update many",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "username",
+					name: "1",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "username",
+					name: "2",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			count, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Update(
+				User.Name.Set("New Name"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 2.0, count)
+
+			actual, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "username",
+					Name:     str("New Name"),
+				},
+			}, {
+				user{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "username",
+					Name:     str("New Name"),
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "Delete",
 		// language=GraphQL
 		before: `
@@ -228,9 +333,9 @@ func TestBasic(t *testing.T) {
 		`,
 		run: func(t *testing.T, client Client, ctx cx) {
 			email := "john@example.com"
-			deleted, err := client.User.DeleteOne(
+			deleted, err := client.User.FindOne(
 				User.Email.Equals(email),
-			).Exec(ctx)
+			).Delete().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -251,6 +356,50 @@ func TestBasic(t *testing.T) {
 			}
 
 			assert.Equal(t, UserModel{}, actual)
+		},
+	}, {
+		name: "Delete many",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "username",
+					name: "1",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "username",
+					name: "2",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			count, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Delete().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 2.0, count)
+
+			actual, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{}
+
+			assert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

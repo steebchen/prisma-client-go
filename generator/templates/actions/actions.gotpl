@@ -1,5 +1,9 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
+var countOutput = []field{
+	{name: "count"},
+}
+
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $modelName := (print $model.Name.GoCase "Model") }}
@@ -12,7 +16,7 @@
 		client *Client
 	}
 
-	var {{ $name }}Outputs = []field{
+	var {{ $name }}Output = []field{
 		{{- range $i := $model.Fields }}
 			{{- if $i.Kind.IncludeInStruct }}
 				{name: "{{ $i.Name.CamelCase }}"},

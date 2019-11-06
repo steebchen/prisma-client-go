@@ -41,39 +41,21 @@ type Action struct {
 	// Type describes a query or a mutation
 	Type string
 	Name types.String
+}
+
+// ActionType describes a CRUD operation type.
+type ActionType struct {
+	Name types.String
 	List bool
 }
 
 // Variations returns "One" and "Many".
-func (Document) Variations() []Action {
-	return []Action{{
-		"",
+func (Document) Variations() []ActionType {
+	return []ActionType{{
 		"One",
 		false,
 	}, {
-		"",
 		"Many",
-		true,
-	}}
-}
-
-// Basic returns basic operations Find and Delete, because they work similarly.
-func (Document) Basic() []Action {
-	return []Action{{
-		"query",
-		"FindOne",
-		false,
-	}, {
-		"query",
-		"FindMany",
-		true,
-	}, {
-		"mutation",
-		"DeleteOne",
-		false,
-	}, {
-		"mutation",
-		"DeleteMany",
 		true,
 	}}
 }
@@ -83,43 +65,19 @@ func (Document) Actions() []Action {
 	return []Action{
 		{
 			"query",
-			"FindOne",
-			false,
-		},
-		{
-			"query",
-			"FindMany",
-			true,
+			"Find",
 		},
 		{
 			"mutation",
-			"CreateOne",
-			false,
+			"Create",
 		},
 		{
 			"mutation",
-			"CreateMany",
-			true,
+			"Update",
 		},
 		{
 			"mutation",
-			"UpdateOne",
-			false,
-		},
-		{
-			"mutation",
-			"UpdateMany",
-			true,
-		},
-		{
-			"mutation",
-			"DeleteOne",
-			false,
-		},
-		{
-			"mutation",
-			"DeleteMany",
-			true,
+			"Delete",
 		},
 	}
 }

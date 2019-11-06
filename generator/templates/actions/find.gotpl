@@ -1,0 +1,105 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{/* Update and Delete operations live in their own files. */}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ range $v := $.DMMF.Variations }}
+		{{ $name := $model.Name.GoLowerCase }}
+		{{ $ns := (print $name "Actions") }}
+		{{ $result := (print $name "Find" $v.Name) }}
+		{{ $updateResult := (print $name "Update" $v.Name) }}
+		{{ $deleteResult := (print $name "Delete" $v.Name) }}
+		{{ $params := (print "i" $model.Name.GoCase "Params") }}
+
+		{{/* FIND */}}
+
+		func (r {{ $ns }}) Find{{ $v.Name }}(params ...{{ $params }}{{ if not $v.List }}Unique{{ end }}) {{ $result }} {
+			var v {{ $result }}
+			v.query.client = r.client
+			var fields []field
+			for _, q := range params {
+				fields = append(fields, q.field())
+			}
+			v.query.inputs = append(v.query.inputs, input{
+				name:   "where",
+				fields: fields,
+			})
+			return v
+		}
+
+		type {{ $result }} struct {
+			query query
+		}
+
+		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model, error) {
+			r.query.operation = "query"
+			r.query.method = "find{{ $v.Name.GoCase }}"
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $name }}Output
+			var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+			err := r.query.exec(ctx, &v)
+			return v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
+		}
+
+		{{ $outputName := $name }}
+		{{ $returnType := print $model.Name.GoCase "Model" }}
+		{{ if $v.List }}
+			{{ $returnType = "float64" }}
+			{{ $outputName = "count" }}
+		{{ end }}
+
+		{{/* UPDATE */}}
+
+		{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
+
+		func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
+			var v {{ $updateResult }}
+			v.query = r.query
+			var fields []field
+			for _, q := range params {
+				fields = append(fields, q.field())
+			}
+			v.query.inputs = append(v.query.inputs, input{
+				name:   "data",
+				fields: fields,
+			})
+			return v
+		}
+
+		type {{ $updateResult }} struct {
+			query query
+		}
+
+		func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+			r.query.operation = "mutation"
+			r.query.method = "update{{ $v.Name.GoCase }}"
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $outputName }}Output
+			var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+			err := r.query.exec(ctx, &v)
+			return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+		}
+
+		{{/* DELETE */}}
+
+		func (r {{ $result }}) Delete() {{ $deleteResult }} {
+			var v {{ $deleteResult }}
+			v.query = r.query
+			return v
+		}
+
+		type {{ $deleteResult }} struct {
+			query query
+		}
+
+		func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+			r.query.operation = "mutation"
+			r.query.method = "delete{{ $v.Name.GoCase }}"
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $outputName }}Output
+			var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+			err := r.query.exec(ctx, &v)
+			return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+		}
+	{{ end }}
+{{ end }}

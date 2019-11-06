@@ -1,14 +1,32 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ $m := $model.Name.GoCase }}
-	{{ $ml := $model.Name.GoLowerCase }}
 	{{ range $action := $.DMMF.Actions }}
-		{{ $an := $action.Name.CamelCase }}
-		type {{ $action.Name.GoLowerCase }}{{ $m }}Response struct {
-			Data struct{
-				{{- $action.Name.GoCase }}{{ $m }} {{ if $action.List -}}[]{{- end -}}{{ $m }}Model `json:"{{ $an }}{{ $m }}"`
-			} `json:"data"`
-		}
+		{{ $m := print $model.Name.GoCase }}
+		{{ $ml := print $model.Name.GoLowerCase }}
+
+		{{ range $v := $.DMMF.Variations }}
+			{{ $an := $action.Name.CamelCase }}
+			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Response struct {
+				Data struct{
+					{{ $action.Name }}{{ $v.Name }}{{ $m }}{{ " " }}
+
+					{{- if and ($v.List) (eq $action.Name "Find") -}}
+						[]{{ $m }}Model
+					{{- else -}}
+						{{- if $v.List -}}
+							{{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result
+						{{- else -}}
+							{{ $m }}Model
+						{{- end -}}
+					{{- end -}}
+					`json:"{{ $an }}{{ $v.Name }}{{ $m }}"`
+				} `json:"data"`
+			}
+
+			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result struct {
+				Count float64 `json:"count"` {{/* TODO use int when prisma-engine bug is fixed */}}
+			}
+		{{ end }}
 	{{ end }}
 {{ end }}
