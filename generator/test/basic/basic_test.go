@@ -305,6 +305,7 @@ func TestBasic(t *testing.T) {
 
 			if tt.before != "" {
 				response, err := client.gql.Raw(ctx, tt.before, map[string]interface{}{})
+				log.Printf("mock response query %+v", response)
 				if err != nil {
 					t.Fatalf("could not send mock query %s %+v", err, response)
 				}

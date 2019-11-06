@@ -35,7 +35,7 @@ var builtin = map[string]string{
 	"ID":       "string",
 	"String":   "string",
 	"Boolean":  "bool",
-	"Int":      "int",
+	"Int":      "float64", // TODO integer type blocked by https://github.com/prisma/prisma-engine/issues/160
 	"Float":    "float64",
 	"DateTime": "DateTime",
 }
