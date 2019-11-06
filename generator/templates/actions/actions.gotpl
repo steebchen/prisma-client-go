@@ -34,14 +34,14 @@
 
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() field
-		isUniqueParam()
+		unique()
 	}
 
 	type {{ $name }}ParamsUnique struct {
 		data field
 	}
 
-	func ({{ $name }}ParamsUnique) isUniqueParam() {}
+	func ({{ $name }}ParamsUnique) unique() {}
 
 	func (p {{ $name }}ParamsUnique) field() field {
 		return p.data

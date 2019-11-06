@@ -36,13 +36,60 @@ func cmd(name string, args ...string) error {
 func TestTypes(t *testing.T) {
 	t.Parallel()
 
-	t.Skip("integer type blocked by https://github.com/prisma/prisma-engine/issues/160")
-
 	tests := []struct {
 		name   string
 		before string
 		run    Func
 	}{{
+		name: "complex strings",
+		run: func(t *testing.T, client Client, ctx cx) {
+			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			id := `f"hi"'`
+			str := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
+			created, err := client.User.CreateOne(
+				User.ID.Set(id),
+				User.Str.Set(str),
+				User.Int.Set(5),
+				User.Float.Set(5.5),
+				User.Bool.Set(true),
+				User.Date.Set(date),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:    id,
+					Str:   str,
+					Int:   5,
+					Float: 5.5,
+					Bool:  true,
+					Date:  date,
+				},
+			}
+
+			assert.Equal(t, expected, created)
+
+			actual, err := client.User.FindOne(
+				User.ID.Equals(id),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+
+			actualSlice, err := client.User.FindMany(
+				User.Str.Equals(str),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{expected}, actualSlice)
+		},
+	}, {
 		name: "basic equals",
 		// language=GraphQL
 		before: `
@@ -53,6 +100,7 @@ func TestTypes(t *testing.T) {
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
+					float: 5.5,
 				}) {
 					id
 				}
@@ -66,7 +114,8 @@ func TestTypes(t *testing.T) {
 				User.Str.Equals("str"),
 				User.Bool.Equals(true),
 				User.Date.Equals(date),
-				// User.Int.Equals(5),
+				User.Float.Equals(5.5),
+				User.Int.Equals(5),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -74,11 +123,12 @@ func TestTypes(t *testing.T) {
 
 			expected := []UserModel{{
 				user{
-					ID:  "id",
-					Str: "str",
-					// Int:  5,
-					Bool: true,
-					Date: date,
+					ID:    "id",
+					Str:   "str",
+					Int:   5,
+					Float: 5.5,
+					Bool:  true,
+					Date:  date,
 				},
 			}}
 
@@ -95,6 +145,7 @@ func TestTypes(t *testing.T) {
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
+					float: 5.5,
 				}) {
 					id
 				}
@@ -111,6 +162,10 @@ func TestTypes(t *testing.T) {
 				User.Int.GT(3),
 				User.Int.LTE(5),
 				User.Int.LT(7),
+				User.Float.GTE(5.5),
+				User.Float.GT(2.7),
+				User.Float.LTE(5.5),
+				User.Float.LT(7.3),
 				User.Date.Before(time.Now()),
 				User.Date.After(before),
 			).Exec(ctx)
@@ -120,11 +175,12 @@ func TestTypes(t *testing.T) {
 
 			expected := []UserModel{{
 				user{
-					ID:   "id",
-					Str:  "alongstring",
-					Int:  5,
-					Bool: true,
-					Date: date,
+					ID:    "id",
+					Str:   "alongstring",
+					Int:   5,
+					Float: 5.5,
+					Bool:  true,
+					Date:  date,
 				},
 			}}
 
@@ -166,6 +222,7 @@ func TestTypes(t *testing.T) {
 
 			if tt.before != "" {
 				response, err := client.gql.Raw(ctx, tt.before, map[string]interface{}{})
+				log.Printf("mock response query %+v", response)
 				if err != nil {
 					t.Fatalf("could not send mock query %s %+v", err, response)
 				}

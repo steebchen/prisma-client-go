@@ -65,11 +65,13 @@ func (q query) build() string {
 
 			switch v := f.value.(type) {
 			case string:
-				builder.WriteString(fmt.Sprintf(`"%s"`, v))
+				builder.WriteString(fmt.Sprintf(`%q`, v))
 			case bool:
 				builder.WriteString(fmt.Sprintf(`%t`, v))
 			case int:
 				builder.WriteString(fmt.Sprintf(`%d`, v))
+			case float64:
+				builder.WriteString(fmt.Sprintf(`%f`, v))
 			case DateTime:
 				builder.WriteString(fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli)))
 			default:

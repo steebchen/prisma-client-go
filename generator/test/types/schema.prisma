@@ -13,6 +13,7 @@ model User {
 	id       String  @id @default(cuid())
 	str      String
 	int      Int
+	float    Float
 	bool     Boolean
 	date     DateTime
 }
