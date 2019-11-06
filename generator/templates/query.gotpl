@@ -12,9 +12,7 @@
 			{{/* Filter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
 				{{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}{
-					{{ $nsQuery }}{{ $field.Type }}: {{ $nsQuery }}{{ $field.Type }}{
-						name: "{{ $field.Name.GoLowerCase }}",
-					},
+					name: "{{ $field.Name.GoLowerCase }}",
 				},
 			{{- end -}}
 		{{- end }}
@@ -39,21 +37,21 @@
 	{{ range $field := $model.Fields }}
 		{{ $nsField := print $nsQuery $field.Name.GoCase }}
 		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
+		{{ $struct := print $nsField $field.Type }}
 
-		type {{ $nsField }}{{ $field.Type }} struct {
-			{{/* embeds common field predicates */}}
-			{{ $nsQuery }}{{ $field.Type }}
+		type {{ $struct }} struct {
+			name string
 		}
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.IsRequired }}
-			{{ $setReturnStruct = $nsFieldParams}}
+			{{ $setReturnStruct = $nsFieldParams }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParams") }}
 		{{ end}}
 
 		// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-		func (r {{ $nsField }}{{ $field.Type }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
+		func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
 			return {{ $setReturnStruct }}{
 				data: field{
 					action: "equals",
@@ -62,171 +60,170 @@
 				},
 			}
 		}
-	{{ end }}
 
-	type {{ $nsQuery }}String struct {
-		name string
-	}
+		{{ $returnStruct := "" }}
+		{{ if $field.IsRequired }}
+			{{ $returnStruct = (print $name "ParamsUnique") }}
+		{{ else }}
+			{{ $returnStruct = (print $name "Params") }}
+		{{ end}}
 
-	func (r {{ $nsQuery }}String) Equals(value string) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "equals",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+		{{ if eq $field.Type "String" }}
+			func (r {{ $struct }}) Equals(value string) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "equals",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}String) Contains(value string) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "contains",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) Contains(value string) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "contains",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}String) HasPrefix(value string) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "starts_with",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) HasPrefix(value string) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "starts_with",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}String) HasSuffix(value string) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "ends_with",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) HasSuffix(value string) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "ends_with",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
+		{{ end }}
 
-	type {{ $nsQuery }}DateTime struct {
-		name string
-	}
+		{{ if eq $field.Type "DateTime" }}
+			func (r {{ $struct }}) Equals(value time.Time) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "equals",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}DateTime) Equals(value time.Time) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "equals",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) Before(value time.Time) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "lt",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}DateTime) Before(value time.Time) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "lt",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) After(value time.Time) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "gt",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}DateTime) After(value time.Time) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "gt",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) BeforeEquals(value time.Time) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "lte",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}DateTime) BeforeEquals(value time.Time) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "lte",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) AfterEquals(value time.Time) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "gte",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
+		{{ end }}
 
-	func (r {{ $nsQuery }}DateTime) AfterEquals(value time.Time) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "gte",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+		{{ if eq $field.Type "Boolean" }}
+			func (r {{ $struct }}) Equals(value bool) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "equals",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
+		{{ end }}
 
-	type {{ $nsQuery }}Boolean struct {
-		name string
-	}
+		{{ if or (eq $field.Type "Int") (eq $field.Type "Float") }}
+			func (r {{ $struct }}) Equals(value int) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "equals",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}Boolean) Equals(value bool) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "equals",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) GT(value int) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "gt",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	type {{ $nsQuery }}Int struct {
-		name string
-	}
+			func (r {{ $struct }}) GTE(value int) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "gte",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}Int) Equals(value int) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "equals",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) LT(value int) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "lt",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
 
-	func (r {{ $nsQuery }}Int) GT(value int) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "gt",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
-
-	func (r {{ $nsQuery }}Int) GTE(value int) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "gte",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
-
-	func (r {{ $nsQuery }}Int) LT(value int) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "lt",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
-
-	func (r {{ $nsQuery }}Int) LTE(value int) {{ $nsParams }} {
-		return {{ $nsParams }}{
-			data: field{
-				action: "lte",
-				name:   r.name,
-				value:  value,
-			},
-		}
-	}
+			func (r {{ $struct }}) LTE(value int) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						action: "lte",
+						name:   r.name,
+						value:  value,
+					},
+				}
+			}
+  	{{ end }}
+  {{ end }}
 {{ end }}

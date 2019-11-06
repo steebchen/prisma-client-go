@@ -4,24 +4,19 @@
 	{{ $name := $model.Name.GoLowerCase }}
   {{ $modelName := (print $model.Name.GoCase "Model") }}
   {{ $ns := (print $name "Actions") }}
-  {{ $params := (print $name "Params") }}
+  {{ $queryParams := (print "i" $model.Name.GoCase "Params") }}
   {{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
 
-	type {{ $setParams }} interface {
-		field() field
-		isSetParam()
-	}
-
 	{{ range $v := $.DMMF.Variations }}
-		{{ $result := (print $name "Update" $v.Name) }}
+		{{ $result := (print $model.Name.GoCase "Update" $v.Name) }}
 
 		// Update{{ $v.Name }}
-		func (r {{ $ns }}) Update{{ $v.Name }}(params ...{{ $params }}) {{ $result }}Data {
+		func (r {{ $ns }}) Update{{ $v.Name }}(params ...{{ $queryParams }}) {{ $result }}Data {
 			var v {{ $result }}Data
 			v.query.client = r.client
 			var fields []field
 			for _, q := range params {
-				fields = append(fields, q.data)
+				fields = append(fields, q.field())
 			}
 			v.query.inputs = append(v.query.inputs, input{
 				name:   "where",

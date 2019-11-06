@@ -20,8 +20,36 @@
 		{{- end }}
 	}
 
+	type i{{ $model.Name.GoCase }}Params interface {
+		field() field
+	}
+
 	type {{ $name }}Params struct {
 		data field
+	}
+
+	func (p {{ $name }}Params) field() field {
+		return p.data
+	}
+
+	type i{{ $model.Name.GoCase }}ParamsUnique interface {
+		field() field
+		isUniqueParam()
+	}
+
+	type {{ $name }}ParamsUnique struct {
+		data field
+	}
+
+	func ({{ $name }}ParamsUnique) isUniqueParam() {}
+
+	func (p {{ $name }}ParamsUnique) field() field {
+		return p.data
+	}
+
+	type i{{ $model.Name.GoCase }}SetParams interface {
+		field() field
+		isSetParam()
 	}
 
 	type {{ $name }}SetParams struct {
