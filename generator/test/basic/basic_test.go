@@ -4,12 +4,12 @@ package basic
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/prisma/photongo/generator/test/hooks"
 )
 
 type cx = context.Context
@@ -17,23 +17,6 @@ type Func func(t *testing.T, client Client, ctx cx)
 
 func str(v string) *string {
 	return &v
-}
-
-func cmd(name string, args ...string) error {
-	cmd := exec.Command(name, args...)
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		exit, ok := err.(*exec.ExitError)
-		if !ok {
-			return fmt.Errorf("command %s %s failed: %w", name, args, err)
-		}
-
-		if !exit.Success() {
-			return fmt.Errorf("%s %s exited with status code %d and output %s: %w", name, args, exit.ExitCode(), string(out), err)
-		}
-	}
-
-	return nil
 }
 
 func TestBasic(t *testing.T) {
@@ -148,6 +131,51 @@ func TestBasic(t *testing.T) {
 			}}, actual)
 		},
 	}, {
+		name: "FindMany empty",
+		// language=GraphQL
+		before: `
+				mutation {
+					a: createOneUser(data: {
+						id: "findMany1",
+						email: "1",
+						username: "john",
+						name: "a",
+					}) {
+						id
+					}
+					b: createOneUser(data: {
+						id: "findMany2",
+						email: "2",
+						username: "john",
+						name: "b",
+					}) {
+						id
+					}
+				}
+			`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{{
+				user{
+					ID:       "findMany1",
+					Email:    "1",
+					Username: "john",
+					Name:     str("a"),
+				},
+			}, {
+				user{
+					ID:       "findMany2",
+					Email:    "2",
+					Username: "john",
+					Name:     str("b"),
+				},
+			}}, actual)
+		},
+	}, {
 		name: "Create",
 		run: func(t *testing.T, client Client, ctx cx) {
 			created, err := client.User.CreateOne(
@@ -199,9 +227,9 @@ func TestBasic(t *testing.T) {
 		`,
 		run: func(t *testing.T, client Client, ctx cx) {
 			email := "john@example.com"
-			updated, err := client.User.UpdateOne(
+			updated, err := client.User.FindOne(
 				User.Email.Equals(email),
-			).Data(
+			).Update(
 				// set required value
 				User.Username.Set("new-username"),
 				// set optional value
@@ -230,6 +258,66 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "Update many",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "username",
+					name: "1",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "username",
+					name: "2",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			count, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Update(
+				User.Name.Set("New Name"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 2.0, count)
+
+			actual, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "username",
+					Name:     str("New Name"),
+				},
+			}, {
+				user{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "username",
+					Name:     str("New Name"),
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "Delete",
 		// language=GraphQL
 		before: `
@@ -245,9 +333,9 @@ func TestBasic(t *testing.T) {
 		`,
 		run: func(t *testing.T, client Client, ctx cx) {
 			email := "john@example.com"
-			deleted, err := client.User.DeleteOne(
+			deleted, err := client.User.FindOne(
 				User.Email.Equals(email),
-			).Exec(ctx)
+			).Delete().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -269,23 +357,55 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, UserModel{}, actual)
 		},
+	}, {
+		name: "Delete many",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "username",
+					name: "1",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "username",
+					name: "2",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			count, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Delete().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 2.0, count)
+
+			actual, err := client.User.FindMany(
+				User.Username.Equals("username"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			if err := cmd("rm", "-rf", "dev.sqlite"); err != nil {
-				log.Fatal(err)
-			}
-			if err := cmd("rm", "-rf", "migrations"); err != nil {
-				log.Fatal(err)
-			}
-
-			if err := cmd("prisma2", "lift", "save", "--create-db", "--name", "init"); err != nil {
-				t.Fatalf("could not run lift save %s", err)
-			}
-			if err := cmd("prisma2", "lift", "up"); err != nil {
-				t.Fatalf("could not run lift up %s", err)
-			}
+			hooks.Run(t)
 
 			client := NewClient()
 			if err := client.Connect(); err != nil {
