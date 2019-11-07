@@ -44,7 +44,7 @@ func getPort() (string, error) {
 func NewClient() Client {
 	c := Client{}
 	c.log = log.New(ioutil.Discard, "", 0)
-	if debug {
+	if debug == Info {
 		c.log = log.New(os.Stdout, "", log.Flags())
 	}
 	return c
@@ -116,7 +116,7 @@ func (c *Client) Connect() error {
 		"RUST_LOG_FORMAT=json",
 	)
 
-	if debug {
+	if debug == Debug {
 		c.cmd.Env = append(
 			c.cmd.Env,
 			"PRISMA_DML_PATH=" + schemaPath,
