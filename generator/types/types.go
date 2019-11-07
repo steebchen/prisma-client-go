@@ -53,3 +53,11 @@ func (t Type) Value() string {
 
 	return v
 }
+
+func (t Type) GoCase() string {
+	return gocase.To(strcase.ToCamel(string(t)))
+}
+
+func (t Type) CamelCase() string {
+	return gocase.To(strcase.ToLowerCamel(string(t)))
+}

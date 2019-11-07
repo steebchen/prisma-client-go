@@ -7,16 +7,7 @@
 
 	{{/* Namespace declaration */}}
 	// {{ $model.Name.GoCase }} acts as a namespaces to access query methods for the {{ $model.Name.GoCase }} model
-	var {{ $model.Name.GoCase }} = {{ $nsQuery }}{
-		{{- range $field := $model.Fields }}
-			{{/* Filter non-relations only for now */}}
-			{{- if $field.Kind.IncludeInStruct -}}
-				{{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}{
-					name: "{{ $field.Name.GoLowerCase }}",
-				},
-			{{- end -}}
-		{{- end }}
-	}
+	var {{ $model.Name.GoCase }} = {{ $nsQuery }}{}
 
 	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
@@ -31,6 +22,18 @@
 				{{- end }}
 				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{ end }}
+
+			{{/* TODO */}}
+			{{- if $field.Kind.IsRelation -}}
+				// {{ $field.Name.GoCase }}
+				//
+				// @relation
+				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
+				//{{- if $field.IsUnique }}
+				//	// @unique
+				//{{- end }}
+				//{{ $field.Name.GoCase }} *{{ $field.Type.CamelCase }}Query
+			{{ end }}
 		{{- end }}
 	}
 
@@ -39,9 +42,25 @@
 		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
 		{{ $struct := print $nsField $field.Type }}
 
-		type {{ $struct }} struct {
-			name string
-		}
+		{{- if $field.Kind.IsRelation -}}
+			{{/* Attach relations to the $nsQuery struct */}}
+			// {{ $field.Name.GoCase }}
+			//
+			// @relation
+			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
+			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}() {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query {
+				return {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query{}
+			}
+
+			{{/* Generate nested variations for relations */}}
+
+			type {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query struct {}
+
+			{{/* TODO here */}}
+
+		{{ end }}
+
+		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.IsRequired }}
@@ -50,16 +69,18 @@
 			{{ $setReturnStruct = (print $name "SetParams") }}
 		{{ end}}
 
-		// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-		func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
-			return {{ $setReturnStruct }}{
-				data: field{
-					action: "equals",
-					name:   r.name,
-					value:  value,
-				},
+		{{ if $field.Kind.IncludeInStruct }}
+			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+			func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				return {{ $setReturnStruct }}{
+					data: field{
+						action: "equals",
+						name:   "{{ $field.Name.CamelCase }}",
+						value:  value,
+					},
+				}
 			}
-		}
+		{{ end }}
 
 		{{ $returnStruct := "" }}
 		{{ if or ($field.IsID) ($field.IsUnique) }}
@@ -68,12 +89,25 @@
 			{{ $returnStruct = (print $name "Params") }}
 		{{ end}}
 
+		{{/* TODO asdf */}}
+		{{ if $field.Kind.IsRelation }}
+			//func (r {{ $struct }}) Connect(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+			//	return {{ $returnStruct }}{
+			//		data: field{
+			//			action: "equals",
+			//			name:   "{{ $field.Name.CamelCase }}",
+			//			value:  value,
+			//		},
+			//	}
+			//}
+		{{ end }}
+
 		{{ if eq $field.Type "String" }}
 			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
 					data: field{
 						action: "equals",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -83,7 +117,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "contains",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -93,7 +127,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "starts_with",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -103,7 +137,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "ends_with",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -115,7 +149,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "equals",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -125,7 +159,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "lt",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -135,7 +169,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "gt",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -145,7 +179,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "lte",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -155,7 +189,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "gte",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -167,7 +201,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "equals",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -179,7 +213,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "equals",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -189,7 +223,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "gt",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -199,7 +233,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "gte",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -209,7 +243,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "lt",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
@@ -219,7 +253,7 @@
 				return {{ $returnStruct }}{
 					data: field{
 						action: "lte",
-						name:   r.name,
+						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
 					},
 				}
