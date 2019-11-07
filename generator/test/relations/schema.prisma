@@ -19,7 +19,6 @@ model User {
 
 model Post {
 	id      String  @id @default(cuid())
-	email   String  @unique
 	title   String
 	content String?
 	user    User

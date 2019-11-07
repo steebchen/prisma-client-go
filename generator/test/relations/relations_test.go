@@ -27,16 +27,45 @@ func TestRelations(t *testing.T) {
 		before string
 		run    Func
 	}{{
-		name: "relations",
+		name: "find many posts by user",
 		// language=GraphQL
 		before: `
 			mutation {
-				createOneUser(data: {
+				unrelated: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					email: "nope",
+					user: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+
+				user: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
 					name: "John",
-					stuff: null,
+					posts: {
+						create: [{
+							id: "a",
+							title: "a",
+							content: "a",
+							email: "a",
+						}, {
+							id: "b",
+							title: "b",
+							content: "b",
+							email: "b",
+						}],
+					},
 				}) {
 					id
 				}
@@ -51,7 +80,23 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, "John", actual[0].ID)
+			expected := []UserModel{{
+				user{
+					ID:       "a",
+					Email:    "a",
+					Username: "a",
+					Name:     str("a"),
+				},
+			}, {
+				user{
+					ID:       "b",
+					Email:    "b",
+					Username: "b",
+					Name:     str("b"),
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

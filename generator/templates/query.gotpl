@@ -22,18 +22,6 @@
 				{{- end }}
 				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{ end }}
-
-			{{/* TODO */}}
-			{{- if $field.Kind.IsRelation -}}
-				// {{ $field.Name.GoCase }}
-				//
-				// @relation
-				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-				//{{- if $field.IsUnique }}
-				//	// @unique
-				//{{- end }}
-				//{{ $field.Name.GoCase }} *{{ $field.Type.CamelCase }}Query
-			{{ end }}
 		{{- end }}
 	}
 
@@ -42,25 +30,43 @@
 		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
 		{{ $struct := print $nsField $field.Type }}
 
-		{{- if $field.Kind.IsRelation -}}
+		// base struct
+		type {{ $struct }} struct {}
+
+		{{ range $toField := $model.Fields }}
+			{{ if $field.Kind.IsRelation }}
+				// extra type relation struct
+				type {{ $nsQuery }}{{ $toField.Name.GoCase}}{{ $toField.Type }}To{{ $field.Name.GoCase }} struct {}
+			{{ end }}
+		{{ end }}
+
+		{{ if $field.Kind.IsRelation }}
 			{{/* Attach relations to the $nsQuery struct */}}
 			// {{ $field.Name.GoCase }}
 			//
 			// @relation
 			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}() {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query {
-				return {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query{}
+			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}() {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query {
+				return {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query{}
 			}
 
 			{{/* Generate nested variations for relations */}}
 
-			type {{ $model.Name.GoCase }}To{{ $field.Type.GoCase }}Query struct {}
-
-			{{/* TODO here */}}
-
+			type {{ $name }}To{{ $field.Type }}Query struct {
+				{{- range $toField := $model.Fields }}
+					{{/* Filter non-relations only for now */}}
+					{{- if $toField.Kind.IncludeInStruct -}}
+						// {{ $toField.Name.GoCase }}
+						//
+						// @{{ if $toField.IsRequired }}required{{ else }}optional{{ end }}
+						{{- if $toField.IsUnique }}
+							// @unique
+						{{- end }}
+						{{ $toField.Name.GoCase }} {{ $nsQuery }}{{ $toField.Name.GoCase }}{{ $toField.Type }}To{{ $field.Name.GoCase }}
+					{{ end }}
+				{{- end }}
+			}
 		{{ end }}
-
-		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.IsRequired }}
@@ -82,182 +88,184 @@
 			}
 		{{ end }}
 
-		{{ $returnStruct := "" }}
-		{{ if or ($field.IsID) ($field.IsUnique) }}
-			{{ $returnStruct = (print $name "ParamsUnique") }}
-		{{ else }}
-			{{ $returnStruct = (print $name "Params") }}
-		{{ end}}
+		{{ range $toField := $model.Fields }}
+			{{ $rel := false }}
+			{{ $cp := "" }}
+			{{ $n := $name }}
+			{{ if eq $toField.Name $field.Name }}
+				{{ $cp = $struct }}
+			{{ else if $toField.Kind.IsRelation }}
+				{{ $cp = print $struct "To" $toField.Name.GoCase }}
+				{{ $rel = true }}
+				{{ $n = $toField.Type.GoLowerCase }}
+			{{ end }}
 
-		{{/* TODO asdf */}}
-		{{ if $field.Kind.IsRelation }}
-			//func (r {{ $struct }}) Connect(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-			//	return {{ $returnStruct }}{
-			//		data: field{
-			//			action: "equals",
-			//			name:   "{{ $field.Name.CamelCase }}",
-			//			value:  value,
-			//		},
-			//	}
-			//}
-		{{ end }}
+			{{ $returnStruct := "" }}
+			{{ if or ($field.IsID) ($field.IsUnique) }}
+				{{ $returnStruct = (print $n "ParamsUnique") }}
+			{{ else }}
+				{{ $returnStruct = (print $n "Params") }}
+			{{ end }}
 
-		{{ if eq $field.Type "String" }}
-			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "equals",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+			{{ if ne $cp "" }}
+				{{ if eq $field.Type "String" }}
+					func (r {{ $cp }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "equals",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) Contains(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "contains",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) Contains(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "contains",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) HasPrefix(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "starts_with",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) HasPrefix(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "starts_with",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) HasSuffix(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "ends_with",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
-		{{ end }}
+					func (r {{ $cp }}) HasSuffix(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "ends_with",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
+				{{ end }}
 
-		{{ if eq $field.Type "DateTime" }}
-			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "equals",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+				{{ if eq $field.Type "DateTime" }}
+					func (r {{ $cp }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "equals",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) Before(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "lt",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) Before(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "lt",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) After(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "gt",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) After(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "gt",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) BeforeEquals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "lte",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) BeforeEquals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "lte",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) AfterEquals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "gte",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
-		{{ end }}
+					func (r {{ $cp }}) AfterEquals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "gte",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
+				{{ end }}
 
-		{{ if eq $field.Type "Boolean" }}
-			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "equals",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
-		{{ end }}
+				{{ if eq $field.Type "Boolean" }}
+					func (r {{ $cp }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "equals",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
+				{{ end }}
 
-		{{ if or (eq $field.Type "Int") (eq $field.Type "Float") }}
-			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "equals",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+				{{ if or (eq $field.Type "Int") (eq $field.Type "Float") }}
+					func (r {{ $cp }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "equals",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) GT(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "gt",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) GT(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "gt",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) GTE(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "gte",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) GTE(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "gte",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) LT(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "lt",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) LT(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "lt",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 
-			func (r {{ $struct }}) LTE(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-				return {{ $returnStruct }}{
-					data: field{
-						action: "lte",
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
-					},
-				}
-			}
+					func (r {{ $cp }}) LTE(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "lte",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
+				{{ end }}
+			{{ end }}
 		{{ end }}
 	{{ end }}
 {{ end }}
