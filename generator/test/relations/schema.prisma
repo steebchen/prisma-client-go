@@ -15,12 +15,20 @@ model User {
 	username String
 	name     String?
 	posts    Post[]
+	comments Comment[]
 }
 
 model Post {
-	id      String  @id @default(cuid())
-	title   String
-	content String?
-	user    User
+	id       String  @id @default(cuid())
+	title    String
+	content  String?
+	user     User
+	comments Comment[]
 }
 
+model Comment {
+	id        String  @id @default(cuid())
+	content   String
+	user      User
+	post      Post
+}

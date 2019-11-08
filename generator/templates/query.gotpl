@@ -42,13 +42,30 @@
 
 		{{ if $field.Kind.IsRelation }}
 			{{/* Attach relations to the $nsQuery struct */}}
-			// {{ $field.Name.GoCase }}
+			// {{ $model.Name.GoCase }} -> {{ $field.Name.GoCase }}
 			//
 			// @relation
 			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}() {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query {
 				return {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query{}
 			}
+
+			{{ range $relField := $model.Fields }}
+				{{ if $relField.Kind.IsRelation }}
+					{{/* Attach relations to the $nsQuery struct */}}
+					// {{ $model.Name.GoCase }} -> {{ $relField.Name.GoCase }}
+					//
+					// @relation
+					// @{{ if $relField.IsRequired }}required{{ else }}optional{{ end }}
+					// $model.Name.GoCase {{ $model.Name.GoCase }}
+					// $field.Name.GoCase {{ $field.Name.GoCase }}
+					// $relField.Type.GoCase {{ $relField.Type.GoCase }}
+					// $relField.Name.GoCase {{ $relField.Name.GoCase }}
+					func ({{ $model.Name.GoLowerCase }}To{{ $relField.Type.GoCase }}Query) {{ $relField.Name.GoCase }}() {{ $relField.Type.GoLowerCase }}Query {
+						return {{ $relField.Type.GoLowerCase }}Query{}
+					}
+				{{ end }}
+			{{ end }}
 
 			{{/* Generate nested variations for relations */}}
 
