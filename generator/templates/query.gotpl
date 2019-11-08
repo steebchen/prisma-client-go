@@ -100,7 +100,7 @@
 			{{ end }}
 
 			{{ $returnStruct := "" }}
-			{{ if or ($field.IsID) ($field.IsUnique) }}
+			{{ if and (not $rel) (or ($field.IsID) ($field.IsUnique)) }}
 				{{ $returnStruct = (print $n "ParamsUnique") }}
 			{{ else }}
 				{{ $returnStruct = (print $n "Params") }}
