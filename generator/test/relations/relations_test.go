@@ -35,7 +35,6 @@ func TestRelations(t *testing.T) {
 					id: "nope",
 					title: "nope",
 					content: "nope",
-					email: "nope",
 					user: {
 						create: {
 							id: "unrelated",
@@ -56,14 +55,12 @@ func TestRelations(t *testing.T) {
 					posts: {
 						create: [{
 							id: "a",
-							title: "a",
+							title: "common",
 							content: "a",
-							email: "a",
 						}, {
 							id: "b",
-							title: "b",
+							title: "common",
 							content: "b",
-							email: "b",
 						}],
 					},
 				}) {
@@ -73,26 +70,24 @@ func TestRelations(t *testing.T) {
 		`,
 		run: func(t *testing.T, client Client, ctx cx) {
 			actual, err := client.Post.FindMany(
-				Post.Title.Equals("asdf"),
+				Post.Title.Equals("common"),
 				Post.User().Email.Equals("john@example.com"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []UserModel{{
-				user{
-					ID:       "a",
-					Email:    "a",
-					Username: "a",
-					Name:     str("a"),
+			expected := []PostModel{{
+				post{
+					ID:      "a",
+					Title:   "common",
+					Content: str("a"),
 				},
 			}, {
-				user{
-					ID:       "b",
-					Email:    "b",
-					Username: "b",
-					Name:     str("b"),
+				post{
+					ID:      "b",
+					Title:   "common",
+					Content: str("b"),
 				},
 			}}
 
