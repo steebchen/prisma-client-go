@@ -22,13 +22,13 @@ model Post {
 	id       String  @id @default(cuid())
 	title    String
 	content  String?
-	user     User
+	author   User
 	comments Comment[]
 }
 
 model Comment {
 	id        String  @id @default(cuid())
 	content   String
-	user      User
+	by        User
 	post      Post
 }

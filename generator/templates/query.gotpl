@@ -2,12 +2,13 @@
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
+	{{ $nameUpper := $model.Name.GoCase }}
 	{{ $nsQuery := (print $name "Query") }}
 	{{ $nsParams := (print $name "Params") }}
 
 	{{/* Namespace declaration */}}
-	// {{ $model.Name.GoCase }} acts as a namespaces to access query methods for the {{ $model.Name.GoCase }} model
-	var {{ $model.Name.GoCase }} = {{ $nsQuery }}{}
+	// {{ $nameUpper }} acts as a namespaces to access query methods for the {{ $nameUpper }} model
+	var {{ $nameUpper }} = {{ $nsQuery }}{}
 
 	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
@@ -33,55 +34,26 @@
 		// base struct
 		type {{ $struct }} struct {}
 
-		{{ range $toField := $model.Fields }}
-			{{ if $field.Kind.IsRelation }}
-				// extra type relation struct
-				type {{ $nsQuery }}{{ $toField.Name.GoCase}}{{ $toField.Type }}To{{ $field.Name.GoCase }} struct {}
-			{{ end }}
-		{{ end }}
-
 		{{ if $field.Kind.IsRelation }}
 			{{/* Attach relations to the $nsQuery struct */}}
-			// {{ $model.Name.GoCase }} -> {{ $field.Name.GoCase }}
+			// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
 			//
 			// @relation
 			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}() {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query {
-				return {{ $field.Type.GoLowerCase }}To{{ $model.Name.GoCase }}Query{}
-			}
+			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
+				var fields []field
 
-			{{ range $relField := $model.Fields }}
-				{{ if $relField.Kind.IsRelation }}
-					{{/* Attach relations to the $nsQuery struct */}}
-					// {{ $model.Name.GoCase }} -> {{ $relField.Name.GoCase }}
-					//
-					// @relation
-					// @{{ if $relField.IsRequired }}required{{ else }}optional{{ end }}
-					// $model.Name.GoCase {{ $model.Name.GoCase }}
-					// $field.Name.GoCase {{ $field.Name.GoCase }}
-					// $relField.Type.GoCase {{ $relField.Type.GoCase }}
-					// $relField.Name.GoCase {{ $relField.Name.GoCase }}
-					func ({{ $model.Name.GoLowerCase }}To{{ $relField.Type.GoCase }}Query) {{ $relField.Name.GoCase }}() {{ $relField.Type.GoLowerCase }}Query {
-						return {{ $relField.Type.GoLowerCase }}Query{}
-					}
-				{{ end }}
-			{{ end }}
+				for _, q := range params {
+					fields = append(fields, q.field())
+				}
 
-			{{/* Generate nested variations for relations */}}
-
-			type {{ $name }}To{{ $field.Type }}Query struct {
-				{{- range $toField := $model.Fields }}
-					{{/* Filter non-relations only for now */}}
-					{{- if $toField.Kind.IncludeInStruct -}}
-						// {{ $toField.Name.GoCase }}
-						//
-						// @{{ if $toField.IsRequired }}required{{ else }}optional{{ end }}
-						{{- if $toField.IsUnique }}
-							// @unique
-						{{- end }}
-						{{ $toField.Name.GoCase }} {{ $nsQuery }}{{ $toField.Name.GoCase }}{{ $toField.Type }}To{{ $field.Name.GoCase }}
-					{{ end }}
-				{{- end }}
+				return {{ $name }}Params{
+					data: field{
+						name:   "{{ $field.Name.CamelCase }}",
+						action: "{{ if $field.IsList }}some{{ end }}",
+						fields: fields,
+					},
+				}
 			}
 		{{ end }}
 
@@ -104,47 +76,25 @@
 			}
 		{{ end }}
 
-		{{ range $toField := $model.Fields }}
-			{{ $rel := false }}
-			{{ $cp := "" }}
-			{{ $n := $name }}
-			{{ if eq $toField.Name $field.Name }}
-				{{ $cp = $struct }}
-			{{ else if $toField.Kind.IsRelation }}
-				{{ $cp = print $struct "To" $toField.Name.GoCase }}
-				{{ $rel = true }}
-				{{ $n = $toField.Type.GoLowerCase }}
-			{{ end }}
+		{{ $returnStruct := "" }}
+		{{ if or ($field.IsID) ($field.IsUnique) }}
+			{{ $returnStruct = (print $name "ParamsUnique") }}
+		{{ else }}
+			{{ $returnStruct = (print $name "Params") }}
+		{{ end }}
 
-			{{ $returnStruct := "" }}
-			{{ if and (not $rel) (or ($field.IsID) ($field.IsUnique)) }}
-				{{ $returnStruct = (print $n "ParamsUnique") }}
-			{{ else }}
-				{{ $returnStruct = (print $n "Params") }}
-			{{ end }}
-
-			{{ if ne $cp "" }}
-				{{ range $type := $.DMMF.Types }}
-					{{ if eq $field.Type $type.Name }}
-						{{ range $method := $type.Methods }}
-							func (r {{ $cp }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-								return {{ $returnStruct }}{
-									data: field{
-										{{- if $rel }}
-											name: "{{ $model.Name.GoLowerCase }}",
-											fields: []field{ {
-										{{- end }}
-										action: "{{ $method.Action }}",
-										name:   "{{ $field.Name.CamelCase }}",
-										value:  value,
-										{{- if $rel }}
-											}},
-										{{ end }}
-									},
-								}
-							}
-						{{ end }}
-					{{ end }}
+		{{ range $type := $.DMMF.Types }}
+			{{ if eq $field.Type $type.Name }}
+				{{ range $method := $type.Methods }}
+					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+						return {{ $returnStruct }}{
+							data: field{
+								action: "{{ $method.Action }}",
+								name:   "{{ $field.Name.CamelCase }}",
+								value:  value,
+							},
+						}
+					}
 				{{ end }}
 			{{ end }}
 		{{ end }}
