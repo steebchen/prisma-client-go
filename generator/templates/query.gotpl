@@ -41,25 +41,27 @@
 		{{ if $field.Kind.IsRelation }}
 			type {{ $nsQuery }}{{ $field.Name.GoCase }}Relations struct {}
 
-			// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
-			//
-			// @relation
-			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Some(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
-				var fields []field
+			{{ range $method := $field.RelationMethods }}
+				// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
+				//
+				// @relation
+				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
+				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
+					var fields []field
 
-				for _, q := range params {
-					fields = append(fields, q.field())
-				}
+					for _, q := range params {
+						fields = append(fields, q.field())
+					}
 
-				return {{ $name }}Params{
-					data: field{
-						name:   "{{ $field.Name.CamelCase }}",
-						action: "{{ if $field.IsList }}some{{ end }}",
-						fields: fields,
-					},
+					return {{ $name }}Params{
+						data: field{
+							name:   "{{ $field.Name.CamelCase }}",
+							action: "{{ $method.Action }}",
+							fields: fields,
+						},
+					}
 				}
-			}
+			{{ end }}
 		{{ end }}
 
 		{{ $setReturnStruct := "" }}
