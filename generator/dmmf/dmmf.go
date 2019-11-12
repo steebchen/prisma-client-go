@@ -14,6 +14,16 @@ const (
 	FieldKindEnum   FieldKind = "enum"
 )
 
+// IncludeInStruct shows whether to include a field in a model struct.
+func (v FieldKind) IncludeInStruct() bool {
+	return v == FieldKindScalar || v == FieldKindEnum
+}
+
+// IsRelation returns whether field is a relation
+func (v FieldKind) IsRelation() bool {
+	return v == FieldKindObject
+}
+
 // DatamodelFieldKind describes a scalar, object or enum.
 type DatamodelFieldKind string
 
@@ -27,6 +37,11 @@ const (
 // IncludeInStruct shows whether to include a field in a model struct.
 func (v DatamodelFieldKind) IncludeInStruct() bool {
 	return v == DatamodelFieldKindScalar || v == DatamodelFieldKindEnum
+}
+
+// IsRelation returns whether field is a relation
+func (v DatamodelFieldKind) IsRelation() bool {
+	return v == DatamodelFieldKindRelation
 }
 
 // Document describes the root of the AST.
@@ -82,6 +97,87 @@ func (Document) Actions() []Action {
 	}
 }
 
+// Method defines the method for the virtual types method
+type Method struct {
+	Name   string
+	Action string
+}
+
+// Type defines the data struct for the virtual types method
+type Type struct {
+	Name    string
+	Methods []Method
+}
+
+// Types provides virtual types and their actions
+func (Document) Types() []Type {
+	number := []Method{{
+		Name:   "Equals",
+		Action: "",
+	}, {
+		Name:   "LT",
+		Action: "lt",
+	}, {
+		Name:   "GT",
+		Action: "gt",
+	}, {
+		Name:   "LTE",
+		Action: "lte",
+	}, {
+		Name:   "GTE",
+		Action: "gte",
+	}}
+	return []Type{{
+		Name: "String",
+		Methods: []Method{{
+			Name:   "Equals",
+			Action: "",
+		}, {
+			Name:   "Contains",
+			Action: "contains",
+		}, {
+			Name:   "HasPrefix",
+			Action: "starts_with",
+		}, {
+			Name:   "HasSuffix",
+			Action: "ends_with",
+		}},
+	}, {
+		Name: "Boolean",
+		Methods: []Method{{
+			Name:   "Equals",
+			Action: "",
+		}, {
+			Name:   "AfterEquals",
+			Action: "gte",
+		}},
+	}, {
+		Name:    "Int",
+		Methods: number,
+	}, {
+		Name:    "Float",
+		Methods: number,
+	}, {
+		Name: "DateTime",
+		Methods: []Method{{
+			Name:   "Equals",
+			Action: "",
+		}, {
+			Name:   "Before",
+			Action: "lt",
+		}, {
+			Name:   "After",
+			Action: "gt",
+		}, {
+			Name:   "BeforeEquals",
+			Action: "lte",
+		}, {
+			Name:   "AfterEquals",
+			Action: "gte",
+		}},
+	}}
+}
+
 // Enum describes an enumerated type.
 type Enum struct {
 	Name   types.String   `json:"name"`
@@ -108,13 +204,13 @@ type Model struct {
 
 // Field describes properties of a single model field.
 type Field struct {
-	Kind       DatamodelFieldKind `json:"kind"`
-	Name       types.String       `json:"name"`
-	IsRequired bool               `json:"isRequired"`
-	IsList     bool               `json:"isList"`
-	IsUnique   bool               `json:"isUnique"`
-	IsID       bool               `json:"isId"`
-	Type       types.Type         `json:"type"`
+	Kind       FieldKind    `json:"kind"`
+	Name       types.String `json:"name"`
+	IsRequired bool         `json:"isRequired"`
+	IsList     bool         `json:"isList"`
+	IsUnique   bool         `json:"isUnique"`
+	IsID       bool         `json:"isId"`
+	Type       types.Type   `json:"type"`
 	// DBName (optional)
 	DBName      types.String `json:"dBName"`
 	IsGenerated bool         `json:"isGenerated"`

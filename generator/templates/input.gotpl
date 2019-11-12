@@ -51,37 +51,8 @@ func (q query) build() string {
 	for _, i := range q.inputs {
 		builder.WriteString(i.name)
 		builder.WriteString(":")
-		builder.WriteString("{")
 
-		for _, f := range i.fields {
-			builder.WriteString(f.name)
-
-			// `equals` operations map to solely the field name in PQL
-			if f.action != "equals" {
-				builder.WriteString("_" + f.action)
-			}
-
-			builder.WriteString(":")
-
-			switch v := f.value.(type) {
-			case string:
-				builder.WriteString(fmt.Sprintf(`%q`, v))
-			case bool:
-				builder.WriteString(fmt.Sprintf(`%t`, v))
-			case int:
-				builder.WriteString(fmt.Sprintf(`%d`, v))
-			case float64:
-				builder.WriteString(fmt.Sprintf(`%f`, v))
-			case DateTime:
-				builder.WriteString(fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli)))
-			default:
-				panic(fmt.Errorf("no branch for field %s of type %T", f.name, v))
-			}
-
-			builder.WriteString(",")
-		}
-
-		builder.WriteString("}")
+		builder.WriteString(buildFields(i.fields))
 	}
 
 	builder.WriteString(")")
@@ -98,6 +69,49 @@ func (q query) build() string {
 	return builder.String()
 }
 
+func buildFields(fields []field) string {
+	var builder strings.Builder
+
+	builder.WriteString("{")
+
+	for _, f := range fields {
+		builder.WriteString(f.name)
+
+		if f.action != "" {
+			builder.WriteString("_" + f.action)
+		}
+
+		builder.WriteString(":")
+
+		if f.fields != nil {
+			builder.WriteString(buildFields(f.fields))
+		}
+
+		switch v := f.value.(type) {
+		case string:
+			builder.WriteString(fmt.Sprintf(`%q`, v))
+		case bool:
+			builder.WriteString(fmt.Sprintf(`%t`, v))
+		case int:
+			builder.WriteString(fmt.Sprintf(`%d`, v))
+		case float64:
+			builder.WriteString(fmt.Sprintf(`%f`, v))
+		case DateTime:
+			builder.WriteString(fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli)))
+		case nil:
+			break
+		default:
+			panic(fmt.Errorf("no branch for field %s of type %T", f.name, v))
+		}
+
+		builder.WriteString(",")
+	}
+
+	builder.WriteString("}")
+
+	return builder.String()
+}
+
 func (q query) exec(ctx context.Context, v interface{}) error {
 	if q.client == nil {
 		panic("client.Connect() needs to be called before sending queries")
@@ -105,7 +119,7 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 
 	s := q.build()
 
-	if debug {
+	if debug == Info {
 		log.Printf("prisma query: `%s`", s)
 	}
 

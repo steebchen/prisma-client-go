@@ -26,6 +26,7 @@ var countOutput = []field{
 
 	type i{{ $model.Name.GoCase }}Params interface {
 		field() field
+		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}Params struct {
@@ -36,14 +37,19 @@ var countOutput = []field{
 		return p.data
 	}
 
+	func (p {{ $name }}Params) {{ $model.Name.GoLowerCase }}Model()() {}
+
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() field
 		unique()
+		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}ParamsUnique struct {
 		data field
 	}
+
+	func (p {{ $name }}ParamsUnique) {{ $model.Name.GoLowerCase }}Model()() {}
 
 	func ({{ $name }}ParamsUnique) unique() {}
 
@@ -53,14 +59,14 @@ var countOutput = []field{
 
 	type i{{ $model.Name.GoCase }}SetParams interface {
 		field() field
-		isSetParam()
+		settable()
 	}
 
 	type {{ $name }}SetParams struct {
 		data field
 	}
 
-	func ({{ $name }}SetParams) isSetParam() {}
+	func ({{ $name }}SetParams) settable() {}
 
 	func (p {{ $name }}SetParams) field() field {
 		return p.data
@@ -71,7 +77,7 @@ var countOutput = []field{
 			data field
 		}
 
-		func ({{ $name }}{{ $field.Name.GoCase }}SetParams) isSetParam() {}
+		func ({{ $name }}{{ $field.Name.GoCase }}SetParams) settable() {}
 
 		func (p {{ $name }}{{ $field.Name.GoCase }}SetParams) field() field {
 			return p.data
