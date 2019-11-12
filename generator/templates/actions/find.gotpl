@@ -13,17 +13,26 @@
 
 		{{/* FIND */}}
 
-		func (r {{ $ns }}) Find{{ $v.Name }}(params ...{{ $params }}{{ if not $v.List }}Unique{{ end }}) {{ $result }} {
+		func (r {{ $ns }}) Find{{ $v.Name }}(params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }}) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
-			var fields []field
-			for _, q := range params {
-				fields = append(fields, q.field())
-			}
-			v.query.inputs = append(v.query.inputs, input{
-				name:   "where",
-				fields: fields,
-			})
+
+			{{ if $v.List }}
+				var fields []field
+				for _, q := range params {
+					fields = append(fields, q.field())
+				}
+				v.query.inputs = append(v.query.inputs, input{
+					name:   "where",
+					fields: fields,
+				})
+			{{ else }}
+				v.query.inputs = append(v.query.inputs, input{
+					name:   "where",
+					fields: []field{params.field()},
+				})
+			{{ end }}
+
 			return v
 		}
 
