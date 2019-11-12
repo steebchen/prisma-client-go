@@ -10,6 +10,9 @@ type field struct {
 	// an action for input fields, e.g. `contains` // TODO maybe create separate field struct for input types
 	action string
 
+	// whether the fields is a list of items
+	list bool
+
 	// value contains the field value. if nil, fields will contain a subselection.
 	value interface{}
 
@@ -52,7 +55,7 @@ func (q query) build() string {
 		builder.WriteString(i.name)
 		builder.WriteString(":")
 
-		builder.WriteString(buildFields(i.fields))
+		builder.WriteString(buildFields(false, i.fields))
 	}
 
 	builder.WriteString(")")
@@ -69,12 +72,18 @@ func (q query) build() string {
 	return builder.String()
 }
 
-func buildFields(fields []field) string {
+func buildFields(wrapList bool, fields []field) string {
 	var builder strings.Builder
 
-	builder.WriteString("{")
+	if !wrapList {
+		builder.WriteString("{")
+	}
 
 	for _, f := range fields {
+		if wrapList {
+			builder.WriteString("{")
+		}
+
 		builder.WriteString(f.name)
 
 		if f.action != "" {
@@ -83,8 +92,12 @@ func buildFields(fields []field) string {
 
 		builder.WriteString(":")
 
+		if f.list {
+			builder.WriteString("[")
+		}
+
 		if f.fields != nil {
-			builder.WriteString(buildFields(f.fields))
+			builder.WriteString(buildFields(f.list, f.fields))
 		}
 
 		switch v := f.value.(type) {
@@ -104,10 +117,20 @@ func buildFields(fields []field) string {
 			panic(fmt.Errorf("no branch for field %s of type %T", f.name, v))
 		}
 
+		if f.list {
+			builder.WriteString("]")
+		}
+
+		if wrapList {
+			builder.WriteString("}")
+		}
+
 		builder.WriteString(",")
 	}
 
-	builder.WriteString("}")
+	if !wrapList {
+		builder.WriteString("}")
+	}
 
 	return builder.String()
 }

@@ -401,6 +401,95 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "NOT operation",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "username",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "username",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Not(
+					User.Email.Equals("email1"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "username",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "OR operation",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Or(
+					User.Email.Equals("email1"),
+					User.ID.Equals("id2"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "a",
+				},
+			}, {
+				user{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

@@ -51,6 +51,23 @@ type Document struct {
 	Mappings  []Mapping `json:"mappings"`
 }
 
+// Operator describes a query operator such as NOT, OR, etc.
+type Operator struct {
+	Name   string
+	Action string
+}
+
+// Operators returns a list of all query operators such as NOT, OR, etc.
+func (Document) Operators() []Operator {
+	return []Operator{{
+		Name:   "Not",
+		Action: "NOT",
+	}, {
+		Name:   "Or",
+		Action: "OR",
+	}}
+}
+
 // Action describes a CRUD operation.
 type Action struct {
 	// Type describes a query or a mutation
