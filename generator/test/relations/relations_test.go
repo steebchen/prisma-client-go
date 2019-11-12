@@ -71,7 +71,7 @@ func TestRelations(t *testing.T) {
 		run: func(t *testing.T, client Client, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
-				Post.Author(
+				Post.Author.Some(
 					User.Email.Equals("john@example.com"),
 				),
 			).Exec(ctx)
@@ -135,9 +135,9 @@ func TestRelations(t *testing.T) {
 		run: func(t *testing.T, client Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Email.Equals("john@example.com"),
-				User.Posts(
+				User.Posts.Some(
 					Post.Title.Equals("common"),
-					Post.Comments(
+					Post.Comments.Some(
 						Comment.Content.Contains("comment"),
 					),
 				),
