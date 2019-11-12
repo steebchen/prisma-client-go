@@ -23,6 +23,10 @@
 				{{- end }}
 				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{ end }}
+
+			{{- if $field.Kind.IsRelation }}
+				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}Relations
+			{{ end }}
 		{{- end }}
 	}
 
@@ -35,26 +39,29 @@
 		type {{ $struct }} struct {}
 
 		{{ if $field.Kind.IsRelation }}
-			{{/* Attach relations to the $nsQuery struct */}}
-			// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
-			//
-			// @relation
-			// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-			func ({{ $nsQuery }}) {{ $field.Name.GoCase }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
-				var fields []field
+			type {{ $nsQuery }}{{ $field.Name.GoCase }}Relations struct {}
 
-				for _, q := range params {
-					fields = append(fields, q.field())
-				}
+			{{ range $method := $field.RelationMethods }}
+				// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
+				//
+				// @relation
+				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
+				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
+					var fields []field
 
-				return {{ $name }}Params{
-					data: field{
-						name:   "{{ $field.Name.CamelCase }}",
-						action: "{{ if $field.IsList }}some{{ end }}",
-						fields: fields,
-					},
+					for _, q := range params {
+						fields = append(fields, q.field())
+					}
+
+					return {{ $name }}Params{
+						data: field{
+							name:   "{{ $field.Name.CamelCase }}",
+							action: "{{ $method.Action }}",
+							fields: fields,
+						},
+					}
 				}
-			}
+			{{ end }}
 		{{ end }}
 
 		{{ $setReturnStruct := "" }}

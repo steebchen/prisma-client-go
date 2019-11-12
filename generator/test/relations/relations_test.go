@@ -27,7 +27,7 @@ func TestRelations(t *testing.T) {
 		before string
 		run    Func
 	}{{
-		name: "find many posts by user",
+		name: "find by single relation",
 		// language=GraphQL
 		before: `
 			mutation {
@@ -71,7 +71,7 @@ func TestRelations(t *testing.T) {
 		run: func(t *testing.T, client Client, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
-				Post.Author(
+				Post.Author.Where(
 					User.Email.Equals("john@example.com"),
 				),
 			).Exec(ctx)
@@ -96,7 +96,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "find user by email, posts and comments",
+		name: "find by to-many relation",
 		// language=GraphQL
 		before: `
 			mutation {
@@ -135,9 +135,9 @@ func TestRelations(t *testing.T) {
 		run: func(t *testing.T, client Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Email.Equals("john@example.com"),
-				User.Posts(
+				User.Posts.Some(
 					Post.Title.Equals("common"),
-					Post.Comments(
+					Post.Comments.Every(
 						Comment.Content.Contains("comment"),
 					),
 				),

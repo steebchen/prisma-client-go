@@ -222,6 +222,30 @@ type Field struct {
 	RelationName types.String
 }
 
+// RelationMethod describes a method for relations
+type RelationMethod struct {
+	Name   string
+	Action string
+}
+
+// RelationMethods returns a mapping for the PQL methods provided for relations
+func (f Field) RelationMethods() []RelationMethod {
+	if f.IsList {
+		return []RelationMethod{{
+			Name:   "Some",
+			Action: "some",
+		}, {
+			Name:   "Every",
+			Action: "every",
+		}}
+	}
+
+	return []RelationMethod{{
+		Name:   "Where",
+		Action: "",
+	}}
+}
+
 // Schema provides the GraphQL/PQL AST.
 type Schema struct {
 	// RootQueryType (optional)
