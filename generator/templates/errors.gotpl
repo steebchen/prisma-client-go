@@ -1,2 +1,2 @@
 // ErrNotFound gets returned when a database record does not exist
-var ErrNotFound = errors.New("Error in connector: Record does not exist.")
+var ErrNotFound = errors.New("ErrNotFound")

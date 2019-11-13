@@ -49,6 +49,10 @@
 			err := r.query.exec(ctx, &v)
 			if v.Errors != nil {
 				first := v.Errors[0]
+				if first.Message == "Error occurred during query execution:\nConnectorError(RecordDoesNotExist)" ||
+					first.Message == "Error in connector: Record does not exist." {
+					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, ErrNotFound
+				}
 				return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
 			}
 			return v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
