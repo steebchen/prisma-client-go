@@ -164,9 +164,6 @@ func (Document) Types() []Type {
 		Methods: []Method{{
 			Name:   "Equals",
 			Action: "",
-		}, {
-			Name:   "AfterEquals",
-			Action: "gte",
 		}},
 	}, {
 		Name:    "Int",
