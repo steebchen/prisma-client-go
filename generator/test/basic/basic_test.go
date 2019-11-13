@@ -85,6 +85,16 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
+		name: "FindOne not found",
+		run: func(t *testing.T, client Client, ctx cx) {
+			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
+			if err == ErrNotFound {
+				return
+			}
+
+			assert.Equal(t, ErrNotFound, err)
+		},
+	}, {
 		name: "FindMany",
 		// language=GraphQL
 		before: `
@@ -349,12 +359,8 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, deleted)
 
-			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			assert.Equal(t, UserModel{}, actual)
+			_, err = client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			assert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Delete many",
