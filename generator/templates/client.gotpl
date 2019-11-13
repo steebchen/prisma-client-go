@@ -47,6 +47,11 @@ func NewClient() Client {
 	if debug == Info {
 		c.log = log.New(os.Stdout, "", log.Flags())
 	}
+
+	c.http = &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
 	return c
 }
 
@@ -55,8 +60,11 @@ type Client struct {
 	// cmd holds the prisma binary process
 	cmd *exec.Cmd
 
-	// gql holds the internal PQL client
-	gql *gqlclient.Client
+	// url holds the query-engine url
+	url string
+
+	// http is the internal http client
+	http *http.Client
 
 	// logger logs depending on the debug value
 	log *log.Logger
@@ -91,8 +99,7 @@ func (c *Client) Connect() error {
 		return fmt.Errorf("get free port: %w", err)
 	}
 
-	gql := gqlclient.New("http://localhost:" + string(port))
-	c.gql = gql
+	c.url = "http://localhost:" + string(port)
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
@@ -134,19 +141,45 @@ func (c *Client) Connect() error {
 
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
+	var gqlErrors []gqlError
 	for i := 0; i < 10; i++ {
-		_, connectErr = c.gql.Raw(ctx, "", map[string]interface{}{})
-		if connectErr != nil {
+		body, err := c.request(ctx, "GET", "/status", map[string]interface{}{})
+
+		if err != nil {
+			connectErr = err
 			c.log.Printf("could not connect; retrying...")
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
+
+		var response gqlResponse
+
+		err = json.Unmarshal(body, &response)
+		if err != nil {
+			connectErr = err
+			c.log.Printf("could not unmarshal response; retrying...")
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+
+		if response.Errors != nil {
+			gqlErrors = response.Errors
+			c.log.Printf("could not connect due to gql errors; retrying...")
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+
 		connectErr = nil
+		gqlErrors = nil
 		break
 	}
 
 	if connectErr != nil {
-		return fmt.Errorf("readiness query error: %w", err)
+		return fmt.Errorf("readiness query error: %w", connectErr)
+	}
+
+	if gqlErrors != nil {
+		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
 
 	c.log.Printf("connected.")

@@ -1,0 +1,81 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+// gqlResponse is the payload for a GraphQL response
+type gqlResponse struct {
+	Data       interface{}            `json:"data"`
+	Errors     []gqlError             `json:"errors"`
+	Extensions map[string]interface{} `json:"extensions"`
+}
+
+// gqlRequest is the payload for GraphQL queries
+type gqlRequest struct {
+	Query         string                 `json:"query"`
+	Variables     map[string]interface{} `json:"variables"`
+	OperationName *string                `json:"operationName"`
+}
+
+// gqlError is a GraphQL Error
+type gqlError struct {
+	Message    string                 `json:"error"` // note: the query-engine uses 'error' instead of 'message'
+	Path       []string               `json:"path"`
+	Extensions map[string]interface{} `json:"query"`
+}
+
+// do sends the http request to the query engine and unmarshals the response
+func (c *Client) do(ctx context.Context, query string, response interface{}) error {
+	payload := gqlRequest{
+		Query:     query,
+		Variables: map[string]interface{}{},
+	}
+
+	body, err := c.request(ctx, "POST", "/", &payload)
+	if err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	err = json.Unmarshal(body, response)
+	if err != nil {
+		return fmt.Errorf("json unmarshal: %w", err)
+	}
+
+	return nil
+}
+
+func (c *Client) request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
+	requestBody, err := json.Marshal(payload)
+	if err != nil {
+		return nil, fmt.Errorf("payload marshal: %w", err)
+	}
+
+	req, err := http.NewRequest(method, c.url + path, bytes.NewBuffer(requestBody))
+
+	if err != nil {
+		return nil, fmt.Errorf("raw post: %w", err)
+	}
+
+	req.Header.Set("content-type", "application/json")
+	req = req.WithContext(ctx)
+
+	rawResponse, err := c.http.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("raw post: %w", err)
+	}
+	defer func() {
+		err := rawResponse.Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	responseBody, err := ioutil.ReadAll(rawResponse.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("raw read: %w", err)
+	}
+
+	if rawResponse.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("http status code %d with response %s", rawResponse.StatusCode, responseBody)
+	}
+
+	return responseBody, nil
+}

@@ -4,18 +4,19 @@
 package {{.Generator.Config.Package}}
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/steebchen/gqlclient"
 )
 
 type LogLevel string
