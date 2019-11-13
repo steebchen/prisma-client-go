@@ -6,6 +6,7 @@ package {{.Generator.Config.Package}}
 import (
 	"bytes"
 	"context"
+	"errors"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"

@@ -47,6 +47,10 @@
 		r.query.outputs = {{ $name }}Output
 		var v createOne{{ $model.Name.GoCase }}Response
 		err := r.query.exec(ctx, &v)
+		if v.Errors != nil {
+			first := v.Errors[0]
+			return {{ $modelName }}{}, fmt.Errorf(first.Message)
+		}
 		return v.Data.CreateOne{{ $model.Name.GoCase }}, err
 	}
 {{ end }}
