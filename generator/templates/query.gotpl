@@ -4,7 +4,6 @@
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
 	{{ $nsQuery := (print $name "Query") }}
-	{{ $nsParams := (print $name "Params") }}
 
 	{{/* Namespace declaration */}}
 	// {{ $nameUpper }} acts as a namespaces to access query methods for the {{ $nameUpper }} model
@@ -29,6 +28,24 @@
 			{{ end }}
 		{{- end }}
 	}
+
+	{{ range $op := $.DMMF.Operators }}
+		func ({{ $nsQuery }}) {{ $op.Name }}(params ...i{{ $nameUpper }}Params) {{ $name }}Params {
+			var fields []field
+
+			for _, q := range params {
+				fields = append(fields, q.field())
+			}
+
+			return {{ $name }}Params{
+				data: field{
+					name:   "{{ $op.Action }}",
+					list: true,
+					fields: fields,
+				},
+			}
+		}
+	{{ end }}
 
 	{{ range $field := $model.Fields }}
 		{{ $nsField := print $nsQuery $field.Name.GoCase }}
