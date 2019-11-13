@@ -146,5 +146,5 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 		log.Printf("prisma query: `%s`", s)
 	}
 
-	return q.client.gql.Full(ctx, s, map[string]interface{}{}, &v)
+	return q.client.do(ctx, s, &v)
 }

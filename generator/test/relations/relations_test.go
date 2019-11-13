@@ -4,7 +4,6 @@ package relations
 
 import (
 	"context"
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -180,10 +179,13 @@ func TestRelations(t *testing.T) {
 			ctx := context.Background()
 
 			if tt.before != "" {
-				response, err := client.gql.Raw(ctx, tt.before, map[string]interface{}{})
-				log.Printf("mock response query %+v", response)
+				var response gqlResponse
+				err := client.do(ctx, tt.before, &response)
 				if err != nil {
-					t.Fatalf("could not send mock query %s %+v", err, response)
+					t.Fatalf("could not send mock query %s", err)
+				}
+				if response.Errors != nil {
+					t.Fatalf("mock query has errors %+v", response)
 				}
 			}
 
