@@ -55,6 +55,13 @@
 		// base struct
 		type {{ $struct }} struct {}
 
+		{{ $setReturnStruct := "" }}
+		{{ if $field.IsRequired }}
+			{{ $setReturnStruct = $nsFieldParams }}
+		{{ else }}
+			{{ $setReturnStruct = (print $name "SetParams") }}
+		{{ end}}
+
 		{{ if $field.Kind.IsRelation }}
 			type {{ $nsQuery }}{{ $field.Name.GoCase }}Relations struct {}
 
@@ -79,14 +86,25 @@
 					}
 				}
 			{{ end }}
-		{{ end }}
 
-		{{ $setReturnStruct := "" }}
-		{{ if $field.IsRequired }}
-			{{ $setReturnStruct = $nsFieldParams }}
-		{{ else }}
-			{{ $setReturnStruct = (print $name "SetParams") }}
-		{{ end}}
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(params ...i{{ $field.Type.GoCase }}Params) {{ $setReturnStruct }} {
+				var fields []field
+
+				for _, q := range params {
+					fields = append(fields, q.field())
+				}
+
+				return {{ $setReturnStruct }}{
+					data: field{
+						name: "{{ $field.Name.CamelCase }}",
+						fields: []field{field{
+							name:   "connect",
+							fields: fields,
+						}},
+					},
+				}
+			}
+		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}
 			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}

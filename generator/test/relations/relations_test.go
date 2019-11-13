@@ -156,6 +156,57 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "create and connect",
+		// language=GraphQL
+		before: `
+			mutation {
+				createOneUser(data: {
+					id: "123",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			title := "What's up?"
+			userID := "123"
+
+			created, err := client.Post.CreateOne(
+				Post.ID.Set("post"),
+				Post.Title.Set(title),
+				Post.Author.Link(
+					User.ID.Equals(userID),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := PostModel{
+				post{
+					ID:    "post",
+					Title: title,
+				},
+			}
+
+			assert.Equal(t, expected, created)
+
+			posts, err := client.Post.FindMany(
+				Post.Title.Equals(title),
+				Post.Author.Where(
+					User.ID.Equals(userID),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []PostModel{expected}, posts)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
