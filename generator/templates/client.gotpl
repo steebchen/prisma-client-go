@@ -3,8 +3,8 @@
 var schemaPath = "{{ .SchemaPath }}"
 
 var binaries = map[string]string{
-	{{ range $i, $binary := $.BinaryPaths.QueryEngine }}
-		"{{ $i }}": "{{ $binary }}",
+	{{- range $name, $_ := $.BinaryPaths.QueryEngine }}
+		"{{ $name }}": "./query-engine-{{ $name }}",
 	{{ end }}
 }
 
