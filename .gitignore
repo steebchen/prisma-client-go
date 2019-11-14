@@ -1,6 +1,10 @@
 **migrations**/
-prisma
+query-engine-*
 photongo
 *.sqlite
 *.json
 *_gen.go
+
+# for development purposes
+schema.graphql
+.graphqlconfig
