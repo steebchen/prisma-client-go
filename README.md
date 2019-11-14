@@ -4,7 +4,9 @@ Photon Go is an auto-generated database client, which is fully typesafe, reduces
 
 Photon Go is a part of the [Prisma Framework](https://github.com/prisma/prisma2) and depends on it.
 
-*NOTE*: Currently, Photon Go is still under heavy development and in an experimentation phase, where we build specifications for the syntax and make major decisions on how the Go client will look and work. Photon Go is unstable and there is no ETA for general availability yet.
+:warning: :warning: Warning :warning: :warning:
+
+**NOTE: Currently, Photon Go is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Photon Go is unstable and there is no ETA for general availability yet.**
 
 ## Setup
 
@@ -21,9 +23,9 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
     go get github.com/prisma/photongo
     ```
 
-3) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with an sqlite database and Photon Go as a generator with two models would look like this:
+3) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Photon Go as a generator with two models would look like this:
 
-    ```
+    ```prisma
     datasource db {
       provider = "sqlite"
       url      = "file:dev.db"
@@ -36,11 +38,11 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
     }
 
     model User {
-      id    String  @default(cuid()) @id @unique
-      email String  @unique
-      name  String?
-      address String?
-      posts Post[]
+      id      String  @default(cuid()) @id @unique
+      email   String  @unique
+      name    String?
+      age     Int?
+      posts   Post[]
     }
 
     model Post {
@@ -52,7 +54,7 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
     }
     ```
 
-    To get this up and running in your database, we use the Prisma tool [`lift`](https://github.com/prisma/lift) to create and migrate our database:
+    To get this up and running in your database, we use the Prisma migration tool [`lift`](https://github.com/prisma/lift) to create and migrate our database:
 
     ```
     prisma2 lift save --create-db --name "init" # the parameters are only required the first time
@@ -65,7 +67,9 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
     prisma2 generate
     ```
 
-    For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally.
+    Photon go is now generated into the file path you specified in the "output" option which is `"./photon/photon_gen.go"` in this case.
+
+    For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
 
     ```
     prisma2 dev
@@ -73,9 +77,9 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
 
 5) A few notes
 
-    Prisma uses a query engine to unify communication regardless of database or programming language. We automatically download it for you to your project path (where you ran `prisma2 generate` or `prisma2 dev`). However, you should ignore the binary file called `query-engine-<platform>` and adding `query-engine-*` to your .gitignore file. When you deploy your Go application to a remote server, you should push this binary as well because Photon Go depends on it.
+    Prisma uses a query engine to unify communication regardless of database or programming language. We automatically download it for you to your project path (where you ran `prisma2 generate` or `prisma2 dev`). However, you should ignore the binary file called `query-engine-<platform>` and adding `query-engine-*` to your .gitignore file (and if you're using docker, also do your .dockerignore). When you deploy your Go application to a remote server, you should push this binary as well because Photon Go depends on it.
     
-To deploy your app, please check the [deploy](#deploy) instructions.
+For more information and intstructions on how to deploy your app, please check the [deploy instructions](#deploy).
 
 ## Usage
 
@@ -157,19 +161,95 @@ func main() {
 
 Deploying a Photon Go adds a few more steps, because it depends on the prisma query engine, which is a binary we automatically download in your project path. Depending on where you deploy your code to, you might need to follow some extra steps.
 
-### Traditionally deploy to a any server
 
-TODO
+#### Set up go generate
+
+While this step is not required, we recommend to use [`go generate`](https://blog.golang.org/generate) to simplify generating the Photon Go client. To do so, you can just put the following line into a go file, and then run go generate so `prisma2 generate` and any other generate commands you run will get executed.
+
+Put this line into a go file in your project, usually in `main.go`:
+
+```go
+//go:generate prisma2 generate
+
+func main() {
+  // ...
+}
+```
+
+Now, run `go generate`:
+
+```
+go generate
+```
+
+Your Photon Go code is now generated.
+
+#### Traditionally deploy to a server
+
+Usually, you would deploy your Go app by running `go build .`, which generates a binary, and then deploy that binary anywhere you want. However, since Photon Go depends on the Prisma query engine, you also need to deploy the query engine binary `query-engine-*` files.
+
+If you use different development environments, e.g. a Mac to develop, and Debian on your server, you need to specify these two binaries in the schema.prisma file so that you can then also upload the binary suitable for your deploy environment.
+
+```prisma
+generator photon {
+  provider = "photongo"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
+```
+
+You can find all binary targets [in our specs repository](https://github.com/prisma/specs/tree/master/binaries#binary-builds).
 
 ### Using docker
 
-TODO
+When deploying with docker, the setup is super easy. Build your dockerfile as usual, run `go generate` (see [setting up go generate](#set-up-go-generate)), and you're good to go!
+
+We also recommend using [Go modules](https://blog.golang.org/using-go-modules), which is recommended when using Go >=1.13.
+
+Your dockerfile could look like this. It uses Go modules, layered caching for fast docker builds and multiple stages for lightweight images (usually a few megabytes).
+
+```dockerfile
+FROM golang:1.13 as build
+
+WORKDIR /app
+
+# install node.js, which is currently required for prisma
+RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && apt-get install -y nodejs
+
+RUN npm i -g prisma2 --unsafe-perm
+
+# add go modules lockfiles
+COPY go.mod go.sum ./
+
+# make sure the Photon Go binary is installed, which is currently required by prisma
+RUN go install github.com/prisma/photongo
+
+COPY . ./
+
+# generate the Photon Go client
+RUN prisma2 generate
+# or, if you use go generate to run prisma2 generate, use the following line instead
+# RUN go generate ./...
+
+# build the binary with all dependencies
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /main .
+
+RUN ls -lah
+
+# run on the smallest image possible
+FROM scratch
+
+# copy CA certificates for TLS
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=build /main /main
+
+CMD ["/main"]
+```
 
 ### Reference
 
 The photon client provides the methods FindOne, FindMany, and CreateOne. Just with these 3 methods, you can query for anything, and optionally update or delete for the queried records.
 
-Additionally, Photon Go provids a fully fluent and type-safe query API, which always follows the schema `photon.<Model>.<Field>.<Action>`, e.g. `photon.User.Name.Equals("John")`.
+Additionally, Photon Go provides a fully fluent and type-safe query API, which always follows the schema `photon.<Model>.<Field>.<Action>`, e.g. `photon.User.Name.Equals("John")`.
 
 #### Reading data
 
