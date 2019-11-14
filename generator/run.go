@@ -22,6 +22,20 @@ func addDefaults(input *Root) {
 func Run(input Root) error {
 	addDefaults(&input)
 
+	// copy the query engine to the local repository path
+	for name, path := range input.BinaryPaths.QueryEngine {
+		input, err := ioutil.ReadFile(path)
+		if err != nil {
+			return fmt.Errorf("could not read file %s: %w", path, err)
+		}
+
+		dest := "./query-engine-" + name
+		err = ioutil.WriteFile(dest, input, os.ModePerm)
+		if err != nil {
+			return fmt.Errorf("could not write file to %s: %w", dest, err)
+		}
+	}
+
 	var buf bytes.Buffer
 
 	ctx := build.Default
@@ -48,11 +62,6 @@ func Run(input Root) error {
 	if err != nil {
 		return fmt.Errorf("could not walk dir %s: %w", templateDir, err)
 	}
-
-	// templates, err := template.ParseGlob(templateDir)
-	// if err != nil {
-	// 	return fmt.Errorf("could not parse go templates dir %s: %w", templateDir, err)
-	// }
 
 	// Run header template first
 	header, err := template.ParseFiles(templateDir + "/_header.gotpl")
@@ -88,6 +97,12 @@ func Run(input Root) error {
 	formatted, err := format.Source(buf.Bytes())
 	if err != nil {
 		return fmt.Errorf("could not format final source: %w", err)
+	}
+
+	path := filepath.Dir(input.Generator.Output)
+	err = os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("could not run MkdirAll on path %s: %w", input.Generator.Output, err)
 	}
 
 	err = ioutil.WriteFile(input.Generator.Output, formatted, 0644)
