@@ -204,7 +204,7 @@ generator photon {
 
 You can find all binary targets [in our specs repository](https://github.com/prisma/specs/tree/master/binaries#binary-builds).
 
-### Using docker
+#### Using docker
 
 When deploying with docker, the setup is super easy. Build your dockerfile as usual, run `go generate` (see [setting up go generate](#set-up-go-generate)), and you're good to go!
 
@@ -225,7 +225,7 @@ RUN npm i -g prisma2 --unsafe-perm
 # add go modules lockfiles
 COPY go.mod go.sum ./
 
-# make sure the Photon Go binary is installed, which is currently required by prisma
+# make sure the Photon Go binary is installed. also see https://github.com/golang/go/issues/27653
 RUN go install github.com/prisma/photongo
 
 COPY . ./
