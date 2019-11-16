@@ -8,12 +8,17 @@ Photon Go is a part of the [Prisma Framework](https://github.com/prisma/prisma2)
 
 **NOTE: Currently, Photon Go is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Photon Go is unstable and there is no ETA for general availability yet.**
 
+We recommend to read the [current caveats](#caveats) (which are planned to be fixed before we make a stable release).
+
 ## Setup
 
 The Photon Go setup has a few caveats due to Prisma Framework being in an alpha state at this time.
 You can already use Photon Go, but it means you have to take a few extra steps. This will not be required anymore in future releases.
 
 1) Install the Prisma CLI (requires Node.JS/npm)
+
+    Note: We're aware that this step probably doesn't fit in your workflow, but currently due to our architecture at Prisma it is required. It's planned to get rid of this step soon, just like you'd expect.
+
     ```
     npm i -g prisma2
     ```
@@ -359,3 +364,12 @@ updated, err := client.User.FindOne(
 ```
 
 #### Querying for relations
+
+*TBD*
+
+## Caveats
+
+- Requires the Prisma CLI, which is currently shipped as a NodeJS package.
+- Multiple Photon Go projects can only have the same version of prisma/photongo, even if you use go modules (https://github.com/golang/go/issues/27653).
+- Breaking changes in minor and patch versions.
+- DO NOT USE IN PRODUCTION!
