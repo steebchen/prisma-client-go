@@ -125,6 +125,19 @@
 			{{ $returnStruct = (print $name "Params") }}
 		{{ end }}
 
+		{{ if $field.Kind.IncludeInStruct }}
+			{{/* Provide an `Equals` method for most types. */}}
+			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						name:   "{{ $field.Name.CamelCase }}",
+						value:  value,
+					},
+				}
+			}
+		{{ end }}
+
+		{{/* Provide type-specific methods. */}}
 		{{ range $type := $.DMMF.Types }}
 			{{ if eq $field.Type $type.Name }}
 				{{ range $method := $type.Methods }}
