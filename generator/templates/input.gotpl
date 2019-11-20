@@ -1,3 +1,5 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
 type input struct {
 	name   string
 	fields []field
@@ -113,6 +115,12 @@ func buildFields(wrapList bool, fields []field) string {
 			builder.WriteString(fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli)))
 		case nil:
 			break
+
+		{{ range $t := $.DMMF.Datamodel.Enums }}
+			case {{ $t.Name}}:
+				builder.WriteString(fmt.Sprintf(`%s`, v))
+		{{ end }}
+
 		default:
 			panic(fmt.Errorf("no branch for field %s of type %T", f.name, v))
 		}
