@@ -16,4 +16,11 @@ model User {
 	float    Float
 	bool     Boolean
 	date     DateTime
+	role     Role?
+}
+
+enum Role {
+	User
+	Moderator
+	Admin
 }

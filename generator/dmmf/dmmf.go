@@ -129,9 +129,6 @@ type Type struct {
 // Types provides virtual types and their actions
 func (Document) Types() []Type {
 	number := []Method{{
-		Name:   "Equals",
-		Action: "",
-	}, {
 		Name:   "LT",
 		Action: "lt",
 	}, {
@@ -144,12 +141,10 @@ func (Document) Types() []Type {
 		Name:   "GTE",
 		Action: "gte",
 	}}
+
 	return []Type{{
 		Name: "String",
 		Methods: []Method{{
-			Name:   "Equals",
-			Action: "",
-		}, {
 			Name:   "Contains",
 			Action: "contains",
 		}, {
@@ -160,11 +155,8 @@ func (Document) Types() []Type {
 			Action: "ends_with",
 		}},
 	}, {
-		Name: "Boolean",
-		Methods: []Method{{
-			Name:   "Equals",
-			Action: "",
-		}},
+		Name:    "Boolean",
+		Methods: []Method{},
 	}, {
 		Name:    "Int",
 		Methods: number,
@@ -174,9 +166,6 @@ func (Document) Types() []Type {
 	}, {
 		Name: "DateTime",
 		Methods: []Method{{
-			Name:   "Equals",
-			Action: "",
-		}, {
 			Name:   "Before",
 			Action: "lt",
 		}, {
