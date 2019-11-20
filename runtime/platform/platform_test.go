@@ -15,15 +15,15 @@ func Test_parseOpenSSLVersion(t *testing.T) {
 	}{{
 		name:  "1.1",
 		input: "OpenSSL 1.1.0d  1 Feb 2014",
-		want:  "1.1",
+		want:  "1.1.x",
 	}, {
 		name:  "1.0",
 		input: "OpenSSL 1.0.2g  1 Mar 2016",
-		want:  "1.0",
+		want:  "1.0.x",
 	}, {
 		name:  "default to 1.1",
 		input: "",
-		want:  "1.1",
+		want:  "1.1.x",
 	}}
 	for _, tt := range tests {
 		tt := tt
