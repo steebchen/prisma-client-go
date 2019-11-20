@@ -97,13 +97,13 @@ func TestTypes(t *testing.T) {
 			}
 
 			created, err := client.User.CreateOne(
-				User.ID.Set("123"),
 				User.Str.Set("a"),
 				User.Int.Set(5),
 				User.Float.Set(5.5),
 				User.Bool.Set(true),
 				User.Date.Set(date),
 				User.Role.Set(RoleAdmin),
+				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
