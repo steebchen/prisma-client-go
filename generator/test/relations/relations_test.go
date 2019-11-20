@@ -176,11 +176,11 @@ func TestRelations(t *testing.T) {
 			userID := "123"
 
 			created, err := client.Post.CreateOne(
-				Post.ID.Set("post"),
 				Post.Title.Set(title),
 				Post.Author.Link(
 					User.ID.Equals(userID),
 				),
+				Post.ID.Set("post"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)

@@ -188,11 +188,11 @@ func TestBasic(t *testing.T) {
 		name: "Create",
 		run: func(t *testing.T, client Client, ctx cx) {
 			created, err := client.User.CreateOne(
-				User.ID.Set("id"),
 				User.Email.Set("email"),
 				User.Username.Set("username"),
 
 				// optional values
+				User.ID.Set("id"),
 				User.Name.Set("name"),
 				User.Stuff.Set("stuff"),
 			).Exec(ctx)
