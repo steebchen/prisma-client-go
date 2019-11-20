@@ -79,6 +79,48 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, []UserModel{expected}, actualSlice)
 		},
 	}, {
+		name: "enums",
+		run: func(t *testing.T, client Client, ctx cx) {
+			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+
+			admin := RoleAdmin
+			expected := UserModel{
+				user{
+					ID:    "123",
+					Str:   "a",
+					Int:   5,
+					Float: 5.5,
+					Bool:  true,
+					Date:  date,
+					Role:  &admin,
+				},
+			}
+
+			created, err := client.User.CreateOne(
+				User.ID.Set("123"),
+				User.Str.Set("a"),
+				User.Int.Set(5),
+				User.Float.Set(5.5),
+				User.Bool.Set(true),
+				User.Date.Set(date),
+				User.Role.Set(RoleAdmin),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, created)
+
+			actual, err := client.User.FindMany(
+				User.Role.Equals(RoleAdmin),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{expected}, actual)
+		},
+	}, {
 		name: "basic equals",
 		// language=GraphQL
 		before: `
