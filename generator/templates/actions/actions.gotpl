@@ -37,7 +37,7 @@ var countOutput = []field{
 		return p.data
 	}
 
-	func (p {{ $name }}Params) {{ $model.Name.GoLowerCase }}Model()() {}
+	func (p {{ $name }}Params) {{ $model.Name.GoLowerCase }}Model() {}
 
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() field
@@ -49,7 +49,7 @@ var countOutput = []field{
 		data field
 	}
 
-	func (p {{ $name }}ParamsUnique) {{ $model.Name.GoLowerCase }}Model()() {}
+	func (p {{ $name }}ParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
 
 	func ({{ $name }}ParamsUnique) unique() {}
 

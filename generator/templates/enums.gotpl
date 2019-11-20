@@ -1,0 +1,11 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+{{ range $enum := $.DMMF.Datamodel.Enums -}}
+	type {{ $enum.Name.GoCase }} string
+
+	const (
+		{{ range $v := $enum.Values -}}
+			{{ $enum.Name.GoCase }}{{ $v.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v.GoCase }}"
+		{{ end }}
+	)
+{{- end }}
