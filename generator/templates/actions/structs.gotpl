@@ -26,7 +26,7 @@
 			}
 
 			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result struct {
-				Count float64 `json:"count"` {{/* TODO use int when prisma-engine bug is fixed */}}
+				Count int `json:"count"`
 			}
 		{{ end }}
 	{{ end }}
