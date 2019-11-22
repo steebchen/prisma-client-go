@@ -299,7 +299,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2.0, count)
+			assert.Equal(t, 2, count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -393,7 +393,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2.0, count)
+			assert.Equal(t, 2, count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),

@@ -62,7 +62,7 @@
 		{{ $outputName := $name }}
 		{{ $returnType := print $model.Name.GoCase "Model" }}
 		{{ if $v.List }}
-			{{ $returnType = "float64" }}
+			{{ $returnType = "int" }}
 			{{ $outputName = "count" }}
 		{{ end }}
 
