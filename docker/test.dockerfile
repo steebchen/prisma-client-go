@@ -10,7 +10,7 @@ RUN go mod download
 COPY . ./
 
 # make sure to always use the latest prisma2 to detect breaking changes for now
-RUN npm i -g prisma2 --unsafe-perm
+RUN npm i -g prisma2@alpha --unsafe-perm
 
 RUN go build .
 RUN go generate ./...
