@@ -18,7 +18,7 @@
 						{{- if $v.List -}}
 							{{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result
 						{{- else -}}
-							{{ $m }}Model
+							{{ if eq $action.Name "Find" }}*{{ end }}{{ $m }}Model
 						{{- end -}}
 					{{- end -}}
 					`json:"{{ $an }}{{ $v.Name }}{{ $m }}"`
