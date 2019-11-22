@@ -105,10 +105,22 @@ func (c *Client) Connect() error {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
+	binaryName := platform.GetName()
+
+	c.log.Printf("%s %+v", binaryName, binaries)
+
 	var path string
-	for _, value := range binaries {
-		path = value
-		break
+	for name, value := range binaries {
+		if name == binaryName {
+			path = value
+			break
+		}
+	}
+
+	c.log.Printf("path %s", path)
+
+	if path == "" {
+		return fmt.Errorf("no such binary %s in possible binaries %+v", binaryName, binaries)
 	}
 
 	c.cmd = exec.Command(path, "-p", string(port))

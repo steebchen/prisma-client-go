@@ -18,6 +18,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/prisma/photongo/runtime/platform"
 )
 
 type LogLevel string
