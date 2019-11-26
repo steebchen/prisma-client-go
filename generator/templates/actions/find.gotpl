@@ -50,6 +50,46 @@
 				})
 				return r
 			}
+
+			func (r {{ $result }}) Skip(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "skip",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) First(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "first",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) Last(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "last",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) After(cursor string) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "after",
+					value: cursor,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) Before(cursor string) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "before",
+					value: cursor,
+				})
+				return r
+			}
 		{{ end }}
 
 		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model, error) {

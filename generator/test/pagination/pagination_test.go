@@ -141,6 +141,189 @@ func TestPagination(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "first 2",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+
+				c: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+
+				b: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.
+				Post.
+				FindMany().
+				OrderBy(
+					Post.Title.Order(ASC),
+				).
+				// would return a, b
+				First(2).
+				// return records after b, which is c
+				After("b").
+				Exec(ctx)
+
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				post{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "first 2 skip",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+
+				c: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+
+				b: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.
+				Post.
+				FindMany().
+				OrderBy(
+					Post.Title.Order(ASC),
+				).
+				// would return a, b
+				First(2).
+				// skip a, return b, c
+				Skip(1).
+				Exec(ctx)
+
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				post{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}, {
+				post{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "last 2",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+
+				c: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+
+				b: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.
+				Post.
+				FindMany().
+				OrderBy(
+					Post.Title.Order(ASC),
+				).
+				// would return b, c
+				Last(2).
+				// before c will return b
+				Before("c").
+				Exec(ctx)
+
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				post{
+					ID:      "a",
+					Title:   "a",
+					Content: "a",
+				},
+			}, {
+				post{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
