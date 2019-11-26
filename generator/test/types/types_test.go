@@ -223,11 +223,10 @@ func TestTypes(t *testing.T) {
 			}
 
 			defer func() {
-				_ = client.Disconnect()
-				// TODO blocked by prisma-engine panicking on disconnect
-				// if err != nil {
-				// 	t.Fatalf("could not disconnect %s", err)
-				// }
+				err := client.Disconnect()
+				if err != nil {
+					t.Fatalf("could not disconnect: %s", err)
+				}
 			}()
 
 			ctx := context.Background()

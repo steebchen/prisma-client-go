@@ -39,6 +39,21 @@ var countOutput = []field{
 
 	func (p {{ $name }}Params) {{ $model.Name.GoLowerCase }}Model() {}
 
+	type i{{ $model.Name.GoCase }}OrderByParams interface {
+		field() field
+		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	type {{ $name }}OrderByParams struct {
+		data field
+	}
+
+	func (p {{ $name }}OrderByParams) field() field {
+		return p.data
+	}
+
+	func (p {{ $name }}OrderByParams) {{ $model.Name.GoLowerCase }}Model() {}
+
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() field
 		unique()
