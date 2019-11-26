@@ -495,6 +495,91 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		// TODO move this to test/types
+		name: "query for IsNull",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Stuff.IsNull(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id2",
+					Email:    "2",
+					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		// TODO move this to test/types
+		name: "query for nullable dynamic field",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			var str *string = nil
+			actual, err := client.User.FindMany(
+				User.Stuff.EqualsOptional(str),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id2",
+					Email:    "2",
+					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

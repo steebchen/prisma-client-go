@@ -143,6 +143,27 @@ const (
 				}
 			}
 
+			{{ if not $field.IsRequired }}
+				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
+					return {{ $returnStruct }}{
+						data: field{
+							name:   "{{ $field.Name.CamelCase }}",
+							value:  value,
+						},
+					}
+				}
+
+				func (r {{ $struct }}) IsNull() {{ $returnStruct }} {
+					var str *string = nil
+					return {{ $returnStruct }}{
+						data: field{
+							name:   "{{ $field.Name.CamelCase }}",
+							value:  str,
+						},
+					}
+				}
+			{{ end }}
+
 			func (r {{ $struct }}) Order(direction Direction) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
 					data: field{

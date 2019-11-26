@@ -24,7 +24,7 @@ func reply(w io.Writer, data interface{}) error {
 		return fmt.Errorf("could not marshal data %s", err)
 	}
 
-	b = append(b, []byte("\n")...)
+	b = append(b, byte('\n'))
 
 	_, err = w.Write(b)
 	if err != nil {
