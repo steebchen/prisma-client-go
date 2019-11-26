@@ -37,7 +37,7 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
     }
 
     generator photon {
-      provider = "/Users/prisma/go/bin/photongo"
+      provider = "photongo"
       output = "./photon/photon_gen.go"
       package = "photon"
     }
