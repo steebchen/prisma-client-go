@@ -1,5 +1,12 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
+type Direction string
+
+const (
+	ASC Direction  = "ASC"
+	DESC Direction = "DESC"
+)
+
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
@@ -132,6 +139,15 @@
 					data: field{
 						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
+					},
+				}
+			}
+
+			func (r {{ $struct }}) Order(direction Direction) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						name:   "{{ $field.Name.CamelCase }}",
+						value: direction,
 					},
 				}
 			}

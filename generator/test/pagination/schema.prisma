@@ -1,0 +1,16 @@
+datasource db {
+	provider = "sqlite"
+	url      = "file:dev.sqlite"
+}
+
+generator photon {
+	provider = "../../../photongo"
+	output = "./photon_gen.go"
+	package = "pagination"
+}
+
+model Post {
+	id      String @id @default(cuid())
+	title   String @unique
+	content String
+}

@@ -3,6 +3,7 @@
 type input struct {
 	name   string
 	fields []field
+	value  interface{}
 }
 
 type field struct {
@@ -55,9 +56,16 @@ func (q query) build() string {
 
 	for _, i := range q.inputs {
 		builder.WriteString(i.name)
+
 		builder.WriteString(":")
 
-		builder.WriteString(buildFields(false, i.fields))
+		if i.value != nil {
+			builder.WriteString(value(i.name, i.value))
+		} else {
+			builder.WriteString(buildFields(false, i.fields))
+		}
+
+		builder.WriteString(",")
 	}
 
 	builder.WriteString(")")
@@ -92,7 +100,9 @@ func buildFields(wrapList bool, fields []field) string {
 			builder.WriteString("_" + f.action)
 		}
 
-		builder.WriteString(":")
+		if f.fields != nil || f.value != nil {
+			builder.WriteString(":")
+		}
 
 		if f.list {
 			builder.WriteString("[")
@@ -102,28 +112,7 @@ func buildFields(wrapList bool, fields []field) string {
 			builder.WriteString(buildFields(f.list, f.fields))
 		}
 
-		switch v := f.value.(type) {
-		case string:
-			builder.WriteString(fmt.Sprintf(`%q`, v))
-		case bool:
-			builder.WriteString(fmt.Sprintf(`%t`, v))
-		case int:
-			builder.WriteString(fmt.Sprintf(`%d`, v))
-		case float64:
-			builder.WriteString(fmt.Sprintf(`%f`, v))
-		case DateTime:
-			builder.WriteString(fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli)))
-		case nil:
-			break
-
-		{{ range $t := $.DMMF.Datamodel.Enums }}
-			case {{ $t.Name}}:
-				builder.WriteString(fmt.Sprintf(`%s`, v))
-		{{ end }}
-
-		default:
-			panic(fmt.Errorf("no branch for field %s of type %T", f.name, v))
-		}
+		builder.WriteString(value(f.name, f.value))
 
 		if f.list {
 			builder.WriteString("]")
@@ -155,4 +144,31 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 	}
 
 	return q.client.do(ctx, s, &v)
+}
+
+func value(name string, value interface{}) string {
+	switch v := value.(type) {
+	case string:
+		return fmt.Sprintf(`%q`, v)
+	case bool:
+		return fmt.Sprintf(`%t`, v)
+	case int:
+		return fmt.Sprintf(`%d`, v)
+	case float64:
+		return fmt.Sprintf(`%f`, v)
+	case DateTime:
+		return fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli))
+	case Direction:
+		return string(v)
+	case nil:
+		return ""
+
+	{{ range $t := $.DMMF.Datamodel.Enums }}
+		case {{ $t.Name}}:
+			return fmt.Sprintf(`%s`, v)
+	{{ end }}
+
+	default:
+		panic(fmt.Errorf("no branch for field %s of type %T", name, v))
+	}
 }
