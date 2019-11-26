@@ -147,6 +147,10 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 }
 
 func value(name string, value interface{}) string {
+	if reflect.ValueOf(value).Kind() == reflect.Ptr {
+		return "null"
+	}
+
 	switch v := value.(type) {
 	case string:
 		return fmt.Sprintf(`%q`, v)
