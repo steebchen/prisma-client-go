@@ -46,9 +46,10 @@ const (
 
 			return {{ $name }}Params{
 				data: field{
-					name:   "{{ $op.Action }}",
-					list: true,
-					fields: fields,
+					name:     "{{ $op.Action }}",
+					list:     true,
+					wrapList: true,
+					fields:   fields,
 				},
 			}
 		}
@@ -143,12 +144,29 @@ const (
 				}
 			}
 
+			{{/* Provide an `In` method for most types. */}}
+			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
+				f := field{
+					name:   "{{ $field.Name.CamelCase }}",
+					action: "in",
+					list:   true,
+				}
+				for _, v := range values {
+					f.fields = append(f.fields, field{
+						value: v,
+					})
+				}
+				return {{ $returnStruct }}{
+					data: f,
+				}
+			}
+
 			{{ if not $field.IsRequired }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
 						data: field{
-							name:   "{{ $field.Name.CamelCase }}",
-							value:  value,
+							name:  "{{ $field.Name.CamelCase }}",
+							value: value,
 						},
 					}
 				}
@@ -157,8 +175,8 @@ const (
 					var str *string = nil
 					return {{ $returnStruct }}{
 						data: field{
-							name:   "{{ $field.Name.CamelCase }}",
-							value:  str,
+							name:  "{{ $field.Name.CamelCase }}",
+							value: str,
 						},
 					}
 				}
