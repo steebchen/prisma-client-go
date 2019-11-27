@@ -18,8 +18,6 @@ type Func func(t *testing.T, client Client, ctx cx)
 func TestTypes(t *testing.T) {
 	t.Parallel()
 
-	t.Skip("blocked by ignored default values: https://github.com/prisma/prisma2/issues/964")
-
 	tests := []struct {
 		name   string
 		before string
