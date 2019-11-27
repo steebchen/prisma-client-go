@@ -16,6 +16,9 @@ type field struct {
 	// whether the fields is a list of items
 	list bool
 
+	// whether the a list field should be wrapped in an object
+	wrapList bool
+
 	// value contains the field value. if nil, fields will contain a subselection.
 	value interface{}
 
@@ -62,7 +65,7 @@ func (q query) build() string {
 		if i.value != nil {
 			builder.WriteString(value(i.name, i.value))
 		} else {
-			builder.WriteString(buildFields(false, i.fields))
+			builder.WriteString(buildFields(false, false, i.fields))
 		}
 
 		builder.WriteString(",")
@@ -82,10 +85,10 @@ func (q query) build() string {
 	return builder.String()
 }
 
-func buildFields(wrapList bool, fields []field) string {
+func buildFields(list bool, wrapList bool, fields []field) string {
 	var builder strings.Builder
 
-	if !wrapList {
+	if !list {
 		builder.WriteString("{")
 	}
 
@@ -94,13 +97,15 @@ func buildFields(wrapList bool, fields []field) string {
 			builder.WriteString("{")
 		}
 
-		builder.WriteString(f.name)
+		if f.name != "" {
+			builder.WriteString(f.name)
+		}
 
-		if f.action != "" {
+		if f.name != "" && f.action != "" {
 			builder.WriteString("_" + f.action)
 		}
 
-		if f.fields != nil || f.value != nil {
+		if f.name != "" {
 			builder.WriteString(":")
 		}
 
@@ -109,7 +114,7 @@ func buildFields(wrapList bool, fields []field) string {
 		}
 
 		if f.fields != nil {
-			builder.WriteString(buildFields(f.list, f.fields))
+			builder.WriteString(buildFields(f.list, f.wrapList, f.fields))
 		}
 
 		builder.WriteString(value(f.name, f.value))
@@ -125,7 +130,7 @@ func buildFields(wrapList bool, fields []field) string {
 		builder.WriteString(",")
 	}
 
-	if !wrapList {
+	if !list {
 		builder.WriteString("}")
 	}
 
