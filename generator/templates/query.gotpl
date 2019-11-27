@@ -1,5 +1,12 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
+type Direction string
+
+const (
+	ASC Direction  = "ASC"
+	DESC Direction = "DESC"
+)
+
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
@@ -39,9 +46,10 @@
 
 			return {{ $name }}Params{
 				data: field{
-					name:   "{{ $op.Action }}",
-					list: true,
-					fields: fields,
+					name:     "{{ $op.Action }}",
+					list:     true,
+					wrapList: true,
+					fields:   fields,
 				},
 			}
 		}
@@ -132,6 +140,53 @@
 					data: field{
 						name:   "{{ $field.Name.CamelCase }}",
 						value:  value,
+					},
+				}
+			}
+
+			{{/* Provide an `In` method for most types. */}}
+			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
+				f := field{
+					name:   "{{ $field.Name.CamelCase }}",
+					action: "in",
+					list:   true,
+				}
+				for _, v := range values {
+					f.fields = append(f.fields, field{
+						value: v,
+					})
+				}
+				return {{ $returnStruct }}{
+					data: f,
+				}
+			}
+
+			{{ if not $field.IsRequired }}
+				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
+					return {{ $returnStruct }}{
+						data: field{
+							name:  "{{ $field.Name.CamelCase }}",
+							value: value,
+						},
+					}
+				}
+
+				func (r {{ $struct }}) IsNull() {{ $returnStruct }} {
+					var str *string = nil
+					return {{ $returnStruct }}{
+						data: field{
+							name:  "{{ $field.Name.CamelCase }}",
+							value: str,
+						},
+					}
+				}
+			{{ end }}
+
+			func (r {{ $struct }}) Order(direction Direction) {{ $returnStruct }} {
+				return {{ $returnStruct }}{
+					data: field{
+						name:   "{{ $field.Name.CamelCase }}",
+						value: direction,
 					},
 				}
 			}

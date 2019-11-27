@@ -299,7 +299,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2.0, count)
+			assert.Equal(t, 2, count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -393,7 +393,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2.0, count)
+			assert.Equal(t, 2, count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -495,6 +495,149 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		// TODO move this to test/types
+		name: "query for IsNull",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Stuff.IsNull(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id2",
+					Email:    "2",
+					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		// TODO move this to test/types
+		name: "query for nullable dynamic field",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			var str *string = nil
+			actual, err := client.User.FindMany(
+				User.Stuff.EqualsOptional(str),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id2",
+					Email:    "2",
+					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		// TODO move this to test/types
+		name: "IN operation",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "first",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: "second",
+				}) {
+					id
+				}
+				c: createOneUser(data: {
+					id: "id3",
+					email: "3",
+					username: "3",
+					stuff: "third",
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Stuff.In([]string{"first", "third"}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "1",
+					Username: "1",
+					Stuff:    str("first"),
+				},
+			}, {
+				user{
+					ID:       "id3",
+					Email:    "3",
+					Username: "3",
+					Stuff:    str("third"),
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
@@ -508,11 +651,10 @@ func TestBasic(t *testing.T) {
 			}
 
 			defer func() {
-				_ = client.Disconnect()
-				// TODO blocked by prisma-engine panicking on disconnect
-				// if err != nil {
-				// 	t.Fatalf("could not disconnect %s", err)
-				// }
+				err := client.Disconnect()
+				if err != nil {
+					t.Fatalf("could not disconnect: %s", err)
+				}
 			}()
 
 			ctx := context.Background()

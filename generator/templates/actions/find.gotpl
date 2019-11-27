@@ -10,6 +10,7 @@
 		{{ $updateResult := (print $name "Update" $v.Name) }}
 		{{ $deleteResult := (print $name "Delete" $v.Name) }}
 		{{ $params := (print "i" $model.Name.GoCase "Params") }}
+		{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
 
 		{{/* FIND */}}
 
@@ -40,6 +41,57 @@
 			query query
 		}
 
+		{{ if $v.List }}
+			{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
+			func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "orderBy",
+					value: Direction(param.field().name + "_" + value(param.field().name, param.field().value)),
+				})
+				return r
+			}
+
+			func (r {{ $result }}) Skip(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "skip",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) First(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "first",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) Last(count int) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "last",
+					value: count,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) After(cursor string) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "after",
+					value: cursor,
+				})
+				return r
+			}
+
+			func (r {{ $result }}) Before(cursor string) {{ $result }} {
+				r.query.inputs = append(r.query.inputs, input{
+					name:  "before",
+					value: cursor,
+				})
+				return r
+			}
+		{{ end }}
+
 		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model, error) {
 			r.query.operation = "query"
 			r.query.method = "find{{ $v.Name.GoCase }}"
@@ -62,7 +114,7 @@
 		{{ $outputName := $name }}
 		{{ $returnType := print $model.Name.GoCase "Model" }}
 		{{ if $v.List }}
-			{{ $returnType = "float64" }}
+			{{ $returnType = "int" }}
 			{{ $outputName = "count" }}
 		{{ end }}
 
