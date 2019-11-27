@@ -152,20 +152,41 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 }
 
 func value(name string, value interface{}) string {
-	if reflect.ValueOf(value).Kind() == reflect.Ptr {
-		return "null"
-	}
-
 	switch v := value.(type) {
 	case string:
 		return fmt.Sprintf(`%q`, v)
+	case *string:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%q`, *v)
 	case bool:
 		return fmt.Sprintf(`%t`, v)
+	case *bool:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%t`, *v)
 	case int:
 		return fmt.Sprintf(`%d`, v)
+	case *int:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%d`, *v)
 	case float64:
 		return fmt.Sprintf(`%f`, v)
+	case *float64:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%f`, *v)
 	case DateTime:
+		return fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli))
+	case *DateTime:
+		if v == nil {
+			return "null"
+		}
 		return fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli))
 	case Direction:
 		return string(v)
@@ -175,6 +196,11 @@ func value(name string, value interface{}) string {
 	{{ range $t := $.DMMF.Datamodel.Enums }}
 		case {{ $t.Name}}:
 			return fmt.Sprintf(`%s`, v)
+		case *{{ $t.Name}}:
+			if v == nil {
+				return "null"
+			}
+			return fmt.Sprintf(`%s`, *v)
 	{{ end }}
 
 	default:

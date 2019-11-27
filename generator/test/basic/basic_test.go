@@ -539,7 +539,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		// TODO move this to test/types
-		name: "query for nullable dynamic field",
+		name: "query for nullable dynamic nil field",
 		// language=GraphQL
 		before: `
 			mutation {
@@ -575,6 +575,51 @@ func TestBasic(t *testing.T) {
 					ID:       "id2",
 					Email:    "2",
 					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		// TODO move this to test/types
+		name: "query for nullable dynamic field with value",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			// TODO query for more types here, especially enums
+			str := "filled"
+			actual, err := client.User.FindMany(
+				User.Stuff.EqualsOptional(&str),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "1",
+					Username: "1",
+					Stuff:    &str,
 				},
 			}}
 
