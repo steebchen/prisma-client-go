@@ -68,7 +68,7 @@ func main() {
 
 			err := mapstructure.Decode(input.Params, &params)
 			if err != nil {
-				log.Fatalf("could not assert params into generator.Options type %s", err)
+				log.Fatalf("could not assert params into generator.Root type %s", err)
 			}
 
 			err = generator.Run(params)

@@ -14,7 +14,9 @@
 
 		{{/* FIND */}}
 
-		func (r {{ $ns }}) Find{{ $v.Name }}(params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }}) {{ $result }} {
+		func (r {{ $ns }}) Find{{ $v.Name }}(
+			params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
+		) {{ $result }} {
 			var v {{ $result }}
 			v.query.client = r.client
 
@@ -92,7 +94,10 @@
 			}
 		{{ end }}
 
-		func (r {{ $result }}) Exec(ctx context.Context) ({{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model, error) {
+		func (r {{ $result }}) Exec(ctx context.Context) (
+			{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
+			error,
+		) {
 			r.query.operation = "query"
 			r.query.method = "find{{ $v.Name.GoCase }}"
 			r.query.model = "{{ $model.Name.GoCase }}"

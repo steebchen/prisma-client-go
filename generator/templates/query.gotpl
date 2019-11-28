@@ -78,7 +78,9 @@ const (
 				//
 				// @relation
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
+				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
+					params ...i{{ $field.Type.GoCase }}Params,
+				) {{ $name }}Params {
 					var fields []field
 
 					for _, q := range params {
@@ -95,7 +97,9 @@ const (
 				}
 			{{ end }}
 
-			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(params ...i{{ $field.Type.GoCase }}Params) {{ $setReturnStruct }} {
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
+				params ...i{{ $field.Type.GoCase }}Params,
+			) {{ $setReturnStruct }} {
 				var fields []field
 
 				for _, q := range params {
