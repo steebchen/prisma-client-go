@@ -106,6 +106,7 @@ func TestTypes(t *testing.T) {
 
 			actual, err := client.User.FindMany(
 				User.Role.Equals(RoleAdmin),
+				User.Role.In([]Role{RoleAdmin}),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
