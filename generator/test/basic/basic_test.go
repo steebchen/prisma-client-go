@@ -4,6 +4,7 @@ package basic
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,6 +55,36 @@ func TestBasic(t *testing.T) {
 			stuff, ok := actual.Stuff()
 			assert.Equal(t, false, ok)
 			assert.Equal(t, "", stuff)
+		},
+	}, {
+		name: "marshal json",
+		// language=GraphQL
+		before: `
+			mutation {
+				createOneUser(data: {
+					id: "marshal",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := json.Marshal(&user)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := `{"id":"marshal","email":"john@example.com","username":"johndoe","name":"John","stuff":null}`
+			assert.Equal(t, expected, string(actual))
 		},
 	}, {
 		name: "FindOne",
