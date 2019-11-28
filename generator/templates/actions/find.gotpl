@@ -94,6 +94,15 @@
 			}
 		{{ end }}
 
+		{{/* Graph style API */}}
+		{{ range $field := $model.Fields }}
+			{{ if ne $field.RelationName "" }}
+				func (r {{ $result }}) {{ $field.Name.GoCase }}() {{ $field.Type.GoLowerCase }}FindMany {
+					// x
+				}
+			{{ end }}
+		{{ end }}
+
 		func (r {{ $result }}) Exec(ctx context.Context) (
 			{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
 			error,

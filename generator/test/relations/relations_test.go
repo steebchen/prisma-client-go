@@ -111,14 +111,14 @@ func TestRelations(t *testing.T) {
 							content: "a",
 							comments: {
 								create: [{
-								id: "comment1",
-								content: "comment 1",
-								by: {
-									connect: {
-										id: "relations"
+									id: "comment1",
+									content: "comment 1",
+									by: {
+										connect: {
+											id: "relations"
+										}
 									}
-								}
-							}]
+								}]
 							}
 						}, {
 							id: "b",
@@ -206,6 +206,60 @@ func TestRelations(t *testing.T) {
 			}
 
 			assert.Equal(t, []PostModel{expected}, posts)
+		},
+	}, {
+		name: "graphql relation single",
+		// language=GraphQL
+		before: `
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+							comments: {
+								create: [{
+									id: "comment1",
+									content: "comment 1",
+									by: {
+										connect: {
+											id: "relations"
+										}
+									}
+								}]
+							}
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Email.Equals("john@example.com"),
+			).Posts().First(3).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				post{
+					ID:    "a",
+					Title: "common",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {
