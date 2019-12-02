@@ -49,11 +49,22 @@ type query struct {
 	outputs []field
 }
 
-func (q query) build() string {
+func (q query) buildQuery() string {
 	var builder strings.Builder
 
 	builder.WriteString(q.operation + " " + q.name)
 	builder.WriteString("{")
+
+	builder.WriteString(q.build())
+
+	builder.WriteString("}")
+
+	return builder.String()
+}
+
+func (q query) build() string {
+	var builder strings.Builder
+
 	builder.WriteString(q.method + q.model)
 	builder.WriteString("(")
 
@@ -79,7 +90,6 @@ func (q query) build() string {
 		builder.WriteString(o.name + " ")
 	}
 
-	builder.WriteString("}")
 	builder.WriteString("}")
 
 	return builder.String()
@@ -142,7 +152,7 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 		panic("client.Connect() needs to be called before sending queries")
 	}
 
-	s := q.build()
+	s := q.buildQuery()
 
 	if debug == Info {
 		log.Printf("prisma query: `%s`", s)
