@@ -20,6 +20,11 @@
 			var v {{ $result }}
 			v.query.client = r.client
 
+			v.query.operation = "query"
+			v.query.method = "find{{ $v.Name.GoCase }}"
+			v.query.model = "{{ $model.Name.GoCase }}"
+			v.query.outputs = {{ $name }}Output
+
 			{{ if $v.List }}
 				var fields []field
 				for _, q := range params {
@@ -41,6 +46,10 @@
 
 		type {{ $result }} struct {
 			query query
+		}
+
+		func (r {{ $result }}) getQuery() query {
+			return r.query
 		}
 
 		{{ if $v.List }}
@@ -98,10 +107,6 @@
 			{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
 			error,
 		) {
-			r.query.operation = "query"
-			r.query.method = "find{{ $v.Name.GoCase }}"
-			r.query.model = "{{ $model.Name.GoCase }}"
-			r.query.outputs = {{ $name }}Output
 			var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
 			if v.Errors != nil {
@@ -128,6 +133,11 @@
 		{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
 
 		func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
+			r.query.operation = "mutation"
+			r.query.method = "update{{ $v.Name.GoCase }}"
+			r.query.model = "{{ $model.Name.GoCase }}"
+			r.query.outputs = {{ $outputName }}Output
+
 			var v {{ $updateResult }}
 			v.query = r.query
 			var fields []field
@@ -146,10 +156,6 @@
 		}
 
 		func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-			r.query.operation = "mutation"
-			r.query.method = "update{{ $v.Name.GoCase }}"
-			r.query.model = "{{ $model.Name.GoCase }}"
-			r.query.outputs = {{ $outputName }}Output
 			var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
 			if v.Errors != nil {
@@ -164,6 +170,10 @@
 		func (r {{ $result }}) Delete() {{ $deleteResult }} {
 			var v {{ $deleteResult }}
 			v.query = r.query
+			v.query.operation = "mutation"
+			v.query.method = "delete{{ $v.Name.GoCase }}"
+			v.query.model = "{{ $model.Name.GoCase }}"
+			v.query.outputs = {{ $outputName }}Output
 			return v
 		}
 
@@ -172,10 +182,6 @@
 		}
 
 		func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-			r.query.operation = "mutation"
-			r.query.method = "delete{{ $v.Name.GoCase }}"
-			r.query.model = "{{ $model.Name.GoCase }}"
-			r.query.outputs = {{ $outputName }}Output
 			var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 			err := r.query.exec(ctx, &v)
 			if v.Errors != nil {

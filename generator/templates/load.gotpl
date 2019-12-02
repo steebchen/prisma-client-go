@@ -1,0 +1,55 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+type iQuery interface {
+	getQuery() query
+}
+
+func (c *Client) Load(params ...iQuery) loadExec {
+	return loadExec{c, params}
+}
+
+type loadExec struct {
+	client *Client
+	queries []iQuery
+}
+
+func (r loadExec) Exec(ctx context.Context, v interface{}) error {
+	var query string
+	query += "query {"
+	for _, q := range r.queries {
+		query += q.getQuery().build() + "\n"
+	}
+	query += "}"
+	if debug == Info {
+		log.Printf("query: %s", query)
+	}
+
+	var result struct{
+		Errors []gqlError  `json:"errors"`
+		Data   interface{} `json:"data"`
+	}
+	if err := r.client.do(ctx, query, &result); err != nil {
+		return fmt.Errorf("query failed: `%s` %w", query, err)
+	}
+
+	if result.Errors != nil {
+		first := result.Errors[0]
+		return fmt.Errorf(first.Message)
+	}
+
+	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
+		Result:      v,
+		TagName:     "json",
+		ErrorUnused: true,
+		ZeroFields:  true,
+	})
+	if err != nil {
+		return fmt.Errorf("mapstructure: %w", err)
+	}
+
+	if err := d.Decode(result.Data); err != nil {
+		return fmt.Errorf("could not decode result: %w", err)
+	}
+
+	return nil
+}

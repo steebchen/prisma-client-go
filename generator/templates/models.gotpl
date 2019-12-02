@@ -3,7 +3,8 @@
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
-		{{ $model.Name.GoLowerCase }}
+		{{/* add `squash` json tag hint for mapstructure */}}
+		{{ $model.Name.GoLowerCase }} `json:",squash"`
 	}
 
 	// {{ $model.Name.GoLowerCase }} is the internal struct for the json unmarshal
