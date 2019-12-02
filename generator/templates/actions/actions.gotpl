@@ -1,6 +1,6 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-var countOutput = []field{
+var countOutput = []output{
 	{name: "count"},
 }
 
@@ -16,7 +16,7 @@ var countOutput = []field{
 		client *Client
 	}
 
-	var {{ $name }}Output = []field{
+	var {{ $name }}Output = []output{
 		{{- range $i := $model.Fields }}
 			{{- if $i.Kind.IncludeInStruct }}
 				{name: "{{ $i.Name.CamelCase }}"},
@@ -24,44 +24,83 @@ var countOutput = []field{
 		{{- end }}
 	}
 
+	type i{{ $model.Name.GoCase }}Loadable interface {
+		getQuery() query
+		field() field
+		loadable()
+		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	{{/* A loadable can either contain a query or a field */}}
+	type {{ $model.Name.GoLowerCase }}Loadable struct {
+		query query
+		data field
+	}
+
+	func ({{ $model.Name.GoLowerCase }}Loadable) loadable() {}
+	func ({{ $model.Name.GoLowerCase }}Loadable) {{ $model.Name.GoLowerCase }}Model() {}
+
+	func (r {{ $model.Name.GoLowerCase }}Loadable) getQuery() query {
+		return r.query
+	}
+
+	func (r {{ $model.Name.GoLowerCase }}Loadable) field() field {
+		return r.data
+	}
+
 	type i{{ $model.Name.GoCase }}Params interface {
 		field() field
+		getQuery() query
 		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}Params struct {
 		data field
+		query query
 	}
 
 	func (p {{ $name }}Params) field() field {
 		return p.data
 	}
 
+	func (p {{ $name }}Params) getQuery() query {
+		return p.query
+	}
+
 	func (p {{ $name }}Params) {{ $model.Name.GoLowerCase }}Model() {}
 
 	type i{{ $model.Name.GoCase }}OrderByParams interface {
 		field() field
+		getQuery() query
 		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}OrderByParams struct {
 		data field
+		query query
 	}
 
 	func (p {{ $name }}OrderByParams) field() field {
 		return p.data
 	}
 
+	func (p {{ $name }}OrderByParams) getQuery() query {
+		return p.query
+	}
+
 	func (p {{ $name }}OrderByParams) {{ $model.Name.GoLowerCase }}Model() {}
 
+	{{/* TODO remove getQuery() field from Unique input and create a separate input for that with variadic parameters */}}
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() field
+		getQuery() query
 		unique()
 		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}ParamsUnique struct {
 		data field
+		query query
 	}
 
 	func (p {{ $name }}ParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
@@ -70,6 +109,10 @@ var countOutput = []field{
 
 	func (p {{ $name }}ParamsUnique) field() field {
 		return p.data
+	}
+
+	func (p {{ $name }}ParamsUnique) getQuery() query {
+		return p.query
 	}
 
 	type i{{ $model.Name.GoCase }}SetParams interface {

@@ -26,13 +26,21 @@
 			v.query.outputs = {{ $name }}Output
 
 			{{ if $v.List }}
-				var fields []field
+				var where []field
 				for _, q := range params {
-					fields = append(fields, q.field())
+					if query := q.getQuery(); query.operation != "" {
+						v.query.outputs = append(v.query.outputs, output{
+							name:    query.method,
+							inputs:  query.inputs,
+							outputs: query.outputs,
+						})
+					} else {
+						where = append(where, q.field())
+					}
 				}
 				v.query.inputs = append(v.query.inputs, input{
 					name:   "where",
-					fields: fields,
+					fields: where,
 				})
 			{{ else }}
 				v.query.inputs = append(v.query.inputs, input{
@@ -50,6 +58,12 @@
 
 		func (r {{ $result }}) getQuery() query {
 			return r.query
+		}
+
+		func (r {{ $result }}) Load() i{{ $model.Name.GoCase }}Loadable {
+			return {{ $model.Name.GoLowerCase }}Loadable{
+				query: r.query,
+			}
 		}
 
 		{{ if $v.List }}

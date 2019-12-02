@@ -1,16 +1,17 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-type iQuery interface {
+type iLoadable interface {
+	loadable()
 	getQuery() query
 }
 
-func (c *Client) Load(params ...iQuery) loadExec {
+func (c *Client) Load(params ...iLoadable) loadExec {
 	return loadExec{c, params}
 }
 
 type loadExec struct {
 	client *Client
-	queries []iQuery
+	queries []iLoadable
 }
 
 func (r loadExec) Exec(ctx context.Context, v interface{}) error {
@@ -25,8 +26,8 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 	}
 
 	var result struct{
-		Errors []gqlError  `json:"errors"`
-		Data   interface{} `json:"data"`
+		Errors []gqlError      `json:"errors"`
+		Data   json.RawMessage `json:"data"`
 	}
 	if err := r.client.do(ctx, query, &result); err != nil {
 		return fmt.Errorf("query failed: `%s` %w", query, err)
@@ -37,18 +38,8 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 		return fmt.Errorf(first.Message)
 	}
 
-	d, err := mapstructure.NewDecoder(&mapstructure.DecoderConfig{
-		Result:      v,
-		TagName:     "json",
-		ErrorUnused: true,
-		ZeroFields:  true,
-	})
-	if err != nil {
-		return fmt.Errorf("mapstructure: %w", err)
-	}
-
-	if err := d.Decode(result.Data); err != nil {
-		return fmt.Errorf("could not decode result: %w", err)
+	if err := json.Unmarshal(result.Data, v); err != nil {
+		return fmt.Errorf("could not decode result.Data: %w", err)
 	}
 
 	return nil

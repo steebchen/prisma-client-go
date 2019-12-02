@@ -19,7 +19,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mitchellh/mapstructure"
 	"github.com/prisma/photongo/runtime/platform"
 )
 

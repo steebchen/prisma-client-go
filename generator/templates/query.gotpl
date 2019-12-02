@@ -97,6 +97,28 @@ const (
 				}
 			{{ end }}
 
+			{{/* Load API */}}
+			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Find{{ if $field.IsList }}Many{{ else }}One{{ end }}(
+				params ...i{{ $field.Type.GoCase }}Params,
+			) {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
+				var v {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
+
+				v.query.operation = "query"
+				v.query.method = "{{ $field.Name.CamelCase }}"
+				v.query.outputs = {{ $field.Type.CamelCase }}Output
+
+				var fields []field
+				for _, q := range params {
+					fields = append(fields, q.field())
+				}
+				v.query.inputs = append(v.query.inputs, input{
+					name:   "where",
+					fields: fields,
+				})
+
+				return v
+			}
+
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
 				params ...i{{ $field.Type.GoCase }}Params,
 			) {{ $setReturnStruct }} {
@@ -109,10 +131,12 @@ const (
 				return {{ $setReturnStruct }}{
 					data: field{
 						name: "{{ $field.Name.CamelCase }}",
-						fields: []field{field{
-							name:   "connect",
-							fields: fields,
-						}},
+						fields: []field{
+							{
+								name:   "connect",
+								fields: fields,
+							},
+						},
 					},
 				}
 			}
