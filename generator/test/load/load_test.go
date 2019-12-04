@@ -165,7 +165,7 @@ func TestLoad(t *testing.T) {
 
 					// for those users which were found, additionally fetch posts
 					User.Posts.
-						FindMany(
+						Fetch(
 							Post.Content.Equals("stuff"),
 						).
 						// returns last of matching content "stuff", meaning id d will be returned instead of c
@@ -237,7 +237,7 @@ func TestLoad(t *testing.T) {
 			err := client.Load(
 				client.Post.FindMany(
 					Post.Title.Equals("1"),
-					Post.Author.FindOne().Load(),
+					Post.Author.Fetch().Load(),
 				).Load(),
 			).Exec(ctx, &actual)
 			if err != nil {
@@ -330,11 +330,11 @@ func TestLoad(t *testing.T) {
 
 					// for those users which were found, additionally fetch posts
 					User.Posts.
-						FindMany(
+						Fetch(
 							Post.Content.Equals("post a"),
 
 							// for each post, also load all comments
-							Post.Comments.FindMany(
+							Post.Comments.Fetch(
 								Comment.Content.Equals("a 2"),
 							).Load(),
 						).

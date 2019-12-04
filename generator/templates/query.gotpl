@@ -98,8 +98,10 @@ const (
 			{{ end }}
 
 			{{/* Load API */}}
-			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Find{{ if $field.IsList }}Many{{ else }}One{{ end }}(
-				params ...i{{ $field.Type.GoCase }}Params,
+			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Fetch(
+				{{ if $field.IsList }}
+					params ...i{{ $field.Type.GoCase }}Params,
+				{{ end }}
 			) {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
 				var v {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
 
@@ -107,26 +109,28 @@ const (
 				v.query.method = "{{ $field.Name.CamelCase }}"
 				v.query.outputs = {{ $field.Type.CamelCase }}Output
 
+			{{ if $field.IsList }}
 				{{/* TODO create a function for this type of field colletion, also used in find.gotpl */}}
-				var where []field
-				for _, q := range params {
-					if query := q.getQuery(); query.operation != "" {
-						v.query.outputs = append(v.query.outputs, output{
-							name:    query.method,
-							inputs:  query.inputs,
-							outputs: query.outputs,
-						})
-					} else {
-						where = append(where, q.field())
+					var where []field
+					for _, q := range params {
+						if query := q.getQuery(); query.operation != "" {
+							v.query.outputs = append(v.query.outputs, output{
+								name:    query.method,
+								inputs:  query.inputs,
+								outputs: query.outputs,
+							})
+						} else {
+							where = append(where, q.field())
+						}
 					}
-				}
 
-				if len(where) > 0 {
-					v.query.inputs = append(v.query.inputs, input{
-						name:   "where",
-						fields: where,
-					})
-				}
+					if len(where) > 0 {
+						v.query.inputs = append(v.query.inputs, input{
+							name:   "where",
+							fields: where,
+						})
+					}
+				{{ end }}
 
 				return v
 			}
