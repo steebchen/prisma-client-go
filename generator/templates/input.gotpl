@@ -79,7 +79,9 @@ func (q query) build() string {
 
 	builder.WriteString(q.method + q.model)
 
-	builder.WriteString(buildInputs(q.inputs))
+	if len(q.inputs) > 0 {
+		builder.WriteString(buildInputs(q.inputs))
+	}
 
 	builder.WriteString(" ")
 
@@ -120,11 +122,12 @@ func buildOutputs(outputs []output) string {
 	for _, o := range outputs {
 		builder.WriteString(o.name + " ")
 
-		if o.inputs != nil {
+		if len(o.inputs) > 0 {
+			log.Printf("building inputs: %d %+v", len(o.inputs), o.inputs)
 			builder.WriteString(buildInputs(o.inputs))
 		}
 
-		if o.outputs != nil {
+		if len(o.outputs) > 0 {
 			builder.WriteString(buildOutputs(o.outputs))
 		}
 	}

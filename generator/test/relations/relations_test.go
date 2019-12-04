@@ -111,14 +111,14 @@ func TestRelations(t *testing.T) {
 							content: "a",
 							comments: {
 								create: [{
-								id: "comment1",
-								content: "comment 1",
-								by: {
-									connect: {
-										id: "relations"
+									id: "comment1",
+									content: "comment 1",
+									by: {
+										connect: {
+											id: "relations"
+										}
 									}
-								}
-							}]
+								}]
 							}
 						}, {
 							id: "b",

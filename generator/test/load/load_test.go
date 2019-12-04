@@ -31,7 +31,7 @@ func TestLoad(t *testing.T) {
 		before: `
 			mutation {
 				user: createOneUser(data: {
-					id: "relations",
+					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
 					name: "John",
@@ -60,7 +60,7 @@ func TestLoad(t *testing.T) {
 			var actual Result
 			err := client.Load(
 				client.User.FindOne(
-					User.ID.Equals("relations"),
+					User.ID.Equals("john"),
 				).Load(),
 				client.User.FindMany(User.Name.Equals("John")).Load(),
 				client.Post.FindMany(Post.Title.Equals("common")).Load(),
@@ -72,7 +72,7 @@ func TestLoad(t *testing.T) {
 			expected := Result{
 				FindOneUser: UserModel{
 					user{
-						ID:       "relations",
+						ID:       "john",
 						Email:    "john@example.com",
 						Username: "johndoe",
 						Name:     str("John"),
@@ -81,7 +81,7 @@ func TestLoad(t *testing.T) {
 				FindManyUser: []UserModel{
 					{
 						user{
-							ID:       "relations",
+							ID:       "john",
 							Email:    "john@example.com",
 							Username: "johndoe",
 							Name:     str("John"),
@@ -109,12 +109,12 @@ func TestLoad(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "fetch a relation",
+		name: "fetch a `many` relation",
 		// language=GraphQL
 		before: `
 			mutation {
 				user: createOneUser(data: {
-					id: "relations",
+					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
 					name: "John",
@@ -157,7 +157,7 @@ func TestLoad(t *testing.T) {
 			var actual Result
 			err := client.Load(
 				client.User.FindMany(
-					User.ID.Equals("relations"),
+					User.ID.Equals("john"),
 					// query for some users but filter by posts
 					User.Posts.Some(
 						Post.Title.Equals("2"),
@@ -181,7 +181,7 @@ func TestLoad(t *testing.T) {
 				FindManyUser: []UserResponse{{
 					UserModel: UserModel{
 						user{
-							ID:       "relations",
+							ID:       "john",
 							Email:    "john@example.com",
 							Username: "johndoe",
 							Name:     str("John"),
@@ -192,6 +192,186 @@ func TestLoad(t *testing.T) {
 							ID:      "d",
 							Title:   "2",
 							Content: str("stuff"),
+						},
+					}},
+				}},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "fetch a `one` relation",
+		// language=GraphQL
+		before: `
+			mutation {
+				user: createOneUser(data: {
+					id: "john",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "1",
+							content: "x",
+						}, {
+							id: "b",
+							title: "2",
+							content: "x",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			type PostResponse struct {
+				PostModel
+				Author UserModel `json:"author"`
+			}
+			type Result struct {
+				FindManyPost []PostResponse `json:"findManyPost"`
+			}
+			var actual Result
+			err := client.Load(
+				client.Post.FindMany(
+					Post.Title.Equals("1"),
+					Post.Author.FindOne().Load(),
+				).Load(),
+			).Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := Result{
+				FindManyPost: []PostResponse{{
+					PostModel: PostModel{
+						post{
+							ID:      "a",
+							Title:   "1",
+							Content: str("x"),
+						},
+					},
+					Author: UserModel{
+						user{
+							ID:       "john",
+							Email:    "john@example.com",
+							Username: "johndoe",
+							Name:     str("John"),
+						},
+					},
+				}},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "deeply nested relation",
+		// language=GraphQL
+		before: `
+			mutation {
+				user: createOneUser(data: {
+					id: "john",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "post-a",
+							title: "post a",
+							content: "post a",
+							comments: {
+								create: [{
+									id: "comment-a-1",
+									content: "a 1",
+									by: {
+										connect: {
+											id: "john",
+										},
+									},
+								}, {
+									id: "comment-a-2",
+									content: "a 2",
+									by: {
+										connect: {
+											id: "john",
+										},
+									},
+								}],
+							},
+						}, {
+							id: "post-b",
+							title: "post b",
+							content: "post b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client Client, ctx cx) {
+			type PostResponse struct {
+				PostModel
+				Comments []CommentModel `json:"comments"`
+			}
+			type UserResponse struct {
+				UserModel
+				Posts []PostResponse `json:"posts"`
+			}
+			type Result struct {
+				FindManyUser []UserResponse `json:"findManyUser"`
+			}
+			var actual Result
+			err := client.Load(
+				client.User.FindMany(
+					User.ID.Equals("john"),
+
+					// for those users which were found, additionally fetch posts
+					User.Posts.
+						FindMany(
+							Post.Content.Equals("post a"),
+
+							// for each post, also load all comments
+							Post.Comments.FindMany(
+								Comment.Content.Equals("a 2"),
+							).Load(),
+						).
+						// returns last of matching content "stuff", meaning id d will be returned instead of c
+						Last(1).
+						Load(),
+				).Load(),
+			).Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := Result{
+				FindManyUser: []UserResponse{{
+					UserModel: UserModel{
+						user{
+							ID:       "john",
+							Email:    "john@example.com",
+							Username: "johndoe",
+							Name:     str("John"),
+						},
+					},
+					Posts: []PostResponse{{
+						PostModel: PostModel{
+							post{
+								ID:      "post-a",
+								Title:   "post a",
+								Content: str("post a"),
+							},
+						},
+						Comments: []CommentModel{
+							{
+								comment{
+									ID:      "comment-a-2",
+									Content: "a 2",
+								},
+							},
 						},
 					}},
 				}},

@@ -26,6 +26,7 @@
 			v.query.outputs = {{ $name }}Output
 
 			{{ if $v.List }}
+				{{/* TODO create a function for this type of field colletion, also used in query.gotpl */}}
 				var where []field
 				for _, q := range params {
 					if query := q.getQuery(); query.operation != "" {
@@ -38,10 +39,13 @@
 						where = append(where, q.field())
 					}
 				}
-				v.query.inputs = append(v.query.inputs, input{
-					name:   "where",
-					fields: where,
-				})
+
+				if len(where) > 0 {
+					v.query.inputs = append(v.query.inputs, input{
+						name:   "where",
+						fields: where,
+					})
+				}
 			{{ else }}
 				v.query.inputs = append(v.query.inputs, input{
 					name:   "where",
