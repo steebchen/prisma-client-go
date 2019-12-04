@@ -107,14 +107,26 @@ const (
 				v.query.method = "{{ $field.Name.CamelCase }}"
 				v.query.outputs = {{ $field.Type.CamelCase }}Output
 
-				var fields []field
+				{{/* TODO create a function for this type of field colletion, also used in find.gotpl */}}
+				var where []field
 				for _, q := range params {
-					fields = append(fields, q.field())
+					if query := q.getQuery(); query.operation != "" {
+						v.query.outputs = append(v.query.outputs, output{
+							name:    query.method,
+							inputs:  query.inputs,
+							outputs: query.outputs,
+						})
+					} else {
+						where = append(where, q.field())
+					}
 				}
-				v.query.inputs = append(v.query.inputs, input{
-					name:   "where",
-					fields: fields,
-				})
+
+				if len(where) > 0 {
+					v.query.inputs = append(v.query.inputs, input{
+						name:   "where",
+						fields: where,
+					})
+				}
 
 				return v
 			}

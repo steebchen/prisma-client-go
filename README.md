@@ -83,7 +83,7 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
 5) A few notes
 
     Prisma uses a query engine to unify communication regardless of database or programming language. We automatically download it for you to your project path (where you ran `prisma2 generate` or `prisma2 dev`). However, you should ignore the binary file called `query-engine-<platform>` and adding `query-engine-*` to your .gitignore file (and if you're using docker, also do your .dockerignore). When you deploy your Go application to a remote server, you should push this binary as well because Photon Go depends on it.
-    
+
 For more information and intstructions on how to deploy your app, please check the [deploy instructions](#deploy).
 
 ## Usage
@@ -136,7 +136,7 @@ func main() {
     photon.User.Email.Set("john.doe@example.com"),
     photon.User.Name.Set("John Doe"),
   ).Exec(ctx)
-  
+
   fmt.Printf("created user: %+v\n", createdUser)
 
   // find a single user
@@ -148,7 +148,7 @@ func main() {
   fmt.Printf("user: %+v\n", user)
 
   // for optional/nullable values, you need to check the function and create two return values
-  // `name` is a string, and `ok` is a bool whether the record is null or not. If it's null, 
+  // `name` is a string, and `ok` is a bool whether the record is null or not. If it's null,
   // `ok` is false, and `name` will default to Go's default values; in this case an empty string (""). Otherwise,
   // `ok` is true and `name` will be "John Doe".
   name, ok := user.Name()
@@ -357,10 +357,7 @@ To delete a record, just query for a field using FindOne or FindMany, and then j
 ```go
 updated, err := client.User.FindOne(
   User.Email.Equals("john@example.com"),
-).Update(
-  User.Username.Set("new-username"),
-  User.Name.Set("New Name"),
-).Exec(ctx)
+).Delete().Exec(ctx)
 ```
 
 #### Querying for relations
