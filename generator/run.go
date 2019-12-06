@@ -72,7 +72,7 @@ func Run(input Root) error {
 
 	err = header.Execute(&buf, input)
 	if err != nil {
-		return fmt.Errorf("could not write header template %s: %w", input.Generator.Output, err)
+		return fmt.Errorf("could not write header template: %w", err)
 	}
 
 	// Then process all remaining templates
@@ -86,7 +86,7 @@ func Run(input Root) error {
 		err = tpl.Execute(&buf, input)
 
 		if err != nil {
-			return fmt.Errorf("could not write template file %s: %w", input.Generator.Output, err)
+			return fmt.Errorf("could not write template file %s: %w", tpl.Name(), err)
 		}
 
 		_, err := format.Source(buf.Bytes())

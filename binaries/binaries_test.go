@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"path/filepath"
 	"testing"
 	"time"
 
@@ -30,11 +29,12 @@ func TestFetch(t *testing.T) {
 }
 
 func TestFetch_localDir(t *testing.T) {
-	ex, _ := os.Executable()
+	wd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
 
-	exPath := filepath.Dir(ex)
-
-	if err := Fetch(exPath); err != nil {
+	if err := Fetch(wd); err != nil {
 		t.Fatalf("fetch failed: %s", err)
 	}
 }

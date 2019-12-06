@@ -25,8 +25,8 @@ const EngineVersion = "4028eec09329a14692b13f06581329fddb7b2876"
 const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s.gz"
 const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
-// PrismaCLIPath returns the local file path of where the CLI is located
-func PrismaCLIPath() string {
+// PrismaCLIName returns the local file path of where the CLI is located
+func PrismaCLIName() string {
 	variation := platform.Name()
 	return fmt.Sprintf("prisma-cli-%s-%s", variation, PrismaVersion)
 }
@@ -41,7 +41,7 @@ func Fetch(toDir string) error {
 		return fmt.Errorf("toDir must be absolute")
 	}
 
-	cli := PrismaCLIPath()
+	cli := PrismaCLIName()
 	to := path.Join(toDir, cli)
 	url := fmt.Sprintf(PrismaURL, cli)
 	if err := download(url, to); err != nil {

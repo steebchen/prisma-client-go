@@ -1,6 +1,6 @@
 package relations
 
-//go:generate prisma2 generate
+//go:generate go run github.com/prisma/photongo generate
 
 import (
 	"context"
