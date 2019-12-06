@@ -19,7 +19,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prisma/photongo/runtime/platform"
+	"github.com/prisma/photongo/platform"
 )
 
 type LogLevel string

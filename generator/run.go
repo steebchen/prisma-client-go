@@ -1,3 +1,4 @@
+// Package generator acts as a prisma generator
 package generator
 
 import (

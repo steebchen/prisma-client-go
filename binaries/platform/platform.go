@@ -9,9 +9,11 @@ import (
 	"strings"
 )
 
-// GetMame returns the name of the prisma binary which should be used
-func GetName() string {
-	platform := runtime.GOOS
+// BinaryNameWithSSL returns the name of the prisma binary which should be used
+func BinaryNameWithSSL() string {
+	// TODO add a cache
+
+	platform := Name()
 
 	if platform != "linux" {
 		return platform
@@ -21,6 +23,11 @@ func GetName() string {
 	ssl := getOpenSSL()
 
 	return fmt.Sprintf("%s-openssl-%s", distro, ssl)
+}
+
+// Name returns the platform name
+func Name() string {
+	return runtime.GOOS
 }
 
 func getLinuxDistro() string {
@@ -37,13 +44,13 @@ func parseLinuxDistro(str string) string {
 	var id string
 	var idLike string
 
-	// match everything after ID= except quotes and newlines
+	// match everything after `ID=` except quotes and newlines
 	idMatches := regexp.MustCompile(`(?m)^ID="?([^"\n]*)"?`).FindStringSubmatch(str)
 	if len(idMatches) > 0 {
 		id = idMatches[1]
 	}
 
-	// match everything after ID_LIKE= except quotes and newlines
+	// match everything after `ID_LIKE=` except quotes and newlines
 	idLikeMatches := regexp.MustCompile(`(?m)^ID_LIKE="?([^"\n]*)"?`).FindStringSubmatch(str)
 	if len(idLikeMatches) > 0 {
 		idLike = idLikeMatches[1]

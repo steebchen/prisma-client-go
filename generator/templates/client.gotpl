@@ -105,7 +105,7 @@ func (c *Client) Connect() error {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	binaryName := platform.GetName()
+	binaryName := platform.BinaryNameWithSSL()
 
 	c.log.Printf("%s %+v", binaryName, binaries)
 
