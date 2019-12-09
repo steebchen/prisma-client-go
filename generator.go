@@ -57,7 +57,15 @@ func invokePrisma() {
 
 		switch input.Method {
 		case "getManifest":
-			response = NewManifest()
+			response = jsonrpc.ManifestResponse{
+				Manifest: jsonrpc.Manifest{
+					DefaultOutput:      "./photon/photon_gen.go",
+					PrettyName:         "Photon Go",
+					Denylist:           []string{},
+					RequiresGenerators: []string{},
+					RequiresEngines:    []string{}, // Photon Go handles downloading the engines
+				},
+			}
 
 		case "generate":
 			response = nil // success

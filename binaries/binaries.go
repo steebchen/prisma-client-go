@@ -22,13 +22,13 @@ const PrismaVersion = "1"
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "4028eec09329a14692b13f06581329fddb7b2876"
 
-const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s.gz"
+const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s-%s.gz"
 const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
 // PrismaCLIName returns the local file path of where the CLI is located
 func PrismaCLIName() string {
 	variation := platform.Name()
-	return fmt.Sprintf("prisma-cli-%s-%s", variation, PrismaVersion)
+	return fmt.Sprintf("prisma-cli-%s", variation)
 }
 
 // Fetch fetches the Prisma binaries needed for the generator to a given directory
@@ -43,7 +43,7 @@ func Fetch(toDir string) error {
 
 	cli := PrismaCLIName()
 	to := path.Join(toDir, cli)
-	url := fmt.Sprintf(PrismaURL, cli)
+	url := fmt.Sprintf(PrismaURL, cli, PrismaVersion)
 	if err := download(url, to); err != nil {
 		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
@@ -55,7 +55,9 @@ func Fetch(toDir string) error {
 	}
 
 	for _, e := range engines {
-		to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", e, EngineVersion[:7]))
+		logger.L.Printf("downloading %s...", url)
+
+		to := path.Join(toDir, fmt.Sprintf("prisma-%s", e))
 
 		urlName := e
 		// the query-engine binary to on S3 is "prisma"
@@ -67,6 +69,12 @@ func Fetch(toDir string) error {
 		if err := download(url, to); err != nil {
 			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 		}
+
+		if err := verify(to); err != nil {
+			return fmt.Errorf("could not run %s: %w", to, err)
+		}
+
+		logger.L.Printf("done")
 	}
 
 	return nil
@@ -78,8 +86,6 @@ func download(url string, dest string) error {
 		return nil
 	}
 
-	logger.L.Printf("downloading %s...", url)
-
 	out, err := os.Create(dest)
 	if err != nil {
 		return fmt.Errorf("could not create %s: %w", dest, err)
@@ -88,7 +94,7 @@ func download(url string, dest string) error {
 
 	err = os.Chmod(dest, 0777)
 	if err != nil {
-		fmt.Println(err)
+		return fmt.Errorf("could not chmod +x %s: %w", url, err)
 	}
 
 	resp, err := http.Get(url)
@@ -112,7 +118,12 @@ func download(url string, dest string) error {
 		return fmt.Errorf("could not copy %s: %w", url, err)
 	}
 
-	// verify that the binary is working
+	return nil
+}
+
+// verify that a given binary runs
+// this is run as en extra function after download() because of https://github.com/golang/go/issues/22315
+func verify(dest string) error {
 	cmd := exec.Command(dest, "--help")
 
 	if logger.Debug {
@@ -120,11 +131,5 @@ func download(url string, dest string) error {
 		cmd.Stdout = os.Stdout
 	}
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("could not run %s: %w", dest, err)
-	}
-
-	logger.L.Printf("done")
-
-	return nil
+	return cmd.Run()
 }

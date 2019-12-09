@@ -1,5 +1,6 @@
 **migrations**/
 prisma-*
+query-engine-*
 photongo
 *.sqlite
 *.json

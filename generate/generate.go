@@ -29,9 +29,8 @@ func Run() error {
 	logger.L.Printf("running %s %s", path.Join(wd, prisma), "generate")
 
 	cmd := exec.Command(path.Join(wd, prisma), "generate")
-	v := binaries.EngineVersion[:7]
-	queryEngine := wd + "/prisma-query-engine-" + v
-	migrationEngine := wd + "/prisma-migration-engine-" + v
+	queryEngine := wd + "/prisma-query-engine"
+	migrationEngine := wd + "/prisma-migration-engine"
 	cmd.Env = append(
 		os.Environ(),
 		"PRISMA_QUERY_ENGINE_BINARY="+queryEngine,
