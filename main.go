@@ -3,21 +3,16 @@ package main
 import (
 	"os"
 
-	"github.com/prisma/photongo/generate"
+	"github.com/prisma/photongo/cli"
 	"github.com/prisma/photongo/logger"
 )
 
 func main() {
-	cmd := ""
-
 	if len(os.Args) > 1 {
-		cmd = os.Args[1]
-	}
-
-	if cmd == "generate" {
-		logger.L.Printf("invoking generate")
+		args := os.Args[1:]
+		logger.L.Printf("invoking command %+v", args)
 		// prisma CLI
-		err := generate.Run()
+		err := cli.Run(args)
 		if err != nil {
 			panic(err)
 		}

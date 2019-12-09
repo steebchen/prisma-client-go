@@ -7,6 +7,8 @@ import (
 	"testing"
 )
 
+const pkg = "github.com/prisma/photongo"
+
 func Run(t *testing.T) {
 	if err := cmd("rm", "-rf", "dev.sqlite"); err != nil {
 		log.Fatal(err)
@@ -15,10 +17,10 @@ func Run(t *testing.T) {
 		log.Fatal(err)
 	}
 
-	if err := cmd("prisma2", "lift", "save", "--create-db", "--name", "init"); err != nil {
+	if err := cmd("go", "run", pkg, "lift", "save", "--create-db", "--name", "init"); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
-	if err := cmd("prisma2", "lift", "up"); err != nil {
+	if err := cmd("go", "run", pkg, "lift", "up"); err != nil {
 		t.Fatalf("could not run lift up %s", err)
 	}
 }

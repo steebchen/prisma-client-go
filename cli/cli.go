@@ -1,4 +1,4 @@
-package generate
+package cli
 
 import (
 	"fmt"
@@ -11,14 +11,12 @@ import (
 	"github.com/prisma/photongo/logger"
 )
 
-// Run the generator
-func Run() error {
+// Run the prisma CLI with given arguments
+func Run(arguments []string) error {
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	logger.L.Printf("using dir %s", wd)
 
 	if err := binaries.Fetch(wd); err != nil {
 		return fmt.Errorf("could not fetch binaries: %w", err)
@@ -26,9 +24,9 @@ func Run() error {
 
 	prisma := binaries.PrismaCLIName()
 
-	logger.L.Printf("running %s %s", path.Join(wd, prisma), "generate")
+	logger.L.Printf("running %s %+v", path.Join(wd, prisma), arguments)
 
-	cmd := exec.Command(path.Join(wd, prisma), "generate")
+	cmd := exec.Command(path.Join(wd, prisma), arguments...)
 	queryEngine := wd + "/prisma-query-engine"
 	migrationEngine := wd + "/prisma-migration-engine"
 	cmd.Env = append(
