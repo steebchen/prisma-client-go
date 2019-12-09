@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/prisma/photongo/generate"
@@ -9,8 +8,6 @@ import (
 )
 
 func main() {
-	log.Printf("args: %+v", os.Args)
-
 	cmd := ""
 
 	if len(os.Args) > 1 {

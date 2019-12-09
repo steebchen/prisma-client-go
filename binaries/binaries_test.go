@@ -57,8 +57,8 @@ func TestFetch_withCache(t *testing.T) {
 
 	log.Printf("second fetch took %s", time.Now().Sub(start))
 
-	if time.Now().Sub(start) > 1*time.Millisecond {
-		t.Fatalf("second fetch took more than 1ms")
+	if time.Now().Sub(start) > 500*time.Millisecond {
+		t.Fatalf("second fetch took more than 500ms")
 	}
 }
 
