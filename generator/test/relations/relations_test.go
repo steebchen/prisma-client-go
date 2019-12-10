@@ -12,7 +12,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client Client, ctx cx)
+type Func func(t *testing.T, client *Client, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -67,7 +67,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
 				Post.Author.Where(
@@ -131,7 +131,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Email.Equals("john@example.com"),
 				User.Posts.Some(
@@ -171,7 +171,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			title := "What's up?"
 			userID := "123"
 
@@ -211,35 +211,10 @@ func TestRelations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			hooks.Run(t)
-
 			client := NewClient()
-			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect: %s", err)
-				return
-			}
-
-			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					t.Fatalf("could not disconnect: %s", err)
-				}
-			}()
-
-			ctx := context.Background()
-
-			if tt.before != "" {
-				var response gqlResponse
-				err := client.do(ctx, tt.before, &response)
-				if err != nil {
-					t.Fatalf("could not send mock query %s", err)
-				}
-				if response.Errors != nil {
-					t.Fatalf("mock query has errors %+v", response)
-				}
-			}
-
-			tt.run(t, client, ctx)
+			hooks.Start(t, client, tt.before, client.do)
+			tt.run(t, client, context.Background())
+			hooks.End(t, client)
 		})
 	}
 }

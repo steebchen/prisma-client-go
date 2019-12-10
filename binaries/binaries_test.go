@@ -48,16 +48,16 @@ func TestFetch_withCache(t *testing.T) {
 		t.Fatalf("fetch 1 failed: %s", err)
 	}
 
-	log.Printf("first fetch took %s", time.Now().Sub(start))
+	log.Printf("first fetch took %s", time.Since(start))
 
 	start = time.Now()
 	if err := Fetch(dir); err != nil {
 		t.Fatalf("fetch 2 failed: %s", err)
 	}
 
-	log.Printf("second fetch took %s", time.Now().Sub(start))
+	log.Printf("second fetch took %s", time.Since(start))
 
-	if time.Now().Sub(start) > 10*time.Millisecond {
+	if time.Since(start) > 10*time.Millisecond {
 		t.Fatalf("second fetch took more than 10ms")
 	}
 }

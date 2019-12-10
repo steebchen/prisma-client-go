@@ -13,7 +13,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client Client, ctx cx)
+type Func func(t *testing.T, client *Client, ctx cx)
 
 func TestTypes(t *testing.T) {
 	t.Parallel()
@@ -24,7 +24,7 @@ func TestTypes(t *testing.T) {
 		run    Func
 	}{{
 		name: "complex strings",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			id := `f"hi"'`
 			str := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
@@ -73,7 +73,7 @@ func TestTypes(t *testing.T) {
 		},
 	}, {
 		name: "enums",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			admin := RoleAdmin
@@ -131,7 +131,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
@@ -176,7 +176,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
 
@@ -215,35 +215,10 @@ func TestTypes(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			hooks.Run(t)
-
 			client := NewClient()
-			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect: %s", err)
-				return
-			}
-
-			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					t.Fatalf("could not disconnect: %s", err)
-				}
-			}()
-
-			ctx := context.Background()
-
-			if tt.before != "" {
-				var response gqlResponse
-				err := client.do(ctx, tt.before, &response)
-				if err != nil {
-					t.Fatalf("could not send mock query %s", err)
-				}
-				if response.Errors != nil {
-					t.Fatalf("mock query has errors %+v", response)
-				}
-			}
-
-			tt.run(t, client, ctx)
+			hooks.Start(t, client, tt.before, client.do)
+			tt.run(t, client, context.Background())
+			hooks.End(t, client)
 		})
 	}
 }

@@ -13,7 +13,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client Client, ctx cx)
+type Func func(t *testing.T, client *Client, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -42,7 +42,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -72,7 +72,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -107,7 +107,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -117,11 +117,8 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "FindOne not found",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
-			if err == ErrNotFound {
-				return
-			}
 
 			assert.Equal(t, ErrNotFound, err)
 		},
@@ -148,7 +145,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -193,7 +190,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -217,7 +214,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "Create",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			created, err := client.User.CreateOne(
 				User.ID.Set("id"),
 				User.Email.Set("email"),
@@ -265,7 +262,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			updated, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -320,7 +317,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Update(
@@ -371,7 +368,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			deleted, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -416,7 +413,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Delete().Exec(ctx)
@@ -458,7 +455,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Not(
 					User.Email.Equals("email1"),
@@ -499,7 +496,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Or(
 					User.Email.Equals("email1"),
@@ -550,7 +547,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Stuff.IsNull(),
 			).Exec(ctx)
@@ -592,7 +589,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			var str *string = nil
 			actual, err := client.User.FindMany(
 				User.Stuff.EqualsOptional(str),
@@ -635,7 +632,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			// TODO query for more types here, especially enums
 			str := "filled"
 			actual, err := client.User.FindMany(
@@ -688,7 +685,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Stuff.In([]string{"first", "third"}),
 			).Exec(ctx)
@@ -718,35 +715,10 @@ func TestBasic(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			hooks.Run(t)
-
 			client := NewClient()
-			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect: %s", err)
-				return
-			}
-
-			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					t.Fatalf("could not disconnect: %s", err)
-				}
-			}()
-
-			ctx := context.Background()
-
-			if tt.before != "" {
-				var response gqlResponse
-				err := client.do(ctx, tt.before, &response)
-				if err != nil {
-					t.Fatalf("could not send mock query %s", err)
-				}
-				if response.Errors != nil {
-					t.Fatalf("mock query has errors %+v", response)
-				}
-			}
-
-			tt.run(t, client, ctx)
+			hooks.Start(t, client, tt.before, client.do)
+			tt.run(t, client, context.Background())
+			hooks.End(t, client)
 		})
 	}
 }
