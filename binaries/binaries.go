@@ -41,13 +41,22 @@ func Fetch(toDir string) error {
 		return fmt.Errorf("toDir must be absolute")
 	}
 
+	// fetch the CLI
 	cli := PrismaCLIName()
 	to := path.Join(toDir, cli)
 	url := fmt.Sprintf(PrismaURL, cli, PrismaVersion)
-	if err := download(url, to); err != nil {
-		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
+
+	if _, err := os.Stat(to); os.IsNotExist(err) {
+		logger.L.Printf("prisma cli doesn't exist, fetching...")
+
+		if err := download(url, to); err != nil {
+			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
+		}
+	} else {
+		logger.L.Printf("prisma cli is cached")
 	}
 
+	// fetch the engines
 	engines := []string{
 		"query-engine",
 		"migration-engine",
