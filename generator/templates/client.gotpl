@@ -2,12 +2,6 @@
 
 var schemaPath = "{{ .SchemaPath }}"
 
-var binaries = map[string]string{
-	{{- range $name, $_ := $.BinaryPaths.QueryEngine }}
-		"{{ $name }}": "./query-engine-{{ $name }}",
-	{{ end }}
-}
-
 func getPort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
 	if err != nil {
@@ -107,21 +101,9 @@ func (c *Client) Connect() error {
 
 	binaryName := platform.BinaryNameWithSSL()
 
-	c.log.Printf("%s %+v", binaryName, binaries)
+	path := "./prisma-query-engine-" + binaryName
 
-	var path string
-	for name, value := range binaries {
-		if name == binaryName {
-			path = value
-			break
-		}
-	}
-
-	c.log.Printf("path %s", path)
-
-	if path == "" {
-		return fmt.Errorf("no such binary %s in possible binaries %+v", binaryName, binaries)
-	}
+	c.log.Printf("launching query engine at %s", path)
 
 	c.cmd = exec.Command(path, "-p", string(port))
 

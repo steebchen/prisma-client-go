@@ -332,7 +332,7 @@ func TestPagination(t *testing.T) {
 
 			client := NewClient()
 			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect %s", err)
+				t.Fatalf("could not connect: %s", err)
 				return
 			}
 

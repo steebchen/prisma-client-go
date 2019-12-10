@@ -9,9 +9,14 @@ import (
 	"strings"
 )
 
-// BinaryNameWithSSL returns the name of the prisma binary which should be used
+var binaryNameWithSSLCache string
+
+// BinaryNameWithSSL returns the name of the prisma binary which should be used,
+// for example "darwin" or "linux-openssl-1.1.x"
 func BinaryNameWithSSL() string {
-	// TODO add a cache
+	if binaryNameWithSSLCache != "" {
+		return binaryNameWithSSLCache
+	}
 
 	platform := Name()
 
@@ -22,7 +27,11 @@ func BinaryNameWithSSL() string {
 	distro := getLinuxDistro()
 	ssl := getOpenSSL()
 
-	return fmt.Sprintf("%s-openssl-%s", distro, ssl)
+	name := fmt.Sprintf("%s-openssl-%s", distro, ssl)
+
+	binaryNameWithSSLCache = name
+
+	return name
 }
 
 // Name returns the platform name

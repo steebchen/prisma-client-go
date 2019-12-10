@@ -17,6 +17,14 @@ func Run(t *testing.T) {
 		log.Fatal(err)
 	}
 
+	// if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}); err != nil {
+	// 	t.Fatalf("could not run lift save %s", err)
+	// }
+	//
+	// if err := cli.Run([]string{"lift", "up"}); err != nil {
+	// 	t.Fatalf("could not run lift save %s", err)
+	// }
+
 	if err := cmd("go", "run", pkg, "lift", "save", "--create-db", "--name", "init"); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
