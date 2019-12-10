@@ -54,38 +54,44 @@ func Fetch(toDir string) error {
 		"introspection-engine",
 	}
 
-	for _, e := range engines {
-		logger.L.Printf("downloading %s...", url)
+	binaryName := platform.BinaryNameWithSSL()
 
-		to := path.Join(toDir, fmt.Sprintf("prisma-%s", e))
+	for _, e := range engines {
+		logger.L.Printf("checking %s...", e)
+
+		to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", e, binaryName))
 
 		urlName := e
 		// the query-engine binary to on S3 is "prisma"
 		if e == "query-engine" {
 			urlName = "prisma"
 		}
-		url := fmt.Sprintf(EngineURL, EngineVersion, platform.BinaryNameWithSSL(), urlName)
+		url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
+
+		if _, err := os.Stat(to); !os.IsNotExist(err) {
+			logger.L.Printf("%s is cached", to)
+			continue
+		}
+
+		logger.L.Printf("%s is missing, downloading...", e)
 
 		if err := download(url, to); err != nil {
 			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 		}
 
+		logger.L.Printf("verifying %s...", e)
+
 		if err := verify(to); err != nil {
 			return fmt.Errorf("could not run %s: %w", to, err)
 		}
 
-		logger.L.Printf("done")
+		logger.L.Printf("%s done", e)
 	}
 
 	return nil
 }
 
 func download(url string, dest string) error {
-	if _, err := os.Stat(dest); !os.IsNotExist(err) {
-		logger.L.Printf("%s exists", dest)
-		return nil
-	}
-
 	out, err := os.Create(dest)
 	if err != nil {
 		return fmt.Errorf("could not create %s: %w", dest, err)
