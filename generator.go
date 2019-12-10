@@ -10,8 +10,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/mitchellh/mapstructure"
-
 	"github.com/prisma/photongo/generator"
 	"github.com/prisma/photongo/jsonrpc"
 )
@@ -72,13 +70,11 @@ func invokePrisma() {
 
 			var params generator.Root
 
-			err := mapstructure.Decode(input.Params, &params)
-			if err != nil {
-				log.Fatalf("could not assert params into generator.Root type %s", err)
+			if err := json.Unmarshal(input.Params, &params); err != nil {
+				log.Fatalf("could not unmarshal params into generator.Root type %s", err)
 			}
 
-			err = generator.Run(params)
-			if err != nil {
+			if err = generator.Run(params); err != nil {
 				log.Fatalf("could not generate code. %s", err)
 			}
 		}

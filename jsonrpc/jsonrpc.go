@@ -1,6 +1,10 @@
 // Package jsonrpc enables communication with Prisma
 package jsonrpc
 
+import (
+	"encoding/json"
+)
+
 // Request sets a generic JSONRPC request, which wraps information and params.
 type Request struct {
 	// JSONRPC describes the version of the JSON RPC protocol. Defaults to `2.0`.
@@ -10,7 +14,7 @@ type Request struct {
 	// Method describes the intention of the request.
 	Method string `json:"method"`
 	// Params contains the payload of the request. Usually parsed into a specific struct for further processing.
-	Params interface{} `json:"params"`
+	Params json.RawMessage `json:"params"`
 }
 
 // Response sets a generic JSONRPC response, which wraps information and a result.
