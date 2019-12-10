@@ -107,8 +107,7 @@ func download(url string, dest string) error {
 	}
 	defer out.Close()
 
-	err = os.Chmod(dest, 0777)
-	if err != nil {
+	if err := os.Chmod(dest, 0777); err != nil {
 		return fmt.Errorf("could not chmod +x %s: %w", url, err)
 	}
 

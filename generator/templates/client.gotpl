@@ -35,8 +35,8 @@ func getPort() (string, error) {
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func NewClient() Client {
-	c := Client{}
+func NewClient() *Client {
+	c := &Client{}
 	c.log = log.New(ioutil.Discard, "", 0)
 	if debug == Info {
 		c.log = log.New(os.Stdout, "", log.Flags())
