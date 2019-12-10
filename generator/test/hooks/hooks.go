@@ -2,34 +2,27 @@ package hooks
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"testing"
-)
 
-const pkg = "github.com/prisma/photongo"
+	"github.com/prisma/photongo/cli"
+)
 
 func Run(t *testing.T) {
 	if err := cmd("rm", "-rf", "dev.sqlite"); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
+
 	if err := cmd("rm", "-rf", "migrations"); err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
-	// if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}); err != nil {
-	// 	t.Fatalf("could not run lift save %s", err)
-	// }
-	//
-	// if err := cli.Run([]string{"lift", "up"}); err != nil {
-	// 	t.Fatalf("could not run lift save %s", err)
-	// }
-
-	if err := cmd("go", "run", pkg, "lift", "save", "--create-db", "--name", "init"); err != nil {
+	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
-	if err := cmd("go", "run", pkg, "lift", "up"); err != nil {
-		t.Fatalf("could not run lift up %s", err)
+
+	if err := cli.Run([]string{"lift", "up"}); err != nil {
+		t.Fatalf("could not run lift save %s", err)
 	}
 }
 

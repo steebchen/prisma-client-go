@@ -57,7 +57,9 @@ func TestFetch_withCache(t *testing.T) {
 
 	log.Printf("second fetch took %s", time.Now().Sub(start))
 
-	// TODO verify that files are cached
+	if time.Now().Sub(start) > 10*time.Millisecond {
+		t.Fatalf("second fetch took more than 10ms")
+	}
 }
 
 func TestFetch_relativeDir(t *testing.T) {

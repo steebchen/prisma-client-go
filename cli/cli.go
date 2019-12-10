@@ -14,6 +14,8 @@ import (
 
 // Run the prisma CLI with given arguments
 func Run(arguments []string) error {
+	logger.L.Printf("running cli with args %+v", arguments)
+
 	wd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -38,12 +40,13 @@ func Run(arguments []string) error {
 		"PRISMA_MIGRATION_ENGINE_BINARY="+migrationEngine,
 		"PRISMA_INTROSPECTION_ENGINE_BINARY="+introspectionEngine,
 	)
-	if logger.Debug {
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
-	}
+
+	cmd.Stdin = os.Stdin
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("could not run prisma generate: %w", err)
+		return fmt.Errorf("could not run %+v: %w", arguments, err)
 	}
 
 	return nil
