@@ -11,17 +11,22 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/prisma/photongo/binaries"
 )
 
 func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = "main"
 	}
+
+	input.PrismaBinaryPath = binaries.GlobalPath()
+	input.PrismaVersion = binaries.PrismaVersion
 }
 
 // Run invokes the generator, which builds the templates and writes to the specified output file.
-func Run(input Root) error {
-	addDefaults(&input)
+func Run(input *Root) error {
+	addDefaults(input)
 
 	// copy the query engine to the local repository path
 	for name, path := range input.BinaryPaths.QueryEngine {
@@ -70,8 +75,7 @@ func Run(input Root) error {
 		return fmt.Errorf("could not find header template %s: %w", templateDir, err)
 	}
 
-	err = header.Execute(&buf, input)
-	if err != nil {
+	if err := header.Execute(&buf, input); err != nil {
 		return fmt.Errorf("could not write header template: %w", err)
 	}
 
@@ -101,13 +105,11 @@ func Run(input Root) error {
 	}
 
 	path := filepath.Dir(input.Generator.Output)
-	err = os.MkdirAll(path, os.ModePerm)
-	if err != nil {
+	if err = os.MkdirAll(path, os.ModePerm); err != nil {
 		return fmt.Errorf("could not run MkdirAll on path %s: %w", input.Generator.Output, err)
 	}
 
-	err = ioutil.WriteFile(input.Generator.Output, formatted, 0644)
-	if err != nil {
+	if err = ioutil.WriteFile(input.Generator.Output, formatted, 0644); err != nil {
 		return fmt.Errorf("could not write template data to file writer %s: %w", input.Generator.Output, err)
 	}
 
