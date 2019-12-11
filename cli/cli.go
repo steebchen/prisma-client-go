@@ -2,7 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -16,24 +15,21 @@ import (
 func Run(arguments []string) error {
 	logger.L.Printf("running cli with args %+v", arguments)
 
-	wd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
+	dir := binaries.GlobalPath()
 
-	if err := binaries.Fetch(wd); err != nil {
+	if err := binaries.Fetch(dir); err != nil {
 		return fmt.Errorf("could not fetch binaries: %w", err)
 	}
 
 	prisma := binaries.PrismaCLIName()
 
-	logger.L.Printf("running %s %+v", path.Join(wd, prisma), arguments)
+	logger.L.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
-	cmd := exec.Command(path.Join(wd, prisma), arguments...)
+	cmd := exec.Command(path.Join(dir, prisma), arguments...)
 	binaryName := platform.BinaryNameWithSSL()
-	queryEngine := wd + "/prisma-query-engine-" + binaryName
-	migrationEngine := wd + "/prisma-migration-engine-" + binaryName
-	introspectionEngine := wd + "/prisma-introspection-engine-" + binaryName
+	queryEngine := dir + "/prisma-query-engine-" + binaryName
+	migrationEngine := dir + "/prisma-migration-engine-" + binaryName
+	introspectionEngine := dir + "/prisma-introspection-engine-" + binaryName
 	cmd.Env = append(
 		os.Environ(),
 		"PRISMA_QUERY_ENGINE_BINARY="+queryEngine,

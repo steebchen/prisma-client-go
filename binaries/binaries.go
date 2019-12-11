@@ -25,10 +25,19 @@ const EngineVersion = "4028eec09329a14692b13f06581329fddb7b2876"
 const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s-%s-%s.gz"
 const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
-// PrismaCLIName returns the local file path of where the CLI is located
+// PrismaCLIName returns the local file path of where the CLI lives
 func PrismaCLIName() string {
 	variation := platform.Name()
 	return fmt.Sprintf("prisma-cli-%s", variation)
+}
+
+// GlobalPath returns the path of where the CLI lives
+func GlobalPath() string {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	return path.Join(home, ".cache/prisma/photongo-prisma-binaries", PrismaVersion)
 }
 
 // Fetch fetches the Prisma binaries needed for the generator to a given directory
@@ -39,6 +48,10 @@ func Fetch(toDir string) error {
 
 	if !strings.HasPrefix(toDir, "/") {
 		return fmt.Errorf("toDir must be absolute")
+	}
+
+	if err := os.MkdirAll(toDir, os.ModePerm); err != nil {
+		return fmt.Errorf("could not run MkdirAll on path %s: %w", toDir, err)
 	}
 
 	// fetch the CLI

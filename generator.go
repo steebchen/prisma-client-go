@@ -74,7 +74,7 @@ func invokePrisma() {
 				log.Fatalf("could not unmarshal params into generator.Root type %s", err)
 			}
 
-			if err = generator.Run(params); err != nil {
+			if err = generator.Run(&params); err != nil {
 				log.Fatalf("could not generate code. %s", err)
 			}
 		}
