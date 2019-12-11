@@ -2,33 +2,20 @@
 
 Photon Go is an auto-generated database client, which is fully typesafe, reduces boilerplate code and replaces traditional ORMs.
 
-Photon Go is a part of the [Prisma Framework](https://github.com/prisma/prisma2) and depends on it.
-
-:warning: :warning: Warning :warning: :warning:
+Photon Go is a part of [Prisma](https://github.com/prisma/prisma2) and depends on it.
 
 **NOTE: Currently, Photon Go is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Photon Go is unstable and there is no ETA for general availability yet.**
 
-We recommend to read the [current caveats](#caveats) (which are planned to be fixed before we make a stable release).
+We recommend to read the [current caveats](#caveats).
 
 ## Setup
 
-The Photon Go setup has a few caveats due to Prisma Framework being in an alpha state at this time.
-You can already use Photon Go, but it means you have to take a few extra steps. This will not be required anymore in future releases.
-
-1) Install the Prisma CLI (requires Node.JS/npm)
-
-    Note: We're aware that this step probably doesn't fit in your workflow, but currently due to our architecture at Prisma it is required. It's planned to get rid of this step soon, just like you'd expect.
-
-    ```
-    npm i -g prisma2
-    ```
-
-2) Get Photon Go
-    ```
+1) Get Photon Go
+    ```shell script
     go get github.com/prisma/photongo
     ```
 
-3) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Photon Go as a generator with two models would look like this:
+2) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Photon Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
@@ -61,30 +48,30 @@ You can already use Photon Go, but it means you have to take a few extra steps. 
 
     To get this up and running in your database, we use the Prisma migration tool [`lift`](https://github.com/prisma/lift) to create and migrate our database:
 
-    ```
-    prisma2 lift save --create-db --name "init" # the parameters are only required the first time
-    prisma2 lift up
+    ```shell script
+    # initialize the first migration
+    go run github.com/prisma/photongo lift save --create-db --name "init"
+    # apply the migration
+    go run github.com/prisma/photongo lift up
     ```
 
 4) Generate the Photon Go client in your project
 
-    ```
-    prisma2 generate
+    ```shell script
+    go run github.com/prisma/photongo generate
     ```
 
     Photon go is now generated into the file path you specified in the "output" option which is `"./photon/photon_gen.go"` in this case.
 
     For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
 
+    ```shell script
+    go run github.com/prisma/photongo dev
     ```
-    prisma2 dev
-    ```
 
-5) A few notes
+    Note: Some errors may get displayed, but you can ignore them. Prisma Studio is currently not working. As an alternative, you can install the [Prisma CLI](https://github.com/prisma/prisma2#getting-started).
 
-    Prisma uses a query engine to unify communication regardless of database or programming language. We automatically download it for you to your project path (where you ran `prisma2 generate` or `prisma2 dev`). However, you should ignore the binary file called `query-engine-<platform>` and adding `query-engine-*` to your .gitignore file (and if you're using docker, also do your .dockerignore). When you deploy your Go application to a remote server, you should push this binary as well because Photon Go depends on it.
-
-For more information and intstructions on how to deploy your app, please check the [deploy instructions](#deploy).
+For more information and instructions on how to deploy your app, please check the [deploy instructions](#deploy).
 
 ## Usage
 
@@ -164,17 +151,16 @@ func main() {
 
 ### Deploy
 
-Deploying a Photon Go adds a few more steps, because it depends on the prisma query engine, which is a binary we automatically download in your project path. Depending on where you deploy your code to, you might need to follow some extra steps.
-
+Deploying a Photon Go adds a few more steps, because it depends on the Prisma query engine, which is a binary we automatically download in your project path. Depending on where you deploy your code to, you might need to follow some extra steps.
 
 #### Set up go generate
 
-While this step is not required, we recommend to use [`go generate`](https://blog.golang.org/generate) to simplify generating the Photon Go client. To do so, you can just put the following line into a go file, and then run go generate so `prisma2 generate` and any other generate commands you run will get executed.
+While this step is not required, we recommend to use [`go generate`](https://blog.golang.org/generate) to simplify generating the Photon Go client. To do so, you can just put the following line into a go file, and then run go generate so `go run github.com/prisma/photongo generate` and any other generate commands you run will get executed.
 
 Put this line into a go file in your project, usually in `main.go`:
 
 ```go
-//go:generate prisma2 generate
+//go:generate go run github.com/prisma/photongo generate
 
 func main() {
   // ...
@@ -183,7 +169,7 @@ func main() {
 
 Now, run `go generate`:
 
-```
+```shell script
 go generate
 ```
 
@@ -217,35 +203,25 @@ FROM golang:1.13 as build
 
 WORKDIR /app
 
-# install node.js, which is currently required for prisma
-RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - && apt-get install -y nodejs
-
-RUN npm i -g prisma2 --unsafe-perm
-
 # add go modules lockfiles
 COPY go.mod go.sum ./
+RUN go mod download
 
-# make sure the Photon Go binary is installed. also see https://github.com/golang/go/issues/27653
+ENV PHOTON_GO_LOG=info
+ENV DEBUG=*
+
+# temporarily needed to enforce installing the photongo binary
 RUN go install github.com/prisma/photongo
 
 COPY . ./
 
 # generate the Photon Go client
-RUN prisma2 generate
-# or, if you use go generate to run prisma2 generate, use the following line instead
+RUN go run github.com/prisma/photongo generate
+# or, if you use go generate to run the generator, use the following line instead
 # RUN go generate ./...
 
 # build the binary with all dependencies
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -ldflags '-extldflags "-static"' -o /main .
-
-RUN ls -lah
-
-# run on the smallest image possible
-FROM scratch
-
-# copy CA certificates for TLS
-COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=build /main /main
+RUN go build -o /main .
 
 CMD ["/main"]
 ```
@@ -366,7 +342,11 @@ updated, err := client.User.FindOne(
 
 ## Caveats
 
-- Requires the Prisma CLI, which is currently shipped as a NodeJS package.
-- Multiple Photon Go projects can only have the same version of prisma/photongo, even if you use go modules (https://github.com/golang/go/issues/27653).
-- Breaking changes in minor and patch versions.
+Photon Go is experimental and comes with some caveats. We plan to eliminate all of these in the future.
+
+- We recommend to use Go 1.13 or higher, everything else is untested.
+- You need to use an absolute path for the generator. Tracked in https://github.com/prisma/prisma2/issues/934.
+- Multiple projects using Photon Go can conflict because a given Go binary just defaults to the last installed version (https://github.com/golang/go/issues/27653). We recommend to use the same version in all your projects, even if they are unrelated. Waiting for https://github.com/prisma/prisma2/issues/1101.
+- Expect breaking changes in minor versions in 0.x.x releases.
+- No Windows support.
 - DO NOT USE IN PRODUCTION!
