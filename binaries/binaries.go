@@ -16,13 +16,13 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "1"
+const PrismaVersion = "2.0.0-alpha.443"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "4028eec09329a14692b13f06581329fddb7b2876"
 
-const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s-%s.gz"
+const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s-%s-%s.gz"
 const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
 // PrismaCLIName returns the local file path of where the CLI is located
@@ -44,7 +44,7 @@ func Fetch(toDir string) error {
 	// fetch the CLI
 	cli := PrismaCLIName()
 	to := path.Join(toDir, cli)
-	url := fmt.Sprintf(PrismaURL, cli, PrismaVersion)
+	url := fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name())
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.L.Printf("prisma cli doesn't exist, fetching...")
@@ -101,16 +101,6 @@ func Fetch(toDir string) error {
 }
 
 func download(url string, dest string) error {
-	out, err := os.Create(dest)
-	if err != nil {
-		return fmt.Errorf("could not create %s: %w", dest, err)
-	}
-	defer out.Close()
-
-	if err := os.Chmod(dest, 0777); err != nil {
-		return fmt.Errorf("could not chmod +x %s: %w", url, err)
-	}
-
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("could not get %s: %w", url, err)
@@ -120,6 +110,16 @@ func download(url string, dest string) error {
 	if resp.StatusCode != http.StatusOK {
 		out, _ := ioutil.ReadAll(resp.Body)
 		return fmt.Errorf("received code %d from %s: %+v", resp.StatusCode, url, string(out))
+	}
+
+	out, err := os.Create(dest)
+	if err != nil {
+		return fmt.Errorf("could not create %s: %w", dest, err)
+	}
+	defer out.Close()
+
+	if err := os.Chmod(dest, 0777); err != nil {
+		return fmt.Errorf("could not chmod +x %s: %w", url, err)
 	}
 
 	g, err := gzip.NewReader(resp.Body)
