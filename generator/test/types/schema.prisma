@@ -10,13 +10,15 @@ generator photon {
 }
 
 model User {
-	id       String  @id @default(cuid())
-	str      String
-	int      Int
-	float    Float
-	bool     Boolean
-	date     DateTime
-	role     Role?
+	id        String   @id @default(cuid())
+	createdAt DateTime @default(now())
+	updatedAt DateTime @updatedAt
+	str       String?
+	int       Int
+	float     Float
+	bool      Boolean
+	date      DateTime
+	role      Role?
 }
 
 enum Role {

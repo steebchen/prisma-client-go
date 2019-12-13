@@ -217,12 +217,26 @@ type Field struct {
 	// DBName (optional)
 	DBName      types.String `json:"dBName"`
 	IsGenerated bool         `json:"isGenerated"`
+	IsUpdatedAt bool         `json:"isUpdatedAt"`
 	// RelationToFields (optional)
 	RelationToFields []interface{} `json:"relationToFields"`
 	// RelationOnDelete (optional)
-	RelationOnDelete types.String
+	RelationOnDelete types.String `json:"relationOnDelete"`
 	// RelationName (optional)
-	RelationName types.String
+	RelationName types.String `json:"relationName"`
+	// Default (optional)
+	Default FieldDefault `json:"default"`
+}
+
+func (f Field) RequiredOnCreate() bool {
+	return f.IsRequired && !f.IsUpdatedAt && f.Default.Name == ""
+}
+
+// FieldDefault describes the default values of a model's field
+type FieldDefault struct {
+	Name       types.String `json:"name"`
+	ReturnType types.Type   `json:"returnType"`
+	// Args []any
 }
 
 // RelationMethod describes a method for relations

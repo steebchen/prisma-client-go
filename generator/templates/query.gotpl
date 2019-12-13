@@ -64,7 +64,7 @@ const (
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
-		{{ if $field.IsRequired }}
+		{{ if $field.RequiredOnCreate }}
 			{{ $setReturnStruct = $nsFieldParams }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParams") }}
