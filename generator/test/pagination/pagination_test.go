@@ -1,6 +1,6 @@
 package pagination
 
-//go:generate prisma2 generate
+//go:generate go run github.com/prisma/photongo generate
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client Client, ctx cx)
+type Func func(t *testing.T, client *Client, ctx cx)
 
 func TestPagination(t *testing.T) {
 	t.Parallel()
@@ -51,7 +51,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(ASC),
 			).Exec(ctx)
@@ -111,7 +111,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(DESC),
 			).Exec(ctx)
@@ -171,7 +171,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().
@@ -228,7 +228,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().
@@ -291,7 +291,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().
@@ -328,35 +328,10 @@ func TestPagination(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			hooks.Run(t)
-
 			client := NewClient()
-			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect %s", err)
-				return
-			}
-
-			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					t.Fatalf("could not disconnect: %s", err)
-				}
-			}()
-
-			ctx := context.Background()
-
-			if tt.before != "" {
-				var response gqlResponse
-				err := client.do(ctx, tt.before, &response)
-				if err != nil {
-					t.Fatalf("could not send mock query %s", err)
-				}
-				if response.Errors != nil {
-					t.Fatalf("mock query has errors %+v", response)
-				}
-			}
-
-			tt.run(t, client, ctx)
+			hooks.Start(t, client, tt.before, client.do)
+			tt.run(t, client, context.Background())
+			hooks.End(t, client)
 		})
 	}
 }

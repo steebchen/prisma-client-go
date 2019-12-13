@@ -1,16 +1,28 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
+{{/* TODO improve these AST components */}}
+
 type input struct {
 	name   string
 	fields []field
 	value  interface{}
 }
 
+// output can be a single name or can have nested fields
+type output struct {
+	name string
+
+	// inputs (optional) to provide arguments to a field
+	inputs []input
+
+	outputs []output
+}
+
 type field struct {
 	// The name of the field.
 	name string
 
-	// an action for input fields, e.g. `contains` // TODO maybe create separate field struct for input types
+	// an action for input fields, e.g. `contains`
 	action string
 
 	// whether the fields is a list of items
@@ -42,22 +54,48 @@ type query struct {
 	// model contains the Prisma model name
 	model string
 
-	// inputs contains the query
+	// inputs contains function arguments
 	inputs []input
 
 	// outputs contains the return fields
-	outputs []field
+	outputs []output
+}
+
+func (q query) buildQuery() string {
+	var builder strings.Builder
+
+	builder.WriteString(q.operation + " " + q.name)
+	builder.WriteString("{")
+
+	builder.WriteString(q.build())
+
+	builder.WriteString("}")
+
+	return builder.String()
 }
 
 func (q query) build() string {
 	var builder strings.Builder
 
-	builder.WriteString(q.operation + " " + q.name)
-	builder.WriteString("{")
 	builder.WriteString(q.method + q.model)
+
+	if len(q.inputs) > 0 {
+		builder.WriteString(buildInputs(q.inputs))
+	}
+
+	builder.WriteString(" ")
+
+	builder.WriteString(buildOutputs(q.outputs))
+
+	return builder.String()
+}
+
+func buildInputs(inputs []input) string {
+	var builder strings.Builder
+
 	builder.WriteString("(")
 
-	for _, i := range q.inputs {
+	for _, i := range inputs {
 		builder.WriteString(i.name)
 
 		builder.WriteString(":")
@@ -72,14 +110,28 @@ func (q query) build() string {
 	}
 
 	builder.WriteString(")")
-	builder.WriteString(" ")
+
+	return builder.String()
+}
+
+func buildOutputs(outputs []output) string {
+	var builder strings.Builder
+
 	builder.WriteString("{")
 
-	for _, o := range q.outputs {
+	for _, o := range outputs {
 		builder.WriteString(o.name + " ")
+
+		if len(o.inputs) > 0 {
+			log.Printf("building inputs: %d %+v", len(o.inputs), o.inputs)
+			builder.WriteString(buildInputs(o.inputs))
+		}
+
+		if len(o.outputs) > 0 {
+			builder.WriteString(buildOutputs(o.outputs))
+		}
 	}
 
-	builder.WriteString("}")
 	builder.WriteString("}")
 
 	return builder.String()
@@ -142,7 +194,7 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 		panic("client.Connect() needs to be called before sending queries")
 	}
 
-	s := q.build()
+	s := q.buildQuery()
 
 	if debug == Info {
 		log.Printf("prisma query: `%s`", s)
@@ -152,20 +204,41 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 }
 
 func value(name string, value interface{}) string {
-	if reflect.ValueOf(value).Kind() == reflect.Ptr {
-		return "null"
-	}
-
 	switch v := value.(type) {
 	case string:
 		return fmt.Sprintf(`%q`, v)
+	case *string:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%q`, *v)
 	case bool:
 		return fmt.Sprintf(`%t`, v)
+	case *bool:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%t`, *v)
 	case int:
 		return fmt.Sprintf(`%d`, v)
+	case *int:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%d`, *v)
 	case float64:
 		return fmt.Sprintf(`%f`, v)
+	case *float64:
+		if v == nil {
+			return "null"
+		}
+		return fmt.Sprintf(`%f`, *v)
 	case DateTime:
+		return fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli))
+	case *DateTime:
+		if v == nil {
+			return "null"
+		}
 		return fmt.Sprintf(`"%s"`, v.UTC().Format(RFC3339Milli))
 	case Direction:
 		return string(v)
@@ -175,6 +248,11 @@ func value(name string, value interface{}) string {
 	{{ range $t := $.DMMF.Datamodel.Enums }}
 		case {{ $t.Name}}:
 			return fmt.Sprintf(`%s`, v)
+		case *{{ $t.Name}}:
+			if v == nil {
+				return "null"
+			}
+			return fmt.Sprintf(`%s`, *v)
 	{{ end }}
 
 	default:

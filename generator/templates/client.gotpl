@@ -1,12 +1,7 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-var schemaPath = "{{ .SchemaPath }}"
-
-var binaries = map[string]string{
-	{{- range $name, $_ := $.BinaryPaths.QueryEngine }}
-		"{{ $name }}": "./query-engine-{{ $name }}",
-	{{ end }}
-}
+const schemaPath = "{{ .SchemaPath }}"
+const binariesPath = "{{ .PrismaBinaryPath }}"
 
 func getPort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
@@ -41,8 +36,8 @@ func getPort() (string, error) {
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func NewClient() Client {
-	c := Client{}
+func NewClient() *Client {
+	c := &Client{}
 	c.log = log.New(ioutil.Discard, "", 0)
 	if debug == Info {
 		c.log = log.New(os.Stdout, "", log.Flags())
@@ -105,25 +100,13 @@ func (c *Client) Connect() error {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	binaryName := platform.GetName()
+	binaryName := platform.BinaryNameWithSSL()
 
-	c.log.Printf("%s %+v", binaryName, binaries)
+	dir := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
 
-	var path string
-	for name, value := range binaries {
-		if name == binaryName {
-			path = value
-			break
-		}
-	}
+	c.log.Printf("launching query engine at %s", dir)
 
-	c.log.Printf("path %s", path)
-
-	if path == "" {
-		return fmt.Errorf("no such binary %s in possible binaries %+v", binaryName, binaries)
-	}
-
-	c.cmd = exec.Command(path, "-p", string(port))
+	c.cmd = exec.Command(dir, "-p", string(port))
 
 	c.cmd.Stdout = os.Stdout
 	c.cmd.Stderr = os.Stderr

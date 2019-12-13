@@ -78,7 +78,9 @@ const (
 				//
 				// @relation
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
-				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(params ...i{{ $field.Type.GoCase }}Params) {{ $name }}Params {
+				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
+					params ...i{{ $field.Type.GoCase }}Params,
+				) {{ $name }}Params {
 					var fields []field
 
 					for _, q := range params {
@@ -95,7 +97,47 @@ const (
 				}
 			{{ end }}
 
-			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(params ...i{{ $field.Type.GoCase }}Params) {{ $setReturnStruct }} {
+			{{/* Load API */}}
+			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Fetch(
+				{{ if $field.IsList }}
+					params ...i{{ $field.Type.GoCase }}Params,
+				{{ end }}
+			) {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
+				var v {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
+
+				v.query.operation = "query"
+				v.query.method = "{{ $field.Name.CamelCase }}"
+				v.query.outputs = {{ $field.Type.CamelCase }}Output
+
+			{{ if $field.IsList }}
+				{{/* TODO create a function for this type of field colletion, also used in find.gotpl */}}
+					var where []field
+					for _, q := range params {
+						if query := q.getQuery(); query.operation != "" {
+							v.query.outputs = append(v.query.outputs, output{
+								name:    query.method,
+								inputs:  query.inputs,
+								outputs: query.outputs,
+							})
+						} else {
+							where = append(where, q.field())
+						}
+					}
+
+					if len(where) > 0 {
+						v.query.inputs = append(v.query.inputs, input{
+							name:   "where",
+							fields: where,
+						})
+					}
+				{{ end }}
+
+				return v
+			}
+
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
+				params ...i{{ $field.Type.GoCase }}Params,
+			) {{ $setReturnStruct }} {
 				var fields []field
 
 				for _, q := range params {
@@ -105,10 +147,12 @@ const (
 				return {{ $setReturnStruct }}{
 					data: field{
 						name: "{{ $field.Name.CamelCase }}",
-						fields: []field{field{
-							name:   "connect",
-							fields: fields,
-						}},
+						fields: []field{
+							{
+								name:   "connect",
+								fields: fields,
+							},
+						},
 					},
 				}
 			}

@@ -1,3 +1,4 @@
+.git/
 .github/
 **migrations**/
 photongo
@@ -5,3 +6,5 @@ photongo
 *.sqlite
 *.json
 *_gen.go
+**/prisma-*
+**/query-engine-*

@@ -1,0 +1,46 @@
+{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+
+type iLoadable interface {
+	loadable()
+	getQuery() query
+}
+
+func (c *Client) Load(params ...iLoadable) loadExec {
+	return loadExec{c, params}
+}
+
+type loadExec struct {
+	client *Client
+	queries []iLoadable
+}
+
+func (r loadExec) Exec(ctx context.Context, v interface{}) error {
+	var query string
+	query += "query {"
+	for _, q := range r.queries {
+		query += q.getQuery().build() + "\n"
+	}
+	query += "}"
+	if debug == Info {
+		log.Printf("query: %s", query)
+	}
+
+	var result struct{
+		Errors []gqlError      `json:"errors"`
+		Data   json.RawMessage `json:"data"`
+	}
+	if err := r.client.do(ctx, query, &result); err != nil {
+		return fmt.Errorf("query failed: `%s` %w", query, err)
+	}
+
+	if result.Errors != nil {
+		first := result.Errors[0]
+		return fmt.Errorf(first.Message)
+	}
+
+	if err := json.Unmarshal(result.Data, v); err != nil {
+		return fmt.Errorf("could not decode result.Data: %w", err)
+	}
+
+	return nil
+}

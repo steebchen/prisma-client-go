@@ -7,7 +7,6 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"reflect"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -16,11 +15,12 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/prisma/photongo/runtime/platform"
+	"github.com/prisma/photongo/binaries/platform"
 )
 
 type LogLevel string

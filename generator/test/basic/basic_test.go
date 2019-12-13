@@ -1,9 +1,10 @@
 package basic
 
-//go:generate prisma2 generate
+//go:generate go run github.com/prisma/photongo generate
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client Client, ctx cx)
+type Func func(t *testing.T, client *Client, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -41,7 +42,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -54,6 +55,36 @@ func TestBasic(t *testing.T) {
 			stuff, ok := actual.Stuff()
 			assert.Equal(t, false, ok)
 			assert.Equal(t, "", stuff)
+		},
+	}, {
+		name: "marshal json",
+		// language=GraphQL
+		before: `
+			mutation {
+				createOneUser(data: {
+					id: "marshal",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client *Client, ctx cx) {
+			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := json.Marshal(&user)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := `{"id":"marshal","email":"john@example.com","username":"johndoe","name":"John","stuff":null}`
+			assert.Equal(t, expected, string(actual))
 		},
 	}, {
 		name: "FindOne",
@@ -76,7 +107,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -86,11 +117,8 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "FindOne not found",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
-			if err == ErrNotFound {
-				return
-			}
 
 			assert.Equal(t, ErrNotFound, err)
 		},
@@ -117,7 +145,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -162,7 +190,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -186,7 +214,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "Create",
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			created, err := client.User.CreateOne(
 				User.Email.Set("email"),
 				User.Username.Set("username"),
@@ -234,7 +262,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			updated, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -289,7 +317,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Update(
@@ -340,7 +368,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			deleted, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -385,7 +413,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Delete().Exec(ctx)
@@ -427,7 +455,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Not(
 					User.Email.Equals("email1"),
@@ -468,7 +496,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Or(
 					User.Email.Equals("email1"),
@@ -519,7 +547,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Stuff.IsNull(),
 			).Exec(ctx)
@@ -539,7 +567,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		// TODO move this to test/types
-		name: "query for nullable dynamic field",
+		name: "query for nullable dynamic nil field",
 		// language=GraphQL
 		before: `
 			mutation {
@@ -561,7 +589,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			var str *string = nil
 			actual, err := client.User.FindMany(
 				User.Stuff.EqualsOptional(str),
@@ -575,6 +603,51 @@ func TestBasic(t *testing.T) {
 					ID:       "id2",
 					Email:    "2",
 					Username: "2",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		// TODO move this to test/types
+		name: "query for nullable dynamic field with value",
+		// language=GraphQL
+		before: `
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "1",
+					username: "1",
+					stuff: "filled",
+				}) {
+					id
+				}
+				b: createOneUser(data: {
+					id: "id2",
+					email: "2",
+					username: "2",
+					stuff: null,
+				}) {
+					id
+				}
+			}
+		`,
+		run: func(t *testing.T, client *Client, ctx cx) {
+			// TODO query for more types here, especially enums
+			str := "filled"
+			actual, err := client.User.FindMany(
+				User.Stuff.EqualsOptional(&str),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				user{
+					ID:       "id1",
+					Email:    "1",
+					Username: "1",
+					Stuff:    &str,
 				},
 			}}
 
@@ -612,7 +685,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`,
-		run: func(t *testing.T, client Client, ctx cx) {
+		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Stuff.In([]string{"first", "third"}),
 			).Exec(ctx)
@@ -642,35 +715,10 @@ func TestBasic(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			hooks.Run(t)
-
 			client := NewClient()
-			if err := client.Connect(); err != nil {
-				t.Fatalf("could not connect %s", err)
-				return
-			}
-
-			defer func() {
-				err := client.Disconnect()
-				if err != nil {
-					t.Fatalf("could not disconnect: %s", err)
-				}
-			}()
-
-			ctx := context.Background()
-
-			if tt.before != "" {
-				var response gqlResponse
-				err := client.do(ctx, tt.before, &response)
-				if err != nil {
-					t.Fatalf("could not send mock query %s", err)
-				}
-				if response.Errors != nil {
-					t.Fatalf("mock query has errors %+v", response)
-				}
-			}
-
-			tt.run(t, client, ctx)
+			hooks.Start(t, client, tt.before, client.do)
+			tt.run(t, client, context.Background())
+			hooks.End(t, client)
 		})
 	}
 }
