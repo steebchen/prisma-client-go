@@ -12,7 +12,7 @@ import (
 )
 
 // Run the prisma CLI with given arguments
-func Run(arguments []string) error {
+func Run(arguments []string, output bool) error {
 	logger.L.Printf("running cli with args %+v", arguments)
 
 	dir := binaries.GlobalPath()
@@ -38,8 +38,11 @@ func Run(arguments []string) error {
 	)
 
 	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	cmd.Stdout = os.Stdout
+
+	if output {
+		cmd.Stderr = os.Stderr
+		cmd.Stdout = os.Stdout
+	}
 
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("could not run %+v: %w", arguments, err)
