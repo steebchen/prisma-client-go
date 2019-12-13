@@ -13,12 +13,34 @@ model User {
 	id        String   @id @default(cuid())
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
-	str       String?
+	str       String
+	strOpt    String?
 	int       Int
+	intOpt    Int?
 	float     Float
+	floatOpt  Float?
 	bool      Boolean
+	boolOpt   Boolean?
 	date      DateTime
-	role      Role?
+	dateOpt   DateTime?
+	role      Role
+	roleOpt   Role?
+
+	chan      String?
+	map       String?
+	continue  String?
+	break     String?
+	const     String?
+	var       String?
+	for       String?
+	range     String?
+	return    String?
+	switch    String?
+	struct    String?
+	type      String?
+	go        String?
+	interface String?
+	defer     String?
 }
 
 enum Role {

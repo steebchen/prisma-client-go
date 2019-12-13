@@ -14,7 +14,7 @@ func main() {
 		args := os.Args[1:]
 		logger.L.Printf("invoking command %+v", args)
 		// prisma CLI
-		err := cli.Run(args)
+		err := cli.Run(args, true)
 		if err != nil {
 			panic(err)
 		}

@@ -24,7 +24,7 @@
 		{{- if and ($field.Kind.IncludeInStruct) (not $field.IsRequired) }}
 			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ $field.Type.Value }}, ok bool) {
 				if r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }} == nil {
-					return "", false
+					return value, false
 				}
 				return *r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}, true
 			}

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/prisma/photongo/cli"
+	"github.com/prisma/photongo/logger"
 )
 
 type gqlResponse struct {
@@ -61,11 +62,11 @@ func setup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}); err != nil {
+	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}, logger.Debug); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
 
-	if err := cli.Run([]string{"lift", "up"}); err != nil {
+	if err := cli.Run([]string{"lift", "up"}, logger.Debug); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
 }

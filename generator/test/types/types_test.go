@@ -33,15 +33,17 @@ func TestTypes(t *testing.T) {
 			id := `f"hi"'`
 			s := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
 			created, err := client.User.CreateOne(
+				User.Str.Set(s),
 				User.Int.Set(5),
 				User.Float.Set(5.5),
 				User.Bool.Set(true),
 				User.Date.Set(date),
+				User.Role.Set(RoleAdmin),
 
 				User.ID.Set(id),
 				User.CreatedAt.Set(date),
 				User.UpdatedAt.Set(date),
-				User.Str.Set(s),
+				User.StrOpt.Set(s),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -52,11 +54,13 @@ func TestTypes(t *testing.T) {
 					ID:        id,
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       &s,
+					Str:       s,
+					StrOpt:    &s,
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
+					Role:      RoleAdmin,
 				},
 			}
 
@@ -72,7 +76,7 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, expected, actual)
 
 			actualSlice, err := client.User.FindMany(
-				User.Str.Equals(s),
+				User.StrOpt.Equals(s),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -86,21 +90,25 @@ func TestTypes(t *testing.T) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			admin := RoleAdmin
+			mod := RoleModerator
 			expected := UserModel{
 				user{
 					ID:        "123",
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       str("a"),
+					Str:       "str",
+					StrOpt:    str("a"),
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      &admin,
+					Role:      admin,
+					RoleOpt:   &mod,
 				},
 			}
 
 			created, err := client.User.CreateOne(
+				User.Str.Set("str"),
 				User.Int.Set(5),
 				User.Float.Set(5.5),
 				User.Bool.Set(true),
@@ -108,7 +116,8 @@ func TestTypes(t *testing.T) {
 				User.Role.Set(RoleAdmin),
 
 				User.ID.Set("123"),
-				User.Str.Set("a"),
+				User.StrOpt.Set("a"),
+				User.RoleOpt.Set(RoleModerator),
 				User.CreatedAt.Set(date),
 				User.UpdatedAt.Set(date),
 			).Exec(ctx)
@@ -121,6 +130,8 @@ func TestTypes(t *testing.T) {
 			actual, err := client.User.FindMany(
 				User.Role.Equals(RoleAdmin),
 				User.Role.In([]Role{RoleAdmin}),
+				User.RoleOpt.Equals(RoleModerator),
+				User.RoleOpt.In([]Role{RoleModerator}),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -137,11 +148,13 @@ func TestTypes(t *testing.T) {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "str",
+					str: "",
+					strOpt: "str",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -152,7 +165,7 @@ func TestTypes(t *testing.T) {
 
 			users, err := client.User.FindMany(
 				User.ID.Equals("id"),
-				User.Str.Equals("str"),
+				User.StrOpt.Equals("str"),
 				User.Bool.Equals(true),
 				User.Date.Equals(date),
 				User.Float.Equals(5.5),
@@ -169,11 +182,12 @@ func TestTypes(t *testing.T) {
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       str("str"),
+					StrOpt:    str("str"),
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
+					Role:      RoleAdmin,
 				},
 			}}
 
@@ -188,11 +202,13 @@ func TestTypes(t *testing.T) {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "alongstring",
+					str: "",
+					strOpt: "alongstring",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -203,7 +219,7 @@ func TestTypes(t *testing.T) {
 			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
-				User.Str.Contains("long"),
+				User.StrOpt.Contains("long"),
 				User.Bool.Equals(true),
 				User.Int.GTE(5),
 				User.Int.GT(3),
@@ -227,11 +243,12 @@ func TestTypes(t *testing.T) {
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       str("alongstring"),
+					StrOpt:    str("alongstring"),
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
+					Role:      RoleAdmin,
 				},
 			}}
 
@@ -247,10 +264,12 @@ func TestTypes(t *testing.T) {
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
 					str: "filled",
+					strOpt: "filled",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -258,11 +277,13 @@ func TestTypes(t *testing.T) {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: null,
+					str: "",
+					strOpt: null,
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -272,7 +293,7 @@ func TestTypes(t *testing.T) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(
-				User.Str.IsNull(),
+				User.StrOpt.IsNull(),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -283,11 +304,12 @@ func TestTypes(t *testing.T) {
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       nil,
+					StrOpt:    nil,
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
+					Role:      RoleAdmin,
 				},
 			}}
 
@@ -302,11 +324,13 @@ func TestTypes(t *testing.T) {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "filled",
+					str: "",
+					strOpt: "filled",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -314,11 +338,13 @@ func TestTypes(t *testing.T) {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: null,
+					str: "",
+					strOpt: null,
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -329,7 +355,7 @@ func TestTypes(t *testing.T) {
 
 			var s *string = nil
 			actual, err := client.User.FindMany(
-				User.Str.EqualsOptional(s),
+				User.StrOpt.EqualsOptional(s),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -340,11 +366,12 @@ func TestTypes(t *testing.T) {
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
-					Str:       nil,
+					StrOpt:    nil,
 					Int:       5,
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
+					Role:      RoleAdmin,
 				},
 			}}
 
@@ -359,11 +386,13 @@ func TestTypes(t *testing.T) {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: null,
+					str: "",
+					strOpt: null,
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -371,11 +400,13 @@ func TestTypes(t *testing.T) {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "filled",
+					str: "",
+					strOpt: "filled",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -386,7 +417,7 @@ func TestTypes(t *testing.T) {
 
 			s := "filled"
 			actual, err := client.User.FindMany(
-				User.Str.EqualsOptional(&s),
+				User.StrOpt.EqualsOptional(&s),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -401,7 +432,8 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Str:       &s,
+					StrOpt:    &s,
+					Role:      RoleAdmin,
 				},
 			}}
 
@@ -416,11 +448,13 @@ func TestTypes(t *testing.T) {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "first",
+					str: "",
+					strOpt: "first",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -428,11 +462,13 @@ func TestTypes(t *testing.T) {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "second",
+					str: "",
+					strOpt: "second",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -440,11 +476,13 @@ func TestTypes(t *testing.T) {
 					id: "id3",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
-					str: "third",
+					str: "",
+					strOpt: "third",
 					bool: true,
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					role: Admin,
 				}) {
 					id
 				}
@@ -454,7 +492,7 @@ func TestTypes(t *testing.T) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(
-				User.Str.In([]string{"first", "third"}),
+				User.StrOpt.In([]string{"first", "third"}),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -469,7 +507,8 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Str:       str("first"),
+					StrOpt:    str("first"),
+					Role:      RoleAdmin,
 				},
 			}, {
 				user{
@@ -480,7 +519,8 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Str:       str("third"),
+					StrOpt:    str("third"),
+					Role:      RoleAdmin,
 				},
 			}}
 
