@@ -1,6 +1,6 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-const schemaPath = "{{ .SchemaPath }}"
+const schema = `{{ .Datamodel }}`
 const binariesPath = "{{ .PrismaBinaryPath }}"
 
 func getPort() (string, error) {
@@ -113,7 +113,7 @@ func (c *Client) Connect() error {
 
 	c.cmd.Env = append(
 		os.Environ(),
-		"PRISMA_DML_PATH=" + schemaPath,
+		"PRISMA_DML=" + schema,
 		"RUST_LOG=error",
 		"RUST_LOG_FORMAT=json",
 	)
@@ -121,7 +121,6 @@ func (c *Client) Connect() error {
 	if debug == Debug {
 		c.cmd.Env = append(
 			c.cmd.Env,
-			"PRISMA_DML_PATH=" + schemaPath,
 			"PRISMA_LOG_QUERIES=y",
 			"RUST_LOG=info",
 		)
