@@ -30,15 +30,18 @@ We recommend to read the [current caveats](#caveats).
     }
 
     model User {
-      id      String  @default(cuid()) @id @unique
-      email   String  @unique
-      name    String?
-      age     Int?
-      posts   Post[]
+      id        String   @default(cuid()) @id @unique
+      createdAt DateTime @default(now())
+      email     String   @unique
+      name      String?
+      age       Int?
+      posts     Post[]
     }
 
     model Post {
       id        String   @default(cuid()) @id @unique
+      createdAt DateTime @default(now())
+      updatedAt DateTime @updatedAt
       published Boolean
       title     String
       content   String?
@@ -63,13 +66,13 @@ We recommend to read the [current caveats](#caveats).
 
     Photon go is now generated into the file path you specified in the "output" option which is `"./photon/photon_gen.go"` in this case.
 
-    For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
+For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
 
-    ```shell script
-    go run github.com/prisma/photongo dev
-    ```
+```shell script
+go run github.com/prisma/photongo dev
+```
 
-    Note: Some errors may get displayed, but you can ignore them. Prisma Studio is currently not working. As an alternative, you can install the [Prisma CLI](https://github.com/prisma/prisma2#getting-started).
+Note: Some errors may get displayed, but you can ignore them. Prisma Studio is currently not working. As an alternative, you can install the [Prisma CLI](https://github.com/prisma/prisma2#getting-started).
 
 For more information and instructions on how to deploy your app, please check the [deploy instructions](#deploy).
 
@@ -119,9 +122,12 @@ func main() {
 
   // create a user
   createdUser, err := client.User.CreateOne(
-    photon.User.ID.Set("123"),
     photon.User.Email.Set("john.doe@example.com"),
     photon.User.Name.Set("John Doe"),
+
+    // ID is optional, which is why it's specified last. if you don't set it
+    // an ID is auto generated for you
+    photon.User.ID.Set("123"),
   ).Exec(ctx)
 
   fmt.Printf("created user: %+v\n", createdUser)
@@ -206,9 +212,6 @@ WORKDIR /app
 # add go modules lockfiles
 COPY go.mod go.sum ./
 RUN go mod download
-
-ENV PHOTON_GO_LOG=info
-ENV DEBUG=*
 
 # temporarily needed to enforce installing the photongo binary
 RUN go install github.com/prisma/photongo
@@ -303,11 +306,11 @@ All of these queries are fully type-safe and independent of the underlying datab
 ```go
 created, err := client.User.CreateOne(
   // required fields
-  User.ID.Set("id"),
   User.Email.Set("email"),
   User.Username.Set("username"),
 
   // optional fields
+  User.ID.Set("id"),
   User.Name.Set("name"),
   User.Stuff.Set("stuff"),
 ).Exec(ctx)
