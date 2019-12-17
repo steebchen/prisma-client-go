@@ -22,8 +22,19 @@ const PrismaVersion = "2.0.0-alpha.443"
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "2eb5a63ad82e15dc2c248a0ac84dc28cd35542d6"
 
-const PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
-const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
+var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
+var EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
+
+// init overrides URLs if env variables are specific for debugging purposes and to
+// be able to provide a fallback if the links above should go down
+func init() {
+	if prismaURL, ok := os.LookupEnv("PRISMA_CLI_URL"); ok {
+		PrismaURL = prismaURL
+	}
+	if engineURL, ok := os.LookupEnv("PRISMA_ENGINE_URL"); ok {
+		EngineURL = engineURL
+	}
+}
 
 // PrismaCLIName returns the local file path of where the CLI lives
 func PrismaCLIName() string {
