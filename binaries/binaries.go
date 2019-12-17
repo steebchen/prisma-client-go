@@ -22,7 +22,7 @@ const PrismaVersion = "2.0.0-alpha.443"
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "2eb5a63ad82e15dc2c248a0ac84dc28cd35542d6"
 
-const PrismaURL = "https://prisma-binaries-photongo.s3.eu-central-1.amazonaws.com/%s-%s-%s.gz"
+const PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
 const EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
 // PrismaCLIName returns the local file path of where the CLI lives
