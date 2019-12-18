@@ -16,12 +16,6 @@ type Root struct {
 	Datamodel string `json:"datamodel"`
 	// BinaryPaths (optional)
 	BinaryPaths BinaryPaths `json:"binaryPaths"`
-
-	// PrismaBinaryPath is a custom field from Photon Go to pass in the global binaries folder
-	PrismaBinaryPath string
-
-	// PrismaVersion is a custom field from Photon Go to hold the Prisma cli version
-	PrismaVersion string
 }
 
 // PhotonGoConfig describes the options for the Photon Go generator

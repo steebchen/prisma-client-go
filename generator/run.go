@@ -21,9 +21,6 @@ func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = "main"
 	}
-
-	input.PrismaBinaryPath = binaries.GlobalPath()
-	input.PrismaVersion = binaries.PrismaVersion
 }
 
 // Run invokes the generator, which builds the templates and writes to the specified output file.
@@ -119,8 +116,8 @@ func Run(input *Root) error {
 		return fmt.Errorf("could not format final source: %w", err)
 	}
 
-	path := filepath.Dir(input.Generator.Output)
-	if err = os.MkdirAll(path, os.ModePerm); err != nil {
+	outputDir := filepath.Dir(input.Generator.Output)
+	if err = os.MkdirAll(outputDir, os.ModePerm); err != nil {
 		return fmt.Errorf("could not run MkdirAll on path %s: %w", input.Generator.Output, err)
 	}
 

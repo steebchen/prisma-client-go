@@ -87,7 +87,34 @@ type Client struct {
 //     }
 //   }()
 func (c *Client) Connect() error {
-	c.log.Printf("connecting...")
+	c.log.Printf("ensure query engine binary...")
+
+	var queryEngine string
+
+	{{/* TODO write tests for this case */}}
+	if prismaQueryEngineBinary != "" {
+		c.log.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
+		queryEngine = prismaQueryEngineBinary
+		{{/* TODO check with os.Stat if the binary exists */}}
+	} else {
+		c.log.Printf("default to fetching it at runtime.")
+
+		start := time.Now()
+
+		to := binaries.GlobalPath()
+
+		qe, err := binaries.DownloadEngine("query-engine", to)
+		if err != nil {
+			return fmt.Errorf("could not fetch query engine: %w", err)
+		}
+
+		queryEngine	= qe
+
+		c.log.Printf("using query engine at %s", qe)
+		c.log.Printf("ensure query engine took %s", time.Since(start))
+	}
+
+	c.log.Printf("connecting to engine...")
 
 	port, err := getPort()
 	if err != nil {
@@ -100,7 +127,7 @@ func (c *Client) Connect() error {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	binaryName := platform.BinaryNameWithSSL()
+	c.log.Printf("launching query engine at %s", queryEngine)
 
 	var file string
 	file = "./" + path.Join("prisma-query-engine-" + binaryName)
@@ -151,7 +178,7 @@ func (c *Client) Connect() error {
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
 	var gqlErrors []gqlError
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		body, err := c.request(ctx, "GET", "/status", map[string]interface{}{})
 
 		if err != nil {
@@ -167,14 +194,14 @@ func (c *Client) Connect() error {
 		if err != nil {
 			connectErr = err
 			c.log.Printf("could not unmarshal response; retrying...")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
 		if response.Errors != nil {
 			gqlErrors = response.Errors
 			c.log.Printf("could not connect due to gql errors; retrying...")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
@@ -190,6 +217,8 @@ func (c *Client) Connect() error {
 	if gqlErrors != nil {
 		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
+
+	c.log.Printf("connecting took %s", time.Since(startEngine))
 
 	c.log.Printf("connected.")
 	return nil
