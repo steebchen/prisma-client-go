@@ -1,0 +1,16 @@
+name: integration test all
+on: push
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: integration
+        run: |
+          docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+          cd integration/ && go run github.com/prisma/photongo lift save --create-db --name init
+          cd integration/ && go run github.com/prisma/photongo lift up
+          docker build . -f docker/integration.dockerfile -t integration
+          docker run integration
