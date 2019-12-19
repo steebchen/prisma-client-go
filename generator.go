@@ -5,10 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/prisma/photongo/generator"
 	"github.com/prisma/photongo/jsonrpc"
@@ -30,25 +27,19 @@ func reply(w io.Writer, data interface{}) error {
 	return nil
 }
 
-func invokePrisma() {
-	// make sure to exit when signal triggers
-	c := make(chan os.Signal)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+func invokePrisma() error {
+	reader := bufio.NewReader(os.Stdin)
 
-	go func() {
-		<-c
-		os.Exit(1)
-	}()
-
-	scanner := bufio.NewScanner(os.Stdin)
-	for scanner.Scan() {
-		content := scanner.Bytes()
+	for {
+		content, err := reader.ReadBytes('\n')
+		if err != nil {
+			return fmt.Errorf("could not read bytes from stdin: %w", err)
+		}
 
 		var input jsonrpc.Request
 
-		err := json.Unmarshal(content, &input)
-		if err != nil {
-			log.Fatalf("could not open stdin %s", err)
+		if err := json.Unmarshal(content, &input); err != nil {
+			return fmt.Errorf("could n		ot open stdin %s", err)
 		}
 
 		var response interface{}
@@ -71,18 +62,18 @@ func invokePrisma() {
 			var params generator.Root
 
 			if err := json.Unmarshal(input.Params, &params); err != nil {
-				log.Fatalf("could not unmarshal params into generator.Root type %s", err)
+				return fmt.Errorf("could not unmarshal params into generator.Root type %s", err)
 			}
 
 			if err = generator.Run(&params); err != nil {
-				log.Fatalf("could not generate code. %s", err)
+				return fmt.Errorf("could not generate code. %s", err)
 			}
+		default:
+			return fmt.Errorf("no such method %s", input.Method)
 		}
 
-		err = reply(os.Stderr, jsonrpc.NewResponse(input.ID, response))
-
-		if err != nil {
-			log.Fatalf("could not open stdin %s", err)
+		if err := reply(os.Stderr, jsonrpc.NewResponse(input.ID, response)); err != nil {
+			return fmt.Errorf("could not open stdin %s", err)
 		}
 	}
 }
