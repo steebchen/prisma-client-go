@@ -3,7 +3,10 @@ package main
 //go:generate go build .
 
 import (
+	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/prisma/photongo/cli"
 	"github.com/prisma/photongo/logger"
@@ -14,13 +17,30 @@ func main() {
 		args := os.Args[1:]
 		logger.L.Printf("invoking command %+v", args)
 		// prisma CLI
-		err := cli.Run(args, true)
-		if err != nil {
+		if err := cli.Run(args, true); err != nil {
 			panic(err)
 		}
-	} else {
-		logger.L.Printf("invoking prisma")
-		// invoke the prisma generator
-		invokePrisma()
+
+		return
 	}
+
+	// running the prisma generator
+
+	logger.L.Printf("invoking prisma")
+
+	// exit when signal triggers
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-c
+		os.Exit(1)
+	}()
+
+	if err := invokePrisma(); err != nil {
+		log.Printf("error occurred when invoking prisma: %s", err)
+		os.Exit(1)
+	}
+
+	logger.L.Printf("success")
 }
