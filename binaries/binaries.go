@@ -44,11 +44,8 @@ func PrismaCLIName() string {
 
 // GlobalPath returns the path of where the CLI lives
 func GlobalPath() string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		panic(err)
-	}
-	return path.Join(home, ".cache/prisma/photongo-prisma-binaries", PrismaVersion)
+	temp := os.TempDir()
+	return path.Join(temp, "prisma", "photongo-prisma-binaries", PrismaVersion)
 }
 
 // Fetch fetches the Prisma binaries needed for the generator to a given directory
