@@ -102,11 +102,26 @@ func (c *Client) Connect() error {
 
 	binaryName := platform.BinaryNameWithSSL()
 
-	dir := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
+	var file string
+	file = "./" + path.Join("prisma-query-engine-" + binaryName)
 
-	c.log.Printf("launching query engine at %s", dir)
+	c.log.Printf("launching query engine at %s", file)
 
-	c.cmd = exec.Command(dir, "-p", string(port))
+	{{/* TODO write tests for local dir */}}
+	if _, err := os.Stat(file); os.IsNotExist(err) {
+		c.log.Printf("no local query-engine %s", file)
+
+		file = path.Join(binariesPath, "prisma-query-engine-" + binaryName)
+
+		if _, err := os.Stat(file); os.IsNotExist(err) {
+			c.log.Printf("no global query-engine %s", file)
+
+			{{/* TODO improve this error message with resources */}}
+			return fmt.Errorf("no query engine could be found")
+		}
+	}
+
+	c.cmd = exec.Command(file, "-p", string(port))
 
 	c.cmd.Stdout = os.Stdout
 	c.cmd.Stderr = os.Stderr
