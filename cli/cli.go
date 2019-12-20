@@ -17,7 +17,7 @@ func Run(arguments []string, output bool) error {
 
 	dir := binaries.GlobalPath()
 
-	if err := binaries.Fetch(dir); err != nil {
+	if err := binaries.FetchNative(dir); err != nil {
 		return fmt.Errorf("could not fetch binaries: %w", err)
 	}
 
