@@ -16,6 +16,16 @@ func main() {
 	if len(os.Args) > 1 {
 		args := os.Args[1:]
 		logger.L.Printf("invoking command %+v", args)
+
+		if args[0] == "prefetch" {
+			// just run prisma -v to trigger the download
+			if err := cli.Run([]string{"-v"}, true); err != nil {
+				panic(err)
+			}
+			os.Exit(0)
+			return
+		}
+
 		// prisma CLI
 		if err := cli.Run(args, true); err != nil {
 			panic(err)
