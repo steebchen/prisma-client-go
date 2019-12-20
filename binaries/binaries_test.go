@@ -23,7 +23,7 @@ func TestFetch(t *testing.T) {
 	dir := tmpDir(t)
 	defer os.RemoveAll(dir)
 
-	if err := Fetch(dir); err != nil {
+	if err := FetchNative(dir); err != nil {
 		t.Fatalf("fetch failed: %s", err)
 	}
 }
@@ -34,7 +34,7 @@ func TestFetch_localDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := Fetch(wd); err != nil {
+	if err := FetchNative(wd); err != nil {
 		t.Fatalf("fetch failed: %s", err)
 	}
 }
@@ -44,14 +44,14 @@ func TestFetch_withCache(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	start := time.Now()
-	if err := Fetch(dir); err != nil {
+	if err := FetchNative(dir); err != nil {
 		t.Fatalf("fetch 1 failed: %s", err)
 	}
 
 	log.Printf("first fetch took %s", time.Since(start))
 
 	start = time.Now()
-	if err := Fetch(dir); err != nil {
+	if err := FetchNative(dir); err != nil {
 		t.Fatalf("fetch 2 failed: %s", err)
 	}
 
@@ -63,7 +63,7 @@ func TestFetch_withCache(t *testing.T) {
 }
 
 func TestFetch_relativeDir(t *testing.T) {
-	err := Fetch(".")
+	err := FetchNative(".")
 	expected := fmt.Errorf("toDir must be absolute")
 	assert.Equal(t, expected, err)
 }

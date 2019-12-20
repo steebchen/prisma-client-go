@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
@@ -48,8 +47,40 @@ func GlobalPath() string {
 	return path.Join(temp, "prisma", "photongo-prisma-binaries", PrismaVersion)
 }
 
-// Fetch fetches the Prisma binaries needed for the generator to a given directory
-func Fetch(toDir string) error {
+func fetch(toDir string, engine string, binary string) error {
+	logger.L.Printf("checking %s...", engine)
+
+	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engine, binary))
+
+	urlName := engine
+	// the query-engine binary to on S3 is "prisma"
+	if engine == "query-engine" {
+		urlName = "prisma"
+	}
+	url := fmt.Sprintf(EngineURL, EngineVersion, binary, urlName)
+
+	if _, err := os.Stat(to); !os.IsNotExist(err) {
+		logger.L.Printf("%s is cached", to)
+		return nil
+	}
+
+	logger.L.Printf("%s is missing, downloading...", engine)
+
+	if err := download(url, to); err != nil {
+		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
+	}
+
+	logger.L.Printf("%s done", engine)
+
+	return nil
+}
+
+func FetchBinary(toDir string, engineName string, binaryName string) error {
+	return fetch(toDir, engineName, binaryName)
+}
+
+// FetchNative fetches the Prisma binaries needed for the generator to a given directory
+func FetchNative(toDir string) error {
 	if toDir == "" {
 		return fmt.Errorf("toDir must be provided")
 	}
@@ -86,36 +117,11 @@ func Fetch(toDir string) error {
 
 	binaryName := platform.BinaryNameWithSSL()
 
-	for _, e := range engines {
-		logger.L.Printf("checking %s...", e)
-
-		to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", e, binaryName))
-
-		urlName := e
-		// the query-engine binary to on S3 is "prisma"
-		if e == "query-engine" {
-			urlName = "prisma"
+	for _, engine := range engines {
+		err := fetch(toDir, engine, binaryName)
+		if err != nil {
+			return fmt.Errorf("fetch: %w", err)
 		}
-		url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
-
-		if _, err := os.Stat(to); !os.IsNotExist(err) {
-			logger.L.Printf("%s is cached", to)
-			continue
-		}
-
-		logger.L.Printf("%s is missing, downloading...", e)
-
-		if err := download(url, to); err != nil {
-			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
-		}
-
-		logger.L.Printf("verifying %s...", e)
-
-		if err := verify(to); err != nil {
-			return fmt.Errorf("could not run %s: %w", to, err)
-		}
-
-		logger.L.Printf("%s done", e)
 	}
 
 	return nil
@@ -176,17 +182,4 @@ func copyFile(from string, to string) error {
 	}
 
 	return nil
-}
-
-// verify that a given binary runs
-// this is run as en extra function after download() because of https://github.com/golang/go/issues/22315
-func verify(dest string) error {
-	cmd := exec.Command(dest, "--help")
-
-	if logger.Debug {
-		cmd.Stderr = os.Stderr
-		cmd.Stdout = os.Stdout
-	}
-
-	return cmd.Run()
 }

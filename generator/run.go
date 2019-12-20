@@ -8,11 +8,13 @@ import (
 	"go/format"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/prisma/photongo/binaries"
+	"github.com/prisma/photongo/binaries/platform"
 )
 
 func addDefaults(input *Root) {
@@ -29,13 +31,26 @@ func Run(input *Root) error {
 	addDefaults(input)
 
 	// copy the query engine to the local repository path
-	for name, path := range input.BinaryPaths.QueryEngine {
-		input, err := ioutil.ReadFile(path)
-		if err != nil {
-			return fmt.Errorf("could not read file %s: %w", path, err)
+	for _, name := range input.Generator.BinaryTargets {
+		if name == "native" {
+			name = platform.BinaryNameWithSSL()
 		}
 
-		dest := "./query-engine-" + name
+		// first, ensure they are actually downloaded
+		if err := binaries.FetchBinary(binaries.GlobalPath(), "query-engine", name); err != nil {
+			return fmt.Errorf("failed fetching binaries: %w", err)
+		}
+
+		qe := "prisma-query-engine-" + name
+
+		dir := path.Join(binaries.GlobalPath(), qe)
+
+		input, err := ioutil.ReadFile(dir)
+		if err != nil {
+			return fmt.Errorf("could not read file %s: %w", name, err)
+		}
+
+		dest := "./" + qe
 		err = ioutil.WriteFile(dest, input, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("could not write file to %s: %w", dest, err)
