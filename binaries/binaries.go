@@ -149,12 +149,10 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 	}
 	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
 
-	startStat := time.Now()
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.L.Printf("%s is cached", to)
 		return to, nil
 	}
-	logger.L.Printf("os.Stat() took %s", time.Since(startStat))
 
 	logger.L.Printf("%s is missing, downloading...", name)
 

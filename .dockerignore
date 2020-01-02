@@ -1,5 +1,6 @@
 .git/
 .github/
+docker/
 **migrations**/
 photongo
 *.db

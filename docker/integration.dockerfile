@@ -28,4 +28,7 @@ RUN apt-get install -qqy openssl ca-certificates
 
 COPY --from=build /main /main
 
+ENV PHOTON_GO_LOG=info
+ENV DEBUG=*
+
 CMD ["/main"]

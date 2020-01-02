@@ -1,7 +1,6 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
-var binariesPath = binaries.GlobalPath()
 
 func getPort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
@@ -89,6 +88,8 @@ type Client struct {
 func (c *Client) Connect() error {
 	c.log.Printf("ensure query engine binary...")
 
+	startEngine := time.Now()
+
 	var queryEngine string
 
 	{{/* TODO write tests for this case */}}
@@ -129,6 +130,9 @@ func (c *Client) Connect() error {
 
 	c.log.Printf("launching query engine at %s", queryEngine)
 
+	binariesPath := binaries.GlobalPath()
+	binaryName := platform.BinaryNameWithSSL()
+
 	var file string
 	file = "./" + path.Join("prisma-query-engine-" + binaryName)
 
@@ -148,7 +152,9 @@ func (c *Client) Connect() error {
 		}
 	}
 
-	c.cmd = exec.Command(file, "-p", string(port))
+	c.log.Printf("running query-engine on port %s", port)
+
+	c.cmd = exec.Command(file, "-p", port)
 
 	c.cmd.Stdout = os.Stdout
 	c.cmd.Stderr = os.Stderr

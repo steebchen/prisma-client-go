@@ -1,5 +1,7 @@
 package main
 
+//go:generate go run github.com/prisma/photongo generate
+
 import (
 	"context"
 	"fmt"
