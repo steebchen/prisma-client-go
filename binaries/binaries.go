@@ -121,7 +121,10 @@ func Fetch(toDir string) error {
 	return nil
 }
 
-func download(url string, dest string) error {
+func download(url string, to string) error {
+	// copy to temp file first
+	dest := to + ".tmp"
+
 	resp, err := http.Get(url)
 	if err != nil {
 		return fmt.Errorf("could not get %s: %w", url, err)
@@ -151,6 +154,25 @@ func download(url string, dest string) error {
 
 	if _, err := io.Copy(out, g); err != nil {
 		return fmt.Errorf("could not copy %s: %w", url, err)
+	}
+
+	// temp file is ready, now copy to the original destination
+	if err := copyFile(dest, to); err != nil {
+		return fmt.Errorf("copy temp file: %w", err)
+	}
+
+	return nil
+}
+
+func copyFile(from string, to string) error {
+	input, err := ioutil.ReadFile(from)
+	if err != nil {
+		return fmt.Errorf("readfile: %w", err)
+	}
+
+	err = ioutil.WriteFile(to, input, 0777)
+	if err != nil {
+		return fmt.Errorf("writefile: %w", err)
 	}
 
 	return nil
