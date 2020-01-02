@@ -1,7 +1,7 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
-const binariesPath = "{{ .PrismaBinaryPath }}"
+var binariesPath = binaries.GlobalPath()
 
 func getPort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
