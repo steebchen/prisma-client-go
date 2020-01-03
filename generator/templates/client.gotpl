@@ -90,15 +90,38 @@ func (c *Client) Connect() error {
 
 	startEngine := time.Now()
 
-	var queryEngine string
+	c.log.Printf("connecting to engine...")
 
-	{{/* TODO write tests for this case */}}
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
+	{{- end }}
+
+	binariesPath := binaries.GlobalPath()
+	binaryName := platform.BinaryNameWithSSL()
+
+	var file string
+
+	localPath := "./" + path.Join("prisma-query-engine-" + binaryName)
+	globalPath := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
+
+	{{/* TODO write tests for all cases */}}
+	{{/* TODO just check for binaryTargets? if binaryTargets are provided, only use that mechanism */}}
+
+	{{/* first, check if the query engine binary is being overriden by PRISMA_QUERY_ENGINE_BINARY */}}
 	if prismaQueryEngineBinary != "" {
 		c.log.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
-		queryEngine = prismaQueryEngineBinary
+		file = prismaQueryEngineBinary
 		{{/* TODO check with os.Stat if the binary exists */}}
+	} else if _, err := os.Stat(localPath); err == nil {
+		{{/* check in the local working directory */}}
+		c.log.Printf("query engine found in working directory")
+		file = localPath
+	} else if _, err := os.Stat(globalPath); err == nil {
+		{{/* check in the global cache directory */}}
+		c.log.Printf("query engine found in global path")
+		file = globalPath
 	} else {
-		c.log.Printf("default to fetching it at runtime.")
+		c.log.Printf("no query engine defined or found. fetching it at runtime...")
 
 		start := time.Now()
 
@@ -109,50 +132,22 @@ func (c *Client) Connect() error {
 			return fmt.Errorf("could not fetch query engine: %w", err)
 		}
 
-		queryEngine	= qe
+		file = qe
 
 		c.log.Printf("using query engine at %s", qe)
 		c.log.Printf("ensure query engine took %s", time.Since(start))
 	}
 
-	c.log.Printf("connecting to engine...")
+	c.log.Printf("launching query engine at %s", file)
 
 	port, err := getPort()
 	if err != nil {
 		return fmt.Errorf("get free port: %w", err)
 	}
 
-	c.url = "http://localhost:" + string(port)
-
-	{{- range $model := $.DMMF.Datamodel.Models }}
-		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
-	{{- end }}
-
-	c.log.Printf("launching query engine at %s", queryEngine)
-
-	binariesPath := binaries.GlobalPath()
-	binaryName := platform.BinaryNameWithSSL()
-
-	var file string
-	file = "./" + path.Join("prisma-query-engine-" + binaryName)
-
-	c.log.Printf("launching query engine at %s", file)
-
-	{{/* TODO write tests for local dir */}}
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		c.log.Printf("no local query-engine %s", file)
-
-		file = path.Join(binariesPath, "prisma-query-engine-" + binaryName)
-
-		if _, err := os.Stat(file); os.IsNotExist(err) {
-			c.log.Printf("no global query-engine %s", file)
-
-			{{/* TODO improve this error message with resources */}}
-			return fmt.Errorf("no query engine could be found")
-		}
-	}
-
 	c.log.Printf("running query-engine on port %s", port)
+
+	c.url = "http://localhost:" + port
 
 	c.cmd = exec.Command(file, "-p", port)
 
