@@ -39,7 +39,7 @@ func invokePrisma() error {
 		var input jsonrpc.Request
 
 		if err := json.Unmarshal(content, &input); err != nil {
-			return fmt.Errorf("could n		ot open stdin %s", err)
+			return fmt.Errorf("could not open stdin %s", err)
 		}
 
 		var response interface{}
@@ -73,7 +73,7 @@ func invokePrisma() error {
 		}
 
 		if err := reply(os.Stderr, jsonrpc.NewResponse(input.ID, response)); err != nil {
-			return fmt.Errorf("could not open stdin %s", err)
+			return fmt.Errorf("could not reply %s", err)
 		}
 	}
 }

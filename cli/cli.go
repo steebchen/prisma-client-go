@@ -14,6 +14,7 @@ import (
 // Run the prisma CLI with given arguments
 func Run(arguments []string, output bool) error {
 	logger.L.Printf("running cli with args %+v", arguments)
+	// TODO respect initial PRISMA_<name>_BINARY env
 
 	dir := binaries.GlobalPath()
 

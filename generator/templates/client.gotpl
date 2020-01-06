@@ -1,7 +1,6 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
-var binariesPath = binaries.GlobalPath()
 
 func getPort() (string, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
@@ -87,41 +86,70 @@ type Client struct {
 //     }
 //   }()
 func (c *Client) Connect() error {
-	c.log.Printf("connecting...")
+	c.log.Printf("ensure query engine binary...")
+
+	startEngine := time.Now()
+
+	c.log.Printf("connecting to engine...")
+
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
+	{{- end }}
+
+	binariesPath := binaries.GlobalPath()
+	binaryName := platform.BinaryNameWithSSL()
+
+	var file string
+
+	localPath := "./" + path.Join("prisma-query-engine-" + binaryName)
+	globalPath := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
+
+	{{/* TODO write tests for all cases */}}
+	{{/* TODO just check for binaryTargets? if binaryTargets are provided, only use that mechanism */}}
+
+	{{/* first, check if the query engine binary is being overriden by PRISMA_QUERY_ENGINE_BINARY */}}
+	if prismaQueryEngineBinary != "" {
+		c.log.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
+		file = prismaQueryEngineBinary
+		{{/* TODO check with os.Stat if the binary exists */}}
+	} else if _, err := os.Stat(localPath); err == nil {
+		{{/* check in the local working directory */}}
+		c.log.Printf("query engine found in working directory")
+		file = localPath
+	} else if _, err := os.Stat(globalPath); err == nil {
+		{{/* check in the global cache directory */}}
+		c.log.Printf("query engine found in global path")
+		file = globalPath
+	} else {
+		c.log.Printf("no query engine defined or found. fetching it at runtime...")
+
+		start := time.Now()
+
+		to := binaries.GlobalPath()
+
+		qe, err := binaries.DownloadEngine("query-engine", to)
+		if err != nil {
+			return fmt.Errorf("could not fetch query engine: %w", err)
+		}
+
+		file = qe
+
+		c.log.Printf("using query engine at %s", qe)
+		c.log.Printf("ensure query engine took %s", time.Since(start))
+	}
+
+	c.log.Printf("launching query engine at %s", file)
 
 	port, err := getPort()
 	if err != nil {
 		return fmt.Errorf("get free port: %w", err)
 	}
 
-	c.url = "http://localhost:" + string(port)
+	c.log.Printf("running query-engine on port %s", port)
 
-	{{- range $model := $.DMMF.Datamodel.Models }}
-		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
-	{{- end }}
+	c.url = "http://localhost:" + port
 
-	binaryName := platform.BinaryNameWithSSL()
-
-	var file string
-	file = "./" + path.Join("prisma-query-engine-" + binaryName)
-
-	c.log.Printf("launching query engine at %s", file)
-
-	{{/* TODO write tests for local dir */}}
-	if _, err := os.Stat(file); os.IsNotExist(err) {
-		c.log.Printf("no local query-engine %s", file)
-
-		file = path.Join(binariesPath, "prisma-query-engine-" + binaryName)
-
-		if _, err := os.Stat(file); os.IsNotExist(err) {
-			c.log.Printf("no global query-engine %s", file)
-
-			{{/* TODO improve this error message with resources */}}
-			return fmt.Errorf("no query engine could be found")
-		}
-	}
-
-	c.cmd = exec.Command(file, "-p", string(port))
+	c.cmd = exec.Command(file, "-p", port)
 
 	c.cmd.Stdout = os.Stdout
 	c.cmd.Stderr = os.Stderr
@@ -151,7 +179,7 @@ func (c *Client) Connect() error {
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
 	var gqlErrors []gqlError
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 100; i++ {
 		body, err := c.request(ctx, "GET", "/status", map[string]interface{}{})
 
 		if err != nil {
@@ -167,14 +195,14 @@ func (c *Client) Connect() error {
 		if err != nil {
 			connectErr = err
 			c.log.Printf("could not unmarshal response; retrying...")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
 		if response.Errors != nil {
 			gqlErrors = response.Errors
 			c.log.Printf("could not connect due to gql errors; retrying...")
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
@@ -190,6 +218,8 @@ func (c *Client) Connect() error {
 	if gqlErrors != nil {
 		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
+
+	c.log.Printf("connecting took %s", time.Since(startEngine))
 
 	c.log.Printf("connected.")
 	return nil
