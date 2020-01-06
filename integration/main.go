@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/prisma/photongo/integration/photon"
+	"integration/photon"
 )
 
 func check(err error) {

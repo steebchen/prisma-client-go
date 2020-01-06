@@ -1,4 +1,4 @@
-FROM golang:1.13 as build
+FROM golang:1.13 as prepare
 
 WORKDIR /app
 
@@ -14,11 +14,23 @@ COPY . ./
 # build photongo
 RUN go build .
 
+FROM golang:1.13 as build
+
+COPY --from=prepare /app/photongo /photongo
+
+WORKDIR /app
+
+ENV PHOTON_GO_LOG=info
+ENV DEBUG=*
+
+COPY integration/ .
+COPY . ./photongo
+
 # generate photon in integration folder
-RUN cd integration/ && go run github.com/prisma/photongo generate
+RUN go run github.com/prisma/photongo generate
 
 # build the integration binary with all dependencies
-RUN cd integration/ && go build -o /app/main .
+RUN go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
 FROM ubuntu:16.04

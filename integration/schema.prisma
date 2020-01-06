@@ -4,7 +4,7 @@ datasource db {
 }
 
 generator photon {
-	provider = "../photongo"
+	provider = "/photongo"
 	output   = "./photon/photon_gen.go"
 	package  = "photon"
 }
