@@ -9,11 +9,12 @@ jobs:
 
       - name: integration
         run: |
-          docker run --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
+          docker network create integration-bridge
+          docker run --network integration-bridge --name localhost -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
           cd integration/
           go run github.com/prisma/photongo lift save --create-db --name init
           go run github.com/prisma/photongo lift up
           cd ..
           docker build . -f docker/integration.dockerfile -t integration
-          docker run integration
+          docker run --network integration-bridge integration
           docker stop postgres
