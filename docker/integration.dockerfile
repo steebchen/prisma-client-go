@@ -1,4 +1,4 @@
-FROM golang:1.13 as prepare
+FROM golang:1.13 as build
 
 WORKDIR /app
 
@@ -12,16 +12,7 @@ RUN go mod download
 COPY . ./
 
 # build photongo
-RUN go build .
-
-FROM golang:1.13 as build
-
-COPY --from=prepare /app/photongo /photongo
-
-WORKDIR /app
-
-ENV PHOTON_GO_LOG=info
-ENV DEBUG=*
+RUN go build -o /photongo .
 
 COPY integration/ .
 COPY . ./photongo
