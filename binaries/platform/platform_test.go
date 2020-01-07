@@ -43,6 +43,10 @@ func Test_parseLinuxDistro(t *testing.T) {
 		input string
 		want  string
 	}{{
+		name:  "default to debian",
+		input: ``,
+		want:  "debian",
+	}, {
 		name: "custom without quotes",
 		input: `
 			ID=fedora

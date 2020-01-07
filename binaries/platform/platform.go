@@ -43,7 +43,7 @@ func getLinuxDistro() string {
 	out, _ := exec.Command("cat", "/etc/os-release").CombinedOutput()
 
 	if out == nil {
-		return ""
+		return "debian"
 	}
 
 	return parseLinuxDistro(string(out))
