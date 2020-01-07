@@ -22,10 +22,17 @@ const PrismaVersion = "2.0.0-alpha.443"
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "2eb5a63ad82e15dc2c248a0ac84dc28cd35542d6"
 
-var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
-var EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
+// PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
+// Plain HTTP is used because otherwise downloads break on a lot of "scratch" like
+// images because no root certificates are installed.
+var PrismaURL = "http://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
 
-// init overrides URLs if env variables are specific for debugging purposes and to
+// EngineURL points to an S3 bucket URL where the Prisma engines are stored.
+// Plain HTTP is used because otherwise downloads break on a lot of "scratch" like
+// images because no root certificates are installed.
+var EngineURL = "http://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
+
+// init overrides URLs if env variables are specified for debugging purposes and to
 // be able to provide a fallback if the links above should go down
 func init() {
 	if prismaURL, ok := os.LookupEnv("PRISMA_CLI_URL"); ok {
