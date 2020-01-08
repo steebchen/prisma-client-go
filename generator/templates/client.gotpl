@@ -92,17 +92,16 @@ func (c *Client) Connect() error {
 
 	c.log.Printf("connecting to engine...")
 
-	{{- range $model := $.DMMF.Datamodel.Models }}
-		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
-	{{- end }}
-
 	binariesPath := binaries.GlobalPath()
 	binaryName := platform.BinaryNameWithSSL()
 
 	var file string
 
-	localPath := "./" + path.Join("prisma-query-engine-" + binaryName)
-	globalPath := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
+	name := "prisma-query-engine-"
+	localPath := "./" + path.Join(name + binaryName)
+	globalPath := path.Join(binariesPath, name + binaryName)
+
+	c.log.Printf("expecting query engine `%s`", name + binaryName)
 
 	{{/* TODO write tests for all cases */}}
 	{{/* TODO just check for binaryTargets? if binaryTargets are provided, only use that mechanism */}}
