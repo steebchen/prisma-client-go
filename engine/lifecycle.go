@@ -15,11 +15,11 @@ import (
 )
 
 func (e *Engine) Connect() error {
-	logger.L.Printf("ensure query engine binary...")
+	logger.Debug.Printf("ensure query engine binary...")
 
 	startEngine := time.Now()
 
-	logger.L.Printf("connecting to engine...")
+	logger.Debug.Printf("connecting to engine...")
 
 	binariesPath := binaries.GlobalPath()
 	binaryName := platform.BinaryNameWithSSL()
@@ -30,28 +30,39 @@ func (e *Engine) Connect() error {
 	localPath := "./" + path.Join(name+binaryName)
 	globalPath := path.Join(binariesPath, name+binaryName)
 
-	logger.L.Printf("expecting query engine `%s`", name+binaryName)
+	logger.Debug.Printf("expecting query engine `%s`", name+binaryName)
 
 	// TODO write tests for all cases
-	// TODO just check for binaryTargets? if binaryTargets are provided, only use that mechanism
 
 	// first, check if the query engine binary is being overridden by PRISMA_QUERY_ENGINE_BINARY
-
 	prismaQueryEngineBinary := os.Getenv("PRISMA_QUERY_ENGINE_BINARY")
 	if prismaQueryEngineBinary != "" {
-		logger.L.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
+		logger.Debug.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
 		file = prismaQueryEngineBinary
 		// TODO check with os.Stat if the binary exists
-	} else if _, err := os.Stat(localPath); err == nil {
+	}
+
+	if _, err := os.Stat(localPath); err == nil {
 		// check in the local working directory
-		logger.L.Printf("query engine found in working directory")
+		logger.Debug.Printf("query engine found in working directory")
 		file = localPath
-	} else if _, err := os.Stat(globalPath); err == nil {
+	}
+
+	if e.hasBinaryTargets && file == "" {
+		logger.Debug.Printf("binaryTargets provided, but no query engine found at `%s`", name)
+		return fmt.Errorf("binary targets were provided, but no query engine was found, please provide/upload the query engine `%s` in the project dir", name)
+	}
+
+	if _, err := os.Stat(globalPath); err == nil {
 		// check in the global cache directory
-		logger.L.Printf("query engine found in global path")
+		logger.Debug.Printf("query engine found in global path")
 		file = globalPath
-	} else {
-		logger.L.Printf("no query engine defined or found. fetching it at runtime...")
+	}
+
+	if file == "" {
+		logger.Debug.Printf("no query engine defined or found. fetching it at runtime...")
+		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\", \"%s\"]` in your schema.prisma file and upload the query engine with your application.", binaryName)
+		logger.Debug.Printf("fetching the query engine now...")
 
 		start := time.Now()
 
@@ -64,18 +75,18 @@ func (e *Engine) Connect() error {
 
 		file = qe
 
-		logger.L.Printf("using query engine at %s", qe)
-		logger.L.Printf("ensure query engine took %s", time.Since(start))
+		logger.Debug.Printf("using query engine at %s", qe)
+		logger.Debug.Printf("ensure query engine took %s", time.Since(start))
 	}
 
-	logger.L.Printf("launching query engine at %s", file)
+	logger.Debug.Printf("launching query engine at %s", file)
 
 	port, err := getPort()
 	if err != nil {
 		return fmt.Errorf("get free port: %w", err)
 	}
 
-	logger.L.Printf("running query-engine on port %s", port)
+	logger.Debug.Printf("running query-engine on port %s", port)
 
 	e.url = "http://localhost:" + port
 
@@ -115,7 +126,7 @@ func (e *Engine) Connect() error {
 
 		if err != nil {
 			connectErr = err
-			logger.L.Printf("could not connect; retrying...")
+			logger.Debug.Printf("could not connect; retrying...")
 			time.Sleep(100 * time.Millisecond)
 			continue
 		}
@@ -125,14 +136,14 @@ func (e *Engine) Connect() error {
 		err = json.Unmarshal(body, &response)
 		if err != nil {
 			connectErr = err
-			logger.L.Printf("could not unmarshal response; retrying...")
+			logger.Debug.Printf("could not unmarshal response; retrying...")
 			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
 		if response.Errors != nil {
 			gqlErrors = response.Errors
-			logger.L.Printf("could not connect due to gql errors; retrying...")
+			logger.Debug.Printf("could not connect due to gql errors; retrying...")
 			time.Sleep(50 * time.Millisecond)
 			continue
 		}
@@ -150,14 +161,14 @@ func (e *Engine) Connect() error {
 		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
 
-	logger.L.Printf("connecting took %s", time.Since(startEngine))
+	logger.Debug.Printf("connecting took %s", time.Since(startEngine))
 
-	logger.L.Printf("connected.")
+	logger.Debug.Printf("connected.")
 	return nil
 }
 
 func (e *Engine) Disconnect() error {
-	logger.L.Printf("disconnecting...")
+	logger.Debug.Printf("disconnecting...")
 
 	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
 		return fmt.Errorf("send signal: %w", err)
@@ -170,6 +181,6 @@ func (e *Engine) Disconnect() error {
 		}
 	}
 
-	logger.L.Printf("disconnected.")
+	logger.Debug.Printf("disconnected.")
 	return nil
 }

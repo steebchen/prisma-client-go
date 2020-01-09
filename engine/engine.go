@@ -6,9 +6,10 @@ import (
 	"time"
 )
 
-func NewEngine(schema string) *Engine {
+func NewEngine(schema string, hasBinaryTargets bool) *Engine {
 	e := &Engine{
-		schema: schema,
+		schema:           schema,
+		hasBinaryTargets: hasBinaryTargets,
 	}
 
 	e.http = &http.Client{
@@ -30,4 +31,8 @@ type Engine struct {
 
 	// schema contains the prisma schema
 	schema string
+
+	// hasBinaryTargets can be toggled by generated code from schema.prisma whether binaryTargets
+	// were specified and thus expects binaries in the local path
+	hasBinaryTargets bool
 }

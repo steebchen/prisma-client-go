@@ -198,7 +198,7 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 
 	{{/* TODO use specific log level */}}
 	if logger.Enabled {
-		logger.L.Printf("prisma query: `%s`", s)
+		logger.Debug.Printf("prisma query: `%s`", s)
 	}
 
 	return q.client.engine.Do(ctx, s, &v)

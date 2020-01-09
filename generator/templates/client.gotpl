@@ -2,6 +2,14 @@
 
 const schema = `{{ .Datamodel }}`
 
+{{ $hasBinaryTargets := false }}
+{{ if gt (len .Generator.BinaryTargets) 0 }}
+	{{ $hasBinaryTargets = true }}
+{{ end }}
+
+// hasBinaryTargets is true when binaryTargets are provided on generation time
+var hasBinaryTargets = {{ $hasBinaryTargets }}
+
 // NewClient creates a new Photon Go client.
 // The client is not connected to the Prisma engine yet.
 //
@@ -22,7 +30,7 @@ const schema = `{{ .Datamodel }}`
 func NewClient() *Client {
 	c := &Client{}
 
-	c.engine = engine.NewEngine(schema)
+	c.engine = engine.NewEngine(schema, hasBinaryTargets)
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}

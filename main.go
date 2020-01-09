@@ -15,7 +15,7 @@ import (
 func main() {
 	if len(os.Args) > 1 {
 		args := os.Args[1:]
-		logger.L.Printf("invoking command %+v", args)
+		logger.Debug.Printf("invoking command %+v", args)
 
 		if args[0] == "prefetch" {
 			// just run prisma -v to trigger the download
@@ -36,7 +36,7 @@ func main() {
 
 	// running the prisma generator
 
-	logger.L.Printf("invoking prisma")
+	logger.Debug.Printf("invoking prisma")
 
 	// exit when signal triggers
 	c := make(chan os.Signal)
@@ -52,5 +52,5 @@ func main() {
 		os.Exit(1)
 	}
 
-	logger.L.Printf("success")
+	logger.Debug.Printf("success")
 }
