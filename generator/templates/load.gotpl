@@ -21,15 +21,17 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 		query += q.getQuery().build() + "\n"
 	}
 	query += "}"
-	if debug == Info {
+
+	{{/* TODO use specific log level */}}
+	if logger.Enabled {
 		log.Printf("query: %s", query)
 	}
 
 	var result struct{
-		Errors []gqlError      `json:"errors"`
+		Errors []engine.GQLError      `json:"errors"`
 		Data   json.RawMessage `json:"data"`
 	}
-	if err := r.client.do(ctx, query, &result); err != nil {
+	if err := r.client.engine.Do(ctx, query, &result); err != nil {
 		return fmt.Errorf("query failed: `%s` %w", query, err)
 	}
 

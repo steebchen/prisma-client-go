@@ -531,7 +531,7 @@ func TestTypes(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
-			hooks.Start(t, client, tt.before, client.do)
+			hooks.Start(t, client, tt.before, client.engine.Do)
 			tt.run(t, client, context.Background())
 			hooks.End(t, client)
 		})

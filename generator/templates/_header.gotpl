@@ -4,37 +4,17 @@
 package {{.Generator.Config.Package}}
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
-	"net"
-	"net/http"
-	"os"
-	"os/exec"
-	"path"
-	"strconv"
 	"strings"
 	"time"
 
-	"github.com/prisma/photongo/binaries"
-	"github.com/prisma/photongo/binaries/platform"
+	"github.com/prisma/photongo/engine"
+	"github.com/prisma/photongo/logger"
 )
-
-type LogLevel string
-
-const (
-	Unknown LogLevel = ""
-	Info    LogLevel = "info"
-	Debug   LogLevel = "debug"
-)
-
-var prismaQueryEngineBinary = os.Getenv("PRISMA_QUERY_ENGINE_BINARY")
-
-var debug LogLevel = LogLevel(os.Getenv("PHOTON_GO_LOG"))
 
 const RFC3339Milli = "2006-01-02T15:04:05.999Z07:00"
 
