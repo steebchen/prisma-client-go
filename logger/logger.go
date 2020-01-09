@@ -11,11 +11,16 @@ import (
 var v = os.Getenv("PHOTON_GO_LOG")
 var Enabled = v != ""
 
-var L *log.Logger
+var Debug *log.Logger
+var Warn *log.Logger
 
 func init() {
-	L = log.New(ioutil.Discard, "", 0)
+	discard := log.New(ioutil.Discard, "", 0)
+
+	Debug = discard
 	if Enabled {
-		L = log.New(os.Stdout, "", log.Flags())
+		Debug = log.New(os.Stdout, "debug", log.Flags())
 	}
+
+	Warn = log.New(os.Stdout, "warn", log.Flags())
 }

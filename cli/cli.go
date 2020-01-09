@@ -13,7 +13,7 @@ import (
 
 // Run the prisma CLI with given arguments
 func Run(arguments []string, output bool) error {
-	logger.L.Printf("running cli with args %+v", arguments)
+	logger.Debug.Printf("running cli with args %+v", arguments)
 	// TODO respect initial PRISMA_<name>_BINARY env
 
 	dir := binaries.GlobalPath()
@@ -24,7 +24,7 @@ func Run(arguments []string, output bool) error {
 
 	prisma := binaries.PrismaCLIName()
 
-	logger.L.Printf("running %s %+v", path.Join(dir, prisma), arguments)
+	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
 	cmd := exec.Command(path.Join(dir, prisma), arguments...)
 	binaryName := platform.BinaryNameWithSSL()

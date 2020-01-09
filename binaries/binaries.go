@@ -49,7 +49,7 @@ func GlobalPath() string {
 }
 
 func fetch(toDir string, engine string, binary string) error {
-	logger.L.Printf("checking %s...", engine)
+	logger.Debug.Printf("checking %s...", engine)
 
 	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engine, binary))
 
@@ -61,17 +61,17 @@ func fetch(toDir string, engine string, binary string) error {
 	url := fmt.Sprintf(EngineURL, EngineVersion, binary, urlName)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
-		logger.L.Printf("%s is cached", to)
+		logger.Debug.Printf("%s is cached", to)
 		return nil
 	}
 
-	logger.L.Printf("%s is missing, downloading...", engine)
+	logger.Debug.Printf("%s is missing, downloading...", engine)
 
 	if err := download(url, to); err != nil {
 		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.L.Printf("%s done", engine)
+	logger.Debug.Printf("%s done", engine)
 
 	return nil
 }
@@ -119,13 +119,15 @@ func DownloadCLI(toDir string) error {
 	url := fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name())
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
-		logger.L.Printf("prisma cli doesn't exist, fetching...")
+		logger.Debug.Printf("prisma cli doesn't exist, fetching...")
 
 		if err := download(url, to); err != nil {
 			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 		}
+
+		logger.Debug.Printf("prisma cli fetched successfully.")
 	} else {
-		logger.L.Printf("prisma cli is cached")
+		logger.Debug.Printf("prisma cli is cached")
 	}
 
 	return nil
@@ -138,7 +140,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 
 	binaryName := platform.BinaryNameWithSSL()
 
-	logger.L.Printf("checking %s...", name)
+	logger.Debug.Printf("checking %s...", name)
 
 	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName))
 
@@ -150,20 +152,20 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
-		logger.L.Printf("%s is cached", to)
+		logger.Debug.Printf("%s is cached", to)
 		return to, nil
 	}
 
-	logger.L.Printf("%s is missing, downloading...", name)
+	logger.Debug.Printf("%s is missing, downloading...", name)
 
 	startDownload := time.Now()
 	if err := download(url, to); err != nil {
 		return "", fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.L.Printf("download() took %s", time.Since(startDownload))
+	logger.Debug.Printf("download() took %s", time.Since(startDownload))
 
-	logger.L.Printf("%s done", name)
+	logger.Debug.Printf("%s done", name)
 
 	return to, nil
 }
