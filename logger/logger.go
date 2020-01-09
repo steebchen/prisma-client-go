@@ -6,15 +6,16 @@ import (
 	"os"
 )
 
-// TODO move logger from gotpl to here
+// TODO add log levels
 
-var Debug = os.Getenv("PHOTON_GO_LOG") != ""
+var v = os.Getenv("PHOTON_GO_LOG")
+var Enabled = v != ""
 
 var L *log.Logger
 
 func init() {
 	L = log.New(ioutil.Discard, "", 0)
-	if Debug {
+	if Enabled {
 		L = log.New(os.Stdout, "", log.Flags())
 	}
 }

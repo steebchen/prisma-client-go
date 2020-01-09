@@ -7,27 +7,20 @@ import (
 	"testing"
 
 	"github.com/prisma/photongo/cli"
+	"github.com/prisma/photongo/engine"
 	"github.com/prisma/photongo/logger"
 )
 
-type gqlResponse struct {
-	Data   interface{} `json:"data"`
-	Errors []gqlError  `json:"errors"`
-}
-
-type gqlError struct {
-	Message string `json:"error"`
-}
-
-type TestClient interface {
+type Engine interface {
 	Connect() error
 	Disconnect() error
+	Do(context.Context, string, interface{}) error
 }
 
-func Start(t *testing.T, client TestClient, before string, do func(context.Context, string, interface{}) error) {
+func Start(t *testing.T, e *engine.Engine, before string) {
 	setup(t)
 
-	if err := client.Connect(); err != nil {
+	if err := e.Connect(); err != nil {
 		t.Fatalf("could not connect: %s", err)
 		return
 	}
@@ -35,8 +28,8 @@ func Start(t *testing.T, client TestClient, before string, do func(context.Conte
 	ctx := context.Background()
 
 	if before != "" {
-		var response gqlResponse
-		err := do(ctx, before, &response)
+		var response engine.GQLResponse
+		err := e.Do(ctx, before, &response)
 		if err != nil {
 			t.Fatalf("could not send mock query %s", err)
 		}
@@ -46,8 +39,8 @@ func Start(t *testing.T, client TestClient, before string, do func(context.Conte
 	}
 }
 
-func End(t *testing.T, client TestClient) {
-	err := client.Disconnect()
+func End(t *testing.T, e Engine) {
+	err := e.Disconnect()
 	if err != nil {
 		t.Fatalf("could not disconnect: %s", err)
 	}
@@ -62,11 +55,11 @@ func setup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}, logger.Debug); err != nil {
+	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}, logger.Enabled); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
 
-	if err := cli.Run([]string{"lift", "up"}, logger.Debug); err != nil {
+	if err := cli.Run([]string{"lift", "up"}, logger.Enabled); err != nil {
 		t.Fatalf("could not run lift save %s", err)
 	}
 }

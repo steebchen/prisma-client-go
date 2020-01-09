@@ -196,11 +196,12 @@ func (q query) exec(ctx context.Context, v interface{}) error {
 
 	s := q.buildQuery()
 
-	if debug == Info {
-		q.client.log.Printf("prisma query: `%s`", s)
+	{{/* TODO use specific log level */}}
+	if logger.Enabled {
+		logger.L.Printf("prisma query: `%s`", s)
 	}
 
-	return q.client.do(ctx, s, &v)
+	return q.client.engine.Do(ctx, s, &v)
 }
 
 func value(name string, value interface{}) string {

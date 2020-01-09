@@ -2,22 +2,6 @@
 
 const schema = `{{ .Datamodel }}`
 
-func getPort() (string, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
-	if err != nil {
-		return "", err
-	}
-
-	l, err := net.ListenTCP("tcp", addr)
-	if err != nil {
-		return "", err
-	}
-	defer l.Close()
-
-	port := l.Addr().(*net.TCPAddr).Port
-	return strconv.Itoa(port), nil
-}
-
 // NewClient creates a new Photon Go client.
 // The client is not connected to the Prisma engine yet.
 //
@@ -37,31 +21,20 @@ func getPort() (string, error) {
 //   }()
 func NewClient() *Client {
 	c := &Client{}
-	c.log = log.New(ioutil.Discard, "", 0)
-	if debug == Info {
-		c.log = log.New(os.Stdout, "", log.Flags())
-	}
 
-	c.http = &http.Client{
-		Timeout: 30 * time.Second,
-	}
+	c.engine = engine.NewEngine(schema)
+
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
+	{{- end }}
 
 	return c
 }
 
 // Client is the instance of the Photon Go client.
 type Client struct {
-	// cmd holds the prisma binary process
-	cmd *exec.Cmd
-
-	// url holds the query-engine url
-	url string
-
-	// http is the internal http client
-	http *http.Client
-
-	// logger logs depending on the debug value
-	log *log.Logger
+	// engine spawns and manages the binary
+	engine *engine.Engine
 
 	{{ range $model := $.DMMF.Datamodel.Models }}
 		// {{ $model.Name.GoCase }} provides access to CRUD methods.
@@ -86,143 +59,7 @@ type Client struct {
 //     }
 //   }()
 func (c *Client) Connect() error {
-	c.log.Printf("ensure query engine binary...")
-
-	startEngine := time.Now()
-
-	c.log.Printf("connecting to engine...")
-
-	{{- range $model := $.DMMF.Datamodel.Models }}
-		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
-	{{- end }}
-
-	binariesPath := binaries.GlobalPath()
-	binaryName := platform.BinaryNameWithSSL()
-
-	var file string
-
-	localPath := "./" + path.Join("prisma-query-engine-" + binaryName)
-	globalPath := path.Join(binariesPath, "prisma-query-engine-" + binaryName)
-
-	{{/* TODO write tests for all cases */}}
-	{{/* TODO just check for binaryTargets? if binaryTargets are provided, only use that mechanism */}}
-
-	{{/* first, check if the query engine binary is being overriden by PRISMA_QUERY_ENGINE_BINARY */}}
-	if prismaQueryEngineBinary != "" {
-		c.log.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
-		file = prismaQueryEngineBinary
-		{{/* TODO check with os.Stat if the binary exists */}}
-	} else if _, err := os.Stat(localPath); err == nil {
-		{{/* check in the local working directory */}}
-		c.log.Printf("query engine found in working directory")
-		file = localPath
-	} else if _, err := os.Stat(globalPath); err == nil {
-		{{/* check in the global cache directory */}}
-		c.log.Printf("query engine found in global path")
-		file = globalPath
-	} else {
-		c.log.Printf("no query engine defined or found. fetching it at runtime...")
-
-		start := time.Now()
-
-		to := binaries.GlobalPath()
-
-		qe, err := binaries.DownloadEngine("query-engine", to)
-		if err != nil {
-			return fmt.Errorf("could not fetch query engine: %w", err)
-		}
-
-		file = qe
-
-		c.log.Printf("using query engine at %s", qe)
-		c.log.Printf("ensure query engine took %s", time.Since(start))
-	}
-
-	c.log.Printf("launching query engine at %s", file)
-
-	port, err := getPort()
-	if err != nil {
-		return fmt.Errorf("get free port: %w", err)
-	}
-
-	c.log.Printf("running query-engine on port %s", port)
-
-	c.url = "http://localhost:" + port
-
-	c.cmd = exec.Command(file, "-p", port)
-
-	c.cmd.Stdout = os.Stdout
-	c.cmd.Stderr = os.Stderr
-
-	c.cmd.Env = append(
-		os.Environ(),
-		"PRISMA_DML=" + schema,
-		"RUST_LOG=error",
-		"RUST_LOG_FORMAT=json",
-	)
-
-	if debug == Debug {
-		c.cmd.Env = append(
-			c.cmd.Env,
-			"PRISMA_LOG_QUERIES=y",
-			"RUST_LOG=info",
-		)
-	}
-
-	err = c.cmd.Start()
-	if err != nil {
-		return fmt.Errorf("start command: %w", err)
-	}
-
-	ctx := context.Background()
-
-	// send a basic readiness healthcheck and retry if unsuccessful
-	var connectErr error
-	var gqlErrors []gqlError
-	for i := 0; i < 100; i++ {
-		body, err := c.request(ctx, "GET", "/status", map[string]interface{}{})
-
-		if err != nil {
-			connectErr = err
-			c.log.Printf("could not connect; retrying...")
-			time.Sleep(100 * time.Millisecond)
-			continue
-		}
-
-		var response gqlResponse
-
-		err = json.Unmarshal(body, &response)
-		if err != nil {
-			connectErr = err
-			c.log.Printf("could not unmarshal response; retrying...")
-			time.Sleep(50 * time.Millisecond)
-			continue
-		}
-
-		if response.Errors != nil {
-			gqlErrors = response.Errors
-			c.log.Printf("could not connect due to gql errors; retrying...")
-			time.Sleep(50 * time.Millisecond)
-			continue
-		}
-
-		connectErr = nil
-		gqlErrors = nil
-		break
-	}
-
-	if connectErr != nil {
-		return fmt.Errorf("readiness query error: %w", connectErr)
-	}
-
-	if gqlErrors != nil {
-		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
-	}
-
-	c.log.Printf("connecting took %s", time.Since(startEngine))
-
-	c.log.Printf("connected.")
-	return nil
+	return c.engine.Connect()
 }
 
 // Disconnects from the Prisma query engine.
@@ -240,19 +77,5 @@ func (c *Client) Connect() error {
 //     }
 //   }()
 func (c *Client) Disconnect() error {
-	c.log.Printf("disconnecting...")
-
-	if err := c.cmd.Process.Signal(os.Interrupt); err != nil {
-		return fmt.Errorf("send signal: %w", err)
-	}
-
-	if err := c.cmd.Wait(); err != nil {
-		{{/* TODO: is this a bug in the query-engine? */}}
-		if err.Error() != "signal: interrupt" {
-			return fmt.Errorf("wait for process: %w", err)
-		}
-	}
-
-	c.log.Printf("disconnected.")
-	return nil
+	return c.engine.Disconnect()
 }

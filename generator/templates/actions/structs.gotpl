@@ -8,7 +8,7 @@
 		{{ range $v := $.DMMF.Variations }}
 			{{ $an := $action.Name.CamelCase }}
 			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Response struct {
-				Errors []gqlError `json:"errors"`
+				Errors []engine.GQLError `json:"errors"`
 				Data struct{
 					{{ $action.Name }}{{ $v.Name }}{{ $m }}{{ " " }}
 
