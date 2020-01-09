@@ -19,7 +19,41 @@ func (e *Engine) Connect() error {
 
 	startEngine := time.Now()
 
-	logger.Debug.Printf("connecting to engine...")
+	file, err := e.ensure()
+	if err != nil {
+		return fmt.Errorf("ensure: %w", err)
+	}
+
+	if err := e.spawn(file); err != nil {
+		return fmt.Errorf("spawn: %w", err)
+	}
+
+	logger.Debug.Printf("connecting took %s", time.Since(startEngine))
+	logger.Debug.Printf("connected.")
+
+	return nil
+}
+
+func (e *Engine) Disconnect() error {
+	logger.Debug.Printf("disconnecting...")
+
+	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
+		return fmt.Errorf("send signal: %w", err)
+	}
+
+	if err := e.cmd.Wait(); err != nil {
+		// TODO: is this a bug in the query-engine?
+		if err.Error() != "signal: interrupt" {
+			return fmt.Errorf("wait for process: %w", err)
+		}
+	}
+
+	logger.Debug.Printf("disconnected.")
+	return nil
+}
+
+func (e *Engine) ensure() (string, error) {
+	ensureEngine := time.Now()
 
 	binariesPath := binaries.GlobalPath()
 	binaryName := platform.BinaryNameWithSSL()
@@ -50,7 +84,7 @@ func (e *Engine) Connect() error {
 
 	if e.hasBinaryTargets && file == "" {
 		logger.Debug.Printf("binaryTargets provided, but no query engine found at `%s`", name)
-		return fmt.Errorf("binary targets were provided, but no query engine was found, please provide/upload the query engine `%s` in the project dir", name)
+		return "", fmt.Errorf("binary targets were provided, but no query engine was found, please provide/upload the query engine `%s` in the project dir", name)
 	}
 
 	if _, err := os.Stat(globalPath); err == nil {
@@ -64,23 +98,23 @@ func (e *Engine) Connect() error {
 		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\", \"%s\"]` in your schema.prisma file and upload the query engine with your application.", binaryName)
 		logger.Debug.Printf("fetching the query engine now...")
 
-		start := time.Now()
-
 		to := binaries.GlobalPath()
 
 		qe, err := binaries.DownloadEngine("query-engine", to)
 		if err != nil {
-			return fmt.Errorf("could not fetch query engine: %w", err)
+			return "", fmt.Errorf("could not fetch query engine: %w", err)
 		}
 
 		file = qe
-
-		logger.Debug.Printf("using query engine at %s", qe)
-		logger.Debug.Printf("ensure query engine took %s", time.Since(start))
 	}
 
-	logger.Debug.Printf("launching query engine at %s", file)
+	logger.Debug.Printf("using query engine at %s", file)
+	logger.Debug.Printf("ensure query engine took %s", time.Since(ensureEngine))
 
+	return file, nil
+}
+
+func (e *Engine) spawn(file string) error {
 	port, err := getPort()
 	if err != nil {
 		return fmt.Errorf("get free port: %w", err)
@@ -111,10 +145,14 @@ func (e *Engine) Connect() error {
 		)
 	}
 
+	logger.Debug.Printf("starting engine...")
+
 	err = e.cmd.Start()
 	if err != nil {
 		return fmt.Errorf("start command: %w", err)
 	}
+
+	logger.Debug.Printf("connecting to engine...")
 
 	ctx := context.Background()
 
@@ -161,26 +199,5 @@ func (e *Engine) Connect() error {
 		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
 
-	logger.Debug.Printf("connecting took %s", time.Since(startEngine))
-
-	logger.Debug.Printf("connected.")
-	return nil
-}
-
-func (e *Engine) Disconnect() error {
-	logger.Debug.Printf("disconnecting...")
-
-	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
-		return fmt.Errorf("send signal: %w", err)
-	}
-
-	if err := e.cmd.Wait(); err != nil {
-		// TODO: is this a bug in the query-engine?
-		if err.Error() != "signal: interrupt" {
-			return fmt.Errorf("wait for process: %w", err)
-		}
-	}
-
-	logger.Debug.Printf("disconnected.")
 	return nil
 }
