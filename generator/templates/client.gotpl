@@ -24,6 +24,10 @@ func NewClient() *Client {
 
 	c.engine = engine.NewEngine(schema)
 
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
+	{{- end }}
+
 	return c
 }
 
