@@ -72,8 +72,12 @@ func (e *Engine) ensure() (string, error) {
 	prismaQueryEngineBinary := os.Getenv("PRISMA_QUERY_ENGINE_BINARY")
 	if prismaQueryEngineBinary != "" {
 		logger.Debug.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
+
+		if _, err := os.Stat(prismaQueryEngineBinary); err == nil {
+			return "", fmt.Errorf("PRISMA_QUERY_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
+		}
+
 		file = prismaQueryEngineBinary
-		// TODO check with os.Stat if the binary exists
 	}
 
 	if _, err := os.Stat(localPath); err == nil {
