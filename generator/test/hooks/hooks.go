@@ -11,15 +11,16 @@ import (
 	"github.com/prisma/photongo/logger"
 )
 
-type Client interface {
+type Engine interface {
 	Connect() error
 	Disconnect() error
+	Do(context.Context, string, interface{}) error
 }
 
-func Start(t *testing.T, client Client, before string, do func(context.Context, string, interface{}) error) {
+func Start(t *testing.T, e *engine.Engine, before string) {
 	setup(t)
 
-	if err := client.Connect(); err != nil {
+	if err := e.Connect(); err != nil {
 		t.Fatalf("could not connect: %s", err)
 		return
 	}
@@ -28,7 +29,7 @@ func Start(t *testing.T, client Client, before string, do func(context.Context, 
 
 	if before != "" {
 		var response engine.GQLResponse
-		err := do(ctx, before, &response)
+		err := e.Do(ctx, before, &response)
 		if err != nil {
 			t.Fatalf("could not send mock query %s", err)
 		}
@@ -38,8 +39,8 @@ func Start(t *testing.T, client Client, before string, do func(context.Context, 
 	}
 }
 
-func End(t *testing.T, client Client) {
-	err := client.Disconnect()
+func End(t *testing.T, e Engine) {
+	err := e.Disconnect()
 	if err != nil {
 		t.Fatalf("could not disconnect: %s", err)
 	}
