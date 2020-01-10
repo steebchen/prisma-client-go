@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -59,6 +60,9 @@ func (e *Engine) ensure() (string, error) {
 	binaryName := platform.BinaryNameWithSSL()
 
 	var file string
+	// forceVersion saves whether a version check should be done, which should be disabled
+	// when providing a custom query engine value
+	forceVersion := true
 
 	name := "prisma-query-engine-"
 	localPath := "./" + path.Join(name+binaryName)
@@ -78,6 +82,7 @@ func (e *Engine) ensure() (string, error) {
 		}
 
 		file = prismaQueryEngineBinary
+		forceVersion = false
 	}
 
 	if _, err := os.Stat(localPath); err == nil {
@@ -108,6 +113,22 @@ func (e *Engine) ensure() (string, error) {
 		}
 
 		file = qe
+	}
+
+	startVersion := time.Now()
+	out, err := exec.Command(file, "--version").Output()
+	if err != nil {
+		return "", fmt.Errorf("version check failed: %w", err)
+	}
+	logger.Debug.Printf("version check took %s", time.Since(startVersion))
+
+	if v := string(bytes.TrimSpace(out)); binaries.EngineVersion != v {
+		msg := fmt.Errorf("expected query engine version %s but got %s", binaries.EngineVersion, v)
+		if forceVersion {
+			return "", msg
+		}
+
+		logger.Warn.Printf("%s, ignoring since custom query engine was provided", msg)
 	}
 
 	logger.Debug.Printf("using query engine at %s", file)
