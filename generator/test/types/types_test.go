@@ -9,6 +9,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/prisma/photongo/generator/runtime"
+
 	"github.com/prisma/photongo/generator/test/hooks"
 )
 
@@ -29,7 +31,7 @@ func TestTypes(t *testing.T) {
 	}{{
 		name: "complex strings",
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 			id := `f"hi"'`
 			s := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
 			created, err := client.User.CreateOne(
@@ -87,7 +89,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "enums",
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			admin := RoleAdmin
 			mod := RoleModerator
@@ -161,7 +163,7 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
 				User.ID.Equals("id"),
@@ -215,8 +217,8 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
+			before, _ := time.Parse(runtime.RFC3339Milli, "1999-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
 				User.StrOpt.Contains("long"),
@@ -290,7 +292,7 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(
 				User.StrOpt.IsNull(),
@@ -351,7 +353,7 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			var s *string = nil
 			actual, err := client.User.FindMany(
@@ -413,7 +415,7 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			s := "filled"
 			actual, err := client.User.FindMany(
@@ -489,7 +491,7 @@ func TestTypes(t *testing.T) {
 			}
 		`,
 		run: func(t *testing.T, client *Client, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			date, _ := time.Parse(runtime.RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(
 				User.StrOpt.In([]string{"first", "third"}),
@@ -531,9 +533,9 @@ func TestTypes(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
-			hooks.Start(t, client.engine, tt.before)
+			hooks.Start(t, client.Engine, tt.before)
 			tt.run(t, client, context.Background())
-			hooks.End(t, client.engine)
+			hooks.End(t, client.Engine)
 		})
 	}
 }

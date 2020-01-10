@@ -17,8 +17,8 @@
 		optional ...{{ $name }}SetParams,
 	) {{ $result }} {
 		var v {{ $result }}
-		v.query.client = r.client
-		var fields []field
+		v.query.Client = r.client
+		var fields []builder.Field
 
 		{{ range $field := $model.Fields }}
 			{{- if $field.RequiredOnCreate -}}
@@ -30,24 +30,24 @@
 			fields = append(fields, q.data)
 		}
 
-		v.query.inputs = append(v.query.inputs, input{
-			name:   "data",
-			fields: fields,
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "data",
+			Fields: fields,
 		})
 		return v
 	}
 
 	type {{ $result }} struct {
-		query query
+		query builder.Query
 	}
 
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
-		r.query.operation = "mutation"
-		r.query.method = "createOne"
-		r.query.model = "{{ $model.Name.GoCase }}"
-		r.query.outputs = {{ $name }}Output
+		r.query.Operation = "mutation"
+		r.query.Method = "createOne"
+		r.query.Model = "{{ $model.Name.GoCase }}"
+		r.query.Outputs = {{ $name }}Output
 		var v createOne{{ $model.Name.GoCase }}Response
-		err := r.query.exec(ctx, &v)
+		err := r.query.Exec(ctx, &v)
 		if v.Errors != nil {
 			first := v.Errors[0]
 			return {{ $modelName }}{}, fmt.Errorf(first.Message)

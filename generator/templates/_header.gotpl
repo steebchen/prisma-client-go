@@ -9,14 +9,23 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"strings"
-	"time"
 
 	"github.com/prisma/photongo/engine"
 	"github.com/prisma/photongo/logger"
+	"github.com/prisma/photongo/generator/runtime"
+	"github.com/prisma/photongo/generator/builder"
 )
 
-const RFC3339Milli = "2006-01-02T15:04:05.999Z07:00"
+// re-declare variables which are needed in Photon Go but also should be exported
+// in the generated photon client
 
-// DateTime is a type alias for time.Time
-type DateTime = time.Time
+type DateTime = runtime.DateTime
+
+type Direction = runtime.Direction
+
+const (
+	ASC  Direction = runtime.ASC
+	DESC Direction = runtime.DESC
+)
+
+const RFC3339Milli = runtime.RFC3339Milli

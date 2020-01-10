@@ -2,7 +2,7 @@
 
 type iLoadable interface {
 	loadable()
-	getQuery() query
+	getQuery() builder.Query
 }
 
 func (c *Client) Load(params ...iLoadable) loadExec {
@@ -18,7 +18,7 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 	var query string
 	query += "query {"
 	for _, q := range r.queries {
-		query += q.getQuery().build() + "\n"
+		query += q.getQuery().Build() + "\n"
 	}
 	query += "}"
 
@@ -31,7 +31,7 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 		Errors []engine.GQLError      `json:"errors"`
 		Data   json.RawMessage `json:"data"`
 	}
-	if err := r.client.engine.Do(ctx, query, &result); err != nil {
+	if err := r.client.Engine.Do(ctx, query, &result); err != nil {
 		return fmt.Errorf("query failed: `%s` %w", query, err)
 	}
 
