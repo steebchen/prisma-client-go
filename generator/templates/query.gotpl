@@ -1,12 +1,5 @@
 {{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
 
-type Direction string
-
-const (
-	ASC Direction  = "ASC"
-	DESC Direction = "DESC"
-)
-
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
@@ -38,18 +31,18 @@ const (
 
 	{{ range $op := $.DMMF.Operators }}
 		func ({{ $nsQuery }}) {{ $op.Name }}(params ...i{{ $nameUpper }}Params) {{ $name }}Params {
-			var fields []field
+			var fields []builder.Field
 
 			for _, q := range params {
 				fields = append(fields, q.field())
 			}
 
 			return {{ $name }}Params{
-				data: field{
-					name:     "{{ $op.Action }}",
-					list:     true,
-					wrapList: true,
-					fields:   fields,
+				data: builder.Field{
+					Name:     "{{ $op.Action }}",
+					List:     true,
+					WrapList: true,
+					Fields:   fields,
 				},
 			}
 		}
@@ -81,17 +74,17 @@ const (
 				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
 					params ...i{{ $field.Type.GoCase }}Params,
 				) {{ $name }}Params {
-					var fields []field
+					var fields []builder.Field
 
 					for _, q := range params {
 						fields = append(fields, q.field())
 					}
 
 					return {{ $name }}Params{
-						data: field{
-							name:   "{{ $field.Name.CamelCase }}",
-							action: "{{ $method.Action }}",
-							fields: fields,
+						data: builder.Field{
+							Name:   "{{ $field.Name.CamelCase }}",
+							Action: "{{ $method.Action }}",
+							Fields: fields,
 						},
 					}
 				}
@@ -105,19 +98,19 @@ const (
 			) {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
 				var v {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
 
-				v.query.operation = "query"
-				v.query.method = "{{ $field.Name.CamelCase }}"
-				v.query.outputs = {{ $field.Type.CamelCase }}Output
+				v.query.Operation = "query"
+				v.query.Method = "{{ $field.Name.CamelCase }}"
+				v.query.Outputs = {{ $field.Type.CamelCase }}Output
 
 			{{ if $field.IsList }}
-				{{/* TODO create a function for this type of field colletion, also used in find.gotpl */}}
-					var where []field
+				{{/* TODO create a function for this type of builder.Field colletion, also used in find.gotpl */}}
+					var where []builder.Field
 					for _, q := range params {
-						if query := q.getQuery(); query.operation != "" {
-							v.query.outputs = append(v.query.outputs, output{
-								name:    query.method,
-								inputs:  query.inputs,
-								outputs: query.outputs,
+						if query := q.getQuery(); query.Operation != "" {
+							v.query.Outputs = append(v.query.Outputs, builder.Output{
+								Name:    query.Method,
+								Inputs:  query.Inputs,
+								Outputs: query.Outputs,
 							})
 						} else {
 							where = append(where, q.field())
@@ -125,9 +118,9 @@ const (
 					}
 
 					if len(where) > 0 {
-						v.query.inputs = append(v.query.inputs, input{
-							name:   "where",
-							fields: where,
+						v.query.Inputs = append(v.query.Inputs, builder.Input{
+							Name:   "where",
+							Fields: where,
 						})
 					}
 				{{ end }}
@@ -138,19 +131,19 @@ const (
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
 				params ...i{{ $field.Type.GoCase }}Params,
 			) {{ $setReturnStruct }} {
-				var fields []field
+				var fields []builder.Field
 
 				for _, q := range params {
 					fields = append(fields, q.field())
 				}
 
 				return {{ $setReturnStruct }}{
-					data: field{
-						name: "{{ $field.Name.CamelCase }}",
-						fields: []field{
+					data: builder.Field{
+						Name: "{{ $field.Name.CamelCase }}",
+						Fields: []builder.Field{
 							{
-								name:   "connect",
-								fields: fields,
+								Name:   "connect",
+								Fields: fields,
 							},
 						},
 					},
@@ -162,9 +155,9 @@ const (
 			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
 			func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
 				return {{ $setReturnStruct }}{
-					data: field{
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
+					data: builder.Field{
+						Name:   "{{ $field.Name.CamelCase }}",
+						Value:  value,
 					},
 				}
 			}
@@ -181,23 +174,23 @@ const (
 			{{/* Provide an `Equals` method for most types. */}}
 			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
-					data: field{
-						name:   "{{ $field.Name.CamelCase }}",
-						value:  value,
+					data: builder.Field{
+						Name:   "{{ $field.Name.CamelCase }}",
+						Value:  value,
 					},
 				}
 			}
 
 			{{/* Provide an `In` method for most types. */}}
 			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
-				f := field{
-					name:   "{{ $field.Name.CamelCase }}",
-					action: "in",
-					list:   true,
+				f := builder.Field{
+					Name:   "{{ $field.Name.CamelCase }}",
+					Action: "in",
+					List:   true,
 				}
 				for _, v := range values {
-					f.fields = append(f.fields, field{
-						value: v,
+					f.Fields = append(f.Fields, builder.Field{
+						Value: v,
 					})
 				}
 				return {{ $returnStruct }}{
@@ -208,9 +201,9 @@ const (
 			{{ if not $field.IsRequired }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
-						data: field{
-							name:  "{{ $field.Name.CamelCase }}",
-							value: value,
+						data: builder.Field{
+							Name:  "{{ $field.Name.CamelCase }}",
+							Value: value,
 						},
 					}
 				}
@@ -218,19 +211,19 @@ const (
 				func (r {{ $struct }}) IsNull() {{ $returnStruct }} {
 					var str *string = nil
 					return {{ $returnStruct }}{
-						data: field{
-							name:  "{{ $field.Name.CamelCase }}",
-							value: str,
+						data: builder.Field{
+							Name:  "{{ $field.Name.CamelCase }}",
+							Value: str,
 						},
 					}
 				}
 			{{ end }}
 
-			func (r {{ $struct }}) Order(direction Direction) {{ $returnStruct }} {
+			func (r {{ $struct }}) Order(direction runtime.Direction) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
-					data: field{
-						name:   "{{ $field.Name.CamelCase }}",
-						value: direction,
+					data: builder.Field{
+						Name:   "{{ $field.Name.CamelCase }}",
+						Value: direction,
 					},
 				}
 			}
@@ -242,10 +235,10 @@ const (
 				{{ range $method := $type.Methods }}
 					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
 						return {{ $returnStruct }}{
-							data: field{
-								action: "{{ $method.Action }}",
-								name:   "{{ $field.Name.CamelCase }}",
-								value:  value,
+							data: builder.Field{
+								Action: "{{ $method.Action }}",
+								Name:   "{{ $field.Name.CamelCase }}",
+								Value:  value,
 							},
 						}
 					}

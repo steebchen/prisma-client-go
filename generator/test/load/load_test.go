@@ -384,9 +384,9 @@ func TestLoad(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
-			hooks.Start(t, client.engine, tt.before)
+			hooks.Start(t, client.Engine, tt.before)
 			tt.run(t, client, context.Background())
-			hooks.End(t, client.engine)
+			hooks.End(t, client.Engine)
 		})
 	}
 }
