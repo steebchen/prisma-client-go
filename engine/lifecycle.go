@@ -55,7 +55,7 @@ func (e *Engine) Disconnect() error {
 func (e *Engine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
-	binariesPath := binaries.GlobalPath()
+	binariesPath := binaries.GlobalTempDir()
 	binaryName := platform.BinaryNameWithSSL()
 
 	var file string
@@ -102,9 +102,7 @@ func (e *Engine) ensure() (string, error) {
 		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\", \"%s\"]` in your schema.prisma file and upload the query engine with your application.", binaryName)
 		logger.Debug.Printf("fetching the query engine now...")
 
-		to := binaries.GlobalPath()
-
-		qe, err := binaries.DownloadEngine("query-engine", to)
+		qe, err := binaries.DownloadEngine("query-engine", binariesPath)
 		if err != nil {
 			return "", fmt.Errorf("could not fetch query engine: %w", err)
 		}

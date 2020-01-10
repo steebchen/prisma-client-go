@@ -42,10 +42,21 @@ func PrismaCLIName() string {
 	return fmt.Sprintf("prisma-cli-%s", variation)
 }
 
-// GlobalPath returns the path of where the CLI lives
-func GlobalPath() string {
+var dirName = path.Join("prisma", "photongo-prisma-binaries", PrismaVersion)
+
+// GlobalTempDir returns the path of where the CLI lives
+func GlobalTempDir() string {
 	temp := os.TempDir()
-	return path.Join(temp, "prisma", "photongo-prisma-binaries", PrismaVersion)
+	return path.Join(temp, dirName)
+}
+
+// GlobalCacheDir returns the path of where the CLI lives
+func GlobalCacheDir() string {
+	cache, err := os.UserCacheDir()
+	if err != nil {
+		panic(fmt.Errorf("could not read user cache dir: %w", err))
+	}
+	return path.Join(cache, dirName)
 }
 
 func fetch(toDir string, engine string, binary string) error {

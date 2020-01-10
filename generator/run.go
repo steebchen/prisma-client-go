@@ -34,13 +34,13 @@ func Run(input *Root) error {
 		}
 
 		// first, ensure they are actually downloaded
-		if err := binaries.FetchBinary(binaries.GlobalPath(), "query-engine", name); err != nil {
+		if err := binaries.FetchBinary(binaries.GlobalTempDir(), "query-engine", name); err != nil {
 			return fmt.Errorf("failed fetching binaries: %w", err)
 		}
 
 		qe := "prisma-query-engine-" + name
 
-		dir := path.Join(binaries.GlobalPath(), qe)
+		dir := path.Join(binaries.GlobalTempDir(), qe)
 
 		input, err := ioutil.ReadFile(dir)
 		if err != nil {
