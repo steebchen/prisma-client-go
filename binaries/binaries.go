@@ -22,7 +22,10 @@ const PrismaVersion = "2.0.0-alpha.443"
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
 const EngineVersion = "2eb5a63ad82e15dc2c248a0ac84dc28cd35542d6"
 
+// PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
+
+// EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
 
 // init overrides URLs if env variables are specific for debugging purposes and to
@@ -59,17 +62,17 @@ func GlobalCacheDir() string {
 	return path.Join(cache, dirName)
 }
 
-func fetch(toDir string, engine string, binary string) error {
+func fetch(toDir string, engine string, binaryName string) error {
 	logger.Debug.Printf("checking %s...", engine)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engine, binary))
+	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engine, binaryName))
 
 	urlName := engine
 	// the query-engine binary to on S3 is "prisma"
 	if engine == "query-engine" {
 		urlName = "prisma"
 	}
-	url := fmt.Sprintf(EngineURL, EngineVersion, binary, urlName)
+	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
@@ -99,10 +102,6 @@ func FetchNative(toDir string) error {
 
 	if !strings.HasPrefix(toDir, "/") {
 		return fmt.Errorf("toDir must be absolute")
-	}
-
-	if err := os.MkdirAll(toDir, os.ModePerm); err != nil {
-		return fmt.Errorf("could not run MkdirAll on path %s: %w", toDir, err)
 	}
 
 	if err := DownloadCLI(toDir); err != nil {
@@ -145,10 +144,6 @@ func DownloadCLI(toDir string) error {
 }
 
 func DownloadEngine(name string, toDir string) (file string, err error) {
-	if err := os.MkdirAll(toDir, os.ModePerm); err != nil {
-		return "", fmt.Errorf("could not run MkdirAll on path %s: %w", toDir, err)
-	}
-
 	binaryName := platform.BinaryNameWithSSL()
 
 	logger.Debug.Printf("checking %s...", name)
@@ -182,6 +177,10 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 }
 
 func download(url string, to string) error {
+	if err := os.MkdirAll(path.Dir(to), os.ModePerm); err != nil {
+		return fmt.Errorf("could not run MkdirAll on path %s: %w", to, err)
+	}
+
 	// copy to temp file first
 	dest := to + ".tmp"
 
@@ -202,7 +201,7 @@ func download(url string, to string) error {
 	}
 	defer out.Close()
 
-	if err := os.Chmod(dest, 0777); err != nil {
+	if err := os.Chmod(dest, os.ModePerm); err != nil {
 		return fmt.Errorf("could not chmod +x %s: %w", url, err)
 	}
 
@@ -230,7 +229,7 @@ func copyFile(from string, to string) error {
 		return fmt.Errorf("readfile: %w", err)
 	}
 
-	err = ioutil.WriteFile(to, input, 0777)
+	err = ioutil.WriteFile(to, input, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("writefile: %w", err)
 	}
