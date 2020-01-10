@@ -16,7 +16,7 @@ func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running cli with args %+v", arguments)
 	// TODO respect initial PRISMA_<name>_BINARY env
 
-	dir := binaries.GlobalPath()
+	dir := binaries.GlobalCacheDir()
 
 	if err := binaries.FetchNative(dir); err != nil {
 		return fmt.Errorf("could not fetch binaries: %w", err)
