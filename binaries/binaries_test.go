@@ -12,7 +12,7 @@ import (
 )
 
 func tmpDir(t *testing.T) string {
-	dir, err := ioutil.TempDir("/tmp", "photongo-test-fetch-")
+	dir, err := ioutil.TempDir("/tmp", "photongo-test-fetchEngine-")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -24,7 +24,7 @@ func TestFetch(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	if err := FetchNative(dir); err != nil {
-		t.Fatalf("fetch failed: %s", err)
+		t.Fatalf("fetchEngine failed: %s", err)
 	}
 }
 
@@ -35,7 +35,7 @@ func TestFetch_localDir(t *testing.T) {
 	}
 
 	if err := FetchNative(wd); err != nil {
-		t.Fatalf("fetch failed: %s", err)
+		t.Fatalf("fetchEngine failed: %s", err)
 	}
 }
 
@@ -45,20 +45,20 @@ func TestFetch_withCache(t *testing.T) {
 
 	start := time.Now()
 	if err := FetchNative(dir); err != nil {
-		t.Fatalf("fetch 1 failed: %s", err)
+		t.Fatalf("fetchEngine 1 failed: %s", err)
 	}
 
-	log.Printf("first fetch took %s", time.Since(start))
+	log.Printf("first fetchEngine took %s", time.Since(start))
 
 	start = time.Now()
 	if err := FetchNative(dir); err != nil {
-		t.Fatalf("fetch 2 failed: %s", err)
+		t.Fatalf("fetchEngine 2 failed: %s", err)
 	}
 
-	log.Printf("second fetch took %s", time.Since(start))
+	log.Printf("second fetchEngine took %s", time.Since(start))
 
 	if time.Since(start) > 10*time.Millisecond {
-		t.Fatalf("second fetch took more than 10ms")
+		t.Fatalf("second fetchEngine took more than 10ms")
 	}
 }
 
