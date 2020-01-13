@@ -45,31 +45,33 @@ func PrismaCLIName() string {
 	return fmt.Sprintf("prisma-cli-%s", variation)
 }
 
-var dirName = path.Join("prisma", "photongo-prisma-binaries", PrismaVersion)
+var baseDirName = path.Join("prisma", "photongo-binaries")
 
-// GlobalTempDir returns the path of where the CLI lives
+// GlobalTempDir returns the path of where the engines live
+// internally, this is the global temp dir
 func GlobalTempDir() string {
 	temp := os.TempDir()
-	return path.Join(temp, dirName)
+	return path.Join(temp, baseDirName, "engines", EngineVersion)
 }
 
 // GlobalCacheDir returns the path of where the CLI lives
+// internally, this is the global temp dir
 func GlobalCacheDir() string {
 	cache, err := os.UserCacheDir()
 	if err != nil {
 		panic(fmt.Errorf("could not read user cache dir: %w", err))
 	}
-	return path.Join(cache, dirName)
+	return path.Join(cache, baseDirName, "cli", PrismaVersion)
 }
 
-func fetch(toDir string, engine string, binaryName string) error {
-	logger.Debug.Printf("checking %s...", engine)
+func FetchEngine(toDir string, engineName string, binaryName string) error {
+	logger.Debug.Printf("checking %s...", engineName)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engine, binaryName))
+	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryName))
 
-	urlName := engine
+	urlName := engineName
 	// the query-engine binary to on S3 is "prisma"
-	if engine == "query-engine" {
+	if engineName == "query-engine" {
 		urlName = "prisma"
 	}
 	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
@@ -79,19 +81,15 @@ func fetch(toDir string, engine string, binaryName string) error {
 		return nil
 	}
 
-	logger.Debug.Printf("%s is missing, downloading...", engine)
+	logger.Debug.Printf("%s is missing, downloading...", engineName)
 
 	if err := download(url, to); err != nil {
 		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.Debug.Printf("%s done", engine)
+	logger.Debug.Printf("%s done", engineName)
 
 	return nil
-}
-
-func FetchBinary(toDir string, engineName string, binaryName string) error {
-	return fetch(toDir, engineName, binaryName)
 }
 
 // FetchNative fetches the Prisma binaries needed for the generator to a given directory

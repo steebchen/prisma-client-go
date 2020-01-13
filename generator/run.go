@@ -34,7 +34,7 @@ func Run(input *Root) error {
 		}
 
 		// first, ensure they are actually downloaded
-		if err := binaries.FetchBinary(binaries.GlobalTempDir(), "query-engine", name); err != nil {
+		if err := binaries.FetchEngine(binaries.GlobalTempDir(), "query-engine", name); err != nil {
 			return fmt.Errorf("failed fetching binaries: %w", err)
 		}
 
