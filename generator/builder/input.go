@@ -2,12 +2,13 @@ package builder
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/prisma/photongo/generator/runtime"
-
 	"github.com/prisma/photongo/logger"
 )
 
@@ -17,11 +18,11 @@ type Input struct {
 	Value  interface{}
 }
 
-// output can be a single Name or can have nested fields
+// Output can be a single Name or can have nested fields
 type Output struct {
 	Name string
 
-	// inputs (optional) to provide arguments to a field
+	// Inputs (optional) to provide arguments to a field
 	Inputs []Input
 
 	Outputs []Output
@@ -34,10 +35,10 @@ type Field struct {
 	// an Action for input fields, e.g. `contains`
 	Action string
 
-	// whether the fields is a list of items
+	// List saves whether the fields is a list of items
 	List bool
 
-	// whether the a list field should be wrapped in an object
+	// WrapList saves whether the a list field should be wrapped in an object
 	WrapList bool
 
 	// Value contains the field value. if nil, fields will contain a subselection.
@@ -52,25 +53,25 @@ type Client interface {
 }
 
 type Query struct {
-	// The generic Photon Client
+	// Client is the generic Photon Client
 	Client Client
 
-	// operation describes the PQL operation: query, mutation or subscription
+	// Operation describes the PQL operation: query, mutation or subscription
 	Operation string
 
 	// Name describes the operation; useful for tracing
 	Name string
 
-	// method describes a crud operation
+	// Method describes a crud operation
 	Method string
 
-	// model contains the Prisma model Name
+	// Model contains the Prisma model Name
 	Model string
 
-	// inputs contains function arguments
+	// Inputs contains function arguments
 	Inputs []Input
 
-	// outputs contains the return fields
+	// Outputs contains the return fields
 	Outputs []Output
 }
 
@@ -93,17 +94,17 @@ func (q Query) Build() string {
 	builder.WriteString(q.Method + q.Model)
 
 	if len(q.Inputs) > 0 {
-		builder.WriteString(buildInputs(q.Inputs))
+		builder.WriteString(q.buildInputs(q.Inputs))
 	}
 
 	builder.WriteString(" ")
 
-	builder.WriteString(buildOutputs(q.Outputs))
+	builder.WriteString(q.buildOutputs(q.Outputs))
 
 	return builder.String()
 }
 
-func buildInputs(inputs []Input) string {
+func (q Query) buildInputs(inputs []Input) string {
 	var builder strings.Builder
 
 	builder.WriteString("(")
@@ -114,9 +115,9 @@ func buildInputs(inputs []Input) string {
 		builder.WriteString(":")
 
 		if i.Value != nil {
-			builder.WriteString(Value(i.Name, i.Value))
+			builder.Write(value(i.Value))
 		} else {
-			builder.WriteString(buildFields(false, false, i.Fields))
+			builder.WriteString(q.buildFields(false, false, i.Fields))
 		}
 
 		builder.WriteString(",")
@@ -127,7 +128,7 @@ func buildInputs(inputs []Input) string {
 	return builder.String()
 }
 
-func buildOutputs(outputs []Output) string {
+func (q Query) buildOutputs(outputs []Output) string {
 	var builder strings.Builder
 
 	builder.WriteString("{")
@@ -137,11 +138,11 @@ func buildOutputs(outputs []Output) string {
 
 		if len(o.Inputs) > 0 {
 			log.Printf("building inputs: %d %+v", len(o.Inputs), o.Inputs)
-			builder.WriteString(buildInputs(o.Inputs))
+			builder.WriteString(q.buildInputs(o.Inputs))
 		}
 
 		if len(o.Outputs) > 0 {
-			builder.WriteString(buildOutputs(o.Outputs))
+			builder.WriteString(q.buildOutputs(o.Outputs))
 		}
 	}
 
@@ -150,7 +151,7 @@ func buildOutputs(outputs []Output) string {
 	return builder.String()
 }
 
-func buildFields(list bool, wrapList bool, fields []Field) string {
+func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	var builder strings.Builder
 
 	if !list {
@@ -179,10 +180,12 @@ func buildFields(list bool, wrapList bool, fields []Field) string {
 		}
 
 		if f.Fields != nil {
-			builder.WriteString(buildFields(f.List, f.WrapList, f.Fields))
+			builder.WriteString(q.buildFields(f.List, f.WrapList, f.Fields))
 		}
 
-		builder.WriteString(Value(f.Name, f.Value))
+		if f.Value != nil {
+			builder.Write(value(f.Value))
+		}
 
 		if f.List {
 			builder.WriteString("]")
@@ -217,60 +220,15 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 	return q.Client.Do(ctx, s, &v)
 }
 
-func Value(name string, value interface{}) string {
-	switch v := value.(type) {
-	case string:
-		return fmt.Sprintf(`%q`, v)
-	case *string:
-		if v == nil {
-			return "null"
-		}
-		return fmt.Sprintf(`%q`, *v)
-	case bool:
-		return fmt.Sprintf(`%t`, v)
-	case *bool:
-		if v == nil {
-			return "null"
-		}
-		return fmt.Sprintf(`%t`, *v)
-	case int:
-		return fmt.Sprintf(`%d`, v)
-	case *int:
-		if v == nil {
-			return "null"
-		}
-		return fmt.Sprintf(`%d`, *v)
-	case float64:
-		return fmt.Sprintf(`%f`, v)
-	case *float64:
-		if v == nil {
-			return "null"
-		}
-		return fmt.Sprintf(`%f`, *v)
-	case runtime.DateTime:
-		return fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli))
-	case *runtime.DateTime:
-		if v == nil {
-			return "null"
-		}
-		return fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli))
-	case runtime.Direction:
-		return string(v)
-	case nil:
-		return ""
-
-	// TODO handle enums
-	// {{ range $t := $.DMMF.Datamodel.Enums }}
-	// case {{ $t.Name}}:
-	// 	return fmt.Sprintf(`%s`, v)
-	// case *{{ $t.Name}}:
-	// 	if v == nil {
-	// 		return "null"
-	// 	}
-	// 	return fmt.Sprintf(`%s`, *v)
-	// {{ end }}
-
-	default:
-		panic(fmt.Errorf("no branch for field %s of type %T", name, v))
+func value(value interface{}) []byte {
+	if v, ok := value.(time.Time); ok {
+		return []byte(fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli)))
 	}
+
+	v, err := json.Marshal(value)
+	if err != nil {
+		panic(err)
+	}
+
+	return v
 }

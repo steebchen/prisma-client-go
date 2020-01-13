@@ -73,9 +73,10 @@
 		{{ if $v.List }}
 			{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
 			func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
+				direction, _ := param.field().Value.(runtime.Direction)
 				r.query.Inputs = append(r.query.Inputs, builder.Input{
 					Name:  "orderBy",
-					Value: runtime.Direction(param.field().Name + "_" + builder.Value(param.field().Name, param.field().Value)),
+					Value: runtime.Direction(param.field().Name + "_" + string(direction)),
 				})
 				return r
 			}
