@@ -30,7 +30,7 @@ We recommend to read the [current caveats](#caveats).
     }
 
     model User {
-      id        String   @default(cuid()) @id @unique
+      id        String   @default(cuid()) @id
       createdAt DateTime @default(now())
       email     String   @unique
       name      String?
@@ -39,7 +39,7 @@ We recommend to read the [current caveats](#caveats).
     }
 
     model Post {
-      id        String   @default(cuid()) @id @unique
+      id        String   @default(cuid()) @id
       createdAt DateTime @default(now())
       updatedAt DateTime @updatedAt
       published Boolean
