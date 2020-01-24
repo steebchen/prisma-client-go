@@ -1,21 +1,21 @@
-# Photon Go
+# Prisma Client Go
 
-Photon Go is an auto-generated database client, which is fully typesafe, reduces boilerplate code and replaces traditional ORMs.
+Prisma Client Go is an auto-generated database client, which is fully typesafe, reduces boilerplate code and replaces traditional ORMs.
 
-Photon Go is a part of [Prisma](https://github.com/prisma/prisma2) and depends on it.
+Prisma Client Go is a part of [Prisma](https://github.com/prisma/prisma2) and depends on it.
 
-**NOTE: Currently, Photon Go is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Photon Go is unstable and there is no ETA for general availability yet.**
+**NOTE: Currently, the Prisma Go Client is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Prisma Client Go is unstable and there is no ETA for general availability yet.**
 
 We recommend to read the [current caveats](#caveats).
 
 ## Setup
 
-1) Get Photon Go
+1) Get Prisma Client Go
     ```shell script
-    go get github.com/prisma/photongo
+    go get github.com/prisma/prisma-client-go
     ```
 
-2) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Photon Go as a generator with two models would look like this:
+2) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
@@ -23,10 +23,10 @@ We recommend to read the [current caveats](#caveats).
       url      = "file:dev.db"
     }
 
-    generator photon {
-      provider = "photongo"
-      output = "./photon/photon_gen.go"
-      package = "photon"
+    generator db {
+      provider = "prisma-client-go"
+      output = "./db/db_gen.go"
+      package = "db"
     }
 
     model User {
@@ -53,23 +53,23 @@ We recommend to read the [current caveats](#caveats).
 
     ```shell script
     # initialize the first migration
-    go run github.com/prisma/photongo lift save --create-db --name "init"
+    go run github.com/prisma/prisma-client-go lift save --create-db --name "init"
     # apply the migration
-    go run github.com/prisma/photongo lift up
+    go run github.com/prisma/prisma-client-go lift up
     ```
 
-4) Generate the Photon Go client in your project
+4) Generate the Prisma Client Go client in your project
 
     ```shell script
-    go run github.com/prisma/photongo generate
+    go run github.com/prisma/prisma-client-go generate
     ```
 
-    Photon go is now generated into the file path you specified in the "output" option which is `"./photon/photon_gen.go"` in this case.
+    Prisma Client Go is now generated into the file path you specified in the "output" option which is `"./db/db_gen.go"` in this case.
 
 For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
 
 ```shell script
-go run github.com/prisma/photongo dev
+go run github.com/prisma/prisma-client-go dev
 ```
 
 Note: Some errors may get displayed, but you can ignore them. Prisma Studio is currently not working. As an alternative, you can install the [Prisma CLI](https://github.com/prisma/prisma2#getting-started).
@@ -78,14 +78,14 @@ For more information and instructions on how to deploy your app, please check th
 
 ## Usage
 
-Once you generated the Photon Go client and set up a datasource with Prisma, you're good to go!
+Once you generated the Prisma Client Go client and set up a datasource with Prisma, you're good to go!
 
-We recommend generating the client into a package called `photon` (see step 3 above) at `./photon/photon_gen.go`, but you can adapt these settings to anything you want.
+We recommend generating the client into a package called `db` (see step 3 above) at `./db/db_gen.go`, but you can adapt these settings to anything you want.
 
 ### Create the client and connect to the prisma engine
 
 ```go
-client := photon.NewClient()
+client := db.NewClient()
 err := client.Connect()
 if err != nil {
   handle(err)
@@ -105,11 +105,11 @@ defer func() {
 import (
   "context"
   "fmt"
-  "github.com/your/repo/photon"
+  "github.com/your/repo/db"
 )
 
 func main() {
-  client := photon.NewClient()
+  client := db.NewClient()
   err := client.Connect()
   check(err)
 
@@ -122,19 +122,19 @@ func main() {
 
   // create a user
   createdUser, err := client.User.CreateOne(
-    photon.User.Email.Set("john.doe@example.com"),
-    photon.User.Name.Set("John Doe"),
+    db.User.Email.Set("john.doe@example.com"),
+    db.User.Name.Set("John Doe"),
 
     // ID is optional, which is why it's specified last. if you don't set it
     // an ID is auto generated for you
-    photon.User.ID.Set("123"),
+    db.User.ID.Set("123"),
   ).Exec(ctx)
 
   fmt.Printf("created user: %+v\n", createdUser)
 
   // find a single user
   user, err := client.User.FindOne(
-    photon.User.Email.Equals("john@example.com"),
+    db.User.Email.Equals("john@example.com"),
   ).Exec(ctx)
   check(err)
 
@@ -157,16 +157,16 @@ func main() {
 
 ### Deploy
 
-Deploying a Photon Go adds a few more steps, because it depends on the Prisma query engine, which is a binary we automatically download in your project path. Depending on where you deploy your code to, you might need to follow some extra steps.
+Deploying a Prisma Client Go adds a few more steps, because it depends on the Prisma query engine, which is a binary we automatically download in your project path. Depending on where you deploy your code to, you might need to follow some extra steps.
 
 #### Set up go generate
 
-While this step is not required, we recommend to use [`go generate`](https://blog.golang.org/generate) to simplify generating the Photon Go client. To do so, you can just put the following line into a go file, and then run go generate so `go run github.com/prisma/photongo generate` and any other generate commands you run will get executed.
+While this step is not required, we recommend to use [`go generate`](https://blog.golang.org/generate) to simplify generating the Prisma Client Go client. To do so, you can just put the following line into a go file, and then run go generate so `go run github.com/prisma/prisma-client-go generate` and any other generate commands you run will get executed.
 
 Put this line into a go file in your project, usually in `main.go`:
 
 ```go
-//go:generate go run github.com/prisma/photongo generate
+//go:generate go run github.com/prisma/prisma-client-go generate
 
 func main() {
   // ...
@@ -179,17 +179,17 @@ Now, run `go generate`:
 go generate
 ```
 
-Your Photon Go code is now generated.
+Your Prisma Client Go code is now generated.
 
 #### Traditionally deploy to a server
 
-Usually, you would deploy your Go app by running `go build .`, which generates a binary, and then deploy that binary anywhere you want. However, since Photon Go depends on the Prisma query engine, you also need to deploy the query engine binary `query-engine-*` files.
+Usually, you would deploy your Go app by running `go build .`, which generates a binary, and then deploy that binary anywhere you want. However, since Prisma Client Go depends on the Prisma query engine, you also need to deploy the query engine binary `query-engine-*` files.
 
 If you use different development environments, e.g. a Mac to develop, and Debian on your server, you need to specify these two binaries in the schema.prisma file so that you can then also upload the binary suitable for your deploy environment.
 
 ```prisma
-generator photon {
-  provider = "photongo"
+generator db {
+  provider = "prisma-client-go"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 ```
@@ -213,13 +213,13 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# temporarily needed to enforce installing the photongo binary
-RUN go install github.com/prisma/photongo
+# temporarily needed to enforce installing the go client binary
+RUN go install github.com/prisma/prisma-client-go
 
 COPY . ./
 
-# generate the Photon Go client
-RUN go run github.com/prisma/photongo generate
+# generate the Prisma Client Go client
+RUN go run github.com/prisma/prisma-client-go generate
 # or, if you use go generate to run the generator, use the following line instead
 # RUN go generate ./...
 
@@ -231,9 +231,9 @@ CMD ["/main"]
 
 ### Reference
 
-The photon client provides the methods FindOne, FindMany, and CreateOne. Just with these 3 methods, you can query for anything, and optionally update or delete for the queried records.
+The db client provides the methods FindOne, FindMany, and CreateOne. Just with these 3 methods, you can query for anything, and optionally update or delete for the queried records.
 
-Additionally, Photon Go provides a fully fluent and type-safe query API, which always follows the schema `photon.<Model>.<Field>.<Action>`, e.g. `photon.User.Name.Equals("John")`.
+Additionally, Prisma Client Go provides a fully fluent and type-safe query API, which always follows the schema `db.<Model>.<Field>.<Action>`, e.g. `db.User.Name.Equals("John")`.
 
 #### Reading data
 
@@ -241,7 +241,7 @@ Additionally, Photon Go provides a fully fluent and type-safe query API, which a
 
 ```go
 user, err := client.User.FindOne(
-  photon.User.Name.Equals("hi"),
+  db.User.Name.Equals("hi"),
 ).Exec(ctx)
 ```
 
@@ -251,15 +251,15 @@ If no records are found, this returns an empty array without returning an error 
 
 ```go
 user, err := client.User.FindOne(
-  photon.User.ID.Equals("123"),
+  db.User.ID.Equals("123"),
 ).Exec(ctx)
 
-if err == photon.ErrNotFound {
+if err == db.ErrNotFound {
   log.Printf("no record with id 123")
 }
 ```
 
-This returns an error of type `ErrNotFound` (exported in the `photon` package) if there was no such record.
+This returns an error of type `ErrNotFound` (exported in the `db` package) if there was no such record.
 
 ##### Query API
 
@@ -268,7 +268,7 @@ Depending on the data types of your fields, you will automatically be able to qu
 ```go
 user, err := client.User.FindOne(
   // query for names containing the string "Jo"
-  photon.User.Name.Contains("Jo"),
+  db.User.Name.Contains("Jo"),
 ).Exec(ctx)
 ```
 
@@ -276,25 +276,25 @@ Other possible queries are:
 
 ```go
 // query for people who are named "John"
-photon.User.Name.Contains("John"),
+db.User.Name.Contains("John"),
 // query for names containing the string "oh"
-photon.User.Name.Contains("oh"),
+db.User.Name.Contains("oh"),
 // query for names starting with "Jo"
-photon.User.Name.HasPrefix("Jo"),
+db.User.Name.HasPrefix("Jo"),
 // query for names ending with "Jo"
-photon.User.Name.HasSuffix("hn"),
+db.User.Name.HasSuffix("hn"),
 // query for all users which are younger than or exactly 18
-photon.User.Age.LTE(18),
+db.User.Age.LTE(18),
 // query for all users which are younger than 18
-photon.User.Age.LT(18),
+db.User.Age.LT(18),
 // query for all users which are older than or exactly 18
-photon.User.Age.GT(18),
+db.User.Age.GT(18),
 // query for all users which are older than 18
-photon.User.Age.GTE(18),
+db.User.Age.GTE(18),
 // query for all users which were created in the last 6 hours
-photon.User.CreatedAt.After(time.Now().Add(-6 * time.Hour)),
+db.User.CreatedAt.After(time.Now().Add(-6 * time.Hour)),
 // query for all users which were created until yesterday
-photon.User.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
+db.User.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
 ```
 
 All of these queries are fully type-safe and independent of the underlying database.
@@ -345,11 +345,11 @@ updated, err := client.User.FindOne(
 
 ## Caveats
 
-Photon Go is experimental and comes with some caveats. We plan to eliminate all of these in the future.
+Prisma Client Go is experimental and comes with some caveats. We plan to eliminate all of these in the future.
 
 - We recommend to use Go 1.13 or higher, everything else is untested.
 - You need to use an absolute path for the generator. Tracked in https://github.com/prisma/prisma2/issues/934.
-- Multiple projects using Photon Go can conflict because a given Go binary just defaults to the last installed version (https://github.com/golang/go/issues/27653). We recommend to use the same version in all your projects, even if they are unrelated. Waiting for https://github.com/prisma/prisma2/issues/1101.
+- Multiple projects using Prisma Client Go can conflict because a given Go binary just defaults to the last installed version (https://github.com/golang/go/issues/27653). We recommend to use the same version in all your projects, even if they are unrelated. Waiting for https://github.com/prisma/prisma2/issues/1101.
 - Expect breaking changes in minor versions in 0.x.x releases.
 - No Windows support.
 - DO NOT USE IN PRODUCTION!

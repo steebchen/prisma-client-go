@@ -13,8 +13,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/prisma/photongo/binaries"
-	"github.com/prisma/photongo/binaries/platform"
+	"github.com/prisma/prisma-client-go/binaries"
+	"github.com/prisma/prisma-client-go/binaries/platform"
 )
 
 func addDefaults(input *Root) {
@@ -57,7 +57,7 @@ func Run(input *Root) error {
 	var buf bytes.Buffer
 
 	ctx := build.Default
-	pkg, err := ctx.Import("github.com/prisma/photongo", ".", build.FindOnly)
+	pkg, err := ctx.Import("github.com/prisma/prisma-client-go", ".", build.FindOnly)
 	if err != nil {
 		return fmt.Errorf("could not get main template asset: %w", err)
 	}

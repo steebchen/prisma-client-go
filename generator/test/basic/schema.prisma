@@ -3,9 +3,9 @@ datasource db {
 	url      = "file:dev.sqlite"
 }
 
-generator photon {
-	provider = "../../../photongo"
-	output = "./photon_gen.go"
+generator db {
+	provider = "../../../prisma-client-go"
+	output = "./db_gen.go"
 	package = "basic"
 }
 

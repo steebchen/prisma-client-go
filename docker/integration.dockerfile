@@ -11,29 +11,30 @@ RUN go mod download
 
 COPY . ./
 
-# build photongo
-RUN go build -o /photongo .
+# build prisma-client-go
+RUN go build -o /prisma-client-go .
 
 FROM golang:1.13 as build
 
 WORKDIR /app
 
-COPY --from=pre /photongo /photongo
+COPY --from=pre /prisma-client-go /prisma-client-go
 
 ENV PHOTON_GO_LOG=info
 ENV DEBUG=*
 
 COPY integration/ .
-COPY . ./photongo
+COPY . ./prisma-client-go
 
-# generate photon in integration folder
-RUN go run github.com/prisma/photongo generate
+# generate the client in the integration folder
+RUN go run github.com/prisma/prisma-client-go generate
 
 # build the integration binary with all dependencies
 RUN go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
 FROM ubuntu:16.04
+# TODO try scratch image
 
 WORKDIR /app
 

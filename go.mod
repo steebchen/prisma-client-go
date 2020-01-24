@@ -1,4 +1,4 @@
-module github.com/prisma/photongo
+module github.com/prisma/prisma-client-go
 
 go 1.13
 

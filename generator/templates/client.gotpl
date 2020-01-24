@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
 
@@ -10,12 +10,12 @@ const schema = `{{ .Datamodel }}`
 // hasBinaryTargets is true when binaryTargets are provided on generation time
 var hasBinaryTargets = {{ $hasBinaryTargets }}
 
-// NewClient creates a new Photon Go client.
+// NewClient creates a new Prisma Client Go client.
 // The client is not connected to the Prisma engine yet.
 //
 // Example:
 //
-//   client := photon.NewClient()
+//   client := db.NewClient()
 //   err := client.Connect()
 //   if err != nil {
 //     handle(err)
@@ -39,7 +39,7 @@ func NewClient() *Client {
 	return c
 }
 
-// Client is the instance of the Photon Go client.
+// Client is the instance of the Prisma Client Go client.
 type Client struct {
 	// engine spawns and manages the binary
 	*engine.Engine

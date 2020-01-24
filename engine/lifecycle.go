@@ -10,9 +10,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/prisma/photongo/binaries"
-	"github.com/prisma/photongo/binaries/platform"
-	"github.com/prisma/photongo/logger"
+	"github.com/prisma/prisma-client-go/binaries"
+	"github.com/prisma/prisma-client-go/binaries/platform"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 func (e *Engine) Connect() error {

@@ -1,7 +1,7 @@
 **migrations**/
 prisma-*
 query-engine-*
-photongo
+prisma-client-go
 *.sqlite
 *.json
 *_gen.go

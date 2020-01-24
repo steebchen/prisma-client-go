@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prisma/photongo/generator/runtime"
-	"github.com/prisma/photongo/logger"
+	"github.com/prisma/prisma-client-go/generator/runtime"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 type Input struct {

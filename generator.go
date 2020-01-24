@@ -7,8 +7,8 @@ import (
 	"io"
 	"os"
 
-	"github.com/prisma/photongo/generator"
-	"github.com/prisma/photongo/jsonrpc"
+	"github.com/prisma/prisma-client-go/generator"
+	"github.com/prisma/prisma-client-go/jsonrpc"
 )
 
 func reply(w io.Writer, data interface{}) error {
@@ -48,11 +48,11 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput:      "./photon/photon_gen.go",
-					PrettyName:         "Photon Go",
+					DefaultOutput:      "./db/db_gen.go",
+					PrettyName:         "Prisma Client Go",
 					Denylist:           []string{},
 					RequiresGenerators: []string{},
-					RequiresEngines:    []string{}, // Photon Go handles downloading the engines
+					RequiresEngines:    []string{}, // Prisma Client Go handles downloading the engines
 				},
 			}
 

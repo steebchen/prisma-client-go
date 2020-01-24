@@ -1,7 +1,7 @@
 package dmmf
 
 import (
-	"github.com/prisma/photongo/generator/types"
+	"github.com/prisma/prisma-client-go/generator/types"
 )
 
 // FieldKind describes a scalar, object or enum.

@@ -15,6 +15,6 @@ I chose this package because [zeit/pkg](https://github.com/zeit/pkg) and [nexe/n
 npm i -g prisma@alpha
 # build the binary
 ./nodec /usr/local/lib/node_modules/prisma2/build/index.js --skip-npm-install -o ./prisma-cli-linux-$(prisma2 -v | cut -f1 -d"," | sed 's/.*@//g')
-# now, manually upload binary to s3 bucket `prisma-binaries-photongo`
+# now, manually upload binary to s3 bucket `prisma-photongo`
 # then, adapt the PRISMA_VERSION variable in binaries/binaries.go
 ```
