@@ -11,8 +11,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prisma/photongo/binaries/platform"
-	"github.com/prisma/photongo/logger"
+	"github.com/prisma/prisma-client-go/binaries/platform"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
@@ -45,7 +45,7 @@ func PrismaCLIName() string {
 	return fmt.Sprintf("prisma-cli-%s", variation)
 }
 
-var baseDirName = path.Join("prisma", "photongo-binaries")
+var baseDirName = path.Join("prisma", "binaries")
 
 // GlobalTempDir returns the path of where the engines live
 // internally, this is the global temp dir

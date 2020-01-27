@@ -3,10 +3,10 @@ datasource db {
 	url      = "postgresql://postgres:mysecretpassword@postgres:5432/db?schema=public"
 }
 
-generator photon {
-	provider = "/photongo"
-	output   = "./photon/photon_gen.go"
-	package  = "photon"
+generator db {
+	provider = "/prisma-client-go"
+	output   = "./db/db_gen.go"
+	package  = "db"
 }
 
 model User {

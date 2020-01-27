@@ -6,9 +6,9 @@ import (
 	"os/exec"
 	"testing"
 
-	"github.com/prisma/photongo/cli"
-	"github.com/prisma/photongo/engine"
-	"github.com/prisma/photongo/logger"
+	"github.com/prisma/prisma-client-go/cli"
+	"github.com/prisma/prisma-client-go/engine"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 type Engine interface {

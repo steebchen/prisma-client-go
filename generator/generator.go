@@ -1,8 +1,8 @@
 package generator
 
 import (
-	"github.com/prisma/photongo/generator/dmmf"
-	"github.com/prisma/photongo/generator/types"
+	"github.com/prisma/prisma-client-go/generator/dmmf"
+	"github.com/prisma/prisma-client-go/generator/types"
 )
 
 // Root describes the generator output root.
@@ -18,7 +18,7 @@ type Root struct {
 	BinaryPaths BinaryPaths `json:"binaryPaths"`
 }
 
-// PhotonGoConfig describes the options for the Photon Go generator
+// PhotonGoConfig describes the options for the Prisma Client Go generator
 type PhotonGoConfig struct {
 	Package types.String `json:"package"`
 }

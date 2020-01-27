@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
 var countOutput = []builder.Output{
 	{Name: "count"},
@@ -12,7 +12,7 @@ var countOutput = []builder.Output{
 	{{ $nsParams := (print $name "Params") }}
 
 	type {{ $ns }} struct {
-		// client holds the photon client
+		// client holds the prisma client
 		client *Client
 	}
 

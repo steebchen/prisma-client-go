@@ -1,12 +1,12 @@
 package main
 
-//go:generate go run github.com/prisma/photongo generate
+//go:generate go run github.com/prisma/prisma-client-go generate
 
 import (
 	"context"
 	"fmt"
 
-	"integration/photon"
+	"integration/db"
 )
 
 func check(err error) {
@@ -16,7 +16,7 @@ func check(err error) {
 }
 
 func main() {
-	client := photon.NewClient()
+	client := db.NewClient()
 	err := client.Connect()
 	check(err)
 	defer func() {
@@ -31,13 +31,13 @@ func main() {
 	fmt.Printf("remove %d items\n", count)
 
 	_, err = client.User.CreateOne(
-		photon.User.Email.Set("new@email.com"),
-		photon.User.Name.Set("John"),
+		db.User.Email.Set("new@email.com"),
+		db.User.Name.Set("John"),
 	).Exec(ctx)
 	check(err)
 
 	user, err := client.User.FindOne(
-		photon.User.Email.Equals("new@email.com"),
+		db.User.Email.Equals("new@email.com"),
 	).Exec(ctx)
 	check(err)
 

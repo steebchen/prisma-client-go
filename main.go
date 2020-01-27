@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/prisma/photongo/cli"
-	"github.com/prisma/photongo/logger"
+	"github.com/prisma/prisma-client-go/cli"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 func main() {

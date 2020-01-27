@@ -11,13 +11,13 @@ RUN go mod download
 
 COPY . ./
 
-# build photongo
-RUN go build -o /photongo .
+# build prisma-client-go
+RUN go build -o /prisma-client-go .
 
 COPY integration/ .
-COPY . ./photongo
+COPY . ./prisma-client-go
 
 ENV PHOTON_GO_LOG=info
 ENV DEBUG=*
 
-CMD ["/app/photongo/docker/lift.sh"]
+CMD ["/app/prisma-client-go/docker/lift.sh"]

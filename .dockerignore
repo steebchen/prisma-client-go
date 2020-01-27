@@ -1,7 +1,7 @@
 .git/
 .github/
 **migrations**/
-photongo
+prisma-client-go
 *.db
 *.sqlite
 *.json

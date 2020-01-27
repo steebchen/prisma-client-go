@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/photongo/generator.Root*/ -}}
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
 {{ range $enum := $.DMMF.Datamodel.Enums -}}
 	type {{ $enum.Name.GoCase }} string
