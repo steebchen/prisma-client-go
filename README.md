@@ -240,8 +240,8 @@ Additionally, Prisma Client Go provides a fully fluent and type-safe query API, 
 ##### Find many records
 
 ```go
-user, err := client.User.FindOne(
-  db.User.Name.Equals("hi"),
+users, err := client.User.FindMany(
+  photon.User.Name.Equals("hi"),
 ).Exec(ctx)
 ```
 
