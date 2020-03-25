@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"github.com/prisma/prisma-client-go/generator"
@@ -32,6 +33,10 @@ func invokePrisma() error {
 
 	for {
 		content, err := reader.ReadBytes('\n')
+		if err == io.EOF {
+			log.Printf("warning: ignoring EOF error. stdin: `%s`", content)
+			return nil
+		}
 		if err != nil {
 			return fmt.Errorf("could not read bytes from stdin: %w", err)
 		}
