@@ -57,7 +57,7 @@ func (e *Engine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
 	binariesPath := binaries.GlobalTempDir()
-	binaryName := platform.BinaryNameWithSSL()
+	binaryName := platform.BinaryPlatformName()
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled

@@ -21,7 +21,7 @@ func TestBinaries(t *testing.T) {
 	log.Printf("%s", string(out))
 
 	// this test only verifies that specifying `binaryTargets` downloaded the separate file into the directory
-	_, err := os.Stat("./prisma-query-engine-" + platform.BinaryNameWithSSL())
+	_, err := os.Stat("./prisma-query-engine-" + platform.BinaryPlatformName())
 	assert.Equal(t, err, nil)
 
 	_, err = os.Stat("./prisma-query-engine-rhel-openssl-1.1.x")

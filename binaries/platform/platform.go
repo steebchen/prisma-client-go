@@ -11,9 +11,9 @@ import (
 
 var binaryNameWithSSLCache string
 
-// BinaryNameWithSSL returns the name of the prisma binary which should be used,
+// BinaryPlatformName returns the name of the prisma binary which should be used,
 // for example "darwin" or "linux-openssl-1.1.x"
-func BinaryNameWithSSL() string {
+func BinaryPlatformName() string {
 	if binaryNameWithSSLCache != "" {
 		return binaryNameWithSSLCache
 	}

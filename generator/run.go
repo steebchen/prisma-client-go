@@ -30,7 +30,7 @@ func Run(input *Root) error {
 	// copy the query engine to the local repository path
 	for _, name := range input.Generator.BinaryTargets {
 		if name == "native" {
-			name = platform.BinaryNameWithSSL()
+			name = platform.BinaryPlatformName()
 		}
 
 		// first, ensure they are actually downloaded
