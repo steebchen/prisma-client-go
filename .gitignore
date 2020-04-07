@@ -6,6 +6,9 @@ prisma-client-go
 *.json
 *_gen.go
 
+# build folder for Prisma CLI binaries
+build/
+
 # for development purposes
 schema.graphql
 .graphqlconfig

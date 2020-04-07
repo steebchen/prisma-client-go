@@ -15,6 +15,7 @@ import (
 func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running cli with args %+v", arguments)
 	// TODO respect initial PRISMA_<name>_BINARY env
+	// TODO optionally override CLI filepath using PRISMA_CLI_PATH
 
 	dir := binaries.GlobalCacheDir()
 
