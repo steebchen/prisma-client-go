@@ -4,17 +4,36 @@
 
 ### Setup
 
-[Install node-packer](https://github.com/pmq20/node-packer)
-
-I chose this package because [zeit/pkg](https://github.com/zeit/pkg) and [nexe/nexe](https://github.com/nexe/nexe) resulted in some weird errors.
-
-### Build the binary
+Install [zeit/pkg](https://github.com/zeit/pkg):
 
 ```shell script
-# install prisma
-npm i -g prisma@alpha
-# build the binary
-./nodec /usr/local/lib/node_modules/prisma2/build/index.js --skip-npm-install -o ./prisma-cli-linux-$(prisma2 -v | cut -f1 -d"," | sed 's/.*@//g')
-# now, manually upload binary to s3 bucket `prisma-photongo`
-# then, adapt the PRISMA_VERSION variable in binaries/binaries.go
+npm i -g pkg
+```
+
+### Build the binary and upload to S3
+
+```shell script
+mkdir -p build
+cd build
+npm init --yes
+npm i @prisma/cli@alpha
+
+mkdir -p binaries
+
+pkg node_modules/@prisma/cli --out-path binaries/
+
+cd binaries
+
+version=$(npx prisma version | grep '^\(prisma2\|@prisma/cli\)' | cut -d : -f 2 | cut -d " " -f 2)
+mv cli-macos "prisma-cli-$version-darwin"
+mv cli-linux "prisma-cli-$version-linux"
+mv cli-win.exe "prisma-cli-$version-windows.exe"
+
+gzip "prisma-cli-$version-darwin"
+gzip "prisma-cli-$version-linux"
+gzip "prisma-cli-$version-windows.exe"
+
+aws s3 cp "prisma-cli-$version-darwin.gz" s3://prisma-photongo --acl public-read
+aws s3 cp "prisma-cli-$version-linux.gz" s3://prisma-photongo --acl public-read
+aws s3 cp "prisma-cli-$version-windows.exe.gz" s3://prisma-photongo --acl public-read
 ```
