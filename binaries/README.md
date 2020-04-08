@@ -16,7 +16,7 @@ npm i -g pkg
 mkdir -p build
 cd build
 npm init --yes
-npm i @prisma/cli@alpha
+npm i @prisma/cli@latest
 
 mkdir -p binaries
 

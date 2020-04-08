@@ -4,7 +4,7 @@ Prisma Client Go is an auto-generated database client, which is fully typesafe, 
 
 Prisma Client Go is a part of [Prisma](https://github.com/prisma/prisma2) and depends on it.
 
-**NOTE: Currently, the Prisma Go Client is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Prisma Client Go is unstable and there is no ETA for general availability yet.**
+**NOTE: Currently, the Prisma Go Client is still under heavy development and in an experimentation phase. It's a prototype, and there can and will be breaking changes. Prisma Client Go is unstable and there is no ETA for general availability yet. The current API is not final and may change.**
 
 We recommend to read the [current caveats](#caveats).
 
@@ -15,7 +15,7 @@ We recommend to read the [current caveats](#caveats).
     go get github.com/prisma/prisma-client-go
     ```
 
-2) [Prepare your Prisma schema](https://github.com/prisma/prisma2/blob/master/docs/prisma-schema-file.md) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
+2) [Prepare your Prisma schema](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
@@ -346,8 +346,6 @@ updated, err := client.User.FindOne(
 Prisma Client Go is experimental and comes with some caveats. We plan to eliminate all of these in the future.
 
 - We recommend to use Go 1.13 or higher, everything else is untested.
-- You need to use an absolute path for the generator. Tracked in https://github.com/prisma/prisma2/issues/934.
-- Multiple projects using Prisma Client Go can conflict because a given Go binary just defaults to the last installed version (https://github.com/golang/go/issues/27653). We recommend to use the same version in all your projects, even if they are unrelated. Waiting for https://github.com/prisma/prisma2/issues/1101.
 - Expect breaking changes in minor versions in 0.x.x releases.
-- No Windows support.
+- Not tested on Windows.
 - DO NOT USE IN PRODUCTION!
