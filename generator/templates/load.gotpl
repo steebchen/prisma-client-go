@@ -24,12 +24,12 @@ func (r loadExec) Exec(ctx context.Context, v interface{}) error {
 
 	{{/* TODO use specific log level */}}
 	if logger.Enabled {
-		log.Printf("query: %s", query)
+		log.Printf("prisma query: `%s`", query)
 	}
 
 	var result struct{
-		Errors []engine.GQLError      `json:"errors"`
-		Data   json.RawMessage `json:"data"`
+		Errors []engine.GQLError `json:"errors"`
+		Data   json.RawMessage   `json:"data"`
 	}
 	if err := r.client.Engine.Do(ctx, query, &result); err != nil {
 		return fmt.Errorf("query failed: `%s` %w", query, err)
