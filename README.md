@@ -35,6 +35,7 @@ We recommend to read the [current caveats](#caveats).
       email     String   @unique
       name      String?
       age       Int?
+
       posts     Post[]
     }
 
@@ -45,7 +46,9 @@ We recommend to read the [current caveats](#caveats).
       published Boolean
       title     String
       content   String?
-      author    User
+
+      author   User @relation(fields: [authorID], references: [id])
+      authorID String
     }
     ```
 
@@ -65,12 +68,7 @@ We recommend to read the [current caveats](#caveats).
     ```
 
     Prisma Client Go is now generated into the file path you specified in the "output" option which is `"./db/db_gen.go"` in this case.
-
-For development, you can also use the dev command for continuous generation. It will also automatically handle migrations locally whenever you change your schema.
-
-```shell script
-go run github.com/prisma/prisma-client-go dev
-```
+    If you make changes to your prisma schema, you need to run this command again.
 
 Note: Some errors may get displayed, but you can ignore them. Prisma Studio is currently not working. As an alternative, you can install the [Prisma CLI](https://github.com/prisma/prisma2#getting-started).
 
@@ -198,7 +196,7 @@ You can find all binary targets [in our specs repository](https://github.com/pri
 
 #### Using docker
 
-When deploying with docker, the setup is super easy. Build your dockerfile as usual, run `go generate` (see [setting up go generate](#set-up-go-generate)), and you're good to go!
+When deploying with docker, the setup is super easy. Build your dockerfile as usual, run `go generate ./...` (see [setting up go generate](#set-up-go-generate)), and you're good to go!
 
 We also recommend using [Go modules](https://blog.golang.org/using-go-modules), which is recommended when using Go >=1.13.
 
@@ -213,8 +211,8 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-# temporarily needed to enforce installing the go client binary
-RUN go install github.com/prisma/prisma-client-go
+# prefetch the binaries, so that they will be cached and not downloaded on each change
+RUN go run github.com/prisma/prisma-client-go prefetch
 
 COPY . ./
 
