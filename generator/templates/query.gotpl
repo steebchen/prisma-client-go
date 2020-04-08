@@ -222,11 +222,23 @@
 			func (r {{ $struct }}) Order(direction runtime.Direction) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
 					data: builder.Field{
-						Name:   "{{ $field.Name.CamelCase }}",
+						Name:  "{{ $field.Name.CamelCase }}",
 						Value: direction,
 					},
 				}
 			}
+
+			{{/* If it's a unique ID, allow using these fields as cursor queries */}}
+			{{ if or ($field.IsID) ($field.IsUnique) }}
+				func (r {{ $struct }}) Cursor(cursor string) {{ $name }}CursorParams {
+					return {{ $name }}CursorParams{
+						data: builder.Field{
+							Name:  "{{ $field.Name.CamelCase }}",
+							Value: cursor,
+						},
+					}
+				}
+			{{ end }}
 		{{ end }}
 
 		{{/* Provide type-specific methods. */}}

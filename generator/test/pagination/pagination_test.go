@@ -193,7 +193,7 @@ func TestPagination(t *testing.T) {
 				// would return a, b
 				First(2).
 				// return records after b, which is c
-				After("b").
+				After(Post.Title.Cursor("b")).
 				Exec(ctx)
 
 			if err != nil {
@@ -321,7 +321,7 @@ func TestPagination(t *testing.T) {
 				// would return b, c
 				Last(2).
 				// before c will return b
-				Before("c").
+				Before(Post.Title.Cursor("c")).
 				Exec(ctx)
 
 			if err != nil {

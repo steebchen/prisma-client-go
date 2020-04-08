@@ -90,6 +90,30 @@ var countOutput = []builder.Output{
 
 	func (p {{ $name }}OrderByParams) {{ $model.Name.GoLowerCase }}Model() {}
 
+	type i{{ $model.Name.GoCase }}CursorParams interface {
+		field() builder.Field
+		getQuery() builder.Query
+		{{ $model.Name.GoLowerCase }}Model()
+		isCursor()
+	}
+
+	type {{ $name }}CursorParams struct {
+		data builder.Field
+		query builder.Query
+	}
+
+	func (p {{ $name }}CursorParams) field() builder.Field {
+		return p.data
+	}
+
+	func (p {{ $name }}CursorParams) isCursor() {}
+
+	func (p {{ $name }}CursorParams) getQuery() builder.Query {
+		return p.query
+	}
+
+	func (p {{ $name }}CursorParams) {{ $model.Name.GoLowerCase }}Model() {}
+
 	{{/* TODO remove getQuery() builder.Field from Unique input and create a separate input for that with variadic parameters */}}
 	type i{{ $model.Name.GoCase }}ParamsUnique interface {
 		field() builder.Field
