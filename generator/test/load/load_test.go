@@ -23,12 +23,12 @@ func TestLoad(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		before string
+		before []string
 		run    Func
 	}{{
 		name: "multiple things",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				user: createOneUser(data: {
 					id: "john",
@@ -50,7 +50,7 @@ func TestLoad(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			type Result struct {
 				FindOneUser  UserModel   `json:"findOneUser"`
@@ -91,16 +91,18 @@ func TestLoad(t *testing.T) {
 				FindManyPost: []PostModel{
 					{
 						post{
-							ID:      "a",
-							Title:   "common",
-							Content: str("a"),
+							ID:       "a",
+							Title:    "common",
+							Content:  str("a"),
+							AuthorID: "john",
 						},
 					},
 					{
 						post{
-							ID:      "b",
-							Title:   "common",
-							Content: str("b"),
+							ID:       "b",
+							Title:    "common",
+							Content:  str("b"),
+							AuthorID: "john",
 						},
 					},
 				},
@@ -111,7 +113,7 @@ func TestLoad(t *testing.T) {
 	}, {
 		name: "fetch a `many` relation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				user: createOneUser(data: {
 					id: "john",
@@ -145,7 +147,7 @@ func TestLoad(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			type UserResponse struct {
 				UserModel
@@ -189,9 +191,10 @@ func TestLoad(t *testing.T) {
 					},
 					Posts: []PostModel{{
 						post{
-							ID:      "d",
-							Title:   "2",
-							Content: str("stuff"),
+							ID:       "d",
+							Title:    "2",
+							Content:  str("stuff"),
+							AuthorID: "john",
 						},
 					}},
 				}},
@@ -202,7 +205,7 @@ func TestLoad(t *testing.T) {
 	}, {
 		name: "fetch a `one` relation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				user: createOneUser(data: {
 					id: "john",
@@ -224,7 +227,7 @@ func TestLoad(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			type PostResponse struct {
 				PostModel
@@ -248,9 +251,10 @@ func TestLoad(t *testing.T) {
 				FindManyPost: []PostResponse{{
 					PostModel: PostModel{
 						post{
-							ID:      "a",
-							Title:   "1",
-							Content: str("x"),
+							ID:       "a",
+							Title:    "1",
+							Content:  str("x"),
+							AuthorID: "john",
 						},
 					},
 					Author: UserModel{
@@ -269,7 +273,7 @@ func TestLoad(t *testing.T) {
 	}, {
 		name: "deeply nested relation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				user: createOneUser(data: {
 					id: "john",
@@ -310,7 +314,7 @@ func TestLoad(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			type PostResponse struct {
 				PostModel
@@ -360,9 +364,10 @@ func TestLoad(t *testing.T) {
 					Posts: []PostResponse{{
 						PostModel: PostModel{
 							post{
-								ID:      "post-a",
-								Title:   "post a",
-								Content: str("post a"),
+								ID:       "post-a",
+								Title:    "post a",
+								Content:  str("post a"),
+								AuthorID: "john",
 							},
 						},
 						Comments: []CommentModel{
@@ -370,6 +375,8 @@ func TestLoad(t *testing.T) {
 								comment{
 									ID:      "comment-a-2",
 									Content: "a 2",
+									UserID:  "john",
+									PostID:  "post-a",
 								},
 							},
 						},

@@ -5,7 +5,7 @@
 
 	const (
 		{{ range $v := $enum.Values -}}
-			{{ $enum.Name.GoCase }}{{ $v.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v.GoCase }}"
+			{{ $enum.Name.GoCase }}{{ $v.Name.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v.Name.GoCase }}"
 		{{ end }}
 	)
 {{- end }}
