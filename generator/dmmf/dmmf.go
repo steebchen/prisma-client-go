@@ -181,10 +181,25 @@ func (Document) Types() []Type {
 	}}
 }
 
-// Enum describes an enumerated type.
-type Enum struct {
+// SchemaEnum describes an enumerated type.
+type SchemaEnum struct {
 	Name   types.String   `json:"name"`
 	Values []types.String `json:"values"`
+	// DBName (optional)
+	DBName types.String `json:"dBName"`
+}
+
+// Enum describes an enumerated type.
+type Enum struct {
+	Name   types.String `json:"name"`
+	Values []EnumValue  `json:"values"`
+	// DBName (optional)
+	DBName types.String `json:"dBName"`
+}
+
+// EnumValue contains detailed information about an enum type.
+type EnumValue struct {
+	Name types.String `json:"name"`
 	// DBName (optional)
 	DBName types.String `json:"dBName"`
 }
@@ -212,6 +227,7 @@ type Field struct {
 	IsRequired bool         `json:"isRequired"`
 	IsList     bool         `json:"isList"`
 	IsUnique   bool         `json:"isUnique"`
+	IsReadOnly bool         `json:"isReadOnly"`
 	IsID       bool         `json:"isId"`
 	Type       types.Type   `json:"type"`
 	// DBName (optional)
@@ -271,7 +287,7 @@ type Schema struct {
 	RootMutationType types.String `json:"rootMutationType"`
 	InputTypes       []InputType  `json:"inputTypes"`
 	OutputTypes      []OutputType `json:"outputTypes"`
-	Enums            []Enum       `json:"enums"`
+	Enums            []SchemaEnum `json:"enums"`
 }
 
 // SchemaArg provides the arguments of a given field.

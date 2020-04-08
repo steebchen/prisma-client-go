@@ -9,8 +9,8 @@ docker network create integration-bridge
 docker run --network integration-bridge --name postgres -e POSTGRES_PASSWORD=mysecretpassword -d postgres
 
 # run migrations
-docker build . -f docker/lift.dockerfile -t lift
-docker run --network integration-bridge lift
+docker build . -f docker/migrate.dockerfile -t migrate
+docker run --network integration-bridge migrate
 
 # run actual tests
 docker build . -f docker/integration.dockerfile -t integration

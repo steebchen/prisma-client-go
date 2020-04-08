@@ -4,7 +4,7 @@ datasource db {
 }
 
 generator db {
-	provider = "../../../prisma-client-go"
+	provider = "go run ../../.."
 	output = "./db_gen.go"
 	package = "binaries"
 	binaryTargets = ["native", "rhel-openssl-1.1.x"]

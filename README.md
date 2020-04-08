@@ -24,7 +24,7 @@ We recommend to read the [current caveats](#caveats).
     }
 
     generator db {
-      provider = "prisma-client-go"
+      provider = "go run github.com/prisma/prisma-client-go"
       output = "./db/db_gen.go"
       package = "db"
     }
@@ -49,13 +49,13 @@ We recommend to read the [current caveats](#caveats).
     }
     ```
 
-    To get this up and running in your database, we use the Prisma migration tool [`lift`](https://github.com/prisma/lift) to create and migrate our database:
+    To get this up and running in your database, we use the Prisma migration tool [`migrate`](https://github.com/prisma/migrate) to create and migrate our database:
 
     ```shell script
     # initialize the first migration
-    go run github.com/prisma/prisma-client-go lift save --create-db --name "init"
+    go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name "init"
     # apply the migration
-    go run github.com/prisma/prisma-client-go lift up
+    go run github.com/prisma/prisma-client-go migrate up --experimental
     ```
 
 4) Generate the Prisma Client Go client in your project
@@ -189,7 +189,7 @@ If you use different development environments, e.g. a Mac to develop, and Debian
 
 ```prisma
 generator db {
-  provider = "prisma-client-go"
+  provider = "go run github.com/prisma/prisma-client-go"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 ```

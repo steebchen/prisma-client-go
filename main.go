@@ -1,7 +1,5 @@
 package main
 
-//go:generate go build .
-
 import (
 	"log"
 	"os"

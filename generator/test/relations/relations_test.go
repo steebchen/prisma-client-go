@@ -23,12 +23,12 @@ func TestRelations(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		before string
+		before []string
 		run    Func
 	}{{
 		name: "find by single relation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				unrelated: createOnePost(data: {
 					id: "nope",
@@ -45,7 +45,9 @@ func TestRelations(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				user: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
@@ -66,7 +68,7 @@ func TestRelations(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
@@ -80,15 +82,17 @@ func TestRelations(t *testing.T) {
 
 			expected := []PostModel{{
 				post{
-					ID:      "a",
-					Title:   "common",
-					Content: str("a"),
+					ID:       "a",
+					Title:    "common",
+					Content:  str("a"),
+					AuthorID: "relations",
 				},
 			}, {
 				post{
-					ID:      "b",
-					Title:   "common",
-					Content: str("b"),
+					ID:       "b",
+					Title:    "common",
+					Content:  str("b"),
+					AuthorID: "relations",
 				},
 			}}
 
@@ -97,7 +101,7 @@ func TestRelations(t *testing.T) {
 	}, {
 		name: "find by to-many relation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				user: createOneUser(data: {
 					id: "relations",
@@ -130,7 +134,7 @@ func TestRelations(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Email.Equals("john@example.com"),
@@ -159,7 +163,7 @@ func TestRelations(t *testing.T) {
 	}, {
 		name: "create and connect",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				createOneUser(data: {
 					id: "123",
@@ -170,7 +174,7 @@ func TestRelations(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			title := "What's up?"
 			userID := "123"
@@ -188,8 +192,9 @@ func TestRelations(t *testing.T) {
 
 			expected := PostModel{
 				post{
-					ID:    "post",
-					Title: title,
+					ID:       "post",
+					Title:    title,
+					AuthorID: "123",
 				},
 			}
 

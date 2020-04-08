@@ -19,12 +19,12 @@ func TestPagination(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		before string
+		before []string
 		run    Func
 	}{{
 		name: "order by ASC",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOnePost(data: {
 					id: "a",
@@ -33,7 +33,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				c: createOnePost(data: {
 					id: "c",
 					title: "c",
@@ -41,7 +43,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				b: createOnePost(data: {
 					id: "b",
 					title: "b",
@@ -50,7 +54,7 @@ func TestPagination(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(ASC),
@@ -84,7 +88,7 @@ func TestPagination(t *testing.T) {
 	}, {
 		name: "order by DESC",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOnePost(data: {
 					id: "a",
@@ -93,7 +97,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				c: createOnePost(data: {
 					id: "c",
 					title: "c",
@@ -101,7 +107,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				b: createOnePost(data: {
 					id: "b",
 					title: "b",
@@ -110,7 +118,7 @@ func TestPagination(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(DESC),
@@ -144,7 +152,7 @@ func TestPagination(t *testing.T) {
 	}, {
 		name: "first 2",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOnePost(data: {
 					id: "a",
@@ -153,7 +161,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				c: createOnePost(data: {
 					id: "c",
 					title: "c",
@@ -161,7 +171,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				b: createOnePost(data: {
 					id: "b",
 					title: "b",
@@ -170,7 +182,7 @@ func TestPagination(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
@@ -181,7 +193,7 @@ func TestPagination(t *testing.T) {
 				// would return a, b
 				First(2).
 				// return records after b, which is c
-				After("b").
+				After(Post.Title.Cursor("b")).
 				Exec(ctx)
 
 			if err != nil {
@@ -201,7 +213,7 @@ func TestPagination(t *testing.T) {
 	}, {
 		name: "first 2 skip",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOnePost(data: {
 					id: "a",
@@ -210,7 +222,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				c: createOnePost(data: {
 					id: "c",
 					title: "c",
@@ -218,7 +232,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				b: createOnePost(data: {
 					id: "b",
 					title: "b",
@@ -227,7 +243,7 @@ func TestPagination(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
@@ -264,7 +280,7 @@ func TestPagination(t *testing.T) {
 	}, {
 		name: "last 2",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOnePost(data: {
 					id: "a",
@@ -273,7 +289,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				c: createOnePost(data: {
 					id: "c",
 					title: "c",
@@ -281,7 +299,9 @@ func TestPagination(t *testing.T) {
 				}) {
 					id
 				}
-
+			}
+		`, `
+			mutation {
 				b: createOnePost(data: {
 					id: "b",
 					title: "b",
@@ -290,7 +310,7 @@ func TestPagination(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.
 				Post.
@@ -301,7 +321,7 @@ func TestPagination(t *testing.T) {
 				// would return b, c
 				Last(2).
 				// before c will return b
-				Before("c").
+				Before(Post.Title.Cursor("c")).
 				Exec(ctx)
 
 			if err != nil {

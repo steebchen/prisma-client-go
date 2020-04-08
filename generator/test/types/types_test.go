@@ -24,7 +24,7 @@ func TestTypes(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		before string
+		before []string
 		run    Func
 	}{{
 		name: "complex strings",
@@ -142,7 +142,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "basic equals",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id",
@@ -159,7 +159,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
@@ -196,7 +196,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "advanced query",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id",
@@ -213,7 +213,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
@@ -257,7 +257,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "IsNull",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -273,6 +273,9 @@ func TestTypes(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
@@ -288,7 +291,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
@@ -318,7 +321,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "nullable dynamic nil field",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -334,6 +337,9 @@ func TestTypes(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
@@ -349,7 +355,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
@@ -380,7 +386,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "nullable dynamic field with value",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -396,6 +402,9 @@ func TestTypes(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
@@ -411,7 +420,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
@@ -442,7 +451,7 @@ func TestTypes(t *testing.T) {
 	}, {
 		name: "IN operation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -458,6 +467,9 @@ func TestTypes(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
@@ -472,6 +484,9 @@ func TestTypes(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				c: createOneUser(data: {
 					id: "id3",
 					createdAt: "2000-01-01T00:00:00Z",
@@ -487,7 +502,7 @@ func TestTypes(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 

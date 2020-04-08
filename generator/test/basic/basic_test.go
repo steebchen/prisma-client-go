@@ -24,12 +24,12 @@ func TestBasic(t *testing.T) {
 
 	tests := []struct {
 		name   string
-		before string
+		before []string
 		run    Func
 	}{{
 		name: "Nullability",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				createOneUser(data: {
 					id: "nullability",
@@ -41,7 +41,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
@@ -59,7 +59,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "marshal json",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				createOneUser(data: {
 					id: "marshal",
@@ -71,7 +71,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
@@ -89,7 +89,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "FindOne",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "findOne1",
@@ -98,6 +98,9 @@ func TestBasic(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "findOne2",
 					email: "jane@findOne.com",
@@ -106,7 +109,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
@@ -125,7 +128,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "FindMany",
 		// language=GraphQL
-		before: `
+		before: []string{`
 				mutation {
 					a: createOneUser(data: {
 						id: "findMany1",
@@ -135,6 +138,9 @@ func TestBasic(t *testing.T) {
 					}) {
 						id
 					}
+				}
+			`, `
+				mutation {
 					b: createOneUser(data: {
 						id: "findMany2",
 						email: "2",
@@ -144,7 +150,7 @@ func TestBasic(t *testing.T) {
 						id
 					}
 				}
-			`,
+			`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
@@ -170,7 +176,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "FindMany empty",
 		// language=GraphQL
-		before: `
+		before: []string{`
 				mutation {
 					a: createOneUser(data: {
 						id: "findMany1",
@@ -180,6 +186,9 @@ func TestBasic(t *testing.T) {
 					}) {
 						id
 					}
+				}
+			`, `
+				mutation {
 					b: createOneUser(data: {
 						id: "findMany2",
 						email: "2",
@@ -189,7 +198,7 @@ func TestBasic(t *testing.T) {
 						id
 					}
 				}
-			`,
+			`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
@@ -250,7 +259,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Update",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				createOneUser(data: {
 					id: "update",
@@ -261,7 +270,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			updated, err := client.User.FindOne(
@@ -297,7 +306,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Update many",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -307,6 +316,9 @@ func TestBasic(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					email: "email2",
@@ -316,7 +328,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -357,7 +369,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Delete",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				createOneUser(data: {
 					id: "delete",
@@ -367,7 +379,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			email := "john@example.com"
 			deleted, err := client.User.FindOne(
@@ -393,7 +405,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Delete many",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -403,6 +415,9 @@ func TestBasic(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					email: "email2",
@@ -412,7 +427,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -437,7 +452,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "NOT operation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -446,6 +461,9 @@ func TestBasic(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					email: "email2",
@@ -454,7 +472,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Not(
@@ -478,7 +496,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "OR operation",
 		// language=GraphQL
-		before: `
+		before: []string{`
 			mutation {
 				a: createOneUser(data: {
 					id: "id1",
@@ -487,6 +505,9 @@ func TestBasic(t *testing.T) {
 				}) {
 					id
 				}
+			}
+		`, `
+			mutation {
 				b: createOneUser(data: {
 					id: "id2",
 					email: "email2",
@@ -495,7 +516,7 @@ func TestBasic(t *testing.T) {
 					id
 				}
 			}
-		`,
+		`},
 		run: func(t *testing.T, client *Client, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Or(

@@ -105,18 +105,18 @@
 				return r
 			}
 
-			func (r {{ $result }}) After(cursor string) {{ $result }} {
+			func (r {{ $result }}) After(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
 				r.query.Inputs = append(r.query.Inputs, builder.Input{
 					Name:  "after",
-					Value: cursor,
+					Fields: []builder.Field{cursor.field()},
 				})
 				return r
 			}
 
-			func (r {{ $result }}) Before(cursor string) {{ $result }} {
+			func (r {{ $result }}) Before(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
 				r.query.Inputs = append(r.query.Inputs, builder.Input{
 					Name:  "before",
-					Value: cursor,
+					Fields: []builder.Field{cursor.field()},
 				})
 				return r
 			}

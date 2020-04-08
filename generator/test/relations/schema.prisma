@@ -4,7 +4,7 @@ datasource db {
 }
 
 generator db {
-	provider = "../../../prisma-client-go"
+	provider = "go run ../../.."
 	output = "./db_gen.go"
 	package = "relations"
 }
@@ -14,6 +14,7 @@ model User {
 	email    String  @unique
 	username String
 	name     String?
+
 	posts    Post[]
 	comments Comment[]
 }
@@ -22,13 +23,20 @@ model Post {
 	id       String  @id @default(cuid())
 	title    String
 	content  String?
-	author   User
+
+	author   User @relation(fields: [authorID], references: [id])
+	authorID String
+
 	comments Comment[]
 }
 
 model Comment {
 	id        String  @id @default(cuid())
 	content   String
-	by        User
-	post      Post
+
+	by        User @relation(fields: [userID], references: [id])
+	userID    String
+
+	post      Post @relation(fields: [postID], references: [id])
+	postID    String
 }

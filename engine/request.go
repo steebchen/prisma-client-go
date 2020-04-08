@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Do sends the http Request to the query engine and unmarshals the response
@@ -19,6 +20,11 @@ func (e *Engine) Do(ctx context.Context, query string, response interface{}) err
 	body, err := e.Request(ctx, "POST", "/", &payload)
 	if err != nil {
 		return fmt.Errorf("Request failed: %w", err)
+	}
+
+	// TODO temporary hack, actually parse the response
+	if str := string(body); strings.Contains(str, "errors: \"[{\"error") {
+		return fmt.Errorf("pql error: %s", str)
 	}
 
 	err = json.Unmarshal(body, response)

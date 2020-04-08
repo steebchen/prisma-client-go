@@ -17,7 +17,7 @@ type Engine interface {
 	Do(context.Context, string, interface{}) error
 }
 
-func Start(t *testing.T, e *engine.Engine, before string) {
+func Start(t *testing.T, e *engine.Engine, before []string) {
 	setup(t)
 
 	if err := e.Connect(); err != nil {
@@ -27,9 +27,9 @@ func Start(t *testing.T, e *engine.Engine, before string) {
 
 	ctx := context.Background()
 
-	if before != "" {
+	for _, b := range before {
 		var response engine.GQLResponse
-		err := e.Do(ctx, before, &response)
+		err := e.Do(ctx, b, &response)
 		if err != nil {
 			t.Fatalf("could not send mock query %s", err)
 		}
@@ -55,12 +55,12 @@ func setup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cli.Run([]string{"lift", "save", "--create-db", "--name", "init"}, logger.Enabled); err != nil {
-		t.Fatalf("could not run lift save %s", err)
+	if err := cli.Run([]string{"migrate", "save", "--experimental", "--create-db", "--name", "init"}, logger.Enabled); err != nil {
+		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 
-	if err := cli.Run([]string{"lift", "up"}, logger.Enabled); err != nil {
-		t.Fatalf("could not run lift save %s", err)
+	if err := cli.Run([]string{"migrate", "up", "--experimental"}, logger.Enabled); err != nil {
+		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 }
 

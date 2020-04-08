@@ -16,17 +16,17 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.0.0-alpha.443"
+const PrismaVersion = "2.0.0-alpha.1037"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "8d31e9a04b33f8e8bf3c3a5ce10b3977223075e0"
+const EngineVersion = "473dada20947db7e1932c52b887b463bc043b6e6"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
-var EngineURL = "https://prisma-builds.s3-eu-west-1.amazonaws.com/master/%s/%s/%s.gz"
+var EngineURL = "https://binaries.prisma.sh/master/%s/%s/%s.gz"
 
 // init overrides URLs if env variables are specific for debugging purposes and to
 // be able to provide a fallback if the links above should go down
@@ -51,6 +51,8 @@ var baseDirName = path.Join("prisma", "binaries")
 // internally, this is the global temp dir
 func GlobalTempDir() string {
 	temp := os.TempDir()
+	logger.Debug.Printf("temp dir: %s", temp)
+
 	return path.Join(temp, baseDirName, "engines", EngineVersion)
 }
 
@@ -61,20 +63,18 @@ func GlobalCacheDir() string {
 	if err != nil {
 		panic(fmt.Errorf("could not read user cache dir: %w", err))
 	}
+
+	logger.Debug.Printf("global cache dir: %s", cache)
+
 	return path.Join(cache, baseDirName, "cli", PrismaVersion)
 }
 
-func FetchEngine(toDir string, engineName string, binaryName string) error {
+func FetchEngine(toDir string, engineName string, binaryPlatformName string) error {
 	logger.Debug.Printf("checking %s...", engineName)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryName))
+	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName))
 
-	urlName := engineName
-	// the query-engine binary to on S3 is "prisma"
-	if engineName == "query-engine" {
-		urlName = "prisma"
-	}
-	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
+	url := fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformName, engineName)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
@@ -142,18 +142,13 @@ func DownloadCLI(toDir string) error {
 }
 
 func DownloadEngine(name string, toDir string) (file string, err error) {
-	binaryName := platform.BinaryNameWithSSL()
+	binaryName := platform.BinaryPlatformName()
 
 	logger.Debug.Printf("checking %s...", name)
 
 	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName))
 
-	urlName := name
-	// the query-engine binary to on S3 is "prisma"
-	if name == "query-engine" {
-		urlName = "prisma"
-	}
-	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, urlName)
+	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, name)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)

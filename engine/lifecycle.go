@@ -1,13 +1,13 @@
 package engine
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries"
@@ -57,7 +57,7 @@ func (e *Engine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
 	binariesPath := binaries.GlobalTempDir()
-	binaryName := platform.BinaryNameWithSSL()
+	binaryName := platform.BinaryPlatformName()
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
@@ -122,8 +122,8 @@ func (e *Engine) ensure() (string, error) {
 	}
 	logger.Debug.Printf("version check took %s", time.Since(startVersion))
 
-	if v := string(bytes.TrimSpace(out)); binaries.EngineVersion != v {
-		msg := fmt.Errorf("expected query engine version %s but got %s", binaries.EngineVersion, v)
+	if v := strings.TrimSpace(strings.Replace(string(out), "query-engine", "", 1)); binaries.EngineVersion != v {
+		msg := fmt.Errorf("expected query engine version `%s` but got `%s`", binaries.EngineVersion, v)
 		if forceVersion {
 			return "", msg
 		}

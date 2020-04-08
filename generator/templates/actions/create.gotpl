@@ -9,7 +9,7 @@
 	// Creates a single user.
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
-			{{- if $field.RequiredOnCreate -}}
+			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
 				// {{ $field.Default }}
 				{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
 			{{- end -}}
@@ -21,7 +21,7 @@
 		var fields []builder.Field
 
 		{{ range $field := $model.Fields }}
-			{{- if $field.RequiredOnCreate -}}
+			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
 				fields = append(fields, {{ $field.Name.GoLowerCase }}.data)
 			{{- end }}
 		{{ end }}
