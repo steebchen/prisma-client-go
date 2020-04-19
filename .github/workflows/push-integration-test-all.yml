@@ -1,5 +1,11 @@
 name: integration test all
-on: push
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 jobs:
   integration:
     runs-on: ubuntu-latest
