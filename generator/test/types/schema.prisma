@@ -48,3 +48,9 @@ enum Role {
 	Moderator
 	Admin
 }
+
+enum AnotherRole {
+	A
+	B
+	C
+}
