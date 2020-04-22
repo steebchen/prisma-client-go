@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
+	"path/filepath"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries/platform"
@@ -98,7 +98,7 @@ func FetchNative(toDir string) error {
 		return fmt.Errorf("toDir must be provided")
 	}
 
-	if !strings.HasPrefix(toDir, "/") {
+	if !filepath.IsAbs(toDir) {
 		return fmt.Errorf("toDir must be absolute")
 	}
 
