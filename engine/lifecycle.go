@@ -38,14 +38,23 @@ func (e *Engine) Connect() error {
 func (e *Engine) Disconnect() error {
 	logger.Debug.Printf("disconnecting...")
 
-	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
-		return fmt.Errorf("send signal: %w", err)
+	if platform.Name() != "windows" {
+		if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
+			return fmt.Errorf("send signal: %w", err)
+		}
+
+		if err := e.cmd.Wait(); err != nil {
+			// TODO: is this a bug in the query-engine?
+			if err.Error() != "signal: interrupt" {
+				return fmt.Errorf("wait for process: %w", err)
+			}
+		}
 	}
 
-	if err := e.cmd.Wait(); err != nil {
-		// TODO: is this a bug in the query-engine?
-		if err.Error() != "signal: interrupt" {
-			return fmt.Errorf("wait for process: %w", err)
+	if platform.Name() == "windows" {
+
+		if err := e.cmd.Process.Kill(); err != nil {
+			return fmt.Errorf("kill process: %w", err)
 		}
 	}
 
@@ -57,7 +66,7 @@ func (e *Engine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
 	binariesPath := binaries.GlobalTempDir()
-	binaryName := platform.BinaryPlatformName()
+	binaryName := platform.CheckForExtension(platform.BinaryPlatformName())
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
@@ -104,7 +113,7 @@ func (e *Engine) ensure() (string, error) {
 
 	if file == "" {
 		logger.Debug.Printf("no query engine defined or found. fetching it at runtime...")
-		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\", \"%s\"]` in your schema.prisma file and upload the query engine with your application.", binaryName)
+		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\"]` in your schema.prisma file under \"generator\" and upload the query engine with your application.")
 		logger.Debug.Printf("fetching the query engine now...")
 
 		qe, err := binaries.DownloadEngine("query-engine", binariesPath)

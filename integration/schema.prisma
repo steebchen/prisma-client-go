@@ -1,6 +1,6 @@
 datasource db {
-	provider = "postgresql"
-	url      = "postgresql://postgres:mysecretpassword@postgres:5432/db?schema=public"
+	provider = "sqlite"
+	url      = "file:dev.db"
 }
 
 generator db {

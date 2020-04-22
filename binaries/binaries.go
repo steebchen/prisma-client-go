@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"strings"
+	"path/filepath"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries/platform"
@@ -98,7 +98,7 @@ func FetchNative(toDir string) error {
 		return fmt.Errorf("toDir must be provided")
 	}
 
-	if !strings.HasPrefix(toDir, "/") {
+	if !filepath.IsAbs(toDir) {
 		return fmt.Errorf("toDir must be absolute")
 	}
 
@@ -123,8 +123,8 @@ func FetchNative(toDir string) error {
 
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
-	to := path.Join(toDir, cli)
-	url := fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name())
+	to := platform.CheckForExtension(path.Join(toDir, cli))
+	url := platform.CheckForExtension(fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Debug.Printf("prisma cli doesn't exist, fetching...")
@@ -146,9 +146,9 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 
 	logger.Debug.Printf("checking %s...", name)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName))
+	to := platform.CheckForExtension(path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
 
-	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, name)
+	url := platform.CheckForExtension(fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
