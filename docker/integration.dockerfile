@@ -11,16 +11,16 @@ RUN go mod download
 
 COPY . ./
 
-RUN cd integration/ && go run github.com/prisma/prisma-client-go prefetch
+RUN cd integration/; go run github.com/prisma/prisma-client-go prefetch
 
-RUN cd integration/ && go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name init
-RUN cd integration/ && go run github.com/prisma/prisma-client-go migrate up --experimental
+RUN cd integration/; go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name init
+RUN cd integration/; go run github.com/prisma/prisma-client-go migrate up --experimental
 
 # generate the client in the integration folder
-RUN cd integration/ && go run github.com/prisma/prisma-client-go generate
+RUN cd integration/; go run github.com/prisma/prisma-client-go generate
 
 # build the integration binary with all dependencies
-RUN cd integration/ && go build -o /app/main .
+RUN cd integration/; go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
 FROM ubuntu:16.04
