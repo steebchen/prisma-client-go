@@ -6,6 +6,8 @@ import (
 )
 
 func Test_checkForExtension(t *testing.T) {
+	t.Parallel()
+
 	type args struct {
 		platform string
 		path     string
@@ -37,6 +39,7 @@ func Test_checkForExtension(t *testing.T) {
 		want: "/some.exe.gz",
 	}}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			if got := checkForExtension(tt.args.platform, tt.args.path); got != tt.want {
 				t.Errorf("checkForExtension() = %v, want %v", got, tt.want)

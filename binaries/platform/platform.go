@@ -21,7 +21,7 @@ func BinaryPlatformName() string {
 	platform := Name()
 
 	if platform != "linux" {
-		return CheckForExtension(platform)
+		return platform
 	}
 
 	distro := getLinuxDistro()
