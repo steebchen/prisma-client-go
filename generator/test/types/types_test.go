@@ -39,6 +39,7 @@ func TestTypes(t *testing.T) {
 				User.Bool.Set(true),
 				User.Date.Set(date),
 				User.Role.Set(RoleAdmin),
+				User.Type.Set("x"),
 
 				User.ID.Set(id),
 				User.CreatedAt.Set(date),
@@ -61,6 +62,7 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}
 
@@ -104,6 +106,7 @@ func TestTypes(t *testing.T) {
 					Date:      date,
 					Role:      admin,
 					RoleOpt:   &mod,
+					Type:      "x",
 				},
 			}
 
@@ -114,6 +117,7 @@ func TestTypes(t *testing.T) {
 				User.Bool.Set(true),
 				User.Date.Set(date),
 				User.Role.Set(RoleAdmin),
+				User.Type.Set("x"),
 
 				User.ID.Set("123"),
 				User.StrOpt.Set("a"),
@@ -154,6 +158,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -188,6 +193,7 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
@@ -208,6 +214,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -249,6 +256,7 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
@@ -269,6 +277,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -286,6 +295,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+				type: "x",
 					role: Admin,
 				}) {
 					id
@@ -313,6 +323,7 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
@@ -333,6 +344,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -350,6 +362,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -378,6 +391,7 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
@@ -398,6 +412,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -415,6 +430,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -443,6 +459,7 @@ func TestTypes(t *testing.T) {
 					Date:      date,
 					StrOpt:    &s,
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
@@ -463,6 +480,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -480,6 +498,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -497,6 +516,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
+					type: "x",
 					role: Admin,
 				}) {
 					id
@@ -524,6 +544,7 @@ func TestTypes(t *testing.T) {
 					Date:      date,
 					StrOpt:    str("first"),
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}, {
 				user{
@@ -536,6 +557,7 @@ func TestTypes(t *testing.T) {
 					Date:      date,
 					StrOpt:    str("third"),
 					Role:      RoleAdmin,
+					Type:      "x",
 				},
 			}}
 
