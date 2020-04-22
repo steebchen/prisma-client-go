@@ -38,14 +38,23 @@ func (e *Engine) Connect() error {
 func (e *Engine) Disconnect() error {
 	logger.Debug.Printf("disconnecting...")
 
-	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
-		return fmt.Errorf("send signal: %w", err)
+	if platform.Name() != "windows" {
+		if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
+			return fmt.Errorf("send signal: %w", err)
+		}
+
+		if err := e.cmd.Wait(); err != nil {
+			// TODO: is this a bug in the query-engine?
+			if err.Error() != "signal: interrupt" {
+				return fmt.Errorf("wait for process: %w", err)
+			}
+		}
 	}
 
-	if err := e.cmd.Wait(); err != nil {
-		// TODO: is this a bug in the query-engine?
-		if err.Error() != "signal: interrupt" {
-			return fmt.Errorf("wait for process: %w", err)
+	if platform.Name() == "windows" {
+
+		if err := e.cmd.Process.Kill(); err != nil {
+			return fmt.Errorf("kill process: %w", err)
 		}
 	}
 
