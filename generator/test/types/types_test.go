@@ -13,7 +13,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *Client, ctx cx)
+type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -28,7 +28,7 @@ func TestTypes(t *testing.T) {
 		run    Func
 	}{{
 		name: "complex strings",
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			id := `f"hi"'`
 			s := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
@@ -88,7 +88,7 @@ func TestTypes(t *testing.T) {
 		},
 	}, {
 		name: "enums",
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			admin := RoleAdmin
@@ -165,7 +165,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
@@ -221,7 +221,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
 
@@ -302,7 +302,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(
@@ -369,7 +369,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			var s *string = nil
@@ -437,7 +437,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			s := "filled"
@@ -523,7 +523,7 @@ func TestTypes(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 
 			actual, err := client.User.FindMany(

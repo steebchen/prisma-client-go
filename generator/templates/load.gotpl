@@ -5,12 +5,12 @@ type iLoadable interface {
 	getQuery() builder.Query
 }
 
-func (c *Client) Load(params ...iLoadable) loadExec {
+func (c *PrismaClient) Load(params ...iLoadable) loadExec {
 	return loadExec{c, params}
 }
 
 type loadExec struct {
-	client *Client
+	client *PrismaClient
 	queries []iLoadable
 }
 

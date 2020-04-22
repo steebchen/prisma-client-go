@@ -12,7 +12,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *Client, ctx cx)
+type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -69,7 +69,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
 				Post.Author.Where(
@@ -135,7 +135,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Email.Equals("john@example.com"),
 				User.Posts.Some(
@@ -175,7 +175,7 @@ func TestRelations(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			title := "What's up?"
 			userID := "123"
 
