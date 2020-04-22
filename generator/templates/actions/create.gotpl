@@ -11,7 +11,7 @@
 		{{ range $field := $model.Fields -}}
 			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
 				// {{ $field.Default }}
-				{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
+				_{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
 			{{- end -}}
 		{{ end }}
 		optional ...{{ $name }}SetParams,
@@ -22,7 +22,7 @@
 
 		{{ range $field := $model.Fields }}
 			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
-				fields = append(fields, {{ $field.Name.GoLowerCase }}.data)
+				fields = append(fields, _{{ $field.Name.GoLowerCase }}.data)
 			{{- end }}
 		{{ end }}
 

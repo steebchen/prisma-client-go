@@ -37,10 +37,11 @@ model User {
 	return    String?
 	switch    String?
 	struct    String?
-	type      String?
 	go        String?
 	interface String?
 	defer     String?
+
+	type     String
 }
 
 enum Role {
