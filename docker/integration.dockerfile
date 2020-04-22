@@ -28,9 +28,6 @@ FROM golang:1.13
 
 WORKDIR /app
 
-RUN apt-get update -qqy
-RUN apt-get install -qqy openssl ca-certificates
-
 COPY --from=build /app/main /app/main
 COPY --from=build /app/integration/dev.db /app/dev.db
 
