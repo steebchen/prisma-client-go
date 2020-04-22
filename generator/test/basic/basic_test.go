@@ -13,7 +13,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *Client, ctx cx)
+type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -42,7 +42,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -72,7 +72,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -110,7 +110,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -120,7 +120,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "FindOne not found",
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
 
 			assert.Equal(t, ErrNotFound, err)
@@ -151,7 +151,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -199,7 +199,7 @@ func TestBasic(t *testing.T) {
 					}
 				}
 			`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -223,7 +223,7 @@ func TestBasic(t *testing.T) {
 		},
 	}, {
 		name: "Create",
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			created, err := client.User.CreateOne(
 				User.Email.Set("email"),
 				User.Username.Set("username"),
@@ -271,7 +271,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
 			updated, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -329,7 +329,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Update(
@@ -380,7 +380,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
 			deleted, err := client.User.FindOne(
 				User.Email.Equals(email),
@@ -428,7 +428,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			count, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Delete().Exec(ctx)
@@ -473,7 +473,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Not(
 					User.Email.Equals("email1"),
@@ -517,7 +517,7 @@ func TestBasic(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Or(
 					User.Email.Equals("email1"),

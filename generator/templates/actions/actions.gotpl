@@ -13,7 +13,7 @@ var countOutput = []builder.Output{
 
 	type {{ $ns }} struct {
 		// client holds the prisma client
-		client *Client
+		client *PrismaClient
 	}
 
 	var {{ $name }}Output = []builder.Output{

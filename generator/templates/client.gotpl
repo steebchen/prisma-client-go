@@ -27,8 +27,8 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func NewClient() *Client {
-	c := &Client{}
+func NewClient() *PrismaClient {
+	c := &PrismaClient{}
 
 	c.Engine = engine.NewEngine(schema, hasBinaryTargets)
 
@@ -39,8 +39,8 @@ func NewClient() *Client {
 	return c
 }
 
-// Client is the instance of the Prisma Client Go client.
-type Client struct {
+// PrismaClient is the instance of the Prisma Client Go client.
+type PrismaClient struct {
 	// engine spawns and manages the binary
 	*engine.Engine
 
@@ -66,7 +66,7 @@ type Client struct {
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func (c *Client) Connect() error {
+func (c *PrismaClient) Connect() error {
 	return c.Engine.Connect()
 }
 
@@ -84,6 +84,6 @@ func (c *Client) Connect() error {
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func (c *Client) Disconnect() error {
+func (c *PrismaClient) Disconnect() error {
 	return c.Engine.Disconnect()
 }

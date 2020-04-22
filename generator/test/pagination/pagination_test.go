@@ -12,7 +12,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *Client, ctx cx)
+type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func TestPagination(t *testing.T) {
 	t.Parallel()
@@ -55,7 +55,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(ASC),
 			).Exec(ctx)
@@ -119,7 +119,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(DESC),
 			).Exec(ctx)
@@ -183,7 +183,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().
@@ -244,7 +244,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().
@@ -311,7 +311,7 @@ func TestPagination(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.
 				Post.
 				FindMany().

@@ -12,7 +12,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *Client, ctx cx)
+type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func str(v string) *string {
 	return &v
@@ -51,7 +51,7 @@ func TestLoad(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			type Result struct {
 				FindOneUser  UserModel   `json:"findOneUser"`
 				FindManyUser []UserModel `json:"findManyUser"`
@@ -149,7 +149,7 @@ func TestLoad(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			type UserResponse struct {
 				UserModel
 				Posts []PostModel `json:"posts"`
@@ -229,7 +229,7 @@ func TestLoad(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			type PostResponse struct {
 				PostModel
 				Author UserModel `json:"author"`
@@ -316,7 +316,7 @@ func TestLoad(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *Client, ctx cx) {
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			type PostResponse struct {
 				PostModel
 				Comments []CommentModel `json:"comments"`
