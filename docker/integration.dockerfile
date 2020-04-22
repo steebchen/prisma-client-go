@@ -23,8 +23,8 @@ RUN cd integration/; go run github.com/prisma/prisma-client-go generate
 RUN cd integration/; go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
-FROM ubuntu:16.04
-# TODO try scratch image
+FROM golang:1.13
+# TODO try scratch image. golang is used because it's available on both linux and windows
 
 WORKDIR /app
 
