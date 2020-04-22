@@ -5,6 +5,46 @@ import (
 	"testing"
 )
 
+func Test_checkForExtension(t *testing.T) {
+	type args struct {
+		platform string
+		path     string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{{
+		name: "linux",
+		args: args{
+			platform: "linux",
+			path:     "/some",
+		},
+		want: "/some",
+	}, {
+		name: "windows",
+		args: args{
+			platform: "windows",
+			path:     "/some",
+		},
+		want: "/some.exe",
+	}, {
+		name: "windows with extension",
+		args: args{
+			platform: "windows",
+			path:     "/some.gz",
+		},
+		want: "/some.exe.gz",
+	}}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := checkForExtension(tt.args.platform, tt.args.path); got != tt.want {
+				t.Errorf("checkForExtension() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func Test_parseOpenSSLVersion(t *testing.T) {
 	t.Parallel()
 

@@ -21,7 +21,7 @@ func BinaryPlatformName() string {
 	platform := Name()
 
 	if platform != "linux" {
-		return platform
+		return CheckForExtension(platform)
 	}
 
 	distro := getLinuxDistro()
@@ -37,6 +37,23 @@ func BinaryPlatformName() string {
 // Name returns the platform name
 func Name() string {
 	return runtime.GOOS
+}
+
+// CheckForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
+func CheckForExtension(path string) string {
+	return checkForExtension(Name(), path)
+}
+
+func checkForExtension(platform string, path string) string {
+	if platform == "windows" {
+		if strings.Contains(path, ".gz") {
+			return strings.Replace(path, ".gz", ".exe.gz", 1)
+		}
+
+		return path + ".exe"
+	}
+
+	return path
 }
 
 func getLinuxDistro() string {
