@@ -32,7 +32,7 @@ func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
 	cmd := exec.Command(path.Join(dir, prisma), arguments...)
-	binaryName := platform.BinaryPlatformName()
+	binaryName := platform.CheckForExtension(platform.BinaryPlatformName())
 	queryEngine := dir + "/prisma-query-engine-" + binaryName
 	migrationEngine := dir + "/prisma-migration-engine-" + binaryName
 	introspectionEngine := dir + "/prisma-introspection-engine-" + binaryName
