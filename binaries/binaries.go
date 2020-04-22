@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries/platform"
@@ -123,8 +124,8 @@ func FetchNative(toDir string) error {
 
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
-	to := path.Join(toDir, cli)
-	url := fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name())
+	to := checkForExtension(platform.Name(), path.Join(toDir, cli))
+	url := checkForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Debug.Printf("prisma cli doesn't exist, fetching...")
@@ -141,14 +142,27 @@ func DownloadCLI(toDir string) error {
 	return nil
 }
 
+// checkForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
+func checkForExtension(platform string, path string) string {
+	if platform == "windows" {
+		if strings.Contains(path, ".gz") {
+			return strings.Replace(path, ".gz", ".exe.gz", 1)
+		} else {
+			return path + ".exe"
+		}
+	}
+
+	return path
+}
+
 func DownloadEngine(name string, toDir string) (file string, err error) {
 	binaryName := platform.BinaryPlatformName()
 
 	logger.Debug.Printf("checking %s...", name)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName))
+	to := checkForExtension(platform.Name(), path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
 
-	url := fmt.Sprintf(EngineURL, EngineVersion, binaryName, name)
+	url := checkForExtension(platform.Name(), fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
