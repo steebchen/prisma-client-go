@@ -104,7 +104,7 @@ func (e *Engine) ensure() (string, error) {
 
 	if file == "" {
 		logger.Debug.Printf("no query engine defined or found. fetching it at runtime...")
-		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\", \"%s\"]` in your schema.prisma file and upload the query engine with your application.", binaryName)
+		logger.Warn.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\"]` in your schema.prisma file under \"generator\" and upload the query engine with your application.")
 		logger.Debug.Printf("fetching the query engine now...")
 
 		qe, err := binaries.DownloadEngine("query-engine", binariesPath)

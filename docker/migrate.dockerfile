@@ -11,13 +11,7 @@ RUN go mod download
 
 COPY . ./
 
-# build prisma-client-go
-RUN go build -o /prisma-client-go .
-
-COPY integration/ .
-COPY . ./prisma-client-go
-
 ENV PHOTON_GO_LOG=info
 ENV DEBUG=*
 
-CMD ["/app/prisma-client-go/docker/migrate.sh"]
+CMD ["/app/docker/migrate.sh"]
