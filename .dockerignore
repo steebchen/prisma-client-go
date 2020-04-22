@@ -1,10 +1,13 @@
 .git/
 .github/
-**migrations**/
 prisma-client-go
 *.db
 *.sqlite
 *.json
 *_gen.go
+schema.graphql
+**migrations**/
 **/prisma-*
 **/query-engine-*
+build/
+.graphqlconfig
