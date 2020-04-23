@@ -127,13 +127,13 @@ func DownloadCLI(toDir string) error {
 	url := platform.CheckForExtension(fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
-		logger.Debug.Printf("prisma cli doesn't exist, fetching...")
+		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
 
 		if err := download(url, to); err != nil {
 			return fmt.Errorf("could not download %s to %s: %w", url, to, err)
 		}
 
-		logger.Debug.Printf("prisma cli fetched successfully.")
+		logger.Info.Printf("prisma cli fetched successfully.")
 	} else {
 		logger.Debug.Printf("prisma cli is cached")
 	}
