@@ -159,20 +159,20 @@ func TestRelationChains(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "select on and return many",
+		name: "select one and return many",
 		// language=GraphQL
 		before: []string{`
 			mutation {
 				unrelated: createOnePost(data: {
-					id: "c",
-					title: "c",
-					content: "c",
+					id: "unrelated",
+					title: "unrelated",
+					content: "unrelated",
 					author: {
 						create: {
-							id: "c",
-							email: "c",
-							username: "c",
-							name: "c",
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
 						}
 					}
 				}) {
@@ -195,6 +195,10 @@ func TestRelationChains(t *testing.T) {
 							id: "b",
 							title: "common",
 							content: "b",
+						}, {
+							id: "c",
+							title: "stuff",
+							content: "c",
 						}],
 					},
 				}) {
@@ -204,7 +208,7 @@ func TestRelationChains(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindOne(
-				Post.ID.Equals("c"),
+				Post.ID.Equals("a"),
 			).GetAuthor().GetPosts().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -236,7 +240,7 @@ func TestRelationChains(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "select on and return many with parameters",
+		name: "select one and return many with parameters",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -313,8 +317,8 @@ func TestRelationChains(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
 			hooks.Start(t, client.Engine, tt.before)
+			defer hooks.End(t, client.Engine)
 			tt.run(t, client, context.Background())
-			hooks.End(t, client.Engine)
 		})
 	}
 }

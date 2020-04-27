@@ -118,11 +118,6 @@
 									Fields: where,
 								})
 							}
-						{{ else }}
-							//v.query.Inputs = append(v.query.Inputs, builder.Input{
-							//	Name:   "{{ $field.Name }}",
-							//	Fields: []builder.Field{},
-							//})
 						{{ end }}
 
 						return v
