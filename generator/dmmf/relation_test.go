@@ -83,6 +83,7 @@ func TestDocument_RelationName(t *testing.T) {
 		want: "author",
 	}}
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			d := &Document{
 				Datamodel: tt.fields.Datamodel,

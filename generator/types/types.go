@@ -67,8 +67,8 @@ func (t Type) Value() string {
 }
 
 // String returns the raw string.
-func (s Type) String() string {
-	return string(s)
+func (t Type) String() string {
+	return string(t)
 }
 
 // GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
