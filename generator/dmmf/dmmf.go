@@ -238,7 +238,7 @@ type Field struct {
 	RelationToFields []interface{} `json:"relationToFields"`
 	// RelationOnDelete (optional)
 	RelationOnDelete types.String `json:"relationOnDelete"`
-	// RelationName (optional)
+	// ReverseRelationName (optional)
 	RelationName types.String `json:"relationName"`
 	// Default (optional)
 	Default FieldDefault `json:"default"`

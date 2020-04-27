@@ -7,8 +7,20 @@ import (
 	"github.com/takuoki/gocase"
 )
 
+type StringLike interface {
+	String() string
+	GoCase() string
+	GoLowerCase() string
+	CamelCase() string
+}
+
 // String acts as a builtin string but provides useful casing methods.
 type String string
+
+// String returns the raw string.
+func (s String) String() string {
+	return string(s)
+}
 
 // GoCase transforms strings into Go-style casing, meaning uppercase including Go casing edge cases.
 func (s String) GoCase() string {
@@ -52,6 +64,11 @@ func (t Type) Value() string {
 	}
 
 	return v
+}
+
+// String returns the raw string.
+func (s Type) String() string {
+	return string(s)
 }
 
 // GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.

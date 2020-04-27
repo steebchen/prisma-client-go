@@ -70,6 +70,67 @@
 			}
 		}
 
+		{{/* Graph style API */}}
+		{{ if not $v.List }}
+			{{ range $field := $model.Fields }}
+				{{ if $field.Kind.IsRelation }}
+					{{ $relationResultType := "One" }}
+					{{ if $field.IsList }}
+						{{ $relationResultType = "Many" }}
+					{{ end }}
+					func (r {{ $result }}) Get{{ $field.Name.GoCase }}({{ if $field.IsList }}params ...i{{ $field.Type.GoCase }}Params{{ end }}) {{ $field.Type.GoLowerCase }}Find{{ $relationResultType }} {
+						{{/* TODO re-use this code from above in normal FindOne/FindMany (it's not quite the same though) */}}
+
+						var v {{ $field.Type.GoLowerCase }}Find{{ $relationResultType }}
+						v.query.Client = r.query.Client
+
+						v.query.Operation = "query"
+						v.query.Method = "find{{ $relationResultType }}"
+						v.query.Model = "{{ $field.Type.GoCase }}"
+						v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
+
+						{{ if $field.IsList }}
+							{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
+							var where []builder.Field
+							for _, q := range params {
+								if query := q.getQuery(); query.Operation != "" {
+									v.query.Outputs = append(v.query.Outputs, builder.Output{
+										Name:    query.Method,
+										Inputs:  query.Inputs,
+										Outputs: query.Outputs,
+									})
+								} else {
+									where = append(where, q.field())
+								}
+							}
+
+							for _, input := range r.query.Inputs {
+								where = append(where, builder.Field{
+									Name: "{{ $.DMMF.ReverseRelationName $field.Type $model.Name }}",
+									Fields: input.Fields,
+									Value: input.Value,
+								})
+							}
+
+							if len(where) > 0 {
+								v.query.Inputs = append(v.query.Inputs, builder.Input{
+									Name:   "where",
+									Fields: where,
+								})
+							}
+						{{ else }}
+							//v.query.Inputs = append(v.query.Inputs, builder.Input{
+							//	Name:   "{{ $field.Name }}",
+							//	Fields: []builder.Field{},
+							//})
+						{{ end }}
+
+						return v
+					}
+				{{ end }}
+			{{ end }}
+		{{ end }}
+
 		{{ if $v.List }}
 			{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
 			func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
