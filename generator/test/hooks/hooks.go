@@ -3,12 +3,12 @@ package hooks
 import (
 	"context"
 	"fmt"
+	"log"
 	"os/exec"
 	"testing"
 
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/logger"
 )
 
 type Engine interface {
@@ -37,6 +37,10 @@ func Start(t *testing.T, e *engine.Engine, before []string) {
 			t.Fatalf("mock query has errors %+v", response)
 		}
 	}
+
+	log.Printf("")
+	log.Printf("-- test start --")
+	log.Printf("")
 }
 
 func End(t *testing.T, e Engine) {
@@ -44,6 +48,10 @@ func End(t *testing.T, e Engine) {
 	if err != nil {
 		t.Fatalf("could not disconnect: %s", err)
 	}
+
+	defer log.Printf("")
+	defer log.Printf("-- test end --")
+	defer log.Printf("")
 }
 
 func setup(t *testing.T) {
@@ -55,11 +63,11 @@ func setup(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := cli.Run([]string{"migrate", "save", "--experimental", "--create-db", "--name", "init"}, logger.Enabled); err != nil {
+	if err := cli.Run([]string{"migrate", "save", "--experimental", "--create-db", "--name", "init"}, false); err != nil {
 		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 
-	if err := cli.Run([]string{"migrate", "up", "--experimental"}, logger.Enabled); err != nil {
+	if err := cli.Run([]string{"migrate", "up", "--experimental"}, false); err != nil {
 		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 }

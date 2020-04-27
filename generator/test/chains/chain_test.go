@@ -60,6 +60,10 @@ func TestRelationChains(t *testing.T) {
 							id: "b",
 							title: "common",
 							content: "b",
+						}, {
+							id: "c",
+							title: "stuff",
+							content: "c",
 						}],
 					},
 				}) {
@@ -128,10 +132,6 @@ func TestRelationChains(t *testing.T) {
 							id: "a",
 							title: "common",
 							content: "a",
-						}, {
-							id: "b",
-							title: "common",
-							content: "b",
 						}],
 					},
 				}) {
@@ -245,15 +245,15 @@ func TestRelationChains(t *testing.T) {
 		before: []string{`
 			mutation {
 				unrelated: createOnePost(data: {
-					id: "c",
-					title: "c",
-					content: "c",
+					id: "unrelated",
+					title: "unrelated",
+					content: "unrelated",
 					author: {
 						create: {
-							id: "c",
-							email: "c",
-							username: "c",
-							name: "c",
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
 						}
 					}
 				}) {
@@ -276,6 +276,10 @@ func TestRelationChains(t *testing.T) {
 							id: "b",
 							title: "common",
 							content: "b",
+						}, {
+							id: "c",
+							title: "stuff",
+							content: "c",
 						}],
 					},
 				}) {

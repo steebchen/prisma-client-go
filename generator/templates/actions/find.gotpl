@@ -82,14 +82,15 @@
 						{{/* TODO re-use this code from above in normal FindOne/FindMany (it's not quite the same though) */}}
 
 						var v {{ $field.Type.GoLowerCase }}Find{{ $relationResultType }}
-						v.query.Client = r.query.Client
-
-						v.query.Operation = "query"
-						v.query.Method = "find{{ $relationResultType }}"
-						v.query.Model = "{{ $field.Type.GoCase }}"
-						v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
 
 						{{ if $field.IsList }}
+							v.query.Client = r.query.Client
+
+							v.query.Operation = "query"
+							v.query.Method = "find{{ $relationResultType }}"
+							v.query.Model = "{{ $field.Type.GoCase }}"
+							v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
+
 							{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
 							var where []builder.Field
 							for _, q := range params {
@@ -117,6 +118,16 @@
 									Name:   "where",
 									Fields: where,
 								})
+							}
+						{{ else }}
+							{{/* 1:1 relation chains are a special case since they're not directly queryable, so we need to query for two things and then discard the parent */}}
+							v.query = r.query
+							{{/* reset the previous outputs */}}
+							v.query.Outputs = []builder.Output{
+								{
+									Name:    "{{ $.DMMF.ReverseRelationName $model.Name $field.Type }}",
+									Outputs: {{ $field.Type.GoLowerCase }}Output,
+								},
 							}
 						{{ end }}
 
