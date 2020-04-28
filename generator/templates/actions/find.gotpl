@@ -75,11 +75,14 @@
 			{{ range $field := $model.Fields }}
 				{{ if $field.Kind.IsRelation }}
 					{{ $relationResultType := "One" }}
+					{{ $relationResultTypeReverse := "Many" }}
 					{{ if $field.IsList }}
 						{{ $relationResultType = "Many" }}
+						{{ $relationResultTypeReverse = "One" }}
 					{{ end }}
 
 					{{ $specialStruct := print $field.Type.GoLowerCase "To" $model.Name.GoCase "Find" $relationResultType }}
+					{{ $specialStructReverse := print $model.Name.GoLowerCase "To" $field.Type.GoCase "Find" $relationResultTypeReverse }}
 
 					type {{ $specialStruct }} struct {
 						query builder.Query
@@ -115,6 +118,55 @@
 					}
 
 					func (r {{ $result }}) Get{{ $field.Name.GoCase }}(
+						{{ if $field.IsList }}params ...i{{ $field.Type.GoCase }}Params,{{ end }}
+					) {{ $specialStruct }} {
+						{{/* TODO re-use this code from above in normal FindOne/FindMany (it's not quite the same though) */}}
+
+						var v {{ $specialStruct }}
+
+						v.query.Client = r.query.Client
+
+						v.query.Operation = "query"
+						v.query.Method = "find{{ $relationResultType }}"
+						v.query.Model = "{{ $field.Type.GoCase }}"
+						v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
+
+						{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
+						var where []builder.Field
+
+						{{ if $field.IsList }}
+							for _, q := range params {
+								if query := q.getQuery(); query.Operation != "" {
+									v.query.Outputs = append(v.query.Outputs, builder.Output{
+										Name:    query.Method,
+										Inputs:  query.Inputs,
+										Outputs: query.Outputs,
+									})
+								} else {
+									where = append(where, q.field())
+								}
+							}
+						{{ end }}
+
+						for _, input := range r.query.Inputs {
+							where = append(where, builder.Field{
+								Name: "{{ $.DMMF.ReverseRelationName $field.Type $model.Name }}{{ if not $field.IsList }}_some{{ end }}",
+								Fields: input.Fields,
+								Value: input.Value,
+							})
+						}
+
+						if len(where) > 0 {
+							v.query.Inputs = append(v.query.Inputs, builder.Input{
+								Name:   "where",
+								Fields: where,
+							})
+						}
+
+						return v
+					}
+
+					func (r {{ $specialStructReverse }}) Get{{ $field.Name.GoCase }}(
 						{{ if $field.IsList }}params ...i{{ $field.Type.GoCase }}Params,{{ end }}
 					) {{ $specialStruct }} {
 						{{/* TODO re-use this code from above in normal FindOne/FindMany (it's not quite the same though) */}}
