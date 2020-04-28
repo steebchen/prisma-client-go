@@ -78,21 +78,60 @@
 					{{ if $field.IsList }}
 						{{ $relationResultType = "Many" }}
 					{{ end }}
-					func (r {{ $result }}) Get{{ $field.Name.GoCase }}({{ if $field.IsList }}params ...i{{ $field.Type.GoCase }}Params{{ end }}) {{ $field.Type.GoLowerCase }}Find{{ $relationResultType }} {
+
+					{{ $specialStruct := print $field.Type.GoLowerCase "To" $model.Name.GoCase "Find" $relationResultType }}
+
+					type {{ $specialStruct }} struct {
+						query builder.Query
+					}
+
+					func (r {{ $specialStruct }}) getQuery() builder.Query {
+						return r.query
+					}
+
+					func (r {{ $specialStruct }}) Exec(ctx context.Context) (
+						{{ if $field.IsList }}[]{{ end }}{{ $field.Type.GoCase }}Model,
+						error,
+					) {
+						r.query.Method = "findMany"
+						var v findMany{{ $field.Type.GoCase }}Response
+						err := r.query.Exec(ctx, &v)
+						if v.Errors != nil {
+							first := v.Errors[0]
+							return {{ if $field.IsList }}[]{{ end }}{{ $field.Type.GoCase }}Model{}, fmt.Errorf(first.Message)
+						}
+						if err != nil {
+							return {{ if $field.IsList }}[]{{ end }}{{ $field.Type.GoCase }}Model{}, fmt.Errorf("unexpected error: %w", err)
+						}
+						result := v.Data.FindMany{{ $field.Type.GoCase }}
+						{{ if not $field.IsList }}
+							if len(result) == 0 {
+								return {{ $field.Type.GoCase }}Model{}, ErrNotFound
+							}
+							return result[0], err
+						{{ else }}
+							return result, err
+						{{ end }}
+					}
+
+					func (r {{ $result }}) Get{{ $field.Name.GoCase }}(
+						{{ if $field.IsList }}params ...i{{ $field.Type.GoCase }}Params,{{ end }}
+					) {{ $specialStruct }} {
 						{{/* TODO re-use this code from above in normal FindOne/FindMany (it's not quite the same though) */}}
 
-						var v {{ $field.Type.GoLowerCase }}Find{{ $relationResultType }}
+						var v {{ $specialStruct }}
+
+						v.query.Client = r.query.Client
+
+						v.query.Operation = "query"
+						v.query.Method = "find{{ $relationResultType }}"
+						v.query.Model = "{{ $field.Type.GoCase }}"
+						v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
+
+						{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
+						var where []builder.Field
 
 						{{ if $field.IsList }}
-							v.query.Client = r.query.Client
-
-							v.query.Operation = "query"
-							v.query.Method = "find{{ $relationResultType }}"
-							v.query.Model = "{{ $field.Type.GoCase }}"
-							v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
-
-							{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
-							var where []builder.Field
 							for _, q := range params {
 								if query := q.getQuery(); query.Operation != "" {
 									v.query.Outputs = append(v.query.Outputs, builder.Output{
@@ -104,32 +143,22 @@
 									where = append(where, q.field())
 								}
 							}
-
-							for _, input := range r.query.Inputs {
-								where = append(where, builder.Field{
-									Name: "{{ $.DMMF.ReverseRelationName $field.Type $model.Name }}",
-									Fields: input.Fields,
-									Value: input.Value,
-								})
-							}
-
-							if len(where) > 0 {
-								v.query.Inputs = append(v.query.Inputs, builder.Input{
-									Name:   "where",
-									Fields: where,
-								})
-							}
-						{{ else }}
-							{{/* 1:1 relation chains are a special case since they're not directly queryable, so we need to query for two things and then discard the parent */}}
-							v.query = r.query
-							{{/* reset the previous outputs */}}
-							v.query.Outputs = []builder.Output{
-								{
-									Name:    "{{ $.DMMF.ReverseRelationName $model.Name $field.Type }}",
-									Outputs: {{ $field.Type.GoLowerCase }}Output,
-								},
-							}
 						{{ end }}
+
+						for _, input := range r.query.Inputs {
+							where = append(where, builder.Field{
+								Name: "{{ $.DMMF.ReverseRelationName $field.Type $model.Name }}{{ if not $field.IsList }}_some{{ end }}",
+								Fields: input.Fields,
+								Value: input.Value,
+							})
+						}
+
+						if len(where) > 0 {
+							v.query.Inputs = append(v.query.Inputs, builder.Input{
+								Name:   "where",
+								Fields: where,
+							})
+						}
 
 						return v
 					}
@@ -198,6 +227,9 @@
 			if v.Errors != nil {
 				first := v.Errors[0]
 				return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
+			}
+			if err != nil {
+				return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf("unexpected error: %w", err)
 			}
 			{{ if not $v.List }}
 				if v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }} == nil {
