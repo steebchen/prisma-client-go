@@ -220,6 +220,17 @@ type Model struct {
 	Fields []Field      `json:"fields"`
 }
 
+func (m Model) RelationFields() []Field {
+	var fields []Field
+	for _, field := range m.Fields {
+		if field.Kind.IsRelation() {
+			fields = append(fields, field)
+		}
+	}
+
+	return fields
+}
+
 // Field describes properties of a single model field.
 type Field struct {
 	Kind       FieldKind    `json:"kind"`
