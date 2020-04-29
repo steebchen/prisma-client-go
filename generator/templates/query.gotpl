@@ -161,6 +161,18 @@
 					},
 				}
 			}
+
+			{{ if not $field.IsRequired }}
+				// Set the optional value of {{ $field.Name.GoCase }} dynamically
+				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					return {{ $setReturnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name.CamelCase }}",
+							Value:  value,
+						},
+					}
+				}
+			{{ end }}
 		{{ end }}
 
 		{{ $returnStruct := "" }}
