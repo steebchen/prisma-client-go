@@ -257,6 +257,44 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "Create with optional values",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			name := "name"
+			created, err := client.User.CreateOne(
+				User.Email.Set("email"),
+				User.Username.Set("username"),
+
+				// optional values
+				User.ID.Set("id"),
+				// set one to a value
+				User.Name.SetOptional(&name),
+				// set one to nil pointer
+				User.Stuff.SetOptional(nil),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "id",
+					Email:    "email",
+					Username: "username",
+					Name:     str("name"),
+					Stuff:    nil,
+				},
+			}
+
+			assert.Equal(t, expected, created)
+
+			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "Update",
 		// language=GraphQL
 		before: []string{`
