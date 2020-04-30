@@ -9,24 +9,24 @@
 	// {{ $model.Name.GoLowerCase }} is the internal struct for the json unmarshal
 	type {{ $model.Name.GoLowerCase }} struct {
 		{{- range $field := $model.Fields }}
-			{{ if $field.Kind.IncludeInStruct }}
-				{{- if $field.IsRequired -}}
-					{{ $field.Name.GoCase }} {{ $field.Type.Value }} {{ $field.Name.Tag }}
-				{{- else -}}
-					{{ $field.Name.GoCase }} *{{ $field.Type.Value }} {{ $field.Name.Tag }}
-				{{- end -}}
+			{{ if $field.Kind.IsRelation }}
+				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}Model {{ $field.Name.Tag }}
+			{{ else if $field.IsRequired }}
+				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
+			{{ else }}
+				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
 			{{ end }}
 		{{- end }}
 	}
 
 	{{/* Attach methods for nullable (non-required) fields. */}}
 	{{- range $field := $model.Fields }}
-		{{- if and ($field.Kind.IncludeInStruct) (not $field.IsRequired) }}
-			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ $field.Type.Value }}, ok bool) {
+		{{- if not $field.IsRequired }}
+			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end }}, ok bool) {
 				if r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }} == nil {
 					return value, false
 				}
-				return *r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}, true
+				return {{ if not $field.IsList }}*{{ end }}r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}, true
 			}
 		{{- end }}
 	{{- end }}

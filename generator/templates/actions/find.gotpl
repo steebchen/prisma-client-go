@@ -70,6 +70,19 @@
 			}
 		}
 
+		func (r {{ $result }}) With(params ...i{{ $model.Name.GoCase }}Loadable) {{ $result }} {
+			for _, q := range params {
+				query := q.getQuery()
+				r.query.Outputs = append(r.query.Outputs, builder.Output{
+					Name:    query.Method,
+					Inputs:  query.Inputs,
+					Outputs: query.Outputs,
+				})
+			}
+
+			return r
+		}
+
 		{{ if $v.List }}
 			{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
 			func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {

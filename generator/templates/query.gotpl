@@ -102,8 +102,8 @@
 				v.query.Method = "{{ $field.Name.CamelCase }}"
 				v.query.Outputs = {{ $field.Type.CamelCase }}Output
 
-			{{ if $field.IsList }}
-				{{/* TODO create a function for this type of builder.Field colletion, also used in find.gotpl */}}
+				{{ if $field.IsList }}
+					{{/* TODO create a function for this type of builder.Field colletion, also used in find.gotpl */}}
 					var where []builder.Field
 					for _, q := range params {
 						if query := q.getQuery(); query.Operation != "" {
