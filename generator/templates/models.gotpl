@@ -1,7 +1,7 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
-	// {{ $model.Name.GoCase }}Model is a wrapper for accessing fields and methods
+	// {{ $model.Name.GoCase }}Model represents the {{ $model.Name.Tag }} model and is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
 		{{ $model.Name.GoLowerCase }}
 	}
@@ -10,7 +10,7 @@
 	type {{ $model.Name.GoLowerCase }} struct {
 		{{- range $field := $model.Fields }}
 			{{ if $field.Kind.IsRelation }}
-				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}Model {{ $field.Name.Tag }}
+				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}Model {{ $field.Name.Tag }}
 			{{ else if $field.IsRequired }}
 				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
 			{{ else }}
@@ -19,14 +19,23 @@
 		{{- end }}
 	}
 
-	{{/* Attach methods for nullable (non-required) fields. */}}
+	{{/* Attach methods for nullable (non-required) fields and relations. */}}
 	{{- range $field := $model.Fields }}
-		{{- if not $field.IsRequired }}
-			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end }}, ok bool) {
+		{{- if or (not $field.IsRequired) ($field.Kind.IsRelation) }}
+			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (
+				value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end }},
+				{{ if or (not $field.Kind.IsRelation) (not $field.IsList) }}
+					ok bool,
+				{{ end }}
+			) {
 				if r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }} == nil {
-					return value, false
+					{{- if $field.Kind.IsRelation }}
+						panic("attempted to access {{ $field.Name.GoLowerCase }} but did not fetch it using the .With() syntax")
+					{{- else }}
+						return value, false
+					{{- end }}
 				}
-				return {{ if not $field.IsList }}*{{ end }}r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}, true
+				return {{ if not $field.IsList }}*{{ end }}r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}{{ if or (not $field.Kind.IsRelation) (not $field.IsList) }}, true{{ end }}
 			}
 		{{- end }}
 	{{- end }}

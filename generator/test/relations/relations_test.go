@@ -487,6 +487,75 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "with by accessing methods",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				post: createOnePost(data: {
+					id: "post-a",
+					title: "common",
+					content: "stuff",
+					comments: {
+						create: [{
+							id: "comment-a",
+							content: "this is a comment",
+							by: {
+								connect: {
+									id: "john"
+								},
+							},
+						}],
+					},
+					author: {
+						create: {
+							id: "john",
+							email: "john@example.com",
+							username: "johndoe",
+							name: "John",
+						},
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindOne(
+				Post.ID.Equals("post-a"),
+			).With(
+				Post.Comments.Fetch().Last(2),
+				Post.Author.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			user := UserModel{
+				user{
+					ID:       "john",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+			}
+
+			author, ok := actual.Author()
+
+			assert.Equal(t, user, author)
+			assert.Equal(t, true, ok)
+
+			comments := []CommentModel{{
+				comment{
+					ID:      "comment-a",
+					Content: "this is a comment",
+					UserID:  "john",
+					PostID:  "post-a",
+				},
+			}}
+
+			assert.Equal(t, comments, actual.Comments())
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
