@@ -64,13 +64,26 @@
 			return r.query
 		}
 
+		func (r {{ $result }}) with() {}
+		func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+
+		func (r {{ $result }}) relatedTo{{ $model.Name.GoCase }}() {}
+
+		{{/* Add methods to satisfy relation interfaces for With() */}}
+		{{ range $field := $model.Fields }}
+			{{ if ne $field.RelationName "" }}
+				//func (r {{ $field.Type.GoLowerCase }}Find{{$v.Name }}) relatedTo{{ $model.Name.GoCase }}() {}
+				func (r {{ $result }}) relatedTo{{ $field.Type.GoCase }}() {}
+			{{ end }}
+		{{ end }}
+
 		func (r {{ $result }}) Load() i{{ $model.Name.GoCase }}Loadable {
 			return {{ $model.Name.GoLowerCase }}Loadable{
 				query: r.query,
 			}
 		}
 
-		func (r {{ $result }}) With(params ...i{{ $model.Name.GoCase }}Loadable) {{ $result }} {
+		func (r {{ $result }}) With(params ...iRelatedTo{{ $model.Name.GoCase }}With) {{ $result }} {
 			for _, q := range params {
 				query := q.getQuery()
 				r.query.Outputs = append(r.query.Outputs, builder.Output{
