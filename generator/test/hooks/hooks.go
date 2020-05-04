@@ -31,9 +31,11 @@ func Start(t *testing.T, e *engine.Engine, before []string) {
 		var response engine.GQLResponse
 		err := e.Do(ctx, b, &response)
 		if err != nil {
+			End(t, e)
 			t.Fatalf("could not send mock query %s", err)
 		}
 		if response.Errors != nil {
+			End(t, e)
 			t.Fatalf("mock query has errors %+v", response)
 		}
 	}
