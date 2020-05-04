@@ -32,12 +32,13 @@ var countOutput = []builder.Output{
 		getQuery() builder.Query
 		with()
 		{{ $model.Name.GoLowerCase }}Model()
+		{{ $model.Name.GoLowerCase }}Relation()
 	}
 
-	type iRelatedTo{{ $model.Name.GoCase }}With interface {
+	type i{{ $model.Name.GoCase }}RelationWith interface {
 		getQuery() builder.Query
 		with()
-		relatedTo{{ $model.Name.GoCase }}()
+		{{ $model.Name.GoLowerCase }}Relation()
 	}
 
 	{{/* A loadable can either contain a query or a builder.Field */}}

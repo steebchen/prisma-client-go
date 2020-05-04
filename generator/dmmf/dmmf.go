@@ -220,6 +220,18 @@ type Model struct {
 	Fields []Field      `json:"fields"`
 }
 
+// RelationFieldsPlusOne returns all fields plus an empty one, so it's easier to iterate through it in some gotpl files
+func (m Model) RelationFieldsPlusOne() []Field {
+	var fields []Field
+	for _, field := range m.Fields {
+		if field.Kind.IsRelation() {
+			fields = append(fields, field)
+		}
+	}
+	fields = append(fields, Field{})
+	return fields
+}
+
 // Field describes properties of a single model field.
 type Field struct {
 	Kind       FieldKind    `json:"kind"`

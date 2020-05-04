@@ -95,8 +95,8 @@
 				{{ if $field.IsList }}
 					params ...i{{ $field.Type.GoCase }}Params,
 				{{ end }}
-			) {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
-				var v {{ $name }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
+			) {{ $name }}To{{ $field.Type.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
+				var v {{ $name }}To{{ $field.Type.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
 
 				v.query.Operation = "query"
 				v.query.Method = "{{ $field.Name.CamelCase }}"
