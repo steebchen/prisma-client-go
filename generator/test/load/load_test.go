@@ -393,8 +393,8 @@ func TestLoad(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
 			hooks.Start(t, client.Engine, tt.before)
+			defer hooks.End(t, client.Engine)
 			tt.run(t, client, context.Background())
-			hooks.End(t, client.Engine)
 		})
 	}
 }
