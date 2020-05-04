@@ -1,213 +1,241 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
-{{/* Update and Delete operations live in their own files. */}}
-
 {{ range $model := $.DMMF.Datamodel.Models }}
-	{{ range $v := $.DMMF.Variations }}
-		{{ $name := $model.Name.GoLowerCase }}
-		{{ $ns := (print $name "Actions") }}
-		{{ $result := (print $name "Find" $v.Name) }}
-		{{ $updateResult := (print $name "Update" $v.Name) }}
-		{{ $deleteResult := (print $name "Delete" $v.Name) }}
-		{{ $params := (print "i" $model.Name.GoCase "Params") }}
-		{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+	{{ range $field := $model.RelationFieldsPlusOne }}
+		{{ range $v := $.DMMF.Variations }}
+			{{ $name := $model.Name.GoLowerCase }}
+			{{ $ns := (print $name "Actions") }}
 
-		{{/* FIND */}}
+			{{ $result := (print $name "Find" $v.Name) }}
+			{{ $updateResult := (print $name "Update" $v.Name) }}
+			{{ $deleteResult := (print $name "Delete" $v.Name) }}
 
-		func (r {{ $ns }}) Find{{ $v.Name }}(
-			params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
-		) {{ $result }} {
-			var v {{ $result }}
-			v.query.Client = r.client
+			{{ $relationName := $model.Name.GoCase }}
 
-			v.query.Operation = "query"
-			v.query.Method = "find{{ $v.Name.GoCase }}"
-			v.query.Model = "{{ $model.Name.GoCase }}"
-			v.query.Outputs = {{ $name }}Output
+			{{ if ne $field.Name "" }}
+				{{ $result = (print $name "To" $field.Type.GoCase "Find" $v.Name) }}
+				{{ $updateResult = (print $name "To" $field.Type.GoCase "Update" $v.Name) }}
+				{{ $deleteResult = (print $name "To" $field.Type.GoCase "Delete" $v.Name) }}
+				{{ $relationName = $field.Type.GoCase }}
+			{{ end }}
 
-			{{ if $v.List }}
-				{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
-				var where []builder.Field
-				for _, q := range params {
-					if query := q.getQuery(); query.Operation != "" {
-						v.query.Outputs = append(v.query.Outputs, builder.Output{
-							Name:    query.Method,
-							Inputs:  query.Inputs,
-							Outputs: query.Outputs,
-						})
-					} else {
-						where = append(where, q.field())
-					}
+			{{ $params := (print "i" $model.Name.GoCase "Params") }}
+			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+
+			type {{ $result }} struct {
+				query builder.Query
+			}
+
+			func (r {{ $result }}) getQuery() builder.Query {
+				return r.query
+			}
+
+			func (r {{ $result }}) with() {}
+			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
+
+			func (r {{ $result }}) Load() i{{ $model.Name.GoCase }}Loadable {
+				return {{ $model.Name.GoLowerCase }}Loadable{
+					query: r.query,
 				}
+			}
 
-				if len(where) > 0 {
-					v.query.Inputs = append(v.query.Inputs, builder.Input{
-						Name:   "where",
-						Fields: where,
+			{{ if eq $field.Name "" }}
+				func (r {{ $ns }}) Find{{ $v.Name }}(
+					params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
+				) {{ $result }} {
+					var v {{ $result }}
+					v.query.Client = r.client
+
+					v.query.Operation = "query"
+					v.query.Method = "find{{ $v.Name.GoCase }}"
+					v.query.Model = "{{ $model.Name.GoCase }}"
+					v.query.Outputs = {{ $name }}Output
+
+					{{ if $v.List }}
+						{{/* TODO create a function for this type of builder.Field colletion, also used in query.gotpl */}}
+						var where []builder.Field
+						for _, q := range params {
+							if query := q.getQuery(); query.Operation != "" {
+								v.query.Outputs = append(v.query.Outputs, builder.Output{
+									Name:    query.Method,
+									Inputs:  query.Inputs,
+									Outputs: query.Outputs,
+								})
+							} else {
+								where = append(where, q.field())
+							}
+						}
+
+						if len(where) > 0 {
+							v.query.Inputs = append(v.query.Inputs, builder.Input{
+								Name:   "where",
+								Fields: where,
+							})
+						}
+					{{ else }}
+						v.query.Inputs = append(v.query.Inputs, builder.Input{
+							Name:   "where",
+							Fields: []builder.Field{params.field()},
+						})
+					{{ end }}
+
+					return v
+				}
+			{{ end }}
+
+			func (r {{ $result }}) With(params ...i{{ $relationName }}RelationWith) {{ $result }} {
+				for _, q := range params {
+					query := q.getQuery()
+					r.query.Outputs = append(r.query.Outputs, builder.Output{
+						Name:    query.Method,
+						Inputs:  query.Inputs,
+						Outputs: query.Outputs,
 					})
 				}
-			{{ else }}
-				v.query.Inputs = append(v.query.Inputs, builder.Input{
-					Name:   "where",
-					Fields: []builder.Field{params.field()},
-				})
-			{{ end }}
 
-			return v
-		}
-
-		type {{ $result }} struct {
-			query builder.Query
-		}
-
-		func (r {{ $result }}) getQuery() builder.Query {
-			return r.query
-		}
-
-		func (r {{ $result }}) Load() i{{ $model.Name.GoCase }}Loadable {
-			return {{ $model.Name.GoLowerCase }}Loadable{
-				query: r.query,
-			}
-		}
-
-		{{ if $v.List }}
-			{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
-			func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
-				direction, _ := param.field().Value.(runtime.Direction)
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "orderBy",
-					Value: runtime.Direction(param.field().Name + "_" + string(direction)),
-				})
 				return r
 			}
 
-			func (r {{ $result }}) Skip(count int) {{ $result }} {
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "skip",
-					Value: count,
-				})
-				return r
-			}
+			{{ if $v.List }}
+				{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
+				func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
+					direction, _ := param.field().Value.(runtime.Direction)
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "orderBy",
+						Value: runtime.Direction(param.field().Name + "_" + string(direction)),
+					})
+					return r
+				}
 
-			func (r {{ $result }}) First(count int) {{ $result }} {
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "first",
-					Value: count,
-				})
-				return r
-			}
+				func (r {{ $result }}) Skip(count int) {{ $result }} {
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "skip",
+						Value: count,
+					})
+					return r
+				}
 
-			func (r {{ $result }}) Last(count int) {{ $result }} {
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "last",
-					Value: count,
-				})
-				return r
-			}
+				func (r {{ $result }}) First(count int) {{ $result }} {
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "first",
+						Value: count,
+					})
+					return r
+				}
 
-			func (r {{ $result }}) After(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "after",
-					Fields: []builder.Field{cursor.field()},
-				})
-				return r
-			}
+				func (r {{ $result }}) Last(count int) {{ $result }} {
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "last",
+						Value: count,
+					})
+					return r
+				}
 
-			func (r {{ $result }}) Before(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
-				r.query.Inputs = append(r.query.Inputs, builder.Input{
-					Name:  "before",
-					Fields: []builder.Field{cursor.field()},
-				})
-				return r
-			}
-		{{ end }}
+				func (r {{ $result }}) After(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "after",
+						Fields: []builder.Field{cursor.field()},
+					})
+					return r
+				}
 
-		func (r {{ $result }}) Exec(ctx context.Context) (
-			{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
-			error,
-		) {
-			var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-			err := r.query.Exec(ctx, &v)
-			if v.Errors != nil {
-				first := v.Errors[0]
-				return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
-			}
-			{{ if not $v.List }}
-				if v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }} == nil {
-					return {{ $model.Name.GoCase }}Model{}, ErrNotFound
+				func (r {{ $result }}) Before(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "before",
+						Fields: []builder.Field{cursor.field()},
+					})
+					return r
 				}
 			{{ end }}
-			return {{ if not $v.List }}*{{ end }}v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
-		}
 
-		{{ $outputName := $name }}
-		{{ $returnType := print $model.Name.GoCase "Model" }}
-		{{ if $v.List }}
-			{{ $returnType = "int" }}
-			{{ $outputName = "count" }}
+			func (r {{ $result }}) Exec(ctx context.Context) (
+				{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
+				error,
+			) {
+				var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+				err := r.query.Exec(ctx, &v)
+				if v.Errors != nil {
+					first := v.Errors[0]
+					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
+				}
+				{{ if not $v.List }}
+					if v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }} == nil {
+						return {{ $model.Name.GoCase }}Model{}, ErrNotFound
+					}
+				{{ end }}
+				return {{ if not $v.List }}*{{ end }}v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
+			}
+
+			{{ $outputName := $name }}
+			{{ $returnType := print $model.Name.GoCase "Model" }}
+			{{ if $v.List }}
+				{{ $returnType = "int" }}
+				{{ $outputName = "count" }}
+			{{ end }}
+
+			{{/* UPDATE */}}
+
+			{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
+
+			func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
+				r.query.Operation = "mutation"
+				r.query.Method = "update{{ $v.Name.GoCase }}"
+				r.query.Model = "{{ $model.Name.GoCase }}"
+				r.query.Outputs = {{ $outputName }}Output
+
+				var v {{ $updateResult }}
+				v.query = r.query
+				var fields []builder.Field
+				for _, q := range params {
+					fields = append(fields, q.field())
+				}
+				v.query.Inputs = append(v.query.Inputs, builder.Input{
+					Name:   "data",
+					Fields: fields,
+				})
+				return v
+			}
+
+			type {{ $updateResult }} struct {
+				query builder.Query
+			}
+
+			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+				var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+				err := r.query.Exec(ctx, &v)
+				if v.Errors != nil {
+					first := v.Errors[0]
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
+				}
+				return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+			}
+
+			{{/* DELETE */}}
+
+			func (r {{ $result }}) Delete() {{ $deleteResult }} {
+				var v {{ $deleteResult }}
+				v.query = r.query
+				v.query.Operation = "mutation"
+				v.query.Method = "delete{{ $v.Name.GoCase }}"
+				v.query.Model = "{{ $model.Name.GoCase }}"
+				v.query.Outputs = {{ $outputName }}Output
+				return v
+			}
+
+			type {{ $deleteResult }} struct {
+				query builder.Query
+			}
+
+			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+				var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
+				err := r.query.Exec(ctx, &v)
+				if v.Errors != nil {
+					first := v.Errors[0]
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
+				}
+				return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+			}
 		{{ end }}
-
-		{{/* UPDATE */}}
-
-		{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
-
-		func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
-			r.query.Operation = "mutation"
-			r.query.Method = "update{{ $v.Name.GoCase }}"
-			r.query.Model = "{{ $model.Name.GoCase }}"
-			r.query.Outputs = {{ $outputName }}Output
-
-			var v {{ $updateResult }}
-			v.query = r.query
-			var fields []builder.Field
-			for _, q := range params {
-				fields = append(fields, q.field())
-			}
-			v.query.Inputs = append(v.query.Inputs, builder.Input{
-				Name:   "data",
-				Fields: fields,
-			})
-			return v
-		}
-
-		type {{ $updateResult }} struct {
-			query builder.Query
-		}
-
-		func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-			var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-			err := r.query.Exec(ctx, &v)
-			if v.Errors != nil {
-				first := v.Errors[0]
-				return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
-			}
-			return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
-		}
-
-		{{/* DELETE */}}
-
-		func (r {{ $result }}) Delete() {{ $deleteResult }} {
-			var v {{ $deleteResult }}
-			v.query = r.query
-			v.query.Operation = "mutation"
-			v.query.Method = "delete{{ $v.Name.GoCase }}"
-			v.query.Model = "{{ $model.Name.GoCase }}"
-			v.query.Outputs = {{ $outputName }}Output
-			return v
-		}
-
-		type {{ $deleteResult }} struct {
-			query builder.Query
-		}
-
-		func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-			var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-			err := r.query.Exec(ctx, &v)
-			if v.Errors != nil {
-				first := v.Errors[0]
-				return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
-			}
-			return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
-		}
 	{{ end }}
 {{ end }}

@@ -212,6 +212,350 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, []PostModel{expected}, posts)
 		},
+	}, {
+		name: "with simple",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				unrelated: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}, {
+							id: "c",
+							title: "common",
+							content: "c",
+						}, {
+							id: "d",
+							title: "stuff",
+							content: "d",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindOne(
+				User.Email.Equals("john@example.com"),
+			).With(
+				User.Posts.Fetch().Last(2),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					Posts: []PostModel{{
+						post{
+							ID:       "c",
+							Title:    "common",
+							Content:  str("c"),
+							AuthorID: "relations",
+						},
+					}, {
+						post{
+							ID:       "d",
+							Title:    "stuff",
+							Content:  str("d"),
+							AuthorID: "relations",
+						},
+					}},
+					Comments: nil,
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "with and sub query",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				unrelated: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}, {
+							id: "c",
+							title: "common",
+							content: "c",
+						}, {
+							id: "d",
+							title: "unrelated",
+							content: "d",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindOne(
+				User.Email.Equals("john@example.com"),
+			).With(
+				User.Posts.Fetch(
+					Post.Title.Equals("common"),
+				).Last(2),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					Posts: []PostModel{{
+						post{
+							ID:       "b",
+							Title:    "common",
+							Content:  str("b"),
+							AuthorID: "relations",
+						},
+					}, {
+						post{
+							ID:       "c",
+							Title:    "common",
+							Content:  str("c"),
+							AuthorID: "relations",
+						},
+					}},
+					Comments: nil,
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "with many to many nested",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				unrelated: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}, {
+							id: "c",
+							title: "common",
+							content: "c",
+						}, {
+							id: "d",
+							title: "unrelated",
+							content: "d",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindOne(
+				User.Email.Equals("john@example.com"),
+			).With(
+				User.Posts.Fetch(
+					Post.Title.Equals("common"),
+				).Last(2).With(
+					Post.Comments.Fetch().First(2),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					Posts: []PostModel{{
+						post{
+							ID:       "b",
+							Title:    "common",
+							Content:  str("b"),
+							AuthorID: "relations",
+							Comments: []CommentModel{},
+						},
+					}, {
+						post{
+							ID:       "c",
+							Title:    "common",
+							Content:  str("c"),
+							AuthorID: "relations",
+							Comments: []CommentModel{},
+						},
+					}},
+					Comments: nil,
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "with by accessing methods",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				post: createOnePost(data: {
+					id: "post-a",
+					title: "common",
+					content: "stuff",
+					comments: {
+						create: [{
+							id: "comment-a",
+							content: "this is a comment",
+							by: {
+								connect: {
+									id: "john"
+								},
+							},
+						}],
+					},
+					author: {
+						create: {
+							id: "john",
+							email: "john@example.com",
+							username: "johndoe",
+							name: "John",
+						},
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindOne(
+				Post.ID.Equals("post-a"),
+			).With(
+				Post.Comments.Fetch().Last(2),
+				Post.Author.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			user := UserModel{
+				user{
+					ID:       "john",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+			}
+
+			author, ok := actual.Author()
+
+			assert.Equal(t, user, author)
+			assert.Equal(t, true, ok)
+
+			comments := []CommentModel{{
+				comment{
+					ID:      "comment-a",
+					Content: "this is a comment",
+					UserID:  "john",
+					PostID:  "post-a",
+				},
+			}}
+
+			assert.Equal(t, comments, actual.Comments())
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

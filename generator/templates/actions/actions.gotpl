@@ -6,10 +6,7 @@ var countOutput = []builder.Output{
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
-	{{ $modelName := (print $model.Name.GoCase "Model") }}
 	{{ $ns := (print $name "Actions") }}
-	{{ $nsFindOne := (print $name "FindOne") }}
-	{{ $nsParams := (print $name "Params") }}
 
 	type {{ $ns }} struct {
 		// client holds the prisma client
@@ -29,6 +26,19 @@ var countOutput = []builder.Output{
 		field() builder.Field
 		loadable()
 		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	type i{{ $model.Name.GoCase }}With interface {
+		getQuery() builder.Query
+		with()
+		{{ $model.Name.GoLowerCase }}Model()
+		{{ $model.Name.GoLowerCase }}Relation()
+	}
+
+	type i{{ $model.Name.GoCase }}RelationWith interface {
+		getQuery() builder.Query
+		with()
+		{{ $model.Name.GoLowerCase }}Relation()
 	}
 
 	{{/* A loadable can either contain a query or a builder.Field */}}
