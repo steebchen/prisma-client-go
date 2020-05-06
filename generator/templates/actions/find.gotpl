@@ -34,12 +34,6 @@
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
 
-			func (r {{ $result }}) Load() i{{ $model.Name.GoCase }}Loadable {
-				return {{ $model.Name.GoLowerCase }}Loadable{
-					query: r.query,
-				}
-			}
-
 			{{ if eq $field.Name "" }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
 					params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
