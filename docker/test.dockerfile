@@ -7,9 +7,6 @@ RUN go mod download
 
 COPY . ./
 
-ENV PHOTON_GO_LOG=info
-ENV DEBUG=*
-
 RUN go build .
 RUN go generate ./...
 RUN go test -v ./...
