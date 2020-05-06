@@ -4,6 +4,7 @@ package relations
 
 import (
 	"context"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,6 +27,50 @@ func TestRelations(t *testing.T) {
 		before []string
 		run    Func
 	}{{
+		name: "marshal json with relation",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindOne(
+				User.Email.Equals("john@example.com"),
+			).With(
+				User.Posts.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := json.Marshal(&user)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","author":null,"authorID":"relations","comments":null},{"id":"b","title":"common","content":"b","author":null,"authorID":"relations","comments":null}],"comments":null}`
+			assert.Equal(t, expected, string(actual))
+		},
+	}, {
 		name: "find by single relation",
 		// language=GraphQL
 		before: []string{`
