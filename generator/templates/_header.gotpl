@@ -6,12 +6,9 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"errors"
-	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/logger"
 	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/generator/builder"
 )

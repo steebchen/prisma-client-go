@@ -90,7 +90,7 @@
 				}
 			{{ end }}
 
-			{{/* Load API */}}
+			{{/* With API */}}
 			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Fetch(
 				{{ if $field.IsList }}
 					params ...i{{ $field.Type.GoCase }}Params,

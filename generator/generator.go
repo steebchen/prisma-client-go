@@ -18,19 +18,19 @@ type Root struct {
 	BinaryPaths BinaryPaths `json:"binaryPaths"`
 }
 
-// PhotonGoConfig describes the options for the Prisma Client Go generator
-type PhotonGoConfig struct {
+// Config describes the options for the Prisma Client Go generator
+type Config struct {
 	Package types.String `json:"package"`
 }
 
 // Generator describes a generator defined in the Prisma schema.
 type Generator struct {
 	// Output (optional) holds the file path of where the client gets generated in.
-	Output        string         `json:"output"`
-	Name          types.String   `json:"name"`
-	Provider      types.String   `json:"provider"`
-	Config        PhotonGoConfig `json:"config"`
-	BinaryTargets []string       `json:"binaryTargets"`
+	Output        string       `json:"output"`
+	Name          types.String `json:"name"`
+	Provider      types.String `json:"provider"`
+	Config        Config       `json:"config"`
+	BinaryTargets []string     `json:"binaryTargets"`
 	// PinnedBinaryTarget (optional)
 	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
 }
