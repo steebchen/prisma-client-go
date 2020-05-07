@@ -82,7 +82,7 @@
 
 					return {{ $name }}Params{
 						data: builder.Field{
-							Name:   "{{ $field.Name.CamelCase }}",
+							Name:   "{{ $field.Name }}",
 							Action: "{{ $method.Action }}",
 							Fields: fields,
 						},
@@ -156,7 +156,7 @@
 			func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
 				return {{ $setReturnStruct }}{
 					data: builder.Field{
-						Name:   "{{ $field.Name.CamelCase }}",
+						Name:   "{{ $field.Name }}",
 						Value:  value,
 					},
 				}
@@ -167,7 +167,7 @@
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
 					return {{ $setReturnStruct }}{
 						data: builder.Field{
-							Name:   "{{ $field.Name.CamelCase }}",
+							Name:   "{{ $field.Name }}",
 							Value:  value,
 						},
 					}
@@ -187,7 +187,7 @@
 			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
 					data: builder.Field{
-						Name:   "{{ $field.Name.CamelCase }}",
+						Name:   "{{ $field.Name }}",
 						Value:  value,
 					},
 				}
@@ -196,7 +196,7 @@
 			{{/* Provide an `In` method for most types. */}}
 			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
 				f := builder.Field{
-					Name:   "{{ $field.Name.CamelCase }}",
+					Name:   "{{ $field.Name }}",
 					Action: "in",
 					List:   true,
 				}
@@ -214,7 +214,7 @@
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
 						data: builder.Field{
-							Name:  "{{ $field.Name.CamelCase }}",
+							Name:  "{{ $field.Name }}",
 							Value: value,
 						},
 					}
@@ -224,7 +224,7 @@
 					var str *string = nil
 					return {{ $returnStruct }}{
 						data: builder.Field{
-							Name:  "{{ $field.Name.CamelCase }}",
+							Name:  "{{ $field.Name }}",
 							Value: str,
 						},
 					}
@@ -234,7 +234,7 @@
 			func (r {{ $struct }}) Order(direction runtime.Direction) {{ $returnStruct }} {
 				return {{ $returnStruct }}{
 					data: builder.Field{
-						Name:  "{{ $field.Name.CamelCase }}",
+						Name:  "{{ $field.Name }}",
 						Value: direction,
 					},
 				}
@@ -245,7 +245,7 @@
 				func (r {{ $struct }}) Cursor(cursor string) {{ $name }}CursorParams {
 					return {{ $name }}CursorParams{
 						data: builder.Field{
-							Name:  "{{ $field.Name.CamelCase }}",
+							Name:  "{{ $field.Name }}",
 							Value: cursor,
 						},
 					}
@@ -261,7 +261,7 @@
 						return {{ $returnStruct }}{
 							data: builder.Field{
 								Action: "{{ $method.Action }}",
-								Name:   "{{ $field.Name.CamelCase }}",
+								Name:   "{{ $field.Name }}",
 								Value:  value,
 							},
 						}

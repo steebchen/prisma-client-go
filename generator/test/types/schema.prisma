@@ -17,6 +17,12 @@ model User {
 	id        String   @id @default(cuid())
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
+
+	UpperCaseTest   String?
+	lowerCaseTest   String?
+	snake_case_test String?
+	wEiRdLycasED_test String?
+
 	str       String
 	strOpt    String?
 	int       Int

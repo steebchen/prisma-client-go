@@ -87,6 +87,64 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, []UserModel{expected}, actualSlice)
 		},
 	}, {
+		name: "different field casing",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+			created, err := client.User.CreateOne(
+				User.Str.Set("str"),
+				User.Int.Set(5),
+				User.Float.Set(5.5),
+				User.Bool.Set(true),
+				User.Date.Set(date),
+				User.Role.Set(RoleAdmin),
+				User.Type.Set("x"),
+
+				User.ID.Set("id"),
+				User.CreatedAt.Set(date),
+				User.UpdatedAt.Set(date),
+				User.UpperCaseTest.Set("test1"),
+				User.LowerCaseTest.Set("test2"),
+				User.SnakeCaseTest.Set("test3"),
+				User.WEiRdLycasEDTest.Set("test4"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				user{
+					ID:               "id",
+					CreatedAt:        date,
+					UpdatedAt:        date,
+					Str:              "str",
+					Int:              5,
+					Float:            5.5,
+					Bool:             true,
+					Date:             date,
+					Role:             RoleAdmin,
+					Type:             "x",
+					UpperCaseTest:    str("test1"),
+					LowerCaseTest:    str("test2"),
+					SnakeCaseTest:    str("test3"),
+					WEiRdLycasEDTest: str("test4"),
+				},
+			}
+
+			assert.Equal(t, expected, created)
+
+			actualSlice, err := client.User.FindMany(
+				User.UpperCaseTest.Equals("test1"),
+				User.LowerCaseTest.Equals("test2"),
+				User.SnakeCaseTest.Equals("test3"),
+				User.WEiRdLycasEDTest.Equals("test4"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{expected}, actualSlice)
+		},
+	}, {
 		name: "enums",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
