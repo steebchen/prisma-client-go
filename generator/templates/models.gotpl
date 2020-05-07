@@ -3,20 +3,30 @@
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model represents the {{ $model.Name.Tag }} model and is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
-		{{ $model.Name.GoLowerCase }}
+		Internal{{ $model.Name.GoCase }}
+		Relations{{ $model.Name.GoCase }}
 	}
 
-	// {{ $model.Name.GoLowerCase }} is the internal struct for the json unmarshal
-	type {{ $model.Name.GoLowerCase }} struct {
-		{{- range $field := $model.Fields }}
+	// Internal{{ $model.Name.GoCase }} is the internal struct for the json unmarshal
+	type Internal{{ $model.Name.GoCase }} struct {
+		{{ range $field := $model.Fields }}
+			{{- if not $field.Kind.IsRelation }}
+				{{- if $field.IsRequired }}
+					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
+				{{- else }}
+					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
+				{{- end }}
+			{{- end }}
+		{{ end }}
+	}
+
+	// Relations{{ $model.Name.GoCase }} is the internal struct just for relations
+	type Relations{{ $model.Name.GoCase }} struct {
+		{{ range $field := $model.Fields }}
 			{{- if $field.Kind.IsRelation }}
 				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}Model {{ $field.Name.Tag }}
-			{{- else if $field.IsRequired }}
-				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
-			{{- else }}
-				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag }}
 			{{- end }}
-		{{- end }}
+		{{ end }}
 	}
 
 	{{/* Attach methods for nullable (non-required) fields and relations. */}}
@@ -28,14 +38,14 @@
 					ok bool,
 				{{- end }}
 			) {
-				if r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }} == nil {
+				if r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Internal{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }} == nil {
 					{{- if $field.Kind.IsRelation }}
 						panic("attempted to access {{ $field.Name.GoLowerCase }} but did not fetch it using the .With() syntax")
 					{{- else }}
 						return value, false
 					{{- end }}
 				}
-				return {{ if not $field.IsList }}*{{ end }}r.{{ $model.Name.GoLowerCase }}.{{ $field.Name.GoCase }}{{ if or (not $field.Kind.IsRelation) (not $field.IsList) }}, true{{ end }}
+				return {{ if not $field.IsList }}*{{ end }}r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Internal{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }}{{ if or (not $field.Kind.IsRelation) (not $field.IsList) }}, true{{ end }}
 			}
 		{{- end }}
 	{{ end }}

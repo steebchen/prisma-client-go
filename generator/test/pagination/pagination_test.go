@@ -64,19 +64,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				post{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -128,19 +128,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				post{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
@@ -201,7 +201,7 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				post{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -262,13 +262,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				post{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -329,13 +329,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				post{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				post{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
