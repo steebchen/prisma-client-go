@@ -64,19 +64,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -128,19 +128,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
@@ -201,7 +201,7 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -262,13 +262,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -329,13 +329,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				RawPost: RawPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
