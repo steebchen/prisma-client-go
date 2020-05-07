@@ -27,7 +27,7 @@ func (s String) CamelCase() string {
 
 // Tag returns the struct tag value of a field.
 func (s String) Tag() string {
-	return fmt.Sprintf("`json:\"%s\"`", s.CamelCase())
+	return fmt.Sprintf("`json:\"%s\"`", s)
 }
 
 // builtin Go types
