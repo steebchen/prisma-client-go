@@ -582,6 +582,135 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "raw query",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var actual []UserModel
+			err := client.Raw("SELECT * FROM User").Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				RawUser: RawUser{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "a",
+				},
+			}, {
+				RawUser: RawUser{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "raw query with parameter",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var actual []UserModel
+			err := client.Raw("SELECT * FROM User WHERE id = ?", "id2").Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				RawUser: RawUser{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "raw query with multiple parameters",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var actual []UserModel
+			err := client.Raw("SELECT * FROM User WHERE id = ? AND email = ?", "id2", "email2").Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				RawUser: RawUser{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

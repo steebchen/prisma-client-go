@@ -99,7 +99,9 @@ func (q Query) Build() string {
 
 	builder.WriteString(" ")
 
-	builder.WriteString(q.buildOutputs(q.Outputs))
+	if len(q.Outputs) > 0 {
+		builder.WriteString(q.buildOutputs(q.Outputs))
+	}
 
 	return builder.String()
 }
@@ -115,7 +117,7 @@ func (q Query) buildInputs(inputs []Input) string {
 		builder.WriteString(":")
 
 		if i.Value != nil {
-			builder.Write(value(i.Value))
+			builder.Write(Value(i.Value))
 		} else {
 			builder.WriteString(q.buildFields(false, false, i.Fields))
 		}
@@ -184,7 +186,7 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		}
 
 		if f.Value != nil {
-			builder.Write(value(f.Value))
+			builder.Write(Value(f.Value))
 		}
 
 		if f.List {
@@ -220,7 +222,7 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 	return q.Client.Do(ctx, s, &v)
 }
 
-func value(value interface{}) []byte {
+func Value(value interface{}) []byte {
 	if v, ok := value.(time.Time); ok {
 		return []byte(fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli)))
 	}

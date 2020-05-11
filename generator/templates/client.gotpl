@@ -36,6 +36,8 @@ func NewClient() *PrismaClient {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
+	c.Actions = &raw.Actions{Client: c}
+
 	return c
 }
 
@@ -43,6 +45,8 @@ func NewClient() *PrismaClient {
 type PrismaClient struct {
 	// engine spawns and manages the binary
 	*engine.Engine
+
+	*raw.Actions
 
 	{{ range $model := $.DMMF.Datamodel.Models }}
 		// {{ $model.Name.GoCase }} provides access to CRUD methods.
