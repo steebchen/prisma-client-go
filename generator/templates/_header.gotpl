@@ -10,6 +10,7 @@ import (
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/generator/runtime"
+	"github.com/prisma/prisma-client-go/generator/raw"
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 
