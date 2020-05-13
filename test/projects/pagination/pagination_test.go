@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/generator/test/hooks"
+	"github.com/prisma/prisma-client-go/test/hooks"
 )
 
 type cx = context.Context

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -139,7 +138,6 @@ func (q Query) buildOutputs(outputs []Output) string {
 		builder.WriteString(o.Name + " ")
 
 		if len(o.Inputs) > 0 {
-			log.Printf("building inputs: %d %+v", len(o.Inputs), o.Inputs)
 			builder.WriteString(q.buildInputs(o.Inputs))
 		}
 

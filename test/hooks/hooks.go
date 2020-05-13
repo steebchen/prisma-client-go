@@ -3,6 +3,7 @@ package hooks
 import (
 	"context"
 	"fmt"
+	"log"
 	"os/exec"
 	"testing"
 
@@ -39,9 +40,15 @@ func Start(t *testing.T, e *engine.Engine, before []string) {
 			t.Fatalf("mock query has errors %+v", response)
 		}
 	}
+
+	log.Printf("")
+	log.Printf("---")
+	log.Printf("")
 }
 
 func End(t *testing.T, e Engine) {
+	defer cleanup(t)
+
 	err := e.Disconnect()
 	if err != nil {
 		t.Fatalf("could not disconnect: %s", err)
@@ -49,13 +56,7 @@ func End(t *testing.T, e Engine) {
 }
 
 func setup(t *testing.T) {
-	if err := cmd("rm", "-rf", "dev.sqlite"); err != nil {
-		t.Fatal(err)
-	}
-
-	if err := cmd("rm", "-rf", "migrations"); err != nil {
-		t.Fatal(err)
-	}
+	cleanup(t)
 
 	if err := cli.Run([]string{"migrate", "save", "--experimental", "--create-db", "--name", "init"}, logger.Enabled); err != nil {
 		t.Fatalf("could not run migrate save --experimental %s", err)
@@ -66,7 +67,17 @@ func setup(t *testing.T) {
 	}
 }
 
-func cmd(name string, args ...string) error {
+func cleanup(t *testing.T) {
+	if err := Cmd("rm", "-rf", "dev.sqlite"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := Cmd("rm", "-rf", "migrations"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func Cmd(name string, args ...string) error {
 	cmd := exec.Command(name, args...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {

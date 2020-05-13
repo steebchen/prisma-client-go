@@ -13,5 +13,15 @@ jobs:
     steps:
       - uses: actions/checkout@v1
 
-      - name: run tests
-        run: docker build . -f docker/test.dockerfile
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - name: deps
+        run: go mod download
+
+      - name: generate
+        run: go generate ./...
+
+      - name: test
+        run: go test ./... -v

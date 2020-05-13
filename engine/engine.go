@@ -7,16 +7,16 @@ import (
 )
 
 func NewEngine(schema string, hasBinaryTargets bool) *Engine {
-	e := &Engine{
+	engine := &Engine{
 		schema:           schema,
 		hasBinaryTargets: hasBinaryTargets,
 	}
 
-	e.http = &http.Client{
+	engine.http = &http.Client{
 		Timeout: 30 * time.Second,
 	}
 
-	return e
+	return engine
 }
 
 type Engine struct {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/generator/test/hooks"
+	"github.com/prisma/prisma-client-go/test/hooks"
 )
 
 type cx = context.Context
@@ -608,7 +608,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw("SELECT * FROM User").Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM "User"`).Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -655,7 +655,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw("SELECT * FROM User WHERE id = ?", "id2").Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM "User" WHERE id = $1`, "id2").Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -696,7 +696,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw("SELECT * FROM User WHERE id = ? AND email = ?", "id2", "email2").Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
