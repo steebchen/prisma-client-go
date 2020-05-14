@@ -10,6 +10,7 @@ import (
 
 	"github.com/prisma/prisma-client-go/generator"
 	"github.com/prisma/prisma-client-go/jsonrpc"
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 func reply(w io.Writer, data interface{}) error {
@@ -31,10 +32,15 @@ func reply(w io.Writer, data interface{}) error {
 func invokePrisma() error {
 	reader := bufio.NewReader(os.Stdin)
 
+	if logger.Enabled {
+		dir, _ := os.Getwd()
+		log.Printf("current working dir: %s", dir)
+	}
+
 	for {
 		content, err := reader.ReadBytes('\n')
 		if err == io.EOF {
-			log.Printf("warning: ignoring EOF error. stdin: `%s`", content)
+			logger.Debug.Printf("warning: ignoring EOF error. stdin: `%s`", content)
 			return nil
 		}
 		if err != nil {

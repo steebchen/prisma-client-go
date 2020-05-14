@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/generator/test/hooks"
+	"github.com/prisma/prisma-client-go/test/hooks"
 )
 
 type cx = context.Context
@@ -120,7 +120,7 @@ func TestRelations(t *testing.T) {
 				Post.Author.Where(
 					User.Email.Equals("john@example.com"),
 				),
-			).Exec(ctx)
+			).OrderBy(Post.ID.Order(ASC)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}

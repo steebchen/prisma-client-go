@@ -1,0 +1,18 @@
+datasource db {
+	provider = "mysql"
+	url      = "mysql://root:pw@localhost:3306/testing"
+}
+
+generator db {
+	provider = "go run ../../.."
+	output = "./db_gen.go"
+	package = "mysql"
+}
+
+model User {
+	id       String  @id @default(cuid())
+	email    String  @unique
+	username String
+	name     String?
+	stuff    String?
+}
