@@ -182,6 +182,41 @@ func TestRaw(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "raw query count",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				b: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var actual []struct {
+				Count int `json:"count"`
+			}
+			err := client.Raw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &actual)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 2, actual[0].Count)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
