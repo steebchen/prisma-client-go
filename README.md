@@ -30,4 +30,8 @@ It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides da
 
 To get started, [read our quickstart tutorial](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
 
-You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference.md)
+You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference.md).
+
+## Notes
+
+The go client works slightly different than the normal Prisma tooling. When you're using the go client, whenever you see Prisma CLI commands such as `prisma ...`, you should always write `go run github.com/prisma/prisma-client-go ...` instead.
