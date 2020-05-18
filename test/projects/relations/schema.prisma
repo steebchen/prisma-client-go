@@ -15,6 +15,11 @@ model User {
 	username String
 	name     String?
 
+	// TODO separate this into an extra test
+	// related issue: https://github.com/prisma/prisma-client-go/issues/126
+	role     User?   @relation(fields: [roleID], references: [id])
+	roleID   String?
+
 	posts    Post[]
 	comments Comment[]
 }
@@ -30,6 +35,7 @@ model Post {
 	// 1) optional relation
 	// 2) uppercase model
 	// TODO create separate tests for these two cases
+	// related issue: https://github.com/prisma/prisma-client-go/issues/127
 	Category   Category?   @relation(fields: [categoryID], references: [id])
 	categoryID String?
 
@@ -48,6 +54,11 @@ model Comment {
 }
 
 model Category {
+	id   String @id @default(cuid())
+	name String
+}
+
+model Role {
 	id   String @id @default(cuid())
 	name String
 }
