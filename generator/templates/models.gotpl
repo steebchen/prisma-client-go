@@ -34,18 +34,26 @@
 		{{- if or (not $field.IsRequired) ($field.Kind.IsRelation) }}
 			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (
 				{{- if $field.IsList }}value []{{ else }}value{{ end }} {{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end -}}
-				{{- if or (not $field.Kind.IsRelation) (not $field.IsList) -}}
+				{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
 					, ok bool
 				{{- end -}}
 			) {
 				if r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Raw{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }} == nil {
-					{{- if $field.Kind.IsRelation }}
+					{{- if and ($field.Kind.IsRelation) ($field.IsRequired) }}
 						panic("attempted to access {{ $field.Name.GoLowerCase }} but did not fetch it using the .With() syntax")
 					{{- else }}
-						return value, false
+						return value
+						{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
+							, false
+						{{- end -}}
 					{{- end }}
 				}
-				return {{ if not $field.IsList }}*{{ end }}r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Raw{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }}{{ if or (not $field.Kind.IsRelation) (not $field.IsList) }}, true{{ end }}
+				return {{ if not $field.IsList }}*{{ end }}r.
+					{{- if $field.Kind.IsRelation }}Relations{{ else }}Raw{{ end }}{{ $model.Name.GoCase }}.
+					{{- $field.Name.GoCase -}}
+					{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
+						, true
+					{{- end -}}
 			}
 		{{- end }}
 	{{ end }}

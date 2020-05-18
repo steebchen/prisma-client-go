@@ -27,6 +27,10 @@ model Post {
 	author   User @relation(fields: [authorID], references: [id])
 	authorID String
 
+	// optional relation
+	category   Category?   @relation(fields: [categoryID], references: [id])
+	categoryID String?
+
 	comments Comment[]
 }
 
@@ -39,4 +43,9 @@ model Comment {
 
 	post      Post @relation(fields: [postID], references: [id])
 	postID    String
+}
+
+model Category {
+	id   String @id @default(cuid())
+	name String
 }
