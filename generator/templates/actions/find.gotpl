@@ -13,9 +13,9 @@
 			{{ $relationName := $model.Name.GoCase }}
 
 			{{ if ne $field.Name "" }}
-				{{ $result = (print $name "To" $field.Type.GoCase "Find" $v.Name) }}
-				{{ $updateResult = (print $name "To" $field.Type.GoCase "Update" $v.Name) }}
-				{{ $deleteResult = (print $name "To" $field.Type.GoCase "Delete" $v.Name) }}
+				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
+				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
+				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
 			{{ end }}
 
