@@ -67,7 +67,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","authorID":"relations","author":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","author":null,"comments":null}],"comments":null}`
+			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","authorID":"relations","categoryID":null,"author":null,"category":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","categoryID":null,"author":null,"category":null,"comments":null}],"comments":null}`
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
@@ -543,7 +543,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "with by accessing methods",
+		name: "with by accessing methods with required relation",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -595,10 +595,9 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			author, ok := actual.Author()
+			author := actual.Author()
 
 			assert.Equal(t, user, author)
-			assert.Equal(t, true, ok)
 
 			comments := []CommentModel{{
 				RawComment: RawComment{
@@ -610,6 +609,113 @@ func TestRelations(t *testing.T) {
 			}}
 
 			assert.Equal(t, comments, actual.Comments())
+		},
+	}, {
+		name: "create and find with existing optional relation",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				post: createOneUser(data: {
+					id: "john",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				category: createOneCategory(data: {
+					id: "media",
+					name: "Media",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			title := "What's up?"
+			userID := "john"
+
+			_, err := client.Post.CreateOne(
+				Post.Title.Set(title),
+				Post.Author.Link(
+					User.ID.Equals(userID),
+				),
+				Post.ID.Set("post"),
+				Post.Category.Link(
+					Category.ID.Equals("media"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := client.Post.FindOne(
+				Post.ID.Equals("post"),
+			).With(
+				Post.Category.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedCategory := CategoryModel{
+				RawCategory: RawCategory{
+					ID:   "media",
+					Name: "Media",
+				},
+			}
+
+			actualCategory, ok := actual.Category()
+
+			assert.Equal(t, expectedCategory, actualCategory)
+			assert.Equal(t, true, ok)
+		},
+	}, {
+		name: "create and find with non-existing optional relations",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				post: createOneUser(data: {
+					id: "john",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			title := "What's up?"
+			userID := "john"
+
+			_, err := client.Post.CreateOne(
+				Post.Title.Set(title),
+				Post.Author.Link(
+					User.ID.Equals(userID),
+				),
+				Post.ID.Set("post"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := client.Post.FindOne(
+				Post.ID.Equals("post"),
+			).With(
+				Post.Category.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actualCategory, ok := actual.Category()
+
+			assert.Equal(t, CategoryModel{}, actualCategory)
+			assert.Equal(t, false, ok)
 		},
 	}}
 	for _, tt := range tests {
