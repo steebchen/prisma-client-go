@@ -99,8 +99,8 @@
 				var v {{ $name }}To{{ $field.Type.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
 
 				v.query.Operation = "query"
-				v.query.Method = "{{ $field.Name.CamelCase }}"
-				v.query.Outputs = {{ $field.Type.CamelCase }}Output
+				v.query.Method = "{{ $field.Name }}"
+				v.query.Outputs = {{ $field.Type.GoLowerCase }}Output
 
 				{{ if $field.IsList }}
 					{{/* TODO create a function for this type of builder.Field colletion, also used in find.gotpl */}}
@@ -139,7 +139,7 @@
 
 				return {{ $setReturnStruct }}{
 					data: builder.Field{
-						Name: "{{ $field.Name.CamelCase }}",
+						Name: "{{ $field.Name }}",
 						Fields: []builder.Field{
 							{
 								Name:   "connect",
