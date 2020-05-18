@@ -27,8 +27,10 @@ model Post {
 	author   User @relation(fields: [authorID], references: [id])
 	authorID String
 
-	// optional relation
-	category   Category?   @relation(fields: [categoryID], references: [id])
+	// 1) optional relation
+	// 2) uppercase model
+	// TODO create separate tests for these two cases
+	Category   Category?   @relation(fields: [categoryID], references: [id])
 	categoryID String?
 
 	comments Comment[]
