@@ -1,8 +1,6 @@
-# API Reference
+# Basic API
 
-The db client provides the methods FindOne, FindMany, and CreateOne. Just with these 3 methods, you can query for anything, and optionally update or delete for the queried records.
-
-Additionally, Prisma Client Go provides a fully fluent and type-safe query API, which always follows the schema `db.<Model>.<Field>.<Action>`, e.g. `db.User.Name.Equals("John")`.
+Find, update and delete records.
 
 ## Reading data
 
@@ -68,6 +66,23 @@ db.User.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
 
 All of these queries are fully type-safe and independent of the underlying database.
 
+### Querying for relations
+
+In a query, you can query for relations by using "Some" or "Every". You can also query for deeply nested relations.
+
+```go
+// get a user which has at least one post with a title "My Title" and that post's comments are all "What up?"
+actual, err := client.User.FindMany(
+    User.Email.Equals("john@example.com"),
+    User.Posts.Some(
+        Post.Title.Equals("My Title"),
+        Post.Comments.Every(
+            Comment.Content.Contains("What up?"),
+        ),
+    ),
+).Exec(ctx)
+```
+
 ## Writing data
 
 ### Create a record
@@ -82,6 +97,20 @@ created, err := client.User.CreateOne(
     User.ID.Set("id"),
     User.Name.Set("name"),
     User.Stuff.Set("stuff"),
+).Exec(ctx)
+```
+
+### Create a record with a relation
+
+Use the method `Link` to connect new objects with existing ones. For example, the following query creates a new post and sets the author of the post to a user with a given ID.
+
+```go
+created, err := client.Post.CreateOne(
+    Post.Title.Set(title),
+    Post.Author.Link(
+        User.ID.Equals(userID),
+    ),
+    Post.ID.Set("post"),
 ).Exec(ctx)
 ```
 
@@ -107,7 +136,3 @@ updated, err := client.User.FindOne(
     User.Email.Equals("john@example.com"),
 ).Delete().Exec(ctx)
 ```
-
-## Querying for relations
-
-*TBD*

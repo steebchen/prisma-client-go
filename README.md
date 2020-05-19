@@ -9,7 +9,7 @@
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href="./docs">Docs</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-    <a href="./docs/reference.md">API Reference</a>
+    <a href="./docs/reference">API reference</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
     <a href="https://www.prisma.io/blog">Blog</a>
     <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
@@ -30,7 +30,7 @@ It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides da
 
 To get started, [read our quickstart tutorial](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
 
-You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference.md).
+You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference).
 
 ## Notes
 
