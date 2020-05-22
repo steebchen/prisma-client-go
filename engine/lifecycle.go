@@ -52,7 +52,6 @@ func (e *Engine) Disconnect() error {
 	}
 
 	if platform.Name() == "windows" {
-
 		if err := e.cmd.Process.Kill(); err != nil {
 			return fmt.Errorf("kill process: %w", err)
 		}

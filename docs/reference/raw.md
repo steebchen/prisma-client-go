@@ -46,8 +46,8 @@ err := client.Raw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "e
 ### Count
 
 ```go
-var actual []struct {
+var result []struct {
     Count int `json:"count"`
 }
-err := client.Raw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &actual)
+err := client.Raw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &result)
 ```
