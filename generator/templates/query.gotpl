@@ -49,16 +49,14 @@
 	{{ end }}
 
 	{{ range $field := $model.Fields }}
-		{{ $nsField := print $nsQuery $field.Name.GoCase }}
-		{{ $nsFieldParams := (print $name $field.Name.GoCase "SetParams") }}
-		{{ $struct := print $nsField $field.Type }}
+		{{ $struct := print $nsQuery $field.Name.GoCase $field.Type }}
 
 		// base struct
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.RequiredOnCreate }}
-			{{ $setReturnStruct = $nsFieldParams }}
+			{{ $setReturnStruct = (print $name $field.Name.GoCase "SetParams") }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParams") }}
 		{{ end}}

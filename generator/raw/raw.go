@@ -13,11 +13,10 @@ type Actions struct {
 }
 
 func (r Actions) Raw(query string, params ...interface{}) Exec {
-	q := &builder.Query{
-		Client:    r.Client,
-		Operation: "mutation",
-		Method:    "executeRaw",
-	}
+	q := builder.NewQuery()
+	q.Client = r.Client
+	q.Operation = "mutation"
+	q.Method = "executeRaw"
 
 	q.Inputs = append(q.Inputs, builder.Input{
 		Name:  "query",
@@ -47,7 +46,7 @@ func (r Actions) Raw(query string, params ...interface{}) Exec {
 }
 
 type Exec struct {
-	query *builder.Query
+	query builder.Query
 }
 
 type Result struct {

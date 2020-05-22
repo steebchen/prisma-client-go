@@ -16,6 +16,7 @@
 		optional ...{{ $name }}SetParams,
 	) {{ $result }} {
 		var v {{ $result }}
+		v.query = builder.NewQuery()
 		v.query.Client = r.client
 		var fields []builder.Field
 

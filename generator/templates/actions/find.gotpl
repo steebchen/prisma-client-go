@@ -39,6 +39,7 @@
 					params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
+					v.query = builder.NewQuery()
 					v.query.Client = r.client
 
 					v.query.Operation = "query"

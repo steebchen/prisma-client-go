@@ -51,6 +51,12 @@ type Client interface {
 	Do(ctx context.Context, query string, into interface{}) error
 }
 
+func NewQuery() Query {
+	return Query{
+		Start: time.Now(),
+	}
+}
+
 type Query struct {
 	// Client is the generic Photon Client
 	Client Client
@@ -72,6 +78,9 @@ type Query struct {
 
 	// Outputs contains the return fields
 	Outputs []Output
+
+	// Start time of the request for tracing
+	Start time.Time
 }
 
 func (q Query) buildQuery() string {
@@ -217,7 +226,13 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 		logger.Debug.Printf("prisma query: `%s`", s)
 	}
 
-	return q.Client.Do(ctx, s, &v)
+	logger.Debug.Printf("[timing] building %s", time.Since(q.Start))
+
+	err := q.Client.Do(ctx, s, &v)
+	now := time.Now()
+	totalDuration := now.Sub(q.Start)
+	logger.Debug.Printf("[timing] TOTAL %s", totalDuration)
+	return err
 }
 
 func Value(value interface{}) []byte {

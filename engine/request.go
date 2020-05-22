@@ -7,11 +7,17 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
+
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 // Do sends the http Request to the query engine and unmarshals the response
 func (e *Engine) Do(ctx context.Context, query string, response interface{}) error {
+	startReq := time.Now()
+
 	payload := GQLRequest{
 		Query:     query,
 		Variables: map[string]interface{}{},
@@ -22,6 +28,10 @@ func (e *Engine) Do(ctx context.Context, query string, response interface{}) err
 		return fmt.Errorf("Request failed: %w", err)
 	}
 
+	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
+
+	startParse := time.Now()
+
 	// TODO temporary hack, actually parse the response
 	if str := string(body); strings.Contains(str, "errors: \"[{\"error") {
 		return fmt.Errorf("pql error: %s", str)
@@ -31,6 +41,8 @@ func (e *Engine) Do(ctx context.Context, query string, response interface{}) err
 	if err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
+
+	logger.Debug.Printf("[timing] request unmarshaling took %s", time.Since(startParse))
 
 	return nil
 }
@@ -50,6 +62,7 @@ func (e *Engine) Request(ctx context.Context, method string, path string, payloa
 	req.Header.Set("content-type", "application/json")
 	req = req.WithContext(ctx)
 
+	startReq := time.Now()
 	rawResponse, err := e.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("raw post: %w", err)
@@ -60,6 +73,8 @@ func (e *Engine) Request(ctx context.Context, method string, path string, payloa
 			panic(err)
 		}
 	}()
+	reqDuration := time.Since(startReq)
+	logger.Debug.Printf("[timing] query engine raw request took %s", reqDuration)
 
 	responseBody, err := ioutil.ReadAll(rawResponse.Body)
 
@@ -69,6 +84,18 @@ func (e *Engine) Request(ctx context.Context, method string, path string, payloa
 
 	if rawResponse.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("http status code %d with response %s", rawResponse.StatusCode, responseBody)
+	}
+
+	if logger.Enabled {
+		if elapsedRaw := rawResponse.Header["X-Elapsed"]; len(elapsedRaw) > 0 {
+			elapsed, _ := strconv.Atoi(elapsedRaw[0])
+			duration := time.Duration(elapsed) * time.Microsecond
+			logger.Debug.Printf("[timing] elapsed: %s", duration)
+
+			diff := reqDuration - duration
+			logger.Debug.Printf("[timing] just http: %s", diff)
+			logger.Debug.Printf("[timing] http percentage: %.2f%%", float64(diff)/float64(reqDuration)*100)
+		}
 	}
 
 	return responseBody, nil
