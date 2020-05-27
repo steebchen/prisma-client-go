@@ -1,4 +1,4 @@
-package sqlite
+package raw
 
 //go:generate go run github.com/prisma/prisma-client-go generate
 
@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test/hooks"
+	"github.com/prisma/prisma-client-go/test"
 )
 
 type cx = context.Context
@@ -191,8 +191,8 @@ func TestRaw(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			client := NewClient()
 
-			hooks.Start(t, client.Engine, tt.before)
-			defer hooks.End(t, client.Engine)
+			mockDB := test.Start(t, test.SQLite, client.Engine, tt.before)
+			defer test.End(t, test.SQLite, client.Engine, mockDB)
 
 			tt.run(t, client, context.Background())
 		})

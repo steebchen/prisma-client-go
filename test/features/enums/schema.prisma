@@ -1,0 +1,29 @@
+datasource db {
+	provider = "postgresql"
+	url      = env("__REPLACE__")
+}
+
+generator db {
+	provider = "go run github.com/prisma/prisma-client-go"
+	output = "./db_gen.go"
+	package = "enums"
+}
+
+model User {
+	id      String  @id @default(cuid())
+	role    Role
+	roleOpt Role?
+}
+
+enum Role {
+	User
+	Moderator
+	Admin
+}
+
+enum AnotherRole {
+	A
+	B
+	C
+}
+
