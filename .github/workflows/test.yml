@@ -23,5 +23,8 @@ jobs:
       - name: generate
         run: go generate ./...
 
+      - name: setup
+        run: go run ./test/setup/init
+
       - name: test
         run: go test ./... -v

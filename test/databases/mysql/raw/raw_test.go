@@ -1,53 +1,21 @@
-package postgresql
+package raw
 
 //go:generate go run github.com/prisma/prisma-client-go generate
 
 import (
 	"context"
-	"log"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test/hooks"
+	"github.com/prisma/prisma-client-go/test"
 )
 
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-const containerName = "go-client-postgres"
-
-func setup(t *testing.T) {
-	teardown(t)
-
-	if err := hooks.Cmd("docker", "stop", "postgres"); err != nil {
-		log.Println(err)
-	}
-
-	if err := hooks.Cmd("docker", "rm", "postgres", "--force"); err != nil {
-		log.Println(err)
-	}
-
-	if err := hooks.Cmd("docker", "run", "--name", "postgres", "-p", "5432:5432", "-e", "POSTGRES_PASSWORD=pw", "-d", "postgres"); err != nil {
-		t.Fatal(err)
-	}
-
-	time.Sleep(5 * time.Second)
-}
-
-func teardown(t *testing.T) {
-	if err := hooks.Cmd("docker", "stop", containerName); err != nil {
-		log.Println(err)
-	}
-
-	if err := hooks.Cmd("docker", "rm", containerName, "--force"); err != nil {
-		log.Println(err)
-	}
-}
-
 func TestRaw(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	tests := []struct {
 		name   string
@@ -79,7 +47,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw(`SELECT * FROM "User"`).Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM User`).Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -126,7 +94,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw(`SELECT * FROM "User" WHERE id = $1`, "id2").Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -167,7 +135,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []UserModel
-			err := client.Raw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &actual)
+			err := client.Raw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -210,7 +178,7 @@ func TestRaw(t *testing.T) {
 			var actual []struct {
 				Count int `json:"count"`
 			}
-			err := client.Raw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &actual)
+			err := client.Raw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -221,16 +189,12 @@ func TestRaw(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			setup(t)
-
 			client := NewClient()
 
-			hooks.Start(t, client.Engine, tt.before)
-			defer hooks.End(t, client.Engine)
+			mockDB := test.Start(t, test.MySQL, client.Engine, tt.before)
+			defer test.End(t, test.MySQL, client.Engine, mockDB)
 
 			tt.run(t, client, context.Background())
-
-			// teardown(t)
 		})
 	}
 }

@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test/hooks"
+	"github.com/prisma/prisma-client-go/test"
 )
 
 type cx = context.Context
@@ -38,7 +38,6 @@ func TestTypes(t *testing.T) {
 				User.Float.Set(5.5),
 				User.Bool.Set(true),
 				User.Date.Set(date),
-				User.Role.Set(RoleAdmin),
 				User.Type.Set("x"),
 
 				User.ID.Set(id),
@@ -61,7 +60,6 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}
@@ -96,7 +94,6 @@ func TestTypes(t *testing.T) {
 				User.Float.Set(5.5),
 				User.Bool.Set(true),
 				User.Date.Set(date),
-				User.Role.Set(RoleAdmin),
 				User.Type.Set("x"),
 
 				User.ID.Set("id"),
@@ -121,7 +118,6 @@ func TestTypes(t *testing.T) {
 					Float:            5.5,
 					Bool:             true,
 					Date:             date,
-					Role:             RoleAdmin,
 					Type:             "x",
 					UpperCaseTest:    str("test1"),
 					LowerCaseTest:    str("test2"),
@@ -145,63 +141,6 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, []UserModel{expected}, actualSlice)
 		},
 	}, {
-		name: "enums",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
-			admin := RoleAdmin
-			mod := RoleModerator
-			expected := UserModel{
-				RawUser: RawUser{
-					ID:        "123",
-					CreatedAt: date,
-					UpdatedAt: date,
-					Str:       "str",
-					StrOpt:    str("a"),
-					Int:       5,
-					Float:     5.5,
-					Bool:      true,
-					Date:      date,
-					Role:      admin,
-					RoleOpt:   &mod,
-					Type:      "x",
-				},
-			}
-
-			created, err := client.User.CreateOne(
-				User.Str.Set("str"),
-				User.Int.Set(5),
-				User.Float.Set(5.5),
-				User.Bool.Set(true),
-				User.Date.Set(date),
-				User.Role.Set(RoleAdmin),
-				User.Type.Set("x"),
-
-				User.ID.Set("123"),
-				User.StrOpt.Set("a"),
-				User.RoleOpt.Set(RoleModerator),
-				User.CreatedAt.Set(date),
-				User.UpdatedAt.Set(date),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			assert.Equal(t, expected, created)
-
-			actual, err := client.User.FindMany(
-				User.Role.Equals(RoleAdmin),
-				User.Role.In([]Role{RoleAdmin}),
-				User.RoleOpt.Equals(RoleModerator),
-				User.RoleOpt.In([]Role{RoleModerator}),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			assert.Equal(t, []UserModel{expected}, actual)
-		},
-	}, {
 		name: "basic equals",
 		// language=GraphQL
 		before: []string{`
@@ -217,7 +156,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -250,7 +188,6 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -273,7 +210,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -313,7 +249,6 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -336,7 +271,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -353,8 +287,7 @@ func TestTypes(t *testing.T) {
 					date: "2000-01-01T00:00:00Z",
 					int: 5,
 					float: 5.5,
-				type: "x",
-					role: Admin,
+					type: "x",
 				}) {
 					id
 				}
@@ -380,7 +313,6 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -403,7 +335,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -421,7 +352,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -448,7 +378,6 @@ func TestTypes(t *testing.T) {
 					Float:     5.5,
 					Bool:      true,
 					Date:      date,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -471,7 +400,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -489,7 +417,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -516,7 +443,6 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					StrOpt:    &s,
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -539,7 +465,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -557,7 +482,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -575,7 +499,6 @@ func TestTypes(t *testing.T) {
 					int: 5,
 					float: 5.5,
 					type: "x",
-					role: Admin,
 				}) {
 					id
 				}
@@ -601,7 +524,6 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					StrOpt:    str("first"),
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}, {
@@ -614,7 +536,6 @@ func TestTypes(t *testing.T) {
 					Bool:      true,
 					Date:      date,
 					StrOpt:    str("third"),
-					Role:      RoleAdmin,
 					Type:      "x",
 				},
 			}}
@@ -625,10 +546,12 @@ func TestTypes(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			client := NewClient()
-			hooks.Start(t, client.Engine, tt.before)
-			defer hooks.End(t, client.Engine)
-			tt.run(t, client, context.Background())
+			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+				client := NewClient()
+				mockDBName := test.Start(t, db, client.Engine, tt.before)
+				defer test.End(t, db, client.Engine, mockDBName)
+				tt.run(t, client, context.Background())
+			})
 		})
 	}
 }

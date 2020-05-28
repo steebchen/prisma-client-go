@@ -9,7 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test/hooks"
+	"github.com/prisma/prisma-client-go/test"
 )
 
 type cx = context.Context
@@ -721,10 +721,12 @@ func TestRelations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			client := NewClient()
-			hooks.Start(t, client.Engine, tt.before)
-			defer hooks.End(t, client.Engine)
-			tt.run(t, client, context.Background())
+			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+				client := NewClient()
+				mockDBName := test.Start(t, db, client.Engine, tt.before)
+				defer test.End(t, db, client.Engine, mockDBName)
+				tt.run(t, client, context.Background())
+			})
 		})
 	}
 }

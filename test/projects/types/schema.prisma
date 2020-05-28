@@ -1,15 +1,20 @@
 datasource db {
 	provider = "sqlite"
-	url      = "file:dev.sqlite"
+	url      = env("__REPLACE__")
 }
 
 generator db {
-	provider = "go run ../../.."
+	provider = "go run github.com/prisma/prisma-client-go"
 	output = "./db_gen.go"
 	package = "types"
 }
 
 model Client {
+	id String @id
+}
+
+// test for a reserver go keyword as model name
+model Type {
 	id String @id
 }
 
@@ -33,9 +38,8 @@ model User {
 	boolOpt   Boolean?
 	date      DateTime
 	dateOpt   DateTime?
-	role      Role
-	roleOpt   Role?
 
+	// test for a reserved model names
 	chan      String?
 	map       String?
 	continue  String?
@@ -52,16 +56,4 @@ model User {
 	defer     String?
 
 	type     String
-}
-
-enum Role {
-	User
-	Moderator
-	Admin
-}
-
-enum AnotherRole {
-	A
-	B
-	C
 }

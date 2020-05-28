@@ -9,6 +9,10 @@ prisma-client-go
 # build folder for Prisma CLI binaries
 build/
 
+schema.temp.*.prisma
+# sqlite artifacts
+go_client_db_*.db
+
 # for development purposes
 schema.graphql
 .graphqlconfig
