@@ -17,7 +17,7 @@ model User {
 
 	// TODO separate this into an extra test
 	// related issue: https://github.com/prisma/prisma-client-go/issues/126
-	role     User?   @relation(fields: [roleID], references: [id])
+	role     Role?   @relation(fields: [roleID], references: [id])
 	roleID   String?
 
 	posts    Post[]

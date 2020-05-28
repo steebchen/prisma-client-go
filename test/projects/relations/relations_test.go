@@ -67,7 +67,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","roleID":null,"role":null,"posts":[{"id":"a","title":"common","content":"a","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null}],"comments":null,"user":null}`
+			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","roleID":null,"role":null,"posts":[{"id":"a","title":"common","content":"a","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null}],"comments":null}`
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
