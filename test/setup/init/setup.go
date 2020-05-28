@@ -16,7 +16,6 @@ func main() {
 
 func setup() {
 	for _, db := range test.Databases {
-		db.Teardown()
 		db.Setup()
 	}
 

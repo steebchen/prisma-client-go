@@ -1,7 +1,5 @@
 package raw
 
-//go:generate go run github.com/prisma/prisma-client-go generate
-
 import (
 	"context"
 	"testing"
@@ -15,7 +13,7 @@ type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func TestRaw(t *testing.T) {
-	// t.Parallel()
+	t.Parallel()
 
 	tests := []struct {
 		name   string
