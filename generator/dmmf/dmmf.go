@@ -252,19 +252,12 @@ type Field struct {
 	RelationOnDelete types.String `json:"relationOnDelete"`
 	// RelationName (optional)
 	RelationName types.String `json:"relationName"`
-	// Default (optional)
-	Default FieldDefault `json:"default"`
+	// HasDefaultValue
+	HasDefaultValue bool `json:"hasDefaultValue"`
 }
 
 func (f Field) RequiredOnCreate() bool {
-	return f.IsRequired && !f.IsUpdatedAt && f.Default.Name == ""
-}
-
-// FieldDefault describes the default values of a model's field
-type FieldDefault struct {
-	Name       types.String `json:"name"`
-	ReturnType types.Type   `json:"returnType"`
-	// Args []any
+	return f.IsRequired && !f.IsUpdatedAt && !f.HasDefaultValue
 }
 
 // RelationMethod describes a method for relations
