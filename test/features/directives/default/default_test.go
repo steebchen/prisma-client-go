@@ -1,7 +1,5 @@
 package enums
 
-//go:generate go run github.com/prisma/prisma-client-go generate
-
 import (
 	"context"
 	"testing"
