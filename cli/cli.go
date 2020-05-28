@@ -11,10 +11,6 @@ import (
 	"github.com/prisma/prisma-client-go/logger"
 )
 
-const QE = "PRISMA_QUERY_ENGINE_BINARY"
-const ME = "PRISMA_MIGRATION_ENGINE_BINARY"
-const IE = "PRISMA_INTROSPECTION_ENGINE_BINARY"
-
 // Run the prisma CLI with given arguments
 func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running cli with args %+v", arguments)
@@ -33,31 +29,21 @@ func Run(arguments []string, output bool) error {
 
 	cmd := exec.Command(path.Join(dir, prisma), arguments...)
 	binaryName := platform.CheckForExtension(platform.BinaryPlatformName())
-	queryEngine := dir + "/prisma-query-engine-" + binaryName
-	migrationEngine := dir + "/prisma-migration-engine-" + binaryName
-	introspectionEngine := dir + "/prisma-introspection-engine-" + binaryName
 
-	if qe := os.Getenv(QE); qe != "" {
-		logger.Debug.Printf("overriding query engine to %s", qe)
-		queryEngine = qe
+	cmd.Env = os.Environ()
+
+	for _, engine := range binaries.Engines {
+		var value string
+
+		if env := os.Getenv(engine.Env); env != "" {
+			logger.Debug.Printf("overriding %s to %s", engine.Name, env)
+			value = env
+		} else {
+			value = path.Join(dir, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
+		}
+
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", engine.Env, value))
 	}
-
-	if me := os.Getenv(ME); me != "" {
-		logger.Debug.Printf("overriding migration engine to %s", me)
-		migrationEngine = me
-	}
-
-	if ie := os.Getenv(IE); ie != "" {
-		logger.Debug.Printf("overriding introspection engine to %s", ie)
-		introspectionEngine = ie
-	}
-
-	cmd.Env = append(
-		os.Environ(),
-		QE+"="+queryEngine,
-		ME+"="+migrationEngine,
-		IE+"="+introspectionEngine,
-	)
 
 	cmd.Stdin = os.Stdin
 

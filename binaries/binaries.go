@@ -28,6 +28,25 @@ var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://binaries.prisma.sh/master/%s/%s/%s.gz"
 
+type Engine struct {
+	Name string
+	Env  string
+}
+
+var Engines = []Engine{{
+	"query-engine",
+	"PRISMA_QUERY_ENGINE_BINARY",
+}, {
+	"migration-engine",
+	"PRISMA_MIGRATION_ENGINE_BINARY",
+}, {
+	"introspection-engine",
+	"PRISMA_INTROSPECTION_ENGINE_BINARY",
+}, {
+	"prisma-fmt",
+	"PRISMA_FMT_BINARY",
+}}
+
 // init overrides URLs if env variables are specific for debugging purposes and to
 // be able to provide a fallback if the links above should go down
 func init() {
@@ -106,14 +125,8 @@ func FetchNative(toDir string) error {
 		return fmt.Errorf("could not download engines: %w", err)
 	}
 
-	engines := []string{
-		"query-engine",
-		"migration-engine",
-		"introspection-engine",
-	}
-
-	for _, e := range engines {
-		if _, err := DownloadEngine(e, toDir); err != nil {
+	for _, e := range Engines {
+		if _, err := DownloadEngine(e.Name, toDir); err != nil {
 			return fmt.Errorf("could not download engines: %w", err)
 		}
 	}
