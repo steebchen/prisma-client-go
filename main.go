@@ -35,10 +35,6 @@ func main() {
 	// running the prisma generator
 
 	logger.Debug.Printf("invoking prisma")
-	logger.Info.Printf("This command is only meant to be invoked internally. Please run the following instead:")
-	logger.Info.Printf("`go run github.com/prisma/prisma-client-go <command>`")
-	logger.Info.Printf("e.g.")
-	logger.Info.Printf("`go run github.com/prisma/prisma-client-go generate`")
 
 	// exit when signal triggers
 	c := make(chan os.Signal)
