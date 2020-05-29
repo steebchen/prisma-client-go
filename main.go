@@ -36,6 +36,15 @@ func main() {
 
 	logger.Debug.Printf("invoking prisma")
 
+	// if this wasn't actually invoked by the prisma generator, print a warning and exit
+	if os.Getenv("PRISMA_GENERATOR_INVOCATION") == "" {
+		logger.Info.Printf("This command is only meant to be invoked internally. Please run the following instead:")
+		logger.Info.Printf("`go run github.com/prisma/prisma-client-go <command>`")
+		logger.Info.Printf("e.g.")
+		logger.Info.Printf("`go run github.com/prisma/prisma-client-go generate`")
+		os.Exit(1)
+	}
+
 	// exit when signal triggers
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
