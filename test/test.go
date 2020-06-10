@@ -59,7 +59,7 @@ func replaceSchema(t *testing.T, db Database, e *engine.Engine, schemaPath strin
 	}
 }
 
-func Start(t *testing.T, db Database, e *engine.Engine, before []string) string {
+func Start(t *testing.T, db Database, e *engine.Engine, queries []string) string {
 	mockDB := db.SetupDatabase(t)
 
 	schemaPath := fmt.Sprintf(schemaTemplate, db.Name())
@@ -72,7 +72,7 @@ func Start(t *testing.T, db Database, e *engine.Engine, before []string) string 
 		return ""
 	}
 
-	for _, b := range before {
+	for _, b := range queries {
 		var response engine.GQLResponse
 		err := e.Do(context.Background(), b, &response)
 		if err != nil {
