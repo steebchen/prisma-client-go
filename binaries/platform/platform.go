@@ -25,6 +25,11 @@ func BinaryPlatformName() string {
 	}
 
 	distro := getLinuxDistro()
+
+	if distro == "alpine" {
+		return "linux-musl"
+	}
+
 	ssl := getOpenSSL()
 
 	name := fmt.Sprintf("%s-openssl-%s", distro, ssl)
@@ -59,11 +64,11 @@ func checkForExtension(platform string, path string) string {
 func getLinuxDistro() string {
 	out, _ := exec.Command("cat", "/etc/os-release").CombinedOutput()
 
-	if out == nil {
-		return "debian"
+	if out != nil {
+		return parseLinuxDistro(string(out))
 	}
 
-	return parseLinuxDistro(string(out))
+	return "debian"
 }
 
 func parseLinuxDistro(str string) string {
@@ -80,6 +85,10 @@ func parseLinuxDistro(str string) string {
 	idLikeMatches := regexp.MustCompile(`(?m)^ID_LIKE="?([^"\n]*)"?`).FindStringSubmatch(str)
 	if len(idLikeMatches) > 0 {
 		idLike = idLikeMatches[1]
+	}
+
+	if id == "alpine" {
+		return "alpine"
 	}
 
 	if strings.Contains(idLike, "centos") ||

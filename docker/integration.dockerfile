@@ -24,7 +24,6 @@ RUN cd test/integration/; go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
 FROM golang:1.13
-# TODO try scratch image. golang is used because it's available on both linux and windows
 
 WORKDIR /app
 
