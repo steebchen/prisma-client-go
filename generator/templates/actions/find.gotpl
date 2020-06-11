@@ -19,7 +19,6 @@
 				{{ $relationName = $field.Type.GoCase }}
 			{{ end }}
 
-			{{ $params := (print "i" $model.Name.GoCase "Params") }}
 			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
 
 			type {{ $result }} struct {
@@ -36,7 +35,8 @@
 
 			{{ if eq $field.Name "" }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					params {{ if $v.List }}...{{ end }}{{ $params }}{{ if not $v.List }}Unique{{ end }},
+					{{/* only allow equals & unique params for FindOne */}}
+					params {{ if $v.List }}...{{ end }}i{{ $model.Name.GoCase }}{{ if not $v.List }}Equals{{ end }}Params{{ if not $v.List }}Unique{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
 					v.query = builder.NewQuery()
