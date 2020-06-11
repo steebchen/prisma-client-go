@@ -1,0 +1,23 @@
+datasource db {
+	provider = "sqlite"
+	url      = env("__REPLACE__")
+}
+
+generator db {
+	provider = "go run github.com/prisma/prisma-client-go"
+	output = "./db_gen.go"
+	package = "db"
+}
+
+model Product {
+	id Int @default(autoincrement()) @id
+	// this model name plus this field would result in a "ProductManufacturer" somewhere, which clashes with the
+	// model which has the same name
+	manufacturer ProductManufacturer @relation(fields: [manufacturerId], references: [id])
+	manufacturerId String
+}
+
+model ProductManufacturer {
+	id String @default(cuid()) @id
+	products Product[]
+}

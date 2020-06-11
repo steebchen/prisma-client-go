@@ -54,7 +54,7 @@
 			func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
 				{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $index.InputType.Type.String }}
 				{{ range $f := $i.Fields }}
-					{{ $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}{{ $f.Name.GoCase }}EqualsParams,
+					{{ $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
 				{{ end }}
 			) i{{ $model.Name.GoCase }}EqualsParamsUnique {
 				var fields []builder.Field
@@ -76,12 +76,11 @@
 	{{ range $field := $model.Fields }}
 		{{ $struct := print $nsQuery $field.Name.GoCase $field.Type }}
 
-		// base struct
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.RequiredOnCreate }}
-			{{ $setReturnStruct = (print $name $field.Name.GoCase "SetParams") }}
+			{{ $setReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "SetParams") }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParams") }}
 		{{ end}}
@@ -210,9 +209,9 @@
 			{{/* Equals has a special return type for individual fields */}}
 			{{ $equalsReturnStruct := "" }}
 			{{ if or ($field.IsID) ($field.IsUnique) }}
-				{{ $equalsReturnStruct = (print $name $field.Name.GoCase "EqualsParamsUnique") }}
+				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParamsUnique") }}
 			{{ else }}
-				{{ $equalsReturnStruct = (print $name $field.Name.GoCase "EqualsParams") }}
+				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParams") }}
 			{{ end }}
 			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
 				return {{ $equalsReturnStruct }}{
