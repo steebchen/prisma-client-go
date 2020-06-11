@@ -10,7 +10,7 @@
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
 			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
-				_{{ $field.Name.GoLowerCase }} {{ $name }}{{ $field.Name.GoCase }}SetParams,
+				_{{ $field.Name.GoLowerCase }} {{ $name }}WithPrisma{{ $field.Name.GoCase }}SetParams,
 			{{- end -}}
 		{{ end }}
 		optional ...{{ $name }}SetParams,

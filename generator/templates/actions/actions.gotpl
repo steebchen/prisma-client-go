@@ -191,7 +191,9 @@ var countOutput = []builder.Output{
 	}
 
 	{{ range $field := $model.Fields }}
-		type i{{ $model.Name.GoCase }}{{ $field.Name.GoCase }}EqualsParams interface {
+		{{ $prefix := (print $name "WithPrisma" $field.Name.GoCase) }}
+
+		type i{{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}EqualsParams interface {
 			field() builder.Field
 			getQuery() builder.Query
 			equals()
@@ -200,44 +202,44 @@ var countOutput = []builder.Output{
 		}
 
 		{{ range $action := $model.Actions }}
-			type {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params struct {
+			type {{ $prefix }}{{ $action }}Params struct {
 				data builder.Field
 				query builder.Query
 			}
 
-			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) field() builder.Field {
+			func (p {{ $prefix }}{{ $action }}Params) field() builder.Field {
 				return p.data
 			}
 
-			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) getQuery() builder.Query {
+			func (p {{ $prefix }}{{ $action }}Params) getQuery() builder.Query {
 				return p.query
 			}
 
-			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) {{ $model.Name.GoLowerCase }}Model() {}
+			func (p {{ $prefix }}{{ $action }}Params) {{ $model.Name.GoLowerCase }}Model() {}
 
-			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) {{ $field.Name.GoLowerCase }}Field() {}
+			func (p {{ $prefix }}{{ $action }}Params) {{ $field.Name.GoLowerCase }}Field() {}
 		{{ end }}
 
-		func ({{ $name }}{{ $field.Name.GoCase }}SetParams) settable() {}
-		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParams) equals() {}
+		func ({{ $prefix }}SetParams) settable() {}
+		func ({{ $prefix }}EqualsParams) equals() {}
 
-		type {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique struct {
+		type {{ $prefix }}EqualsParamsUnique struct {
 			data builder.Field
 			query builder.Query
 		}
 
-		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) field() builder.Field {
+		func (p {{ $prefix }}EqualsParamsUnique) field() builder.Field {
 			return p.data
 		}
 
-		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) getQuery() builder.Query {
+		func (p {{ $prefix }}EqualsParamsUnique) getQuery() builder.Query {
 			return p.query
 		}
 
-		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
-		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) {{ $field.Name.GoLowerCase }}Field() {}
+		func (p {{ $prefix }}EqualsParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
+		func (p {{ $prefix }}EqualsParamsUnique) {{ $field.Name.GoLowerCase }}Field() {}
 
-		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) unique() {}
-		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) equals() {}
+		func ({{ $prefix }}EqualsParamsUnique) unique() {}
+		func ({{ $prefix }}EqualsParamsUnique) equals() {}
 	{{ end }}
 {{ end }}
