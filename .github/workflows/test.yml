@@ -24,7 +24,7 @@ jobs:
         run: go generate ./...
 
       - name: setup
-        run: go run ./test/setup/init
+        run: go run ./test/setup/init setup
 
       - name: test
         run: go test ./... -v

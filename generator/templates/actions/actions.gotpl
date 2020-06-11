@@ -141,14 +141,53 @@ var countOutput = []builder.Output{
 	}
 
 	{{ range $field := $model.Fields }}
-		type {{ $name }}{{ $field.Name.GoCase }}SetParams struct {
-			data builder.Field
+		type i{{ $model.Name.GoCase }}{{ $field.Name.GoCase }}EqualsParams interface {
+			field() builder.Field
+			getQuery() builder.Query
+			equals()
+			{{ $model.Name.GoLowerCase }}Model()
+			{{ $field.Name.GoLowerCase }}Field()
 		}
+
+		{{ range $action := $model.Actions }}
+			type {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params struct {
+				data builder.Field
+				query builder.Query
+			}
+
+			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) field() builder.Field {
+				return p.data
+			}
+
+			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) getQuery() builder.Query {
+				return p.query
+			}
+
+			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) {{ $model.Name.GoLowerCase }}Model() {}
+
+			func (p {{ $name }}{{ $field.Name.GoCase }}{{ $action }}Params) {{ $field.Name.GoLowerCase }}Field() {}
+		{{ end }}
 
 		func ({{ $name }}{{ $field.Name.GoCase }}SetParams) settable() {}
+		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParams) equals() {}
 
-		func (p {{ $name }}{{ $field.Name.GoCase }}SetParams) field() builder.Field {
+		type {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique struct {
+			data builder.Field
+			query builder.Query
+		}
+
+		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) field() builder.Field {
 			return p.data
 		}
+
+		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) getQuery() builder.Query {
+			return p.query
+		}
+
+		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
+		func (p {{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) {{ $field.Name.GoLowerCase }}Field() {}
+
+		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) unique() {}
+		func ({{ $name }}{{ $field.Name.GoCase }}EqualsParamsUnique) equals() {}
 	{{ end }}
 {{ end }}

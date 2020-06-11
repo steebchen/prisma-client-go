@@ -2,16 +2,26 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/prisma/prisma-client-go/test"
 )
 
 func main() {
-	log.Printf("setting up tests")
-	teardown()
-	setup()
+	action := ""
+	if len(os.Args) > 1 {
+		action = os.Args[1]
+	}
 
-	// teardown()
+	switch action {
+	case "setup":
+		teardown()
+		setup()
+	case "teardown":
+		teardown()
+	default:
+		log.Fatalf("no such action %s, only 'setup' or 'teardown' are accepted", action)
+	}
 }
 
 func setup() {
