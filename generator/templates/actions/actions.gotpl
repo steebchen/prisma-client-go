@@ -125,6 +125,56 @@ var countOutput = []builder.Output{
 		return p.query
 	}
 
+	type i{{ $model.Name.GoCase }}EqualsParams interface {
+		field() builder.Field
+		getQuery() builder.Query
+		equals()
+		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	type {{ $name }}EqualsParams struct {
+		data builder.Field
+		query builder.Query
+	}
+
+	func (p {{ $name }}EqualsParams) {{ $model.Name.GoLowerCase }}Model() {}
+
+	func ({{ $name }}EqualsParams) equals() {}
+
+	func (p {{ $name }}EqualsParams) field() builder.Field {
+		return p.data
+	}
+
+	func (p {{ $name }}EqualsParams) getQuery() builder.Query {
+		return p.query
+	}
+
+	type i{{ $model.Name.GoCase }}EqualsParamsUnique interface {
+		field() builder.Field
+		getQuery() builder.Query
+		equals()
+		unique()
+		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	type {{ $name }}EqualsParamsUnique struct {
+		data builder.Field
+		query builder.Query
+	}
+
+	func (p {{ $name }}EqualsParamsUnique) {{ $model.Name.GoLowerCase }}Model() {}
+
+	func ({{ $name }}EqualsParamsUnique) unique() {}
+	func ({{ $name }}EqualsParamsUnique) equals() {}
+
+	func (p {{ $name }}EqualsParamsUnique) field() builder.Field {
+		return p.data
+	}
+
+	func (p {{ $name }}EqualsParamsUnique) getQuery() builder.Query {
+		return p.query
+	}
+
 	type i{{ $model.Name.GoCase }}SetParams interface {
 		field() builder.Field
 		settable()
