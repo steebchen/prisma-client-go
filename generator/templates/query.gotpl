@@ -53,15 +53,15 @@
 		{{ range $index := $input.Fields }}
 			func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
 				{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $index.InputType.Type.String }}
-				{{ range $f := $i.Fields }}
-					{{ $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
-				{{ end }}
+				{{- range $f := $i.Fields }}
+					{{- $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
+				{{ end -}}
 			) i{{ $model.Name.GoCase }}EqualsParamsUnique {
 				var fields []builder.Field
 
 				{{ range $f := $i.Fields }}
 					fields = append(fields, {{ $f.Name.GoLowerCase }}.field())
-				{{ end }}
+				{{- end }}
 
 				return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
 					data: builder.Field{
@@ -76,6 +76,7 @@
 	{{ range $field := $model.Fields }}
 		{{ $struct := print $nsQuery $field.Name.GoCase $field.Type }}
 
+		// base struct
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
@@ -175,13 +176,28 @@
 
 		{{ if $field.Kind.IncludeInStruct }}
 			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-			func (r {{ $struct }}) Set(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
-				return {{ $setReturnStruct }}{
-					data: builder.Field{
-						Name:   "{{ $field.Name }}",
-						Value:  value,
-					},
-				}
+			func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				{{/* if scalar list (only postgres) */}}
+				{{ if $field.IsList }}
+					return {{ $setReturnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name }}",
+							Fields: []builder.Field{
+								builder.Field{
+									Name:   "set",
+									Value:  value,
+								},
+							},
+						},
+					}
+				{{ else }}
+					return {{ $setReturnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name }}",
+							Value:  value,
+						},
+					}
+				{{ end }}
 			}
 
 			{{ if not $field.IsRequired }}
@@ -189,8 +205,8 @@
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
 					return {{ $setReturnStruct }}{
 						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Value:  value,
+							Name:  "{{ $field.Name }}",
+							Value: value,
 						},
 					}
 				}
