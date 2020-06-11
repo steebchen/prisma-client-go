@@ -59,7 +59,7 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput:      "./db/db_gen.go",
+					DefaultOutput:      fmt.Sprintf("./%s/%s_gen.go", generator.DefaultPackageName, generator.DefaultPackageName),
 					PrettyName:         "Prisma Client Go",
 					Denylist:           []string{},
 					RequiresGenerators: []string{},
