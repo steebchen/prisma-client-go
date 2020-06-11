@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
@@ -25,7 +26,7 @@ func generate() {
 		if err != nil {
 			return err
 		}
-		if info.Name() == "schema.prisma" {
+		if !strings.Contains(path, "migrations") && info.Name() == "schema.prisma" {
 			files = append(files, path)
 		}
 		return nil

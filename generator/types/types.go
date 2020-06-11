@@ -10,6 +10,10 @@ import (
 // String acts as a builtin string but provides useful casing methods.
 type String string
 
+func (s String) String() string {
+	return string(s)
+}
+
 // GoCase transforms strings into Go-style casing, meaning uppercase including Go casing edge cases.
 func (s String) GoCase() string {
 	return gocase.To(strcase.ToCamel(string(s)))
@@ -42,6 +46,10 @@ var builtin = map[string]string{
 
 // Type acts as a builtin string but provides useful methods for type DMMF values.
 type Type string
+
+func (t Type) String() string {
+	return string(t)
+}
 
 // Value returns the native value of a type.
 func (t Type) Value() string {

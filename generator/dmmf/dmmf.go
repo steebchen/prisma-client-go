@@ -1,6 +1,9 @@
 package dmmf
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/prisma/prisma-client-go/generator/types"
 )
 
@@ -48,7 +51,6 @@ func (v DatamodelFieldKind) IsRelation() bool {
 type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
-	Mappings  []Mapping `json:"mappings"`
 }
 
 // Operator describes a query operator such as NOT, OR, etc.
@@ -220,6 +222,10 @@ type Model struct {
 	Fields []Field      `json:"fields"`
 }
 
+func (m Model) Actions() []string {
+	return []string{"Set", "Equals"}
+}
+
 // RelationFieldsPlusOne returns all fields plus an empty one, so it's easier to iterate through it in some gotpl files
 func (m Model) RelationFieldsPlusOne() []Field {
 	var fields []Field
@@ -295,6 +301,33 @@ type Schema struct {
 	Enums            []SchemaEnum `json:"enums"`
 }
 
+func (s *Schema) UniqueTypes() []InputType {
+	var inputs []InputType
+	for _, inputType := range s.InputTypes {
+		// check for unique input types
+		if strings.HasSuffix(string(inputType.Name), "UniqueInput") {
+			for _, field := range inputType.Fields {
+				// check if there's unique compound input type in it
+				if strings.HasSuffix(string(field.InputType.Type), "CompoundUniqueInput") {
+					// if yes, add the full inputType and break
+					inputs = append(inputs, inputType)
+					break
+				}
+			}
+		}
+	}
+	return inputs
+}
+
+func (s *Schema) UniqueCompoundTypeByName(name string) InputType {
+	for _, inputType := range s.InputTypes {
+		if string(inputType.Name) == name {
+			return inputType
+		}
+	}
+	panic(fmt.Sprintf("no such type %s found", name))
+}
+
 // SchemaArg provides the arguments of a given field.
 type SchemaArg struct {
 	Name      types.String    `json:"name"`
@@ -328,7 +361,7 @@ type SchemaField struct {
 
 // SchemaOutputType describes an output type of a given field.
 type SchemaOutputType struct {
-	Type       types.String `json:"type"` // note that in the serialized state we don't have the reference to MergedOutputTypes
+	Type       types.String `json:"type"`
 	IsList     bool         `json:"isList"`
 	IsRequired bool         `json:"isRequired"`
 	Kind       FieldKind    `json:"kind"`
@@ -347,39 +380,3 @@ type InputType struct {
 	AtMostOne bool        `json:"atMostOne"`
 	Fields    []SchemaArg `json:"fields"`
 }
-
-// Mapping provides information for CRUD methods to allow easy mapping to the query engine.
-type Mapping struct {
-	Model types.String `json:"model"`
-	// FindOne (optional)
-	FindOne types.String `json:"findOne"`
-	// FindMany (optional)
-	FindMany types.String `json:"findMany"`
-	// Create (optional)
-	Create types.String `json:"create"`
-	// Update (optional)
-	Update types.String `json:"update"`
-	// UpdateMany (optional)
-	UpdateMany types.String `json:"updateMany"`
-	// Upsert (optional)
-	Upsert types.String `json:"upsert"`
-	// Delete (optional)
-	Delete types.String `json:"delete"`
-	// DeleteMany (optional)
-	DeleteMany types.String `json:"deleteMany"`
-}
-
-// ModelAction describes a CRUD operation.
-type ModelAction types.String
-
-// ModelAction values
-const (
-	ModelActionFindOne    ModelAction = "findOne"
-	ModelActionFindMany   ModelAction = "findMany"
-	ModelActionCreate     ModelAction = "create"
-	ModelActionUpdate     ModelAction = "update"
-	ModelActionUpdateMany ModelAction = "updateMany"
-	ModelActionUpsert     ModelAction = "upsert"
-	ModelActionDelete     ModelAction = "delete"
-	ModelActionDeleteMany ModelAction = "deleteMany"
-)
