@@ -17,9 +17,11 @@ import (
 	"github.com/prisma/prisma-client-go/binaries/platform"
 )
 
+const DefaultPackageName = "db"
+
 func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
-		input.Generator.Config.Package = "main"
+		input.Generator.Config.Package = DefaultPackageName
 	}
 }
 
