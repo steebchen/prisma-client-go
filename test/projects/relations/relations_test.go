@@ -347,6 +347,55 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "CreateOne with relation",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.CreateOne(
+				Post.Title.Set("hi"),
+				Post.Author.Link(
+					User.ID.Equals("relations"),
+				),
+				Post.ID.Set("post1"),
+			).With(
+				Post.Author.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := PostModel{
+				RawPost: RawPost{
+					ID:       "post1",
+					Title:    "hi",
+					AuthorID: "relations",
+				},
+				RelationsPost: RelationsPost{
+					Author: &UserModel{
+						RawUser: RawUser{
+							ID:       "relations",
+							Email:    "john@example.com",
+							Username: "johndoe",
+							Name:     str("John"),
+						},
+					},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "with and sub query",
 		// language=GraphQL
 		before: []string{`
