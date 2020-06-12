@@ -18,6 +18,12 @@
 		var v {{ $result }}
 		v.query = builder.NewQuery()
 		v.query.Client = r.client
+
+		v.query.Operation = "mutation"
+		v.query.Method = "createOne"
+		v.query.Model = "{{ $model.Name.GoCase }}"
+		v.query.Outputs = {{ $name }}Output
+
 		var fields []builder.Field
 
 		{{ range $field := $model.Fields }}
@@ -37,15 +43,24 @@
 		return v
 	}
 
+	func (r {{ $result }}) With(params ...i{{ $model.Name.GoCase }}RelationWith) {{ $result }} {
+		for _, q := range params {
+			query := q.getQuery()
+			r.query.Outputs = append(r.query.Outputs, builder.Output{
+				Name:    query.Method,
+				Inputs:  query.Inputs,
+				Outputs: query.Outputs,
+			})
+		}
+
+		return r
+	}
+
 	type {{ $result }} struct {
 		query builder.Query
 	}
 
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
-		r.query.Operation = "mutation"
-		r.query.Method = "createOne"
-		r.query.Model = "{{ $model.Name.GoCase }}"
-		r.query.Outputs = {{ $name }}Output
 		var v createOne{{ $model.Name.GoCase }}Response
 		err := r.query.Exec(ctx, &v)
 		if v.Errors != nil {
