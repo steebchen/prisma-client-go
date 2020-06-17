@@ -172,6 +172,22 @@
 					},
 				}
 			}
+
+			{{ if not $field.IsRequired }}
+				func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Unlink() {{ $setReturnStruct }} {
+					return {{ $setReturnStruct }}{
+						data: builder.Field{
+							Name: "{{ $field.Name }}",
+							Fields: []builder.Field{
+								{
+									Name:  "disconnect",
+									Value: true,
+								},
+							},
+						},
+					}
+				}
+			{{ end }}
 		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}

@@ -396,6 +396,92 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "unlink",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					role: {
+						create: {
+							id: "admin",
+							name: "Admin",
+						},
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindOne(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				RawUser: RawUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   str("admin"),
+				},
+				RelationsUser: RelationsUser{
+					Role: &RoleModel{
+						RawRole: RawRole{
+							ID:   "admin",
+							Name: "Admin",
+						},
+					},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+
+			actual, err = client.User.FindOne(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Update(
+				User.Role.Unlink(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedEmpty := UserModel{
+				RawUser: RawUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   nil,
+				},
+			}
+
+			assert.Equal(t, expectedEmpty, actual)
+
+			actual, err = client.User.FindOne(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expectedEmpty, actual)
+
+		},
+	}, {
 		name: "with and sub query",
 		// language=GraphQL
 		before: []string{`

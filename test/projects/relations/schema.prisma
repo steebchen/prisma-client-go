@@ -36,7 +36,7 @@ model Post {
 	// 2) uppercase model
 	// TODO create separate tests for these two cases
 	// related issue: https://github.com/prisma/prisma-client-go/issues/127
-	Category   Category?   @relation(fields: [categoryID], references: [id])
+	Category   Category? @relation(fields: [categoryID], references: [id])
 	categoryID String?
 
 	comments Comment[]
