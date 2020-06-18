@@ -31,6 +31,7 @@ func Run(arguments []string, output bool) error {
 	binaryName := platform.CheckForExtension(platform.BinaryPlatformName())
 
 	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "PRISMA_HIDE_UPDATE_MESSAGE=true")
 
 	for _, engine := range binaries.Engines {
 		var value string
