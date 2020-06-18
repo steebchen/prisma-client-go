@@ -23,11 +23,17 @@ func TestEnums(t *testing.T) {
 				ID:      "123",
 				Role:    admin,
 				RoleOpt: &mod,
+				Stuff1:  StuffCASING,
+				Stuff2:  StuffDifferent,
+				Stuff3:  StuffHaHa,
 			},
 		}
 
 		created, err := client.User.CreateOne(
 			User.Role.Set(RoleAdmin),
+			User.Stuff1.Set(StuffCASING),
+			User.Stuff2.Set(StuffDifferent),
+			User.Stuff3.Set(StuffHaHa),
 			User.ID.Set("123"),
 			User.RoleOpt.Set(RoleModerator),
 		).Exec(ctx)
