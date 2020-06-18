@@ -13,6 +13,9 @@ model User {
 	id      String  @id @default(cuid())
 	role    Role
 	roleOpt Role?
+	stuff1  Stuff
+	stuff2  Stuff
+	stuff3  Stuff
 }
 
 enum Role {
@@ -21,9 +24,9 @@ enum Role {
 	Admin
 }
 
-enum AnotherRole {
-	A
-	B
-	C
+enum Stuff {
+	different
+	CASING
+	HaHa
 }
 
