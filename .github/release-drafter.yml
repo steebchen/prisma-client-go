@@ -5,6 +5,14 @@ sort-direction: ascending
 prerelease: true
 
 template: |
+  # v$NEXT_PATCH_VERSION
+  
+  TODO: description
+  
+  ## Major changes
+  
+  TODO: list major changes
+
   ## Changes
 
   $CHANGES
