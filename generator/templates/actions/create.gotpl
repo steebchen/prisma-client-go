@@ -21,7 +21,7 @@
 
 		v.query.Operation = "mutation"
 		v.query.Method = "createOne"
-		v.query.Model = "{{ $model.Name.GoCase }}"
+		v.query.Model = "{{ $model.Name.String }}"
 		v.query.Outputs = {{ $name }}Output
 
 		var fields []builder.Field
