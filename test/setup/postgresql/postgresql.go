@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"testing"
-	"time"
 
 	"github.com/prisma/prisma-client-go/test/cmd"
 	"github.com/prisma/prisma-client-go/test/setup"
@@ -47,8 +46,6 @@ func (db *postgreSQL) Setup() {
 	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "5432:5432", "-e", "POSTGRES_PASSWORD=pw", "-d", "postgres"); err != nil {
 		panic(err)
 	}
-
-	time.Sleep(5 * time.Second)
 }
 
 func (db *postgreSQL) Teardown() {

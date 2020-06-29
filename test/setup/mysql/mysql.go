@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"testing"
-	"time"
 
 	"github.com/prisma/prisma-client-go/test/cmd"
 	"github.com/prisma/prisma-client-go/test/setup"
@@ -47,8 +46,6 @@ func (*mySQL) Setup() {
 	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "3306:3306", "-e", "MYSQL_DATABASE=testing", "-e", "MYSQL_ROOT_PASSWORD=pw", "-d", "mysql:5.6"); err != nil {
 		panic(err)
 	}
-
-	time.Sleep(15 * time.Second)
 }
 
 func (*mySQL) Teardown() {
