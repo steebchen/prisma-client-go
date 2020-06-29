@@ -1,0 +1,31 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("__REPLACE__")
+}
+
+generator db {
+  provider = "go run github.com/prisma/prisma-client-go"
+  output   = "./db_gen.go"
+  package  = "db"
+}
+
+// this schema tests for unique constraints on relation ids
+
+model User {
+  id           String        @default(cuid()) @id
+  participants Participant[]
+}
+
+model Participant {
+  id      String @default(cuid()) @id
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  event   Event  @relation(fields: [eventId], references: [id])
+  eventId String
+  @@unique([userId, eventId])
+}
+
+model Event {
+  id           String        @id
+  participants Participant[]
+}

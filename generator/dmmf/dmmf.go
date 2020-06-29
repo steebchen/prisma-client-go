@@ -1,7 +1,6 @@
 package dmmf
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/prisma/prisma-client-go/generator/types"
@@ -301,7 +300,7 @@ type Schema struct {
 	Enums            []SchemaEnum `json:"enums"`
 }
 
-func (s *Schema) UniqueTypes() []InputType {
+func (s *Schema) UniqueCompoundTypes() []InputType {
 	var inputs []InputType
 	for _, inputType := range s.InputTypes {
 		// check for unique input types
@@ -319,13 +318,42 @@ func (s *Schema) UniqueTypes() []InputType {
 	return inputs
 }
 
-func (s *Schema) UniqueCompoundTypeByName(name string) InputType {
-	for _, inputType := range s.InputTypes {
-		if string(inputType.Name) == name {
-			return inputType
+func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType {
+	var inputType InputType
+	for _, i := range s.InputTypes {
+		if i.Name.String() == name {
+
+			inputType = i
+			break
 		}
 	}
-	panic(fmt.Sprintf("no such type %s found", name))
+	if inputType.Name == "" {
+		return nil
+	}
+
+	var secondInputType InputType
+
+	// found the input type. now check if the model matches...
+outer:
+	for _, i := range s.InputTypes {
+		for _, f := range i.Fields {
+			if f.InputType.Type.String() == name {
+				secondInputType = i
+				break outer
+			}
+		}
+	}
+
+	if secondInputType.Name == "" {
+		return nil
+	}
+
+	modelField := strings.Replace(secondInputType.Name.String(), "WhereUniqueInput", "", 1)
+	if modelField != model {
+		return nil
+	}
+
+	return &inputType
 }
 
 // SchemaArg provides the arguments of a given field.
