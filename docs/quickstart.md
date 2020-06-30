@@ -99,6 +99,8 @@ defer func() {
 ### Full example
 
 ```go
+package main
+
 import (
     "context"
     "log"
@@ -135,7 +137,7 @@ func main() {
 
     // find a single user
     user, err := client.User.FindOne(
-        db.User.Email.Equals("john@example.com"),
+        db.User.Email.Equals("john.doe@example.com"),
     ).Exec(ctx)
     if err != nil {
         panic(err)
