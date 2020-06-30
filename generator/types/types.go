@@ -56,7 +56,7 @@ func (t Type) Value() string {
 	str := string(t)
 	v, ok := builtin[str]
 	if !ok {
-		return str
+		return gocase.To(strcase.ToCamel(str))
 	}
 
 	return v
