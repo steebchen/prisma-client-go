@@ -6,7 +6,6 @@
 		{{ $ml := print $model.Name.GoLowerCase }}
 
 		{{ range $v := $.DMMF.Variations }}
-			{{ $an := $action.Name.CamelCase }}
 			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Response struct {
 				Errors []engine.GQLError `json:"errors"`
 				Data struct{
@@ -21,7 +20,7 @@
 							{{ if eq $action.Name "Find" }}*{{ end }}{{ $m }}Model
 						{{- end -}}
 					{{- end -}}
-					`json:"{{ $an }}{{ $v.Name }}{{ $m }}"`
+					`json:"{{ $action.Name.CamelCase }}{{ $v.Name }}{{ $model.Name }}"`
 				} `json:"data"`
 			}
 

@@ -44,7 +44,7 @@
 
 					v.query.Operation = "query"
 					v.query.Method = "find{{ $v.Name.GoCase }}"
-					v.query.Model = "{{ $model.Name.GoCase }}"
+					v.query.Model = "{{ $model.Name.String }}"
 					v.query.Outputs = {{ $name }}Output
 
 					{{ if $v.List }}
@@ -213,7 +213,7 @@
 				v.query = r.query
 				v.query.Operation = "mutation"
 				v.query.Method = "delete{{ $v.Name.GoCase }}"
-				v.query.Model = "{{ $model.Name.GoCase }}"
+				v.query.Model = "{{ $model.Name.String }}"
 				v.query.Outputs = {{ $outputName }}Output
 				return v
 			}
