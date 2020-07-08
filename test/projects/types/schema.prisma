@@ -13,7 +13,7 @@ model Client {
 	id String @id
 }
 
-// test for a reserver go keyword as model name
+// test for a reserved go keyword as model name
 model Type {
 	id String @id
 }
@@ -55,5 +55,16 @@ model User {
 	interface String?
 	defer     String?
 
-	type     String
+	type String
+
+	// special names
+	relation   String?
+	with       String?
+	model      String?
+	field      String?
+	findOne    String?
+	output     String?
+	input      String?
+	params     String?
+	set_params String?
 }

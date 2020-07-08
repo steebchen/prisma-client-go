@@ -21,13 +21,6 @@ var countOutput = []builder.Output{
 		{{- end }}
 	}
 
-	type i{{ $model.Name.GoCase }}With interface {
-		getQuery() builder.Query
-		with()
-		{{ $model.Name.GoLowerCase }}Model()
-		{{ $model.Name.GoLowerCase }}Relation()
-	}
-
 	type i{{ $model.Name.GoCase }}RelationWith interface {
 		getQuery() builder.Query
 		with()
