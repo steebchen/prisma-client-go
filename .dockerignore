@@ -9,5 +9,6 @@ prisma-client-go
 schema.graphql
 **migrations**/
 **/prisma-*
+**/query-engine-*
 build/
 .graphqlconfig
