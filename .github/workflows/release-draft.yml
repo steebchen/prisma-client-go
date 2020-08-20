@@ -1,9 +1,10 @@
 name: release-drafter
-
 on:
   push:
     branches:
       - master
+env:
+  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go release-draft.yml"
 
 jobs:
   update-release-draft:
