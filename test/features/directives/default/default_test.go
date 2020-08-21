@@ -20,7 +20,7 @@ func TestEnums(t *testing.T) {
 		boolOpt := false
 		testB := TestB
 		expected := UserModel{
-			RawUser: RawUser{
+			InternalUser: InternalUser{
 				ID:        "123",
 				String:    "string",
 				StringOpt: &stringOpt,

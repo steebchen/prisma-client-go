@@ -43,7 +43,7 @@ func TestArrays(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:    "id1",
 					Items: []string{"a", "b", "c"},
 				},
@@ -63,7 +63,7 @@ func TestArrays(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:    "id",
 					Items: []string{"a", "b", "c"},
 				},
