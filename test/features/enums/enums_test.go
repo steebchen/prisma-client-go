@@ -19,7 +19,7 @@ func TestEnums(t *testing.T) {
 		admin := RoleAdmin
 		mod := RoleModerator
 		expected := UserModel{
-			RawUser: RawUser{
+			InternalUser: InternalUser{
 				ID:      "123",
 				Role:    admin,
 				RoleOpt: &mod,
