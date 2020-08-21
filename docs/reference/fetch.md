@@ -8,7 +8,7 @@ user, err := client.User.FindOne(
     User.Email.Equals("john@example.com"),
 ).With(
     // also fetch 3 their posts
-    User.Posts.Fetch().Limit(3),
+    User.Posts.Fetch().Take(3),
 ).Exec(ctx)
 check(err)
 log.Printf("user's name: %s", user.Name)
