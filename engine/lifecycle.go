@@ -188,7 +188,6 @@ func (e *Engine) spawn(file string) error {
 	var gqlErrors []GQLError
 	for i := 0; i < 100; i++ {
 		body, err := e.Request(ctx, "GET", "/status", map[string]interface{}{})
-
 		if err != nil {
 			connectErr = err
 			logger.Debug.Printf("could not connect; retrying...")
@@ -198,8 +197,7 @@ func (e *Engine) spawn(file string) error {
 
 		var response GQLResponse
 
-		err = json.Unmarshal(body, &response)
-		if err != nil {
+		if err := json.Unmarshal(body, &response); err != nil {
 			connectErr = err
 			logger.Debug.Printf("could not unmarshal response; retrying...")
 			time.Sleep(50 * time.Millisecond)
