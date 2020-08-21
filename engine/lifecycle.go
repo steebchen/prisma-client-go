@@ -64,8 +64,10 @@ func (e *Engine) Disconnect() error {
 func (e *Engine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
-	binariesPath := binaries.GlobalTempDir()
-	binaryName := platform.CheckForExtension(platform.BinaryPlatformName())
+	binariesPath := binaries.GlobalUnpackDir()
+	// check for darwin/windows/linux first
+	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
+	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
@@ -73,10 +75,13 @@ func (e *Engine) ensure() (string, error) {
 	forceVersion := true
 
 	name := "prisma-query-engine-"
-	localPath := "./" + path.Join(name+binaryName)
+	localPath := path.Join("./", name+binaryName)
+	localExactPath := path.Join("./", name+exactBinaryName)
 	globalPath := path.Join(binariesPath, name+binaryName)
+	globalExactPath := path.Join(binariesPath, name+exactBinaryName)
 
-	logger.Debug.Printf("expecting query engine `%s`", name+binaryName)
+	logger.Debug.Printf("expecting local query engine `%s` or `%s`", localPath, localExactPath)
+	logger.Debug.Printf("expecting global query engine `%s` or `%s`", globalPath, globalExactPath)
 
 	// TODO write tests for all cases
 
@@ -93,36 +98,25 @@ func (e *Engine) ensure() (string, error) {
 		forceVersion = false
 	}
 
-	if _, err := os.Stat(localPath); err == nil {
-		// check in the local working directory
+	if _, err := os.Stat(localExactPath); err == nil {
+		logger.Debug.Printf("exact query engine found in working directory")
+		file = localExactPath
+	} else if _, err := os.Stat(localPath); err == nil {
 		logger.Debug.Printf("query engine found in working directory")
 		file = localPath
 	}
 
-	if e.hasBinaryTargets && file == "" {
-		logger.Debug.Printf("binaryTargets provided, but no query engine found at `%s`", name)
-		return "", fmt.Errorf("binary targets were provided, but no query engine was found, please provide/upload the query engine `%s` in the project dir", name)
-	}
-
-	if _, err := os.Stat(globalPath); err == nil {
-		// check in the global cache directory
+	if _, err := os.Stat(globalExactPath); err == nil {
 		logger.Debug.Printf("query engine found in global path")
+		file = globalExactPath
+	} else if _, err := os.Stat(globalPath); err == nil {
+		logger.Debug.Printf("exact query engine found in global path")
 		file = globalPath
 	}
 
 	if file == "" {
-		logger.Info.Printf("no query engine defined or found")
-		logger.Info.Printf("if you want to pre-fetch the query engine for better startup performance, specify `binaryTargets = [\"native\"]` in your Schema.prisma file under \"generator\" and upload the query engine with your application.")
-		logger.Info.Printf("fetching the query engine now...")
-
-		qe, err := binaries.DownloadEngine("query-engine", binariesPath)
-		if err != nil {
-			return "", fmt.Errorf("could not fetch query engine: %w", err)
-		}
-
-		logger.Info.Printf("done.")
-
-		file = qe
+		// TODO log instructions on how to fix this problem
+		return "", fmt.Errorf("no binary found ")
 	}
 
 	startVersion := time.Now()

@@ -20,7 +20,9 @@ type Root struct {
 
 // Config describes the options for the Prisma Client Go generator
 type Config struct {
-	Package types.String `json:"package"`
+	Package           types.String `json:"package"`
+	DisableGitignore  string       `json:"disableGitignore"`
+	DisableGoBinaries string       `json:"disableGoBinaries"`
 }
 
 // Generator describes a generator defined in the Prisma schema.
