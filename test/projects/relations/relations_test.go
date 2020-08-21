@@ -311,7 +311,7 @@ func TestRelations(t *testing.T) {
 			actual, err := client.User.FindOne(
 				User.Email.Equals("john@example.com"),
 			).With(
-				User.Posts.Fetch().Last(2),
+				User.Posts.Fetch().Take(-2),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -539,7 +539,7 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).Last(2),
+				).Take(-2),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -632,8 +632,8 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).Last(2).With(
-					Post.Comments.Fetch().First(2),
+				).Take(-2).With(
+					Post.Comments.Fetch().Take(2),
 				),
 			).Exec(ctx)
 			if err != nil {
@@ -712,7 +712,7 @@ func TestRelations(t *testing.T) {
 			actual, err := client.Post.FindOne(
 				Post.ID.Equals("post-a"),
 			).With(
-				Post.Comments.Fetch().Last(2),
+				Post.Comments.Fetch().Take(-2),
 				Post.Author.Fetch(),
 			).Exec(ctx)
 			if err != nil {
