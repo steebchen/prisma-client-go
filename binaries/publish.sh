@@ -8,6 +8,7 @@ mkdir -p build
 cd build
 npm init --yes
 npm i "@prisma/cli@$v"
+npx @prisma/cli version
 
 mkdir -p binaries
 
@@ -28,4 +29,4 @@ aws s3 cp "prisma-cli-$version-darwin.gz" s3://prisma-photongo --acl public-read
 aws s3 cp "prisma-cli-$version-linux.gz" s3://prisma-photongo --acl public-read
 aws s3 cp "prisma-cli-$version-windows.exe.gz" s3://prisma-photongo --acl public-read
 
-cd ..
+cd ../..
