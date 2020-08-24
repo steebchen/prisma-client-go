@@ -103,6 +103,8 @@ func FetchEngine(toDir string, engineName string, binaryPlatformName string) err
 	}
 	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
 
+	logger.Debug.Printf("download url %s", url)
+
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
 		return nil
@@ -174,6 +176,8 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 	to := platform.CheckForExtension(binaryName, path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
 
 	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
+
+	logger.Debug.Printf("download url %s", url)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
