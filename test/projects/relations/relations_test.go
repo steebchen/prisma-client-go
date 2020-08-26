@@ -124,14 +124,14 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:       "a",
 					Title:    "common",
 					Content:  str("a"),
 					AuthorID: "relations",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:       "b",
 					Title:    "common",
 					Content:  str("b"),
@@ -193,7 +193,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -234,7 +234,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := PostModel{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:       "post",
 					Title:    title,
 					AuthorID: "123",
@@ -311,14 +311,14 @@ func TestRelations(t *testing.T) {
 			actual, err := client.User.FindOne(
 				User.Email.Equals("john@example.com"),
 			).With(
-				User.Posts.Fetch().Last(2),
+				User.Posts.Fetch().Take(-2),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -326,14 +326,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
 							AuthorID: "relations",
 						},
 					}, {
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "d",
 							Title:    "stuff",
 							Content:  str("d"),
@@ -376,14 +376,14 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := PostModel{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:       "post1",
 					Title:    "hi",
 					AuthorID: "relations",
 				},
 				RelationsPost: RelationsPost{
 					Author: &UserModel{
-						RawUser: RawUser{
+						InternalUser: InternalUser{
 							ID:       "relations",
 							Email:    "john@example.com",
 							Username: "johndoe",
@@ -427,7 +427,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -436,7 +436,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Role: &RoleModel{
-						RawRole: RawRole{
+						InternalRole: InternalRole{
 							ID:   "admin",
 							Name: "Admin",
 						},
@@ -458,7 +458,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expectedEmpty := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -539,14 +539,14 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).Last(2),
+				).Take(-2),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -554,14 +554,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
 							AuthorID: "relations",
 						},
 					}, {
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -632,8 +632,8 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).Last(2).With(
-					Post.Comments.Fetch().First(2),
+				).Take(-2).With(
+					Post.Comments.Fetch().Take(2),
 				),
 			).Exec(ctx)
 			if err != nil {
@@ -641,7 +641,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -649,7 +649,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
@@ -659,7 +659,7 @@ func TestRelations(t *testing.T) {
 							Comments: []CommentModel{},
 						},
 					}, {
-						RawPost: RawPost{
+						InternalPost: InternalPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -712,7 +712,7 @@ func TestRelations(t *testing.T) {
 			actual, err := client.Post.FindOne(
 				Post.ID.Equals("post-a"),
 			).With(
-				Post.Comments.Fetch().Last(2),
+				Post.Comments.Fetch().Take(-2),
 				Post.Author.Fetch(),
 			).Exec(ctx)
 			if err != nil {
@@ -720,7 +720,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			user := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "john",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -733,7 +733,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, user, author)
 
 			comments := []CommentModel{{
-				RawComment: RawComment{
+				InternalComment: InternalComment{
 					ID:      "comment-a",
 					Content: "this is a comment",
 					UserID:  "john",
@@ -795,7 +795,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expectedCategory := CategoryModel{
-				RawCategory: RawCategory{
+				InternalCategory: InternalCategory{
 					ID:   "media",
 					Name: "Media",
 				},

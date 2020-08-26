@@ -62,19 +62,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -126,19 +126,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
@@ -189,9 +189,10 @@ func TestPagination(t *testing.T) {
 					Post.Title.Order(ASC),
 				).
 				// would return a, b
-				First(2).
+				Take(2).
+				Skip(1).
 				// return records after b, which is c
-				After(Post.Title.Cursor("b")).
+				Cursor(Post.Title.Cursor("b")).
 				Exec(ctx)
 
 			if err != nil {
@@ -199,7 +200,7 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -250,7 +251,7 @@ func TestPagination(t *testing.T) {
 					Post.Title.Order(ASC),
 				).
 				// would return a, b
-				First(2).
+				Take(2).
 				// skip a, return b, c
 				Skip(1).
 				Exec(ctx)
@@ -260,13 +261,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -317,9 +318,10 @@ func TestPagination(t *testing.T) {
 					Post.Title.Order(ASC),
 				).
 				// would return b, c
-				Last(2).
+				Take(-2).
+				Skip(1).
 				// before c will return b
-				Before(Post.Title.Cursor("c")).
+				Cursor(Post.Title.Cursor("c")).
 				Exec(ctx)
 
 			if err != nil {
@@ -327,13 +329,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				RawPost: RawPost{
+				InternalPost: InternalPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",

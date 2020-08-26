@@ -16,11 +16,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.0.0-alpha.1265"
+const PrismaVersion = "2.0.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "4dbefe724ae6df3621eb660a5d0e0402e34189bf"
+const EngineVersion = "de2bc1cbdb5561ad73d2f08463fa2eec48993f56"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
@@ -75,6 +75,10 @@ func GlobalTempDir() string {
 	return path.Join(temp, baseDirName, "engines", EngineVersion)
 }
 
+func GlobalUnpackDir() string {
+	return path.Join(GlobalTempDir(), "unpacked")
+}
+
 // GlobalCacheDir returns the path of where the CLI lives
 // internally, this is the global temp dir
 func GlobalCacheDir() string {
@@ -91,9 +95,15 @@ func GlobalCacheDir() string {
 func FetchEngine(toDir string, engineName string, binaryPlatformName string) error {
 	logger.Debug.Printf("checking %s...", engineName)
 
-	to := path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName))
+	to := platform.CheckForExtension(binaryPlatformName, path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName)))
 
-	url := fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformName, engineName)
+	binaryPlatformRemoteName := binaryPlatformName
+	if binaryPlatformRemoteName == "linux" {
+		binaryPlatformRemoteName = "linux-musl"
+	}
+	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
+
+	logger.Debug.Printf("download url %s", url)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
@@ -136,8 +146,8 @@ func FetchNative(toDir string) error {
 
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
-	to := platform.CheckForExtension(path.Join(toDir, cli))
-	url := platform.CheckForExtension(fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
+	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
+	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
@@ -154,14 +164,20 @@ func DownloadCLI(toDir string) error {
 	return nil
 }
 
+func GetEnginePath(dir, engine, binaryName string) string {
+	return platform.CheckForExtension(binaryName, path.Join(dir, fmt.Sprintf("prisma-%s-%s", engine, binaryName)))
+}
+
 func DownloadEngine(name string, toDir string) (file string, err error) {
 	binaryName := platform.BinaryPlatformName()
 
 	logger.Debug.Printf("checking %s...", name)
 
-	to := platform.CheckForExtension(path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
+	to := platform.CheckForExtension(binaryName, path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
 
-	url := platform.CheckForExtension(fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
+	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
+
+	logger.Debug.Printf("download url %s", url)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached", to)
@@ -235,8 +251,7 @@ func copyFile(from string, to string) error {
 		return fmt.Errorf("readfile: %w", err)
 	}
 
-	err = ioutil.WriteFile(to, input, os.ModePerm)
-	if err != nil {
+	if err := ioutil.WriteFile(to, input, os.ModePerm); err != nil {
 		return fmt.Errorf("writefile: %w", err)
 	}
 
