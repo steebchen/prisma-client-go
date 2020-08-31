@@ -8,7 +8,7 @@ mkdir -p build
 cd build
 npm init --yes
 npm i "@prisma/cli@$v"
-npx @prisma/cli version
+npx prisma version
 
 mkdir -p binaries
 

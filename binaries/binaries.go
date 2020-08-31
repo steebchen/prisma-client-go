@@ -26,7 +26,7 @@ const EngineVersion = "de2bc1cbdb5561ad73d2f08463fa2eec48993f56"
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
-var EngineURL = "https://binaries.prisma.sh/master/%s/%s/%s.gz"
+var EngineURL = "https://binaries.prisma.sh/all_commits/%s/%s/%s.gz"
 
 type Engine struct {
 	Name string
