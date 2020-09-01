@@ -28,8 +28,6 @@
 
     generator db {
         provider = "go run github.com/prisma/prisma-client-go"
-        output = "./db/db_gen.go"
-        package = "db"
     }
 
     model User {
