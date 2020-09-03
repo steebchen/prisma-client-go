@@ -22,8 +22,8 @@ jobs:
           path: |
             ~/go/pkg/mod
             ~/.cache
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-go-
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
       - name: deps
         run: go mod download
