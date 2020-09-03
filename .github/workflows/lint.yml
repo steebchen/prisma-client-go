@@ -8,10 +8,22 @@ on:
       - master
 jobs:
   lint:
+    name: lint
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-      - name: run linter
-        run: docker run -v $(pwd):/app -w /app golangci/golangci-lint:v1.21.0 golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
+      - uses: actions/setup-go@v1
+        with:
+          go-version: '1.15'
+
+      - name: generate
+        run: go generate ./...
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          version: v1.29
+          args: --enable "gofmt,golint,scopelint,gocritic"
