@@ -19,6 +19,8 @@ jobs:
       - uses: actions/checkout@v1
 
       - uses: satackey/action-docker-layer-caching@v0.0.8
+        with:
+          key: docker-${{ runner.os }}-${{ github.workflow }}-{hash}
 
       - name: integration
         run: docker build . -f test/integration/integration.dockerfile -t integration && docker run integration
