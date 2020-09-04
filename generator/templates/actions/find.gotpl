@@ -94,23 +94,21 @@
 
 			{{ if $v.List }}
 				func (r {{ $result }}) OrderBy(params ...{{ $orderByParams }}) {{ $result }} {
-					var inputs []builder.Input
+					var fields []builder.Field
 
 					for _, param := range params {
 						direction, _ := param.field().Value.(runtime.Direction)
 
-						inputs = append(inputs, builder.Input{
-							Name:  "orderBy",
-							Fields: []builder.Field{
-								{
-									Name: param.field().Name,
-									Value: direction,
-								},
-							},
+						fields = append(fields, builder.Field{
+							Name: param.field().Name,
+							Value: direction,
 						})
 					}
 
-					r.query.Inputs = append(r.query.Inputs, inputs...)
+					r.query.Inputs = append(r.query.Inputs, builder.Input{
+						Name:  "orderBy",
+						Fields: fields,
+					})
 
 					return r
 				}
