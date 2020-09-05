@@ -285,7 +285,7 @@ func (f Field) RelationMethods() []RelationMethod {
 
 	return []RelationMethod{{
 		Name:   "Where",
-		Action: "",
+		Action: "is",
 	}}
 }
 
