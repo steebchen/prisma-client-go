@@ -300,7 +300,12 @@
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
-							Value: value,
+							Fields: []builder.Field{
+								{
+									Name: "equals",
+									Value: value,
+								},
+							},
 						},
 					}
 				}
