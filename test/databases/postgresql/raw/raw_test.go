@@ -33,7 +33,7 @@ func TestRaw(t *testing.T) {
 
 	strOpt := "strOpt"
 	i := 5
-	f := "5.5"
+	f := "5.5000000000000000000000000000"
 	b := false
 
 	tests := []struct {
