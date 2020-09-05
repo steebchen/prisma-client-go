@@ -69,7 +69,7 @@
 					return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
 						data: builder.Field{
 							Name:   "{{ $index.Name }}",
-							Fields: fields,
+							Fields: builder.TransformEquals(fields),
 						},
 					}
 				}
@@ -174,7 +174,7 @@
 						Fields: []builder.Field{
 							{
 								Name:   "connect",
-								Fields: fields,
+								Fields: builder.TransformEquals(fields),
 							},
 						},
 					},
@@ -310,7 +310,12 @@
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
-							Value: str,
+							Fields: []builder.Field{
+								{
+									Name: "equals",
+									Value: str,
+								},
+							},
 						},
 					}
 				}

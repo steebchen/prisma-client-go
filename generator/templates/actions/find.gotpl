@@ -69,9 +69,10 @@
 							})
 						}
 					{{ else }}
+						{{/* transform this document because the signature of FindOne is different than FindMany */}}
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
-							Fields: []builder.Field{params.field()},
+							Fields: builder.TransformEquals([]builder.Field{params.field()}),
 						})
 					{{ end }}
 
