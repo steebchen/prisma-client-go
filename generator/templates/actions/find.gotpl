@@ -178,7 +178,22 @@
 				v.query = r.query
 				var fields []builder.Field
 				for _, q := range params {
-					fields = append(fields, q.field())
+					{{/* TODO consider upcoming non-set methods */}}
+					field := q.field()
+					{{/* if scalar, wrap in 'set' */}}
+					if field.Fields == nil {
+						v := field.Value
+						field.Fields = []builder.Field{
+							{
+								Name: "set",
+								Value: v,
+							},
+						}
+
+						field.Value = nil
+					}
+
+					fields = append(fields, field)
 				}
 				v.query.Inputs = append(v.query.Inputs, builder.Input{
 					Name:   "data",
