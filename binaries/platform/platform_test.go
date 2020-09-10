@@ -243,7 +243,7 @@ func Test_parseLinuxDistro(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			input := strings.Replace(tt.input, "\t", "", -1)
+			input := strings.ReplaceAll(tt.input, "\t", "")
 			if got := parseLinuxDistro(input); got != tt.want {
 				t.Errorf("parseLinuxDistro() = %v, want %v", got, tt.want)
 			}
