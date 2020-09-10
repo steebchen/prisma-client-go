@@ -45,11 +45,7 @@ func Name() string {
 }
 
 // CheckForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
-func CheckForExtension(path string) string {
-	return checkForExtension(Name(), path)
-}
-
-func checkForExtension(platform string, path string) string {
+func CheckForExtension(platform, path string) string {
 	if platform == "windows" {
 		if strings.Contains(path, ".gz") {
 			return strings.Replace(path, ".gz", ".exe.gz", 1)

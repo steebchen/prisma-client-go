@@ -156,14 +156,14 @@ func TestBasic(t *testing.T) {
 			}
 
 			assert.Equal(t, []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "findMany1",
 					Email:    "1",
 					Username: "john",
 					Name:     str("a"),
 				},
 			}, {
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "findMany2",
 					Email:    "2",
 					Username: "john",
@@ -204,14 +204,14 @@ func TestBasic(t *testing.T) {
 			}
 
 			assert.Equal(t, []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "findMany1",
 					Email:    "1",
 					Username: "john",
 					Name:     str("a"),
 				},
 			}, {
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "findMany2",
 					Email:    "2",
 					Username: "john",
@@ -236,7 +236,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id",
 					Email:    "email",
 					Username: "username",
@@ -274,7 +274,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id",
 					Email:    "email",
 					Username: "username",
@@ -322,7 +322,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "update",
 					Email:    email,
 					Username: "new-username",
@@ -385,14 +385,14 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id1",
 					Email:    "email1",
 					Username: "username",
 					Name:     str("New Name"),
 				},
 			}, {
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id2",
 					Email:    "email2",
 					Username: "username",
@@ -426,7 +426,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := UserModel{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "delete",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -520,7 +520,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id2",
 					Email:    "email2",
 					Username: "username",
@@ -565,13 +565,13 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id1",
 					Email:    "email1",
 					Username: "a",
 				},
 			}, {
-				RawUser: RawUser{
+				InternalUser: InternalUser{
 					ID:       "id2",
 					Email:    "email2",
 					Username: "b",

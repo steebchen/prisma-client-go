@@ -41,7 +41,7 @@ func Test_checkForExtension(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			if got := checkForExtension(tt.args.platform, tt.args.path); got != tt.want {
+			if got := CheckForExtension(tt.args.platform, tt.args.path); got != tt.want {
 				t.Errorf("checkForExtension() = %v, want %v", got, tt.want)
 			}
 		})

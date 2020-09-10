@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"time"
 
 	"github.com/prisma/prisma-client-go/test"
 )
@@ -28,6 +29,8 @@ func setup() {
 	for _, db := range test.Databases {
 		db.Setup()
 	}
+
+	time.Sleep(15 * time.Second)
 
 	log.Printf("setup done")
 }

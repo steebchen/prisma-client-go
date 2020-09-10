@@ -36,7 +36,18 @@ func generate() {
 	}
 
 	// prefetch the binaries first
-	cmd := exec.Command("go", "run", "github.com/prisma/prisma-client-go", "prefetch")
+	// generating in this folder makes sure binaries are unpacked
+	cmd := exec.Command("go", "run", "github.com/prisma/prisma-client-go", "generate")
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	// manually unpack binary
+	log.Printf("unpacking binaries...")
+	cmd = exec.Command("go", "run", "./db")
+	cmd.Env = append(os.Environ(), "PHOTON_GO_LOG=info")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	if err := cmd.Run(); err != nil {

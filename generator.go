@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"path"
 
 	"github.com/prisma/prisma-client-go/generator"
 	"github.com/prisma/prisma-client-go/jsonrpc"
@@ -59,7 +60,7 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput:      fmt.Sprintf("./%s/%s_gen.go", generator.DefaultPackageName, generator.DefaultPackageName),
+					DefaultOutput:      path.Join(".", "db"),
 					PrettyName:         "Prisma Client Go",
 					Denylist:           []string{},
 					RequiresGenerators: []string{},

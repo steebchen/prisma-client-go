@@ -44,7 +44,7 @@
 
 					v.query.Operation = "query"
 					v.query.Method = "find{{ $v.Name.GoCase }}"
-					v.query.Model = "{{ $model.Name.GoCase }}"
+					v.query.Model = "{{ $model.Name.String }}"
 					v.query.Outputs = {{ $name }}Output
 
 					{{ if $v.List }}
@@ -111,33 +111,17 @@
 					return r
 				}
 
-				func (r {{ $result }}) First(count int) {{ $result }} {
+				func (r {{ $result }}) Take(count int) {{ $result }} {
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
-						Name:  "first",
+						Name:  "take",
 						Value: count,
 					})
 					return r
 				}
 
-				func (r {{ $result }}) Last(count int) {{ $result }} {
+				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
-						Name:  "last",
-						Value: count,
-					})
-					return r
-				}
-
-				func (r {{ $result }}) After(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
-					r.query.Inputs = append(r.query.Inputs, builder.Input{
-						Name:  "after",
-						Fields: []builder.Field{cursor.field()},
-					})
-					return r
-				}
-
-				func (r {{ $result }}) Before(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
-					r.query.Inputs = append(r.query.Inputs, builder.Input{
-						Name:  "before",
+						Name:  "cursor",
 						Fields: []builder.Field{cursor.field()},
 					})
 					return r
@@ -213,7 +197,7 @@
 				v.query = r.query
 				v.query.Operation = "mutation"
 				v.query.Method = "delete{{ $v.Name.GoCase }}"
-				v.query.Model = "{{ $model.Name.GoCase }}"
+				v.query.Model = "{{ $model.Name.String }}"
 				v.query.Outputs = {{ $outputName }}Output
 				return v
 			}

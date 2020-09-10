@@ -4,4 +4,4 @@ go 1.13
 
 replace github.com/prisma/prisma-client-go => ../../
 
-require github.com/prisma/prisma-client-go v0.0.0-00010101000000-000000000000 // indirect
+require github.com/prisma/prisma-client-go v0.0.0-00010101000000-000000000000

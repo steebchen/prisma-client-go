@@ -8,7 +8,7 @@ Find, update and delete records.
 
 ```go
 users, err := client.User.FindMany(
-    photon.User.Name.Equals("hi"),
+    db.User.Name.Equals("hi"),
 ).Exec(ctx)
 ```
 

@@ -17,7 +17,7 @@ func TestComposite(t *testing.T) {
 		defer test.End(t, db, client.Engine, mockDB)
 
 		expected := UserModel{
-			RawUser: RawUser{
+			InternalUser: InternalUser{
 				FirstName:  "a",
 				MiddleName: "b",
 				LastName:   "c",

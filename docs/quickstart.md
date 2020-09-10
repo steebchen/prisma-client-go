@@ -28,8 +28,6 @@
 
     generator db {
         provider = "go run github.com/prisma/prisma-client-go"
-        output = "./db/db_gen.go"
-        package = "db"
     }
 
     model User {
@@ -70,14 +68,11 @@
     go run github.com/prisma/prisma-client-go generate
     ```
 
-    Prisma Client Go is now generated into the file path you specified in the "output" option which is `"./db/db_gen.go"` in this case.
     If you make changes to your prisma schema, you need to run this command again.
 
 ## Usage
 
 Once you generated the Prisma Client Go client and set up a datasource with Prisma, you're good to go!
-
-We recommend generating the client into a package called `db` (see step 3 above) at `./db/db_gen.go`, but you can adapt these settings to anything you want.
 
 ### Create the client and connect to the prisma engine
 
@@ -99,6 +94,8 @@ defer func() {
 ### Full example
 
 ```go
+package main
+
 import (
     "context"
     "log"
@@ -135,7 +132,7 @@ func main() {
 
     // find a single user
     user, err := client.User.FindOne(
-        db.User.Email.Equals("john@example.com"),
+        db.User.Email.Equals("john.doe@example.com"),
     ).Exec(ctx)
     if err != nil {
         panic(err)

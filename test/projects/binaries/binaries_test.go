@@ -1,9 +1,7 @@
 package binaries
 
 import (
-	"log"
 	"os"
-	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,14 +12,10 @@ import (
 func TestBinaries(t *testing.T) {
 	t.Parallel()
 
-	// just for logging purposes
-	out, _ := exec.Command("ls").CombinedOutput()
-	log.Printf("%s", string(out))
-
 	// this test only verifies that specifying `binaryTargets` downloaded the separate file into the directory
-	_, err := os.Stat("./prisma-query-engine-" + platform.BinaryPlatformName())
+	_, err := os.Stat("./query-engine-" + platform.BinaryPlatformName() + "_gen.go")
 	assert.Equal(t, err, nil)
 
-	_, err = os.Stat("./prisma-query-engine-rhel-openssl-1.1.x")
+	_, err = os.Stat("./query-engine-rhel-openssl-1.1.x_gen.go")
 	assert.Equal(t, err, nil)
 }
