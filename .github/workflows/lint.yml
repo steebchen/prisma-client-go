@@ -23,4 +23,4 @@ jobs:
         run: go generate ./...
 
       - name: run linter
-        run: docker run -v $(pwd):/app -w /app golangci/golangci-lint:v1.21.0 golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
+        run: docker run -v $(pwd):/app -w /app golangci/golangci-lint:v1.31.0-alpine golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
