@@ -14,7 +14,7 @@ import (
 
 // TODO check checksum after expanding file
 
-//noinspection GoUnusedExportedFunction
+// noinspection GoUnusedExportedFunction
 func Unpack(data []byte, name string) {
 	start := time.Now()
 
