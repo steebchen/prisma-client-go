@@ -300,18 +300,21 @@ type Schema struct {
 	Enums            []SchemaEnum `json:"enums"`
 }
 
-func (s *Schema) UniqueCompoundTypes() []InputType {
+func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 	var inputs []InputType
 	for _, inputType := range s.InputTypes {
 		// check for unique input types
-		if strings.HasSuffix(string(inputType.Name), "UniqueInput") {
-			for _, field := range inputType.Fields {
-				// check if there's unique compound input type in it
-				if strings.HasSuffix(string(field.InputType.Type), "CompoundUniqueInput") {
-					// if yes, add the full inputType and break
-					inputs = append(inputs, inputType)
-					break
-				}
+		if !strings.HasPrefix(string(inputType.Name), model) ||
+			!strings.HasSuffix(string(inputType.Name), "UniqueInput") {
+			continue
+		}
+
+		for _, field := range inputType.Fields {
+			// check if there's unique compound input type in it
+			if strings.HasSuffix(string(field.InputType.Type), "CompoundUniqueInput") {
+				// if yes, add the full inputType and break
+				inputs = append(inputs, inputType)
+				break
 			}
 		}
 	}
@@ -331,29 +334,31 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 		return nil
 	}
 
-	var secondInputType InputType
+	var secondInputTypes []InputType
 
 	// found the input type. now check if the model matches...
-outer:
 	for _, i := range s.InputTypes {
 		for _, f := range i.Fields {
 			if f.InputType.Type.String() == name {
-				secondInputType = i
-				break outer
+				secondInputTypes = append(secondInputTypes, i)
 			}
 		}
 	}
 
-	if secondInputType.Name == "" {
-		return nil
+	for _, secondInputType := range secondInputTypes {
+		if secondInputType.Name == "" {
+			continue
+		}
+
+		modelField := strings.Replace(secondInputType.Name.String(), "WhereUniqueInput", "", 1)
+		if modelField != model {
+			continue
+		}
+
+		return &inputType
 	}
 
-	modelField := strings.Replace(secondInputType.Name.String(), "WhereUniqueInput", "", 1)
-	if modelField != model {
-		return nil
-	}
-
-	return &inputType
+	return nil
 }
 
 // SchemaArg provides the arguments of a given field.

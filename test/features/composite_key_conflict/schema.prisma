@@ -1,0 +1,27 @@
+datasource db {
+	provider = "sqlite"
+	url      = env("__REPLACE__")
+}
+
+generator db {
+	provider = "go run github.com/prisma/prisma-client-go"
+	output = "."
+	disableGoBinaries = true
+	package = "composite"
+}
+
+model User {
+	id  String @default(cuid()) @id
+	foo String
+	bar String
+
+	@@unique([foo, bar])
+}
+
+model Post {
+	id  String @default(cuid()) @id
+	foo String
+	bar String
+
+	@@unique([foo, bar])
+}
