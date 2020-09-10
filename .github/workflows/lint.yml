@@ -19,8 +19,14 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-go-
 
+      - name: download
+        run: go mod download
+
       - name: generate
         run: go generate ./...
 
+      - name: install golangci-lint
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.31.0
+
       - name: run linter
-        run: docker run -v $(pwd):/app -w /app golangci/golangci-lint:v1.31.0-alpine golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
+        run: ./bin/golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
