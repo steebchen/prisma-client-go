@@ -49,10 +49,8 @@
 	{{ end }}
 
 	{{/* composite keys for FindOne */}}
-	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes }}
+	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes $model.Name.String }}
 		{{ range $index := $input.Fields }}
-			// searched for field {{ $index.Name }}
-			// type: {{ $index.InputType.Type.String }}
 			{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $index.InputType.Type.String }}
 			{{ if $i }}
 				func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(

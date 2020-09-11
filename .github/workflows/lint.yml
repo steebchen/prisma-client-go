@@ -1,11 +1,5 @@
 name: lint all
-on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+on: push
 jobs:
   lint:
     name: lint
@@ -17,13 +11,22 @@ jobs:
         with:
           go-version: '1.15'
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: ${{ runner.os }}-go-
+
+      - name: download
+        run: go mod download
+
       - name: generate
         run: go generate ./...
 
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          version: v1.29
-          args: --enable "gofmt,golint,scopelint,gocritic"
+      - name: install golangci-lint
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.31.0
+
+      - name: run linter
+        run: ./bin/golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
