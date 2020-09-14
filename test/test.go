@@ -47,12 +47,12 @@ const schemaTemplate = "schema.temp.%s.prisma"
 func replaceSchema(t *testing.T, db Database, e *engine.Engine, schemaPath string, mockDB string) {
 	e.ReplaceSchema(func(schema string) string {
 		for _, fromDB := range Databases {
-			schema = strings.Replace(schema, fmt.Sprintf(`"%s"`, fromDB.Name()), fmt.Sprintf(`"%s"`, db.Name()), -1)
+			schema = strings.ReplaceAll(schema, fmt.Sprintf(`"%s"`, fromDB.Name()), fmt.Sprintf(`"%s"`, db.Name()))
 		}
 		return schema
 	})
 	e.ReplaceSchema(func(schema string) string {
-		return strings.Replace(schema, `env("__REPLACE__")`, fmt.Sprintf(`"%s"`, db.ConnectionString(mockDB)), -1)
+		return strings.ReplaceAll(schema, `env("__REPLACE__")`, fmt.Sprintf(`"%s"`, db.ConnectionString(mockDB)))
 	})
 	if err := ioutil.WriteFile(schemaPath, []byte(e.Schema), 0644); err != nil {
 		t.Fatal(err)
