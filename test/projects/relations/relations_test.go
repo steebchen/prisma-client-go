@@ -632,7 +632,7 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).OrderBy(Post.ID.Order(ASC)).Take(-2),
+				).OrderBy(Post.ID.Order(DESC)).Take(3),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -648,6 +648,13 @@ func TestRelations(t *testing.T) {
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
 						InternalPost: InternalPost{
+							ID:       "c",
+							Title:    "common",
+							Content:  str("c"),
+							AuthorID: "relations",
+						},
+					}, {
+						InternalPost: InternalPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
@@ -655,9 +662,9 @@ func TestRelations(t *testing.T) {
 						},
 					}, {
 						InternalPost: InternalPost{
-							ID:       "c",
+							ID:       "a",
 							Title:    "common",
-							Content:  str("c"),
+							Content:  str("a"),
 							AuthorID: "relations",
 						},
 					}},
