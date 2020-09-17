@@ -12,14 +12,15 @@
 
 			{{ $relationName := $model.Name.GoCase }}
 
+			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+
 			{{ if ne $field.Name "" }}
 				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
 				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
 				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
+				{{ $orderByParams = (print "i" $field.Type.GoCase "OrderByParams") }}
 			{{ end }}
-
-			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
 
 			type {{ $result }} struct {
 				query builder.Query
