@@ -36,9 +36,9 @@
         id        String   @default(cuid()) @id
         createdAt DateTime @default(now())
         updatedAt DateTime @updatedAt
-        published Boolean
         title     String
-        content   String?
+        published Boolean
+        desc      String?
     }
     ```
 
@@ -87,6 +87,7 @@ package main
 
 import (
     "context"
+    "fmt"
     "log"
 
     "demo/db"
@@ -98,11 +99,11 @@ func main() {
     }
 }
 
-func run() error{
+func run() error {
     client := db.NewClient()
     err := client.Connect()
     if err != nil {
-        panic(err)
+        return err
     }
 
     defer func() {
@@ -123,17 +124,17 @@ func run() error{
         db.Post.ID.Set("123"),
     ).Exec(ctx)
     if err != nil {
-        panic(err)
+        return err
     }
 
     log.Printf("created post: %+v", createdPost)
 
     // find a single post
     post, err := client.Post.FindOne(
-        db.Post.Email.Equals("john.doe@example.com"),
+        db.Post.ID.Equals("123"),
     ).Exec(ctx)
     if err != nil {
-        panic(err)
+        return err
     }
 
     log.Printf("post: %+v", post)
@@ -145,11 +146,12 @@ func run() error{
     name, ok := post.Desc()
 
     if !ok {
-        log.Printf("post's name is null")
-        return
+        return fmt.Errorf("post's name is null")
     }
 
     log.Printf("The posts's name is: %s", name)
+
+    return nil
 }
 ```
 
