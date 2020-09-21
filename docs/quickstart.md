@@ -2,7 +2,16 @@
 
 ## Setup
 
-1) Get Prisma Client Go
+1) Init go project
+
+    If you don't have a go project yet, initialise one using go modules:
+
+    ```shell script
+    mkdir demo && cd demo
+    go mod init demo
+    ```
+
+2) Get Prisma Client Go
 
     Install the go module in your project:
 
@@ -10,7 +19,7 @@
     go get github.com/prisma/prisma-client-go
     ```
 
-2) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
+3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
@@ -80,7 +89,7 @@ import (
     "context"
     "log"
 
-    "github.com/your/repo/db"
+    "demo/db"
 )
 
 func main() {
