@@ -25,7 +25,7 @@ We will also need to add a relation from to the post model in order to make a 1:
 model Post {
     // ...
 
-    posts     Post[]
+    comments Comment[]
 }
 ```
 
@@ -51,7 +51,7 @@ model Post {
         title     String
         content   String?
 
-        posts     Post[]
+        comments Comment[]
     }
 
     model Comment {
@@ -78,12 +78,17 @@ go run github.com/prisma/prisma-client-go generate
 In order to create comments, we first need to create a post, and then reference that post when creating a comment.
 
 ```go
-// create a post first
 post, err := client.Post.CreateOne(
     db.Post.Title.Set("My new post"),
     db.Post.Published.Set(true),
     db.Post.Desc.Set("Hi there."),
+    db.Post.ID.Set("123"),
 ).Exec(ctx)
+if err != nil {
+    return err
+}
+
+log.Printf("post: %+v", post)
 
 // then create a comment
 comments, err := client.Comment.CreateOne(
@@ -93,6 +98,11 @@ comments, err := client.Comment.CreateOne(
         db.Post.ID.Equals(post.ID),
     ),
 ).Exec(ctx)
+if err != nil {
+    return err
+}
+
+log.Printf("post: %+v", comments)
 ```
 
 Now that a post and a comment are created, you can query for them as follows:
@@ -102,22 +112,60 @@ Now that a post and a comment are created, you can query for them as follows:
 posts, err := client.Post.FindMany(
     db.Post.Published.Equals(true),
 ).Exec(ctx)
+if err != nil {
+    return err
+}
+
+log.Printf("published posts: %+v", posts)
+
+// insert a few new comments
+_, err = client.Comment.CreateOne(
+    db.Comment.Content.Set("first comment"),
+    // link the post we created before
+    db.Comment.Post.Link(
+        db.Post.ID.Equals("123"),
+    ),
+).Exec(ctx)
+if err != nil {
+    return err
+}
+_, err = client.Comment.CreateOne(
+    db.Comment.Content.Set("second comment"),
+    // link the post we created before
+    db.Comment.Post.Link(
+        db.Post.ID.Equals("123"),
+    ),
+).Exec(ctx)
+if err != nil {
+    return err
+}
+
 
 // return all comments from a post with a given id
 comments, err := client.Comment.FindMany(
     db.Comment.Post.Where(
-        db.Post.ID.Equals("post"),
+        db.Post.ID.Equals("123"),
     ),
 ).Exec(ctx)
+if err != nil {
+    return err
+}
+
+log.Printf("comments of post with id 123: %+v", comments)
 
 // return the first two comments from a post with which contains a given title, and sort by descending date
-comments, err := client.Comment.FindMany(
+orderedComments, err := client.Comment.FindMany(
     db.Comment.Post.Where(
-        db.Post.ID.Equals("post"),
+        db.Post.ID.Equals("123"),
     ),
 ).Take(2).OrderBy(
     db.Comment.CreatedAt.Order(db.DESC),
-)Exec(ctx)
+).Exec(ctx)
+if err != nil {
+    return err
+}
+
+log.Printf("ordered comments: %+v", orderedComments)
 ```
 
 Prisma also allows you to fetch multiple things at once. Instead of doing complicated joins, you can fetch a post and
