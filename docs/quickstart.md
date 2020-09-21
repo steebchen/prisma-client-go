@@ -93,8 +93,14 @@ import (
 )
 
 func main() {
+    if err := run(); err != nil {
+        panic(err)
+    }
+}
+
+func run() error{
     client := db.NewClient()
-    err := client.Connect()``
+    err := client.Connect()
     if err != nil {
         panic(err)
     }
