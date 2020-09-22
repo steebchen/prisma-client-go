@@ -575,6 +575,106 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "with and sub query orderby",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				unrelated: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				user: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}, {
+							id: "c",
+							title: "common",
+							content: "c",
+						}, {
+							id: "d",
+							title: "unrelated",
+							content: "d",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindOne(
+				User.Email.Equals("john@example.com"),
+			).With(
+				User.Posts.Fetch(
+					Post.Title.Equals("common"),
+				).OrderBy(Post.ID.Order(DESC)).Take(3),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := UserModel{
+				InternalUser: InternalUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+				RelationsUser: RelationsUser{
+					Posts: []PostModel{{
+						InternalPost: InternalPost{
+							ID:       "c",
+							Title:    "common",
+							Content:  str("c"),
+							AuthorID: "relations",
+						},
+					}, {
+						InternalPost: InternalPost{
+							ID:       "b",
+							Title:    "common",
+							Content:  str("b"),
+							AuthorID: "relations",
+						},
+					}, {
+						InternalPost: InternalPost{
+							ID:       "a",
+							Title:    "common",
+							Content:  str("a"),
+							AuthorID: "relations",
+						},
+					}},
+					Comments: nil,
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "with many to many nested",
 		// language=GraphQL
 		before: []string{`
