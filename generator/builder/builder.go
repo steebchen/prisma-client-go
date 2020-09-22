@@ -31,9 +31,6 @@ type Field struct {
 	// The Name of the field.
 	Name string
 
-	// an Action for input fields, e.g. `contains`
-	Action string
-
 	// List saves whether the fields is a list of items
 	List bool
 
@@ -174,10 +171,6 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 
 		if f.Name != "" {
 			builder.WriteString(f.Name)
-		}
-
-		if f.Name != "" && f.Action != "" {
-			builder.WriteString("_" + f.Action)
 		}
 
 		if f.Name != "" {

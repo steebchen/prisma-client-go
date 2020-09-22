@@ -15,7 +15,9 @@ func getPort() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer l.Close()
+	if err := l.Close(); err != nil {
+		return "", err
+	}
 
 	port := l.Addr().(*net.TCPAddr).Port
 	return strconv.Itoa(port), nil

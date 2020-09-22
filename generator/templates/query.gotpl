@@ -67,7 +67,7 @@
 					return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
 						data: builder.Field{
 							Name:   "{{ $index.Name }}",
-							Fields: fields,
+							Fields: builder.TransformEquals(fields),
 						},
 					}
 				}
@@ -108,8 +108,12 @@
 					return {{ $name }}Params{
 						data: builder.Field{
 							Name:   "{{ $field.Name }}",
-							Action: "{{ $method.Action }}",
-							Fields: fields,
+							Fields: []builder.Field{
+								{
+									Name: "{{ $method.Action }}",
+									Fields: fields,
+								},
+							},
 						},
 					}
 				}
@@ -168,7 +172,7 @@
 						Fields: []builder.Field{
 							{
 								Name:   "connect",
-								Fields: fields,
+								Fields: builder.TransformEquals(fields),
 							},
 						},
 					},
@@ -257,25 +261,35 @@
 				return {{ $equalsReturnStruct }}{
 					data: builder.Field{
 						Name:   "{{ $field.Name }}",
-						Value:  value,
+						Fields: []builder.Field{
+							{
+								Name:   "equals",
+								Value:  value,
+							},
+						},
 					},
 				}
 			}
 
 			{{/* Provide an `In` method for most types. */}}
 			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
-				f := builder.Field{
-					Name:   "{{ $field.Name }}",
-					Action: "in",
-					List:   true,
-				}
+				var fields []builder.Field
 				for _, v := range values {
-					f.Fields = append(f.Fields, builder.Field{
+					fields = append(fields, builder.Field{
 						Value: v,
 					})
 				}
 				return {{ $returnStruct }}{
-					data: f,
+					data: builder.Field{
+						Name:   "{{ $field.Name }}",
+						Fields: []builder.Field{
+							{
+								Name:   "in",
+								List:   true,
+								Fields: fields,
+							},
+						},
+					},
 				}
 			}
 
@@ -284,7 +298,12 @@
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
-							Value: value,
+							Fields: []builder.Field{
+								{
+									Name: "equals",
+									Value: value,
+								},
+							},
 						},
 					}
 				}
@@ -294,7 +313,12 @@
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
-							Value: str,
+							Fields: []builder.Field{
+								{
+									Name: "equals",
+									Value: str,
+								},
+							},
 						},
 					}
 				}
@@ -329,9 +353,13 @@
 					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
 						return {{ $returnStruct }}{
 							data: builder.Field{
-								Action: "{{ $method.Action }}",
 								Name:   "{{ $field.Name }}",
-								Value:  value,
+								Fields: []builder.Field{
+									{
+										Name: "{{ $method.Action }}",
+										Value: value,
+									},
+								},
 							},
 						}
 					}

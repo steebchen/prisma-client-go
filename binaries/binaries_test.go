@@ -21,6 +21,7 @@ func tmpDir(t *testing.T) string {
 
 func TestFetch(t *testing.T) {
 	dir := tmpDir(t)
+	//goland:noinspection GoUnhandledErrorResult
 	defer os.RemoveAll(dir)
 
 	if err := FetchNative(dir); err != nil {
@@ -41,6 +42,7 @@ func TestFetch_localDir(t *testing.T) {
 
 func TestFetch_withCache(t *testing.T) {
 	dir := tmpDir(t)
+	//goland:noinspection GoUnhandledErrorResult
 	defer os.RemoveAll(dir)
 
 	start := time.Now()
