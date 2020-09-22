@@ -12,14 +12,15 @@
 
 			{{ $relationName := $model.Name.GoCase }}
 
+			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+
 			{{ if ne $field.Name "" }}
 				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
 				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
 				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
+				{{ $orderByParams = (print "i" $field.Type.GoCase "OrderByParams") }}
 			{{ end }}
-
-			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
 
 			type {{ $result }} struct {
 				query builder.Query
@@ -69,9 +70,10 @@
 							})
 						}
 					{{ else }}
+						{{/* transform this document because the signature of FindOne is different than FindMany */}}
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
-							Fields: []builder.Field{params.field()},
+							Fields: builder.TransformEquals([]builder.Field{params.field()}),
 						})
 					{{ end }}
 
@@ -93,13 +95,23 @@
 			}
 
 			{{ if $v.List }}
-				{{/* TODO: small hack until https://github.com/prisma/prisma2/issues/779 is fixed */}}
-				func (r {{ $result }}) OrderBy(param {{ $orderByParams }}) {{ $result }} {
-					direction, _ := param.field().Value.(runtime.Direction)
+				func (r {{ $result }}) OrderBy(params ...{{ $orderByParams }}) {{ $result }} {
+					var fields []builder.Field
+
+					for _, param := range params {
+						direction, _ := param.field().Value.(runtime.Direction)
+
+						fields = append(fields, builder.Field{
+							Name: param.field().Name,
+							Value: direction,
+						})
+					}
+
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "orderBy",
-						Value: runtime.Direction(param.field().Name + "_" + string(direction)),
+						Fields: fields,
 					})
+
 					return r
 				}
 
@@ -167,7 +179,22 @@
 				v.query = r.query
 				var fields []builder.Field
 				for _, q := range params {
-					fields = append(fields, q.field())
+					{{/* TODO consider upcoming non-set methods */}}
+					field := q.field()
+					{{/* if scalar, wrap in 'set' */}}
+					if field.Fields == nil {
+						v := field.Value
+						field.Fields = []builder.Field{
+							{
+								Name: "set",
+								Value: v,
+							},
+						}
+
+						field.Value = nil
+					}
+
+					fields = append(fields, field)
 				}
 				v.query.Inputs = append(v.query.Inputs, builder.Input{
 					Name:   "data",

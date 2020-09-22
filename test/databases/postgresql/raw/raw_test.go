@@ -33,7 +33,7 @@ func TestRaw(t *testing.T) {
 
 	strOpt := "strOpt"
 	i := 5
-	f := "5.5"
+	f := "5.5000000000000000000000000000"
 	b := false
 
 	tests := []struct {
@@ -87,10 +87,6 @@ func TestRaw(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			strOpt := "strOpt"
-			i := 5
-			f := "5.5"
-			b := false
 			expected := []RawUserModel{{
 				ID:       "id1",
 				Email:    "email1",

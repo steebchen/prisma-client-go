@@ -20,7 +20,7 @@
 
 <hr>
 
-Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces boilerplate**. You can use it as an alternative to traditional ORMs such as GOORM, sqlboiler and most database-specific tools.
+Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most database-specific tools.
 
 It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access, declarative data modeling, schema migrations and visual data management.
 
@@ -28,7 +28,7 @@ It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides da
 
 ## Getting started
 
-To get started, [read our quickstart tutorial](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
+To get started, [**read our quickstart tutorial**](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
 
 You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference).
 

@@ -16,11 +16,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.0.0"
+const PrismaVersion = "2.7.1"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "de2bc1cbdb5561ad73d2f08463fa2eec48993f56"
+const EngineVersion = "5c2ad460cf4fe8c9330e6640b266c046542c8b6a"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
@@ -210,6 +210,7 @@ func download(url string, to string) error {
 	if err != nil {
 		return fmt.Errorf("could not get %s: %w", url, err)
 	}
+	//goland:noinspection GoUnhandledErrorResult
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
@@ -221,6 +222,7 @@ func download(url string, to string) error {
 	if err != nil {
 		return fmt.Errorf("could not create %s: %w", dest, err)
 	}
+	//goland:noinspection GoUnhandledErrorResult
 	defer out.Close()
 
 	if err := os.Chmod(dest, os.ModePerm); err != nil {
@@ -231,6 +233,7 @@ func download(url string, to string) error {
 	if err != nil {
 		return fmt.Errorf("could not create gzip reader: %w", err)
 	}
+	//goland:noinspection GoUnhandledErrorResult
 	defer g.Close()
 
 	if _, err := io.Copy(out, g); err != nil {

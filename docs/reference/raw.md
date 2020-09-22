@@ -8,23 +8,20 @@ You can use the raw API when there's something you can't do with the current go 
 
 ```go
 var users []db.UserModel
-err := client.Raw(`SELECT * FROM User`).Exec(ctx, &users)
+err := client.QueryRaw(`SELECT * FROM User`).Exec(ctx, &users)
 ```
 
 ### Select specific
 
 ```go
 var users []UserModel
-err := client.Raw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc", "prisma@example.com").Exec(ctx, &users)
+err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc", "prisma@example.com").Exec(ctx, &users)
 ```
 
 ### Count
 
 ```go
-var actual []struct {
-    Count int `json:"count"`
-}
-err := client.Raw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
+count, err := client.ExecuteRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
 ```
 
 ## Postgres
@@ -33,21 +30,18 @@ err := client.Raw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
 
 ```go
 var users []UserModel
-err := client.Raw(`SELECT * FROM "User"`).Exec(ctx, &users)
+err := client.QueryRaw(`SELECT * FROM "User"`).Exec(ctx, &users)
 ```
 
 ### Select specific
 
 ```go
 var users []UserModel
-err := client.Raw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &users)
+err := client.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &users)
 ```
 
 ### Count
 
 ```go
-var result []struct {
-    Count int `json:"count"`
-}
-err := client.Raw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &result)
+count, err := client.ExecuteRaw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &result)
 ```

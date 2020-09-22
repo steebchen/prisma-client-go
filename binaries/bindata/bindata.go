@@ -16,6 +16,7 @@ func WriteFile(name, pkg, platform, from, to string) error {
 		return fmt.Errorf("generate open go file: %w", err)
 	}
 
+	//goland:noinspection GoUnhandledErrorResult
 	defer f.Close()
 
 	if err := writeHeader(f, pkg, name, platform); err != nil {
@@ -70,6 +71,7 @@ func writeAsset(w io.Writer, name, file string) error {
 		return err
 	}
 
+	//goland:noinspection GoUnhandledErrorResult
 	defer fd.Close()
 
 	h := sha256.New()
