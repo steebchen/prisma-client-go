@@ -6,6 +6,9 @@ on:
   pull_request:
     branches:
       - master
+env:
+  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go lint.yml"
+
 jobs:
   lint:
     name: lint
