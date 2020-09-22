@@ -28,7 +28,7 @@ It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides da
 
 ## Getting started
 
-To get started, [read our quickstart tutorial](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
+To get started, [**read our quickstart tutorial**](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
 
 You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference).
 

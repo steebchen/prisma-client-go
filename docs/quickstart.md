@@ -1,27 +1,29 @@
 # Quickstart
 
-## Set up Prisma
+## Setup
 
-1) Create a new project with Go modules
+1) Init go project
 
-    Skip this step if you're using an existing project.
+    If you don't have a go project yet, initialise one using go modules:
 
     ```shell script
-    go mod init github.com/your/repo
+    mkdir demo && cd demo
+    go mod init demo
     ```
 
 2) Get Prisma Client Go
 
-    Prisma client Go is decoupled from Prisma in a way that you can use it without manually instally the Prisma CLI. Instead, it is shipped with the Go module and downloaded for you.
+    Install the go module in your project:
 
     ```shell script
     go get github.com/prisma/prisma-client-go
     ```
 
-3) [Prepare your Prisma schema](https://www.prisma.io/docs/reference/tools-and-interfaces/prisma-schema/prisma-schema-file) in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
+3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
+        // could be postgresql or mysql
         provider = "sqlite"
         url      = "file:dev.db"
     }
@@ -30,26 +32,13 @@
         provider = "go run github.com/prisma/prisma-client-go"
     }
 
-    model User {
-        id        String   @default(cuid()) @id
-        createdAt DateTime @default(now())
-        email     String   @unique
-        name      String?
-        age       Int?
-
-        posts     Post[]
-    }
-
     model Post {
         id        String   @default(cuid()) @id
         createdAt DateTime @default(now())
         updatedAt DateTime @updatedAt
-        published Boolean
         title     String
-        content   String?
-
-        author   User @relation(fields: [authorID], references: [id])
-        authorID String
+        published Boolean
+        desc      String?
     }
     ```
 
@@ -98,15 +87,23 @@ package main
 
 import (
     "context"
+    "fmt"
     "log"
-    "github.com/your/repo/db"
+
+    "demo/db"
 )
 
 func main() {
+    if err := run(); err != nil {
+        panic(err)
+    }
+}
+
+func run() error {
     client := db.NewClient()
     err := client.Connect()
     if err != nil {
-        panic(err)
+        return err
     }
 
     defer func() {
@@ -118,39 +115,47 @@ func main() {
 
     ctx := context.Background()
 
-    // create a user
-    createdUser, err := client.User.CreateOne(
-        db.User.Email.Set("john.doe@example.com"),
-        db.User.Name.Set("John Doe"),
-
-        // ID is optional, which is why it's specified last. if you don't set it
-        // an ID is auto generated for you
-        db.User.ID.Set("123"),
-    ).Exec(ctx)
-
-    log.Printf("created user: %+v", createdUser)
-
-    // find a single user
-    user, err := client.User.FindOne(
-        db.User.Email.Equals("john.doe@example.com"),
+    // create a post
+    createdPost, err := client.Post.CreateOne(
+        db.Post.Title.Set("Hi from Prisma!"),
+        db.Post.Published.Set(true),
+        db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
+        // ID is optional since it's auto generated, which is why it's specified last.
+        db.Post.ID.Set("123"),
     ).Exec(ctx)
     if err != nil {
-        panic(err)
+        return err
     }
 
-    log.Printf("user: %+v", user)
+    log.Printf("created post: %+v", createdPost)
+
+    // find a single post
+    post, err := client.Post.FindOne(
+        db.Post.ID.Equals("123"),
+    ).Exec(ctx)
+    if err != nil {
+        return err
+    }
+
+    log.Printf("post: %+v", post)
 
     // for optional/nullable values, you need to check the function and create two return values
     // `name` is a string, and `ok` is a bool whether the record is null or not. If it's null,
     // `ok` is false, and `name` will default to Go's default values; in this case an empty string (""). Otherwise,
-    // `ok` is true and `name` will be "John Doe".
-    name, ok := user.Name()
+    // `ok` is true and `desc` will be "my description".
+    name, ok := post.Desc()
 
     if !ok {
-        log.Printf("user's name is null")
-        return
+        return fmt.Errorf("post's name is null")
     }
 
-    log.Printf("The users's name is: %s", name)
+    log.Printf("The posts's name is: %s", name)
+
+    return nil
 }
 ```
+
+### Next steps
+
+We just scratched the surface of what you can do. Read our [advanced tutorial](./advanced.md) to
+learn about more complex queries and how you can query for relations.
