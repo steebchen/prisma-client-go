@@ -1,20 +1,20 @@
 # Fetching additional data
 
-You can query for an entity and specify what to return in addition. For example, if you want to show a user's information with some of their posts, you would usually do 2 separate queries, but using the With/Fetch syntax you can do it in a single query.
+You can query for an entity and specify what to return in addition. For example, if you want to show a post's information with some of its comments, you would usually do 2 separate queries, but using the With/Fetch syntax you can do it in a single query.
 
 ```go
-// find a user
-user, err := client.User.FindOne(
-    User.Email.Equals("john@example.com"),
+// find a post
+post, err := client.Post.FindOne(
+    Post.Title.Equals("hi"),
 ).With(
-    // also fetch 3 their posts
-    User.Posts.Fetch().Take(3),
+    // also fetch 3 its comments
+    Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 check(err)
-log.Printf("user's name: %s", user.Name)
+log.Printf("post's title: %s", post.Title)
 
-posts := user.Posts()
-for _, post := range posts {
-    log.Printf("post: %+v", post)
+comments := post.Comments()
+for _, comment := range comments {
+    log.Printf("comment: %s", comment)
 }
 ```
