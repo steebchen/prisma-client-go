@@ -145,7 +145,9 @@
 				error,
 			) {
 				var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-				err := r.query.Exec(ctx, &v)
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
+				}
 				if v.Errors != nil {
 					first := v.Errors[0]
 					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
@@ -155,7 +157,7 @@
 						return {{ $model.Name.GoCase }}Model{}, ErrNotFound
 					}
 				{{ end }}
-				return {{ if not $v.List }}*{{ end }}v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
+				return {{ if not $v.List }}*{{ end }}v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, nil
 			}
 
 			{{ $outputName := $name }}
