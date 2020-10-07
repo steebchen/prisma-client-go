@@ -20,7 +20,7 @@ func (*postgreSQL) Name() string {
 }
 
 func (*postgreSQL) ConnectionString(mockDBName string) string {
-	return fmt.Sprintf("postgresql://postgres:pw@localhost:5432/%s", mockDBName)
+	return fmt.Sprintf("postgresql://postgres:pw@localhost:5433/%s", mockDBName)
 }
 
 func (*postgreSQL) SetupDatabase(t *testing.T) string {
@@ -43,7 +43,7 @@ func exec(t *testing.T, query string) {
 }
 
 func (db *postgreSQL) Setup() {
-	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "5432:5432", "-e", "POSTGRES_PASSWORD=pw", "-d", "postgres"); err != nil {
+	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "5433:5432", "-e", "POSTGRES_PASSWORD=pw", "-d", "postgres"); err != nil {
 		panic(err)
 	}
 }
