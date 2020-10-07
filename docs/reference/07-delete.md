@@ -35,3 +35,7 @@ updated, err := client.Post.FindOne(
     Post.Title.Equals("what up"),
 ).Delete().Exec(ctx)
 ```
+
+## Next steps
+
+Check out the details of [querying for relations](./08-relations.md).

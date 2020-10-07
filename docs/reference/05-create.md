@@ -77,3 +77,7 @@ updated, err := client.Post.FindOne(
     Post.Title.Equals("what up"),
 ).Delete().Exec(ctx)
 ```
+
+## Next steps
+
+Learn how to [update data](./06-update.md).

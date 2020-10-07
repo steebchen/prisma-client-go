@@ -39,3 +39,7 @@ posts, err := client.Post.FindMany(
     ),
 ).Exec(ctx)
 ```
+
+## Next steps
+
+If the go client shouldn't support for a query you need to do, read how you can use [raw sql queries](./09-raw.md).

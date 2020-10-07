@@ -80,3 +80,7 @@ posts, err := client.Post.FindMany(
 ```
 
 To explore querying for relations in detail, see [more relation query examples](./08-relations.md).
+
+## Next steps
+
+Read the next article [query filters](./03-filters.md) to explore how to form more complex queries.

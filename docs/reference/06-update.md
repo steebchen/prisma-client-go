@@ -38,3 +38,7 @@ updated, err := client.Post.FindOne(
     Post.Title.Set("new title"),
 ).Exec(ctx)
 ```
+
+## Next steps
+
+Learn how to [delete data](./07-delete.md).

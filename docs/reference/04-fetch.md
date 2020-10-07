@@ -18,3 +18,7 @@ for _, comment := range comments {
     log.Printf("comment: %s", comment)
 }
 ```
+
+## Next steps
+
+Check out a [detailed explanation for creating rows](./05-create.md).
