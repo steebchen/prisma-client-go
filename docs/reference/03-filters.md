@@ -52,7 +52,9 @@ db.Post.CreatedAt.BeforeEquals(time.Now().Truncate(24 * time.Hour)),
 
 ## General
 
-### NOT
+There are a few general filters you can apply. Note that the model has to be used to preserve type information.
+
+### Not
 
 If you want to negate a query, you can use NOT.
 
@@ -64,4 +66,15 @@ db.Post.Not(
 )
 ```
 
-The model has to be used to preserve type information.
+### Or
+
+If you want to negate a query, you can use NOT.
+
+The following query queries for all posts where either their title equals "123" OR their description equals "456":
+
+```go
+db.Post.Or(
+  db.Post.Title.Equals("123"),
+  db.Post.Desc.Equals("456"),
+)
+```
