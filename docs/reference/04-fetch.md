@@ -7,7 +7,7 @@ You can query for an entity and specify what to return in addition. For example,
 post, err := client.Post.FindOne(
     Post.Title.Equals("hi"),
 ).With(
-    // also fetch 3 its comments
+    // also fetch 3 of its comments
     Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 check(err)
@@ -18,3 +18,7 @@ for _, comment := range comments {
     log.Printf("comment: %s", comment)
 }
 ```
+
+## Next steps
+
+Check out a [detailed explanation for creating rows](./05-create.md).
