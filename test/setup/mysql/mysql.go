@@ -20,7 +20,7 @@ func (*mySQL) Name() string {
 }
 
 func (*mySQL) ConnectionString(mockDBName string) string {
-	return fmt.Sprintf("mysql://root:pw@localhost:3306/%s", mockDBName)
+	return fmt.Sprintf("mysql://root:pw@localhost:3307/%s", mockDBName)
 }
 
 func (*mySQL) SetupDatabase(t *testing.T) string {
@@ -43,7 +43,7 @@ func exec(t *testing.T, query string) {
 }
 
 func (*mySQL) Setup() {
-	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "3306:3306", "-e", "MYSQL_DATABASE=testing", "-e", "MYSQL_ROOT_PASSWORD=pw", "-d", "mysql:5.6"); err != nil {
+	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "3307:3306", "-e", "MYSQL_DATABASE=testing", "-e", "MYSQL_ROOT_PASSWORD=pw", "-d", "mysql:5.6"); err != nil {
 		panic(err)
 	}
 }
