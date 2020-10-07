@@ -2,7 +2,7 @@
 
 ## Type filters
 
-When querying for data, you often need to query for specific things, such as if a database column contains a word,
+You probably want to build detailed queries, such as if a database column contains a word,
 or if a number is great or lower than something. On this page, you can explore what filter methods are available
 by type. All of these queries are fully type-safe and independent of the underlying database.
 
@@ -56,7 +56,7 @@ There are a few general filters you can apply. Note that the model has to be use
 
 ### Not
 
-If you want to negate a query, you can use NOT.
+If you want to negate a query, you can use `Not`.
 
 The following query queries for all posts where their title doesn't equal "123":
 
@@ -68,7 +68,7 @@ db.Post.Not(
 
 ### Or
 
-If you want to negate a query, you can use NOT.
+If you want to negate a query, you can use `Or`.
 
 The following query queries for all posts where either their title equals "123" OR their description equals "456":
 

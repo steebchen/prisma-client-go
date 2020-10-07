@@ -1,6 +1,4 @@
-# Create records
-
-Find, update and delete records.
+# Relations
 
 The examples use the following prisma schema:
 
@@ -26,7 +24,7 @@ model Comment {
 }
 ```
 
-### Delete a record
+### Find by nested relation
 
 In a query, you can query for relations by using "Some" or "Every". You can also query for deeply nested relations.
 
@@ -42,4 +40,4 @@ posts, err := client.Post.FindMany(
 
 ## Next steps
 
-If the go client shouldn't support for a query you need to do, read how you can use [raw sql queries](./09-raw.md).
+If the Go client shouldn't support for a query you need to do, read how you can use [raw SQL queries](./09-raw.md).

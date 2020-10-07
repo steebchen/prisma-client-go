@@ -48,4 +48,4 @@ count, err := client.ExecuteRaw(`UPDATE "User" SET name = $1 WHERE id = $2`, "Jo
 
 ## Next steps
 
-Check out the go client's [current limitations](./10-limitations.md).
+Check out the Go client's [current limitations](./10-limitations.md).

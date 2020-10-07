@@ -32,11 +32,11 @@ model Comment {
 
 ```go
 posts, err := client.Post.FindMany(
-    db.Post.Title.Equals("hi"),
+	db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 ```
 
-If no records are found, this returns an empty array without returning an error (like usual SQL queries).
+If no records are found, the query above returns an slice array without returning an error (like usual SQL queries).
 
 ### Find one record
 
@@ -50,11 +50,11 @@ if err == db.ErrNotFound {
 }
 ```
 
-This returns an error of type `ErrNotFound` (exported in the `db` package) if there was no such record.
+This returns an `ErrNotFound` error (exported by the generated client) if there was no such record.
 
 ### Query API
 
-Depending on the data types of your fields, you will automatically be able to query for respective operations. For example, for integer or float fields you might want to query for a field which is less than or greater than some number.
+The query operations change based on the data types in your schema. For example, integers and floats will have greater than and less than operations, while strings have prefix and suffix operations.
 
 ```go
 post, err := client.Post.FindOne(
@@ -63,11 +63,11 @@ post, err := client.Post.FindOne(
 ).Exec(ctx)
 ```
 
-To explore more query filter, see [all possible query filters](./03-filters.md).
+To explore more query filters, see [all possible query filters](./03-filters.md).
 
 ### Querying for relations
 
-In a query, you can query for relations by using "Some" or "Every". You can also query for deeply nested relations.
+You can query for relations by using "Some" or "Every" to query for records where only some or all of the records match respectively. You can nest those queries as deep as you like.
 
 ```go
 // get posts which have at least one comment with a title "My Title" and that post's comments are all "What up?"

@@ -19,6 +19,6 @@ Contents
 
 ```go
 func main() {
-  users, err := client.User.FindOne().Exec()
+    users, err := client.User.FindOne().Exec()
 }
 ```

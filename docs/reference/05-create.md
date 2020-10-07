@@ -1,7 +1,5 @@
 # Create records
 
-Find, update and delete records.
-
 The examples use the following prisma schema:
 
 ```prisma
@@ -43,7 +41,7 @@ created, err := client.Post.CreateOne(
 
 ### Create a record with a relation
 
-Use the method `Link` to connect new objects with existing ones. For example, the following query creates a new post and sets the postID attribute of the comment.
+Use the `Link` method to connect new records with existing ones. For example, the following query creates a new post and sets the postID attribute of the comment.
 
 ```go
 created, err := client.Comment.CreateOne(
@@ -53,29 +51,6 @@ created, err := client.Comment.CreateOne(
     ),
     Comment.ID.Set("post"),
 ).Exec(ctx)
-```
-
-### Update a record
-
-To update a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Update()`.
-
-```go
-updated, err := client.Post.FindOne(
-    Post.Title.Equals("what up"),
-).Update(
-    Post.Desc.Set("new description"),
-    Post.Title.Set("new title"),
-).Exec(ctx)
-```
-
-### Delete a record
-
-To delete a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Delete()`.
-
-```go
-updated, err := client.Post.FindOne(
-    Post.Title.Equals("what up"),
-).Delete().Exec(ctx)
 ```
 
 ## Next steps

@@ -1,6 +1,4 @@
-# Create records
-
-Find, update and delete records.
+# Delete records
 
 The examples use the following prisma schema:
 
