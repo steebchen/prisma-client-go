@@ -117,13 +117,6 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
-		name: "FindOne not found",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
-
-			assert.Equal(t, ErrNotFound, err)
-		},
-	}, {
 		name: "FindMany",
 		// language=GraphQL
 		before: []string{`

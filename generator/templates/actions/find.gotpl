@@ -212,11 +212,17 @@
 			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 				err := r.query.Exec(ctx, &v)
-				if v.Errors != nil {
+				if err != nil {
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
+				}
+				if len(v.Errors) > 0 {
 					first := v.Errors[0]
+					if first.Message == internalUpdateNotFoundMessage {
+						return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, ErrNotFound
+					}
 					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
 				}
-				return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+				return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil
 			}
 
 			{{/* DELETE */}}
@@ -238,11 +244,17 @@
 			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 				err := r.query.Exec(ctx, &v)
-				if v.Errors != nil {
+				if err != nil {
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
+				}
+				if len(v.Errors) > 0 {
 					first := v.Errors[0]
+					if first.Message == internalDeleteNotFoundMessage {
+						return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, ErrNotFound
+					}
 					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
 				}
-				return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+				return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil
 			}
 		{{ end }}
 	{{ end }}
