@@ -4,63 +4,63 @@
 
 1) Initialise a new Go project
 
-	 If you don't have a Go project yet, initialise one using Go modules:
+    If you don't have a Go project yet, initialise one using Go modules:
 
-	  ```shell script
-		mkdir demo && cd demo
-		go mod init demo
-		```
+    ```shell script
+    mkdir demo && cd demo
+    go mod init demo
+    ```
 
 2) Get Prisma Client Go
 
-	 Install the Go module in your project:
+    Install the Go module in your project:
 
-	  ```shell script
-		go get github.com/prisma/prisma-client-go
-		```
+    ```shell script
+    go get github.com/prisma/prisma-client-go
+    ```
 
 3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
-	 Prisma Client Go as a generator with two models would look like this:
+    Prisma Client Go as a generator with two models would look like this:
 
-	  ```prisma
-		datasource db {
-				// could be postgresql or mysql
-				provider = "sqlite"
-				url      = "file:dev.db"
-		}
+    ```prisma
+    datasource db {
+        // could be postgresql or mysql
+        provider = "sqlite"
+        url      = "file:dev.db"
+    }
 
-		generator db {
-				provider = "go run github.com/prisma/prisma-client-go"
-		}
+    generator db {
+        provider = "go run github.com/prisma/prisma-client-go"
+    }
 
-		model Post {
-				id        String   @default(cuid()) @id
-				createdAt DateTime @default(now())
-				updatedAt DateTime @updatedAt
-				title     String
-				published Boolean
-				desc      String?
-		}
-		```
+    model Post {
+        id        String   @default(cuid()) @id
+        createdAt DateTime @default(now())
+        updatedAt DateTime @updatedAt
+        title     String
+        published Boolean
+        desc      String?
+    }
+    ```
 
-	 To get this up and running in your database, we use the Prisma migration
-	 tool [`migrate`](https://github.com/prisma/migrate) (Note: this tool is experimental) to create and migrate our
-	 database:
+    To get this up and running in your database, we use the Prisma migration
+    tool [`migrate`](https://github.com/prisma/migrate) (Note: this tool is experimental) to create and migrate our
+    database:
 
-	  ```shell script
-		# initialize the first migration
-		go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name "init"
-		# apply the migration
-		go run github.com/prisma/prisma-client-go migrate up --experimental
-		```
+     ```shell script
+    # initialize the first migration
+    go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name "init"
+    # apply the migration
+    go run github.com/prisma/prisma-client-go migrate up --experimental
+    ```
 
 4) Generate the Prisma Client Go client in your project
 
-	  ```shell script
-		go run github.com/prisma/prisma-client-go generate
-		```
+     ```shell script
+    go run github.com/prisma/prisma-client-go generate
+    ```
 
-	 If you make changes to your prisma schema, you need to run this command again.
+    If you make changes to your prisma schema, you need to run this command again.
 
 ## Usage
 
@@ -79,7 +79,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		panic(err)
+    panic(err)
 	}
 }
 
@@ -87,26 +87,26 @@ func run() error {
 	client := db.NewClient()
 	err := client.Connect()
 	if err != nil {
-		return err
+    return err
 	}
 
 	defer func() {
-		err := client.Disconnect()
-		if err != nil {
-			panic(err)
-		}
+    err := client.Disconnect()
+    if err != nil {
+    	panic(err)
+    }
 	}()
 
 	ctx := context.Background()
 
 	// create a post
 	createdPost, err := client.Post.CreateOne(
-		db.Post.Title.Set("Hi from Prisma!"),
-		db.Post.Published.Set(true),
-		db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
+    db.Post.Title.Set("Hi from Prisma!"),
+    db.Post.Published.Set(true),
+    db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
 	).Exec(ctx)
 	if err != nil {
-		return err
+    return err
 	}
 
 	result, _ := json.MarshalIndent(createdPost, "", "  ")
@@ -114,10 +114,10 @@ func run() error {
 
 	// find a single post
 	post, err := client.Post.FindOne(
-		db.Post.ID.Equals(createdPost.ID),
+    db.Post.ID.Equals(createdPost.ID),
 	).Exec(ctx)
 	if err != nil {
-		return err
+    return err
 	}
 
 	result, _ = json.MarshalIndent(post, "", "  ")
@@ -130,7 +130,7 @@ func run() error {
 	name, ok := post.Desc()
 
 	if !ok {
-		return fmt.Errorf("post's name is null")
+    return fmt.Errorf("post's name is null")
 	}
 
 	fmt.Printf("The posts's name is: %s\n", name)
