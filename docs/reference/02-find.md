@@ -32,7 +32,7 @@ model Comment {
 
 ```go
 posts, err := client.Post.FindMany(
-	db.Post.Title.Equals("hi"),
+    db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 ```
 
