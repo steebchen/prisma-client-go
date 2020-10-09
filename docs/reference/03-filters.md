@@ -34,7 +34,6 @@ db.Post.Views.GT(50),
 db.Post.Views.GTE(50),
 ```
 
-
 ### Time filters
 
 ```go
@@ -62,7 +61,7 @@ The following query queries for all posts where their title doesn't equal "123":
 
 ```go
 db.Post.Not(
-  db.Post.Title.Equals("123"),
+    db.Post.Title.Equals("123"),
 )
 ```
 
@@ -74,8 +73,8 @@ The following query queries for all posts where either their title equals "123" 
 
 ```go
 db.Post.Or(
-  db.Post.Title.Equals("123"),
-  db.Post.Desc.Equals("456"),
+    db.Post.Title.Equals("123"),
+    db.Post.Desc.Equals("456"),
 )
 ```
 
