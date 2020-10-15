@@ -127,8 +127,31 @@ type Type struct {
 	Methods []Method
 }
 
-// Types provides virtual types and their actions
-func (Document) Types() []Type {
+func (Document) WriteTypes() []Type {
+	number := []Method{{
+		Name:   "Increment",
+		Action: "increment",
+	}, {
+		Name:   "Decrement",
+		Action: "decrement",
+	}, {
+		Name:   "Multiply",
+		Action: "multiply",
+	}, {
+		Name:   "Divide",
+		Action: "divide",
+	}}
+	return []Type{{
+		Name:    "Int",
+		Methods: number,
+	}, {
+		Name:    "Float",
+		Methods: number,
+	}}
+}
+
+// ReadTypes provides virtual types and their actions
+func (Document) ReadTypes() []Type {
 	number := []Method{{
 		Name:   "LT",
 		Action: "lt",
