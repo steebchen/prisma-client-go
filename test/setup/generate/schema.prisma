@@ -1,8 +1,3 @@
-datasource db {
-	provider = "sqlite"
-	url      = env("NOOP")
-}
-
 generator db {
 	provider = "go run github.com/prisma/prisma-client-go"
 	output = "db"
