@@ -167,5 +167,5 @@ The posts's name is: Prisma is a database toolkit and makes databases easy.
 
 ### Next steps
 
-We just scratched the surface of what you can do. Read our [advanced tutorial](./advanced.md) to learn about more
+We just scratched the surface of what you can do. Read our [advanced tutorial](advanced.md) to learn about more
 complex queries and how you can query for relations.

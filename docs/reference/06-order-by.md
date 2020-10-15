@@ -1,4 +1,4 @@
-# Delete records
+# Order By
 
 The examples use the following prisma schema:
 
@@ -24,16 +24,10 @@ model Comment {
 }
 ```
 
-### Delete a record
-
-To delete a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Delete()`.
-
 ```go
-deleted, err := client.Post.FindOne(
-    Post.Title.Equals("what up"),
-).Delete().Exec(ctx)
+TODO
 ```
 
 ## Next steps
 
-Check out the details of [querying for relations](./08-relations.md).
+Check out a [detailed explanation on how to create records](07-create.md).

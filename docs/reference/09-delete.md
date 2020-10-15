@@ -1,4 +1,4 @@
-# Relations
+# Delete records
 
 The examples use the following prisma schema:
 
@@ -24,20 +24,16 @@ model Comment {
 }
 ```
 
-### Find by nested relation
+### Delete a record
 
-In a query, you can query for relations by using "Some" or "Every". You can also query for deeply nested relations.
+To delete a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Delete()`.
 
 ```go
-// get posts which have at least one comment with a title "My Title" and that post's comments are all "What up?"
-posts, err := client.Post.FindMany(
+deleted, err := client.Post.FindOne(
     Post.Title.Equals("what up"),
-    Post.Comments.Some(
-        Comment.Title.Equals("My Title"),
-    ),
-).Exec(ctx)
+).Delete().Exec(ctx)
 ```
 
 ## Next steps
 
-If the Go client shouldn't support for a query you need to do, read how you can use [raw SQL queries](./09-raw.md).
+Check out the details of [querying for relations](10-relations.md).

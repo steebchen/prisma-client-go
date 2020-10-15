@@ -52,8 +52,7 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-You can swap them out as you wish, given that the query is possible for whatever you're querying. For example, you can
-only query for fields which actually exist on a given model. If a field is optional, you will also get additional
+This schema is consistently used. You can usually just type `db.` and then see what models, fields and actions your editor auto completion will suggest. Depending on the type or the shape of a model or a field, there may be different actions available. If a field is optional, you will also get additional
 methods such as IsNull() and *Optional variations to query for SQL NULLs:
 
 ```go
@@ -68,4 +67,4 @@ posts, err := client.Post.FindMany(
 
 ## Next steps
 
-We'll explore how you can query for data in the [next article](./02-find.md).
+We'll explore how you can query for data in the [next article](02-find.md).

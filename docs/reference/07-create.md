@@ -30,12 +30,11 @@ model Comment {
 created, err := client.Post.CreateOne(
     // required fields
     Post.Title.Set("what up"),
-    Post.Desc.Set("this is a description"),
+    Post.Published.Set(true),
 
     // optional fields
     Post.ID.Set("id"),
-    Post.Title.Set("name"),
-    Post.Stuff.Set("stuff"),
+    Post.Content.Set("stuff"),
 ).Exec(ctx)
 ```
 
@@ -55,4 +54,4 @@ created, err := client.Comment.CreateOne(
 
 ## Next steps
 
-Learn how to [update data](./06-update.md).
+Learn how to [update data](08-update.md).
