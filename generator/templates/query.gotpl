@@ -239,6 +239,29 @@
 					return r.Set(*value)
 				}
 			{{ end }}
+
+			{{ if not $field.IsList }}
+				{{ range $type := $.DMMF.WriteTypes }}
+					{{ if eq $field.Type $type.Name }}
+						{{ range $method := $type.Methods }}
+							// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+							func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
+								return {{ $setReturnStruct }}{
+									data: builder.Field{
+										Name:   "{{ $field.Name }}",
+										Fields: []builder.Field{
+											builder.Field{
+												Name:   "{{ $method.Action }}",
+												Value:  value,
+											},
+										},
+									},
+								}
+							}
+						{{ end }}
+					{{ end }}
+				{{ end }}
+			{{ end }}
 		{{ end }}
 
 		{{ $returnStruct := "" }}
@@ -347,7 +370,7 @@
 		{{ end }}
 
 		{{/* Provide type-specific methods. */}}
-		{{ range $type := $.DMMF.Types }}
+		{{ range $type := $.DMMF.ReadTypes }}
 			{{ if eq $field.Type $type.Name }}
 				{{ range $method := $type.Methods }}
 					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {

@@ -151,7 +151,7 @@ func (e *Engine) spawn(file string) error {
 
 	e.url = "http://localhost:" + port
 
-	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
+	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries", "--enable-experimental=atomicNumberOperations")
 
 	e.cmd.Stdout = os.Stdout
 	e.cmd.Stderr = os.Stderr
