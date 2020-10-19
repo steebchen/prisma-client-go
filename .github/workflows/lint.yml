@@ -31,5 +31,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          version: v1.29
           args: --enable "gofmt,golint,scopelint,gocritic"
+          version: v1.29
