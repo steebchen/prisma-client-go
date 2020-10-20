@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 
@@ -19,9 +18,7 @@ type QueryExec struct {
 }
 
 type QueryResult struct {
-	Data struct {
-		QueryRaw json.RawMessage `json:"queryRaw"`
-	} `json:"data"`
+	QueryRaw json.RawMessage `json:"queryRaw"`
 }
 
 func (r QueryExec) Exec(ctx context.Context, into interface{}) error {
@@ -29,8 +26,7 @@ func (r QueryExec) Exec(ctx context.Context, into interface{}) error {
 	if err := r.query.Exec(ctx, &result); err != nil {
 		return fmt.Errorf("could not send raw query: %w", err)
 	}
-
-	if err := json.Unmarshal(result.Data.QueryRaw, into); err != nil {
+	if err := json.Unmarshal(result.QueryRaw, into); err != nil {
 		return fmt.Errorf("could not decode result.QueryRaw: %w", err)
 	}
 

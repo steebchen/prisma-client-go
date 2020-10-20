@@ -7,21 +7,19 @@
 
 		{{ range $v := $.DMMF.Variations }}
 			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Response struct {
-				Errors []engine.GQLError `json:"errors"`
-				Data struct{
-					{{ $action.Name }}{{ $v.Name }}{{ $m }}{{ " " }}
+				{{ $action.Name }}{{ $v.Name }}{{ $m }}{{ " " }}
 
-					{{- if and ($v.List) (eq $action.Name "Find") -}}
-						[]{{ $m }}Model
+				{{- if and ($v.List) (eq $action.Name "Find") -}}
+					[]{{ $m }}Model
+				{{- else -}}
+					{{- if $v.List -}}
+						{{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result
 					{{- else -}}
-						{{- if $v.List -}}
-							{{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result
-						{{- else -}}
-							{{ if eq $action.Name "Find" }}*{{ end }}{{ $m }}Model
-						{{- end -}}
+						{{ if eq $action.Name "Find" }}*{{ end }}{{ $m }}Model
 					{{- end -}}
-					`json:"{{ $action.Name.CamelCase }}{{ $v.Name }}{{ $model.Name }}"`
-				} `json:"data"`
+				{{- end -}}
+
+				`json:"{{ $action.Name.CamelCase }}{{ $v.Name }}{{ $model.Name }}"`
 			}
 
 			type {{ $action.Name.GoLowerCase }}{{ $v.Name }}{{ $m }}Result struct {

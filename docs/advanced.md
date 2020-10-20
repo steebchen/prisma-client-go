@@ -1,7 +1,7 @@
 ## Advanced usage
 
-In the [quickstart](./quickstart.md), we have created a simple post model and ran a few queries.
-However, Prisma and the Go client are designed to work with relations between models.
+In the [quickstart](./quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
+Go client are designed to work with relations between models.
 
 We already created a post model, such as for a blog. Let's assume we want to add comments to a post, and connect these
 models in a way so we can rely on SQL's foreign keys and the Go client's ability to work with relations.
@@ -63,6 +63,7 @@ model Post {
         postID String
     }
     ```
+
 </details>
 
 Whenever you make changes to your model, migrate your database and re-generate your prisma code:
@@ -140,7 +141,6 @@ if err != nil {
     return err
 }
 
-
 // return all comments from a post with a given id
 comments, err := client.Comment.FindMany(
     db.Comment.Post.Where(
@@ -168,8 +168,8 @@ if err != nil {
 log.Printf("ordered comments: %+v", orderedComments)
 ```
 
-Prisma also allows you to fetch multiple things at once. Instead of doing complicated joins, you can fetch a post and
-a few of their comments in just a few lines and fully typesafe:
+Prisma also allows you to fetch multiple things at once. Instead of doing complicated joins, you can fetch a post and a
+few of their comments in just a few lines and fully type-safe:
 
 ```go
 // return a post by its id including 5 of its comments

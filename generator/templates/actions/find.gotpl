@@ -145,17 +145,15 @@
 				error,
 			) {
 				var v find{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-				err := r.query.Exec(ctx, &v)
-				if v.Errors != nil {
-					first := v.Errors[0]
-					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, fmt.Errorf(first.Message)
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
 				}
 				{{ if not $v.List }}
-					if v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }} == nil {
+					if v.Find{{ $v.Name }}{{ $model.Name.GoCase }} == nil {
 						return {{ $model.Name.GoCase }}Model{}, ErrNotFound
 					}
 				{{ end }}
-				return {{ if not $v.List }}*{{ end }}v.Data.Find{{ $v.Name }}{{ $model.Name.GoCase }}, err
+				return {{ if not $v.List }}*{{ end }}v.Find{{ $v.Name }}{{ $model.Name.GoCase }}, nil
 			}
 
 			{{ $outputName := $name }}
@@ -210,11 +208,10 @@
 			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 				err := r.query.Exec(ctx, &v)
-				if v.Errors != nil {
-					first := v.Errors[0]
-					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
+				if err != nil {
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
 				}
-				return v.Data.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+				return v.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil
 			}
 
 			{{/* DELETE */}}
@@ -236,11 +233,10 @@
 			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
 				err := r.query.Exec(ctx, &v)
-				if v.Errors != nil {
-					first := v.Errors[0]
-					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, fmt.Errorf(first.Message)
+				if err != nil {
+					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
 				}
-				return v.Data.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, err
+				return v.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil
 			}
 		{{ end }}
 	{{ end }}

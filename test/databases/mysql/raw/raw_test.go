@@ -293,6 +293,17 @@ func TestRaw(t *testing.T) {
 
 			assert.Equal(t, 2, actual[0].Count)
 		},
+	}, {
+		name:   "insert into",
+		before: []string{},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			count, err := client.ExecuteRaw("INSERT INTO `User` (`id`, `email`, `username`, `str`, `strOpt`, `int`, `intOpt`, `float`, `floatOpt`, `bool`, `boolOpt`) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 1, count)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

@@ -5,17 +5,22 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/prisma/prisma-client-go/generator/runtime"
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/prisma/prisma-client-go/logger"
 )
 
+var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
+	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
+var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
+	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
+
 // Do sends the http Request to the query engine and unmarshals the response
-func (e *Engine) Do(ctx context.Context, query string, response interface{}) error {
+func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
 	startReq := time.Now()
 
 	payload := GQLRequest{
@@ -32,13 +37,21 @@ func (e *Engine) Do(ctx context.Context, query string, response interface{}) err
 
 	startParse := time.Now()
 
-	// TODO temporary hack, actually parse the response
-	if str := string(body); strings.Contains(str, "errors: \"[{\"error") {
-		return fmt.Errorf("pql error: %s", str)
+	var response GQLResponse
+	if err := json.Unmarshal(body, &response); err != nil {
+		return fmt.Errorf("json unmarshal: %w", err)
 	}
 
-	err = json.Unmarshal(body, response)
-	if err != nil {
+	if len(response.Errors) > 0 {
+		first := response.Errors[0]
+		if first.Message == internalUpdateNotFoundMessage ||
+			first.Message == internalDeleteNotFoundMessage {
+			return runtime.ErrNotFound
+		}
+		return fmt.Errorf("pql error: %s", first.Message)
+	}
+
+	if err := json.Unmarshal(response.Data, v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
 

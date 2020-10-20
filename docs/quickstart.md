@@ -2,9 +2,9 @@
 
 ## Setup
 
-1) Init go project
+1) Initialise a new Go project
 
-    If you don't have a go project yet, initialise one using go modules:
+    If you don't have a Go project yet, initialise one using Go modules:
 
     ```shell script
     mkdir demo && cd demo
@@ -13,13 +13,14 @@
 
 2) Get Prisma Client Go
 
-    Install the go module in your project:
+    Install the Go module in your project:
 
     ```shell script
     go get github.com/prisma/prisma-client-go
     ```
 
-3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
+3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
+    Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
     datasource db {
@@ -42,9 +43,11 @@
     }
     ```
 
-    To get this up and running in your database, we use the Prisma migration tool [`migrate`](https://github.com/prisma/migrate) (Note: this tool is experimental) to create and migrate our database:
+    To get this up and running in your database, we use the Prisma migration
+    tool [`migrate`](https://github.com/prisma/migrate) (Note: this tool is experimental) to create and migrate our
+    database:
 
-    ```shell script
+     ```shell script
     # initialize the first migration
     go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name "init"
     # apply the migration
@@ -53,7 +56,7 @@
 
 4) Generate the Prisma Client Go client in your project
 
-    ```shell script
+     ```shell script
     go run github.com/prisma/prisma-client-go generate
     ```
 
@@ -61,34 +64,15 @@
 
 ## Usage
 
-Once you generated the Prisma Client Go client and set up a datasource with Prisma, you're good to go!
-
-### Create the client and connect to the prisma engine
-
-```go
-client := db.NewClient()
-err := client.Connect()
-if err != nil {
-    handle(err)
-}
-
-defer func() {
-    err := client.Disconnect()
-    if err != nil {
-        panic(fmt.Errorf("could not disconnect %w", err))
-    }
-}()
-```
-
-### Full example
+Create a file `main.go`:
 
 ```go
 package main
 
 import (
     "context"
+    "encoding/json"
     "fmt"
-    "log"
 
     "demo/db"
 )
@@ -120,42 +104,68 @@ func run() error {
         db.Post.Title.Set("Hi from Prisma!"),
         db.Post.Published.Set(true),
         db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
-        // ID is optional since it's auto generated, which is why it's specified last.
-        db.Post.ID.Set("123"),
     ).Exec(ctx)
     if err != nil {
         return err
     }
 
-    log.Printf("created post: %+v", createdPost)
+    result, _ := json.MarshalIndent(createdPost, "", "  ")
+    fmt.Printf("created post: %s\n", result)
 
     // find a single post
     post, err := client.Post.FindOne(
-        db.Post.ID.Equals("123"),
+        db.Post.ID.Equals(createdPost.ID),
     ).Exec(ctx)
     if err != nil {
         return err
     }
 
-    log.Printf("post: %+v", post)
+    result, _ = json.MarshalIndent(post, "", "  ")
+    fmt.Printf("post: %s\n", result)
 
     // for optional/nullable values, you need to check the function and create two return values
     // `name` is a string, and `ok` is a bool whether the record is null or not. If it's null,
     // `ok` is false, and `name` will default to Go's default values; in this case an empty string (""). Otherwise,
     // `ok` is true and `desc` will be "my description".
     name, ok := post.Desc()
-
     if !ok {
         return fmt.Errorf("post's name is null")
     }
 
-    log.Printf("The posts's name is: %s", name)
+    fmt.Printf("The posts's name is: %s\n", name)
 
     return nil
 }
 ```
 
+and run it:
+
+```shell script
+go run .
+```
+
+```
+❯ go run .
+created post: {
+  "id": "ckfnrp7ec0000oh9kygil9s94",
+  "createdAt": "2020-09-29T09:37:44.628Z",
+  "updatedAt": "2020-09-29T09:37:44.628Z",
+  "title": "Hi from Prisma!",
+  "published": true,
+  "desc": "Prisma is a database toolkit and makes databases easy."
+}
+post: {
+  "id": "ckfnrp7ec0000oh9kygil9s94",
+  "createdAt": "2020-09-29T09:37:44.628Z",
+  "updatedAt": "2020-09-29T09:37:44.628Z",
+  "title": "Hi from Prisma!",
+  "published": true,
+  "desc": "Prisma is a database toolkit and makes databases easy."
+}
+The posts's name is: Prisma is a database toolkit and makes databases easy.
+```
+
 ### Next steps
 
-We just scratched the surface of what you can do. Read our [advanced tutorial](./advanced.md) to
-learn about more complex queries and how you can query for relations.
+We just scratched the surface of what you can do. Read our [advanced tutorial](./advanced.md) to learn about more
+complex queries and how you can query for relations.

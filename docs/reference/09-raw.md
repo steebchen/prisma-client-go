@@ -21,7 +21,7 @@ err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc"
 ### Count
 
 ```go
-count, err := client.ExecuteRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
+count, err := client.ExecuteRaw(`UPDATE User SET name = ? WHERE id = ?`, "John", "123").Exec(ctx)
 ```
 
 ## Postgres
@@ -43,5 +43,9 @@ err := client.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2
 ### Count
 
 ```go
-count, err := client.ExecuteRaw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &result)
+count, err := client.ExecuteRaw(`UPDATE "User" SET name = $1 WHERE id = $2`, "John", "123").Exec(ctx)
 ```
+
+## Next steps
+
+Check out the Go client's [current limitations](./10-limitations.md).
