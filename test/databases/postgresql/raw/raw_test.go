@@ -301,7 +301,7 @@ func TestRaw(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 0, count)
+			assert.Equal(t, 1, count)
 		},
 	}}
 	for _, tt := range tests {
