@@ -303,6 +303,43 @@ func TestRaw(t *testing.T) {
 
 			assert.Equal(t, 1, count)
 		},
+	}, {
+		name: "update",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				a: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+					str: "str",
+					strOpt: "strOpt",
+					int: 5,
+					intOpt: 5,
+					float: 5.5,
+					floatOpt: 5.5,
+					bool: true,
+					boolOpt: false,
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			count, err := client.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "id1").Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 1, count)
+
+			count, err = client.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "non-existing").Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 0, count)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
