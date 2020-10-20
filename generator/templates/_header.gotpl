@@ -7,8 +7,6 @@ package {{.Generator.Config.Package}}
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/generator/runtime"
