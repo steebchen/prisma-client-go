@@ -1,8 +1,10 @@
 package engine
 
+import "encoding/json"
+
 // GQLResponse is the payload for a GraphQL response
 type GQLResponse struct {
-	Data       interface{}            `json:"data"`
+	Data       json.RawMessage        `json:"data"`
 	Errors     []GQLError             `json:"errors"`
 	Extensions map[string]interface{} `json:"extensions"`
 }
