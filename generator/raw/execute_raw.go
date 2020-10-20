@@ -18,9 +18,7 @@ type ExecuteExec struct {
 }
 
 type ExecuteResult struct {
-	Data struct {
-		ExecuteRaw int `json:"executeRaw"`
-	} `json:"data"`
+	ExecuteRaw int `json:"executeRaw"`
 }
 
 func (r ExecuteExec) Exec(ctx context.Context) (int, error) {
@@ -29,5 +27,5 @@ func (r ExecuteExec) Exec(ctx context.Context) (int, error) {
 		return 0, fmt.Errorf("could not send raw query: %w", err)
 	}
 
-	return result.Data.ExecuteRaw, nil
+	return result.ExecuteRaw, nil
 }
