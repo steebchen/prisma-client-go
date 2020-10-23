@@ -1,5 +1,29 @@
 # Query filters
 
+The examples use the following prisma schema:
+
+```prisma
+model Post {
+    id        String   @default(cuid()) @id
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    published Boolean
+    title     String
+    content   String?
+
+    comments Comment[]
+}
+
+model Comment {
+    id        String   @default(cuid()) @id
+    createdAt DateTime @default(now())
+    content   String
+
+    post   Post @relation(fields: [postID], references: [id])
+    postID String
+}
+```
+
 ## Type filters
 
 You probably want to build detailed queries, such as if a database column contains a word,
@@ -80,4 +104,4 @@ db.Post.Or(
 
 ## Next steps
 
-In the next article, you can explore how to [fetch for multiple things](./04-fetch.md) at once.
+In the next article, you can explore how to [fetch for multiple things](04-fetch.md) at once.

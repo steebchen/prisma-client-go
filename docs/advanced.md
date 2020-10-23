@@ -1,6 +1,6 @@
 ## Advanced usage
 
-In the [quickstart](./quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
+In the [quickstart](quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
 Go client are designed to work with relations between models.
 
 We already created a post model, such as for a blog. Let's assume we want to add comments to a post, and connect these
@@ -186,4 +186,4 @@ log.Printf("post: %+v", post)
 
 ## API reference
 
-To explore all query capabilities, check out the [API reference](./reference).
+To explore all query capabilities, check out the [API reference](reference).

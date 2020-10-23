@@ -2,9 +2,9 @@
 
 Contents
 
-- [Quickstart](./quickstart.md)
-- [API reference](./reference)
-- [Deploy](./deploy.md)
+- [Quickstart](quickstart.md)
+- [API reference](reference)
+- [Deploy](deploy.md)
 
 ---
 
