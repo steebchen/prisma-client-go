@@ -158,6 +158,36 @@
 			}
 
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
+				params {{ if $field.IsList }}...{{ end }}i{{ $field.Type.GoCase }}Params,
+			) {{ $setReturnStruct }} {
+				var fields []builder.Field
+
+				{{ if $field.IsList }}
+					for _, q := range params {
+						fields = append(fields, q.field())
+					}
+				{{ else }}
+					fields = append(fields, params.field())
+				{{ end }}
+
+				return {{ $setReturnStruct }}{
+					data: builder.Field{
+						Name: "{{ $field.Name }}",
+						Fields: []builder.Field{
+							{
+								Name:     "connect",
+								Fields:   builder.TransformEquals(fields),
+								{{ if $field.IsList }}
+									List:     true,
+									WrapList: true,
+								{{ end }}
+							},
+						},
+					},
+				}
+			}
+
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Create(
 				params ...i{{ $field.Type.GoCase }}Params,
 			) {{ $setReturnStruct }} {
 				var fields []builder.Field
@@ -171,8 +201,8 @@
 						Name: "{{ $field.Name }}",
 						Fields: []builder.Field{
 							{
-								Name:   "connect",
-								Fields: builder.TransformEquals(fields),
+								Name:   "create",
+								Fields: fields,
 							},
 						},
 					},
