@@ -16,7 +16,7 @@ pkg node_modules/@prisma/cli --out-path binaries/
 
 cd binaries
 
-version=$(npx prisma version | grep '^\(prisma2\|@prisma/cli\)' | cut -d : -f 2 | cut -d " " -f 2)
+version=$(npx prisma version | grep '^\(@prisma/cli \)' | cut -d : -f 2 | cut -d " " -f 2)
 mv cli-macos "prisma-cli-$version-darwin"
 mv cli-linux "prisma-cli-$version-linux"
 mv cli-win.exe "prisma-cli-$version-windows.exe"

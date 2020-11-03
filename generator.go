@@ -60,11 +60,8 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput:      path.Join(".", "db"),
-					PrettyName:         "Prisma Client Go",
-					Denylist:           []string{},
-					RequiresGenerators: []string{},
-					RequiresEngines:    []string{}, // Prisma Client Go handles downloading the engines
+					DefaultOutput: path.Join(".", "db"),
+					PrettyName:    "Prisma Client Go",
 				},
 			}
 
