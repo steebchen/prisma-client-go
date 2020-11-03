@@ -333,11 +333,13 @@ func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 		}
 
 		for _, field := range inputType.Fields {
-			// check if there's unique compound input type in it
-			if strings.HasSuffix(string(field.InputType.Type), "CompoundUniqueInput") {
-				// if yes, add the full inputType and break
-				inputs = append(inputs, inputType)
-				break
+			for _, input := range field.InputTypes {
+				// check if there's unique compound input type in it
+				if strings.HasSuffix(string(input.Type), "CompoundUniqueInput") {
+					// if yes, add the full inputType and break
+					inputs = append(inputs, inputType)
+					break
+				}
 			}
 		}
 	}
@@ -362,8 +364,10 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 	// found the input type. now check if the model matches...
 	for _, i := range s.InputTypes {
 		for _, f := range i.Fields {
-			if f.InputType.Type.String() == name {
-				secondInputTypes = append(secondInputTypes, i)
+			for _, t := range f.InputTypes {
+				if t.Type.String() == name {
+					secondInputTypes = append(secondInputTypes, i)
+				}
 			}
 		}
 	}
@@ -386,8 +390,8 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 
 // SchemaArg provides the arguments of a given field.
 type SchemaArg struct {
-	Name      types.String    `json:"name"`
-	InputType SchemaInputType `json:"inputType"`
+	Name       types.String      `json:"name"`
+	InputTypes []SchemaInputType `json:"inputTypes"`
 	// IsRelationFilter (optional)
 	IsRelationFilter bool `json:"isRelationFilter"`
 }
