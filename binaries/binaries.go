@@ -16,7 +16,7 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.10.1"
+const PrismaVersion = "2.10.2"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
