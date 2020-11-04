@@ -49,28 +49,32 @@
 	{{ end }}
 
 	{{/* composite keys for FindOne */}}
+	{{ $break := false }}
 	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes $model.Name.String }}
 		{{ range $index := $input.Fields }}
-			{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $index.InputType.Type.String }}
-			{{ if $i }}
-				func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
-					{{- range $f := $i.Fields }}
-						_{{- $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
-					{{ end -}}
-				) i{{ $model.Name.GoCase }}EqualsParamsUnique {
-					var fields []builder.Field
+			{{ range $inner := $index.InputTypes }}
+				{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $inner.Type.String }}
+				{{ if and $i (not $break) }}
+					{{ $break = true }}
+					func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
+						{{- range $f := $i.Fields }}
+							_{{- $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
+						{{ end -}}
+					) i{{ $model.Name.GoCase }}EqualsParamsUnique {
+						var fields []builder.Field
 
-					{{ range $f := $i.Fields }}
-						fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
-					{{- end }}
+						{{ range $f := $i.Fields }}
+							fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
+						{{- end }}
 
-					return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
-						data: builder.Field{
-							Name:   "{{ $index.Name }}",
-							Fields: builder.TransformEquals(fields),
-						},
+						return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
+							data: builder.Field{
+								Name:   "{{ $index.Name }}",
+								Fields: builder.TransformEquals(fields),
+							},
+						}
 					}
-				}
+				{{ end }}
 			{{ end }}
 		{{ end }}
 	{{ end }}
