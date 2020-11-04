@@ -20,7 +20,7 @@ func str(v string) *string {
 func TestTypes(t *testing.T) {
 	t.Parallel()
 
-	date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
+	date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00+00:00")
 
 	tests := []struct {
 		name   string
@@ -160,7 +160,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-
 			users, err := client.User.FindMany(
 				User.ID.Equals("id"),
 				User.StrOpt.Equals("str"),
