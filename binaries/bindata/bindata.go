@@ -23,7 +23,7 @@ func WriteFile(name, pkg, platform, from, to string) error {
 		return fmt.Errorf("write header: %w", err)
 	}
 
-	if err := writeAsset(f, name, from); err != nil {
+	if err := writeAsset(f, from); err != nil {
 		return fmt.Errorf("write asset: %w", err)
 	}
 
@@ -65,7 +65,7 @@ func init() {
 	return err
 }
 
-func writeAsset(w io.Writer, name, file string) error {
+func writeAsset(w io.Writer, file string) error {
 	fd, err := os.Open(file)
 	if err != nil {
 		return err
@@ -94,7 +94,9 @@ func uncompressedMemcopy(w io.Writer, r io.Reader) error {
 		return err
 	}
 
-	fmt.Fprintf(w, "%+q", b)
+	if _, err := fmt.Fprintf(w, "%+q", b); err != nil {
+		return err
+	}
 
 	if _, err := fmt.Fprintf(w, `)`); err != nil {
 		return err

@@ -479,7 +479,6 @@ func TestRelations(t *testing.T) {
 			}
 
 			assert.Equal(t, expectedEmpty, actual)
-
 		},
 	}, {
 		name: "with and sub query",

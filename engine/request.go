@@ -5,12 +5,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/prisma/prisma-client-go/generator/runtime"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 	"time"
 
+	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/logger"
 )
 
@@ -30,7 +30,7 @@ func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
 
 	body, err := e.Request(ctx, "POST", "/", &payload)
 	if err != nil {
-		return fmt.Errorf("Request failed: %w", err)
+		return fmt.Errorf("request failed: %w", err)
 	}
 
 	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
