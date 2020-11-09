@@ -1,11 +1,8 @@
 name-template: v$NEXT_PATCH_VERSION
 sort-direction: ascending
 
-# As long as we're <1.0.0, mark all releases as pre-release
-prerelease: true
-
 template: |
-  # v$NEXT_PATCH_VERSION
+  # v$NEXT_MINOR_VERSION
   
   TODO: description
   
