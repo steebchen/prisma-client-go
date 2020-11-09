@@ -7,14 +7,15 @@ v="$1"
 mkdir -p build
 cd build
 npm init --yes
-npm i "@prisma/cli@$v"
+npm i "pkg" --dev
+npm i "@prisma/cli@$v" --dev
+npm i "@prisma/client@$v"
 npx prisma version
 
-mkdir -p binaries
+mkdir -p node_modules/@prisma/cli/node_modules/@prisma/engines
+cp -R node_modules/@prisma/engines/* node_modules/@prisma/cli/node_modules/@prisma/engines
 
-pkg node_modules/@prisma/cli --out-path binaries/
-
-cd binaries
+npx pkg node_modules/@prisma/cl
 
 version=$(npx prisma version | grep '^\(@prisma/cli \)' | cut -d : -f 2 | cut -d " " -f 2)
 mv cli-macos "prisma-cli-$version-darwin"

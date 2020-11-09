@@ -206,7 +206,7 @@ func download(url string, to string) error {
 	// copy to temp file first
 	dest := to + ".tmp"
 
-	resp, err := http.Get(url)
+	resp, err := http.Get(url) //nolint:gosec
 	if err != nil {
 		return fmt.Errorf("could not get %s: %w", url, err)
 	}
@@ -236,7 +236,7 @@ func download(url string, to string) error {
 	//goland:noinspection GoUnhandledErrorResult
 	defer g.Close()
 
-	if _, err := io.Copy(out, g); err != nil {
+	if _, err := io.Copy(out, g); err != nil { //nolint:gosec
 		return fmt.Errorf("could not copy %s: %w", url, err)
 	}
 

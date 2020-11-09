@@ -350,7 +350,6 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 	var inputType InputType
 	for _, i := range s.InputTypes {
 		if i.Name.String() == name {
-
 			inputType = i
 			break
 		}

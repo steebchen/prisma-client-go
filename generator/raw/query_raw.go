@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 

@@ -289,7 +289,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-
 			actual, err := client.User.FindMany(
 				User.StrOpt.IsNull(),
 			).Exec(ctx)
@@ -352,7 +351,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-
 			var s *string = nil
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(s),
@@ -416,7 +414,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-
 			s := "filled"
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(&s),
@@ -497,7 +494,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-
 			actual, err := client.User.FindMany(
 				User.StrOpt.In([]string{"first", "third"}),
 			).Exec(ctx)

@@ -474,9 +474,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []UserModel{}
-
-			assert.Equal(t, expected, actual)
+			assert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "NOT operation",

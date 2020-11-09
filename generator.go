@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -17,14 +18,14 @@ import (
 func reply(w io.Writer, data interface{}) error {
 	b, err := json.Marshal(data)
 	if err != nil {
-		return fmt.Errorf("could not marshal data %s", err)
+		return fmt.Errorf("could not marshal data %w", err)
 	}
 
 	b = append(b, byte('\n'))
 
 	_, err = w.Write(b)
 	if err != nil {
-		return fmt.Errorf("could not write data %s", err)
+		return fmt.Errorf("could not write data %w", err)
 	}
 
 	return nil
@@ -40,7 +41,7 @@ func invokePrisma() error {
 
 	for {
 		content, err := reader.ReadBytes('\n')
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			logger.Debug.Printf("warning: ignoring EOF error. stdin: `%s`", content)
 			return nil
 		}
@@ -51,7 +52,7 @@ func invokePrisma() error {
 		var input jsonrpc.Request
 
 		if err := json.Unmarshal(content, &input); err != nil {
-			return fmt.Errorf("could not open stdin %s", err)
+			return fmt.Errorf("could not open stdin %w", err)
 		}
 
 		var response interface{}
@@ -71,18 +72,18 @@ func invokePrisma() error {
 			var params generator.Root
 
 			if err := json.Unmarshal(input.Params, &params); err != nil {
-				return fmt.Errorf("could not unmarshal params into generator.Root type %s", err)
+				return fmt.Errorf("could not unmarshal params into generator.Root type %w", err)
 			}
 
 			if err = generator.Run(&params); err != nil {
-				return fmt.Errorf("could not generate code. %s", err)
+				return fmt.Errorf("could not generate code. %w", err)
 			}
 		default:
 			return fmt.Errorf("no such method %s", input.Method)
 		}
 
 		if err := reply(os.Stderr, jsonrpc.NewResponse(input.ID, response)); err != nil {
-			return fmt.Errorf("could not reply %s", err)
+			return fmt.Errorf("could not reply %w", err)
 		}
 	}
 }
