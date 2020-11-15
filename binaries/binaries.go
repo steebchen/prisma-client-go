@@ -16,11 +16,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.10.2"
+const PrismaVersion = "2.11.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "7d0087eadc7265e12d4b8d8c3516b02c4c965111"
+const EngineVersion = "58369335532e47bdcec77a2f1e7c1fb83a463918"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
@@ -148,6 +148,8 @@ func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
 	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
+
+	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, to, url)
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
