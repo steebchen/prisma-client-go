@@ -260,12 +260,10 @@
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
 					if value == nil {
-						{{/* nil value of type */}}
-						var v *{{ $field.Type.Value }}
 						return {{ $setReturnStruct }}{
 							data: builder.Field{
 								Name:  "{{ $field.Name }}",
-								Value: v,
+								Value: nil,
 							},
 						}
 					}
