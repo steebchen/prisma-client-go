@@ -174,8 +174,7 @@ func (e *Engine) spawn(file string) error {
 
 	logger.Debug.Printf("starting engine...")
 
-	err = e.cmd.Start()
-	if err != nil {
+	if err := e.cmd.Start(); err != nil {
 		return fmt.Errorf("start command: %w", err)
 	}
 

@@ -15,11 +15,9 @@ func check(err error) {
 
 func main() {
 	client := db.NewClient()
-	err := client.Connect()
-	check(err)
+	check(client.Connect())
 	defer func() {
-		err := client.Disconnect()
-		check(err)
+		check(client.Disconnect())
 	}()
 
 	ctx := context.Background()
