@@ -23,8 +23,7 @@ func reply(w io.Writer, data interface{}) error {
 
 	b = append(b, byte('\n'))
 
-	_, err = w.Write(b)
-	if err != nil {
+	if _, err = w.Write(b); err != nil {
 		return fmt.Errorf("could not write data %w", err)
 	}
 
@@ -75,7 +74,7 @@ func invokePrisma() error {
 				return fmt.Errorf("could not unmarshal params into generator.Root type %w", err)
 			}
 
-			if err = generator.Run(&params); err != nil {
+			if err := generator.Run(&params); err != nil {
 				return fmt.Errorf("could not generate code. %w", err)
 			}
 		default:

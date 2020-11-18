@@ -74,8 +74,7 @@ func Start(t *testing.T, db Database, e *engine.Engine, queries []string) string
 
 	for _, b := range queries {
 		var response engine.GQLResponse
-		err := e.Do(context.Background(), b, &response)
-		if err != nil {
+		if err := e.Do(context.Background(), b, &response); err != nil {
 			End(t, db, e, mockDB)
 			t.Fatalf("could not send mock query %s", err)
 		}

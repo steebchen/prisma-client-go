@@ -82,8 +82,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User`).Exec(ctx, &actual)
-			if err != nil {
+			if err := client.QueryRaw(`SELECT * FROM User`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -157,8 +156,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual)
-			if err != nil {
+			if err := client.QueryRaw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -220,8 +218,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual)
-			if err != nil {
+			if err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -285,8 +282,7 @@ func TestRaw(t *testing.T) {
 			var actual []struct {
 				Count int `json:"count"`
 			}
-			err := client.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
-			if err != nil {
+			if err := client.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
