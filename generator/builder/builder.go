@@ -230,7 +230,7 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 
 func Value(value interface{}) []byte {
 	if v, ok := value.(time.Time); ok {
-		return []byte(fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli)))
+		return []byte(fmt.Sprintf(`%q`, v.UTC().Format(runtime.RFC3339Milli)))
 	}
 
 	v, err := json.Marshal(value)
