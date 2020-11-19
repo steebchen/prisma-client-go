@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"encoding/json"
-	"log"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -22,7 +21,7 @@ func TestJSON(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "json",
+		name: "json create",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			x := struct {
 				Attr string `json:"attr"`
@@ -59,11 +58,50 @@ func TestJSON(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			log.Printf("json result: %s", string(actual.JSON))
-			v, _ := actual.JSONOpt()
-			log.Printf("jsonOpt result: %s", string(v))
-
 			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "json find by json field",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			x := struct {
+				Attr string `json:"attr"`
+			}{
+				Attr: "stuff",
+			}
+			data, err := json.Marshal(x)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			created, err := client.User.CreateOne(
+				User.JSON.Set(data),
+				User.JSONOpt.Set([]byte(`"hi"`)),
+				User.ID.Set("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			var opt JSON = []byte(`"hi"`)
+			expected := UserModel{
+				InternalUser: InternalUser{
+					ID:      "123",
+					JSON:    data,
+					JSONOpt: &opt,
+				},
+			}
+
+			assert.Equal(t, created, expected)
+
+			actual, err := client.User.FindMany(
+				User.JSON.Equals(data),
+				User.JSONOpt.Equals(opt),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual[0])
 		},
 	}}
 	for _, tt := range tests {
