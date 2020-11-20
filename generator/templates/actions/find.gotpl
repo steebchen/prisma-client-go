@@ -207,8 +207,7 @@
 
 			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v update{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-				err := r.query.Exec(ctx, &v)
-				if err != nil {
+				if err := r.query.Exec(ctx, &v); err != nil {
 					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
 				}
 				return v.Update{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil
@@ -232,8 +231,7 @@
 
 			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v delete{{ $v.Name.GoCase }}{{ $model.Name.GoCase }}Response
-				err := r.query.Exec(ctx, &v)
-				if err != nil {
+				if err := r.query.Exec(ctx, &v); err != nil {
 					return {{ if $v.List }}-1{{ else }}{{ $returnType }}{}{{ end }}, err
 				}
 				return v.Delete{{ $v.Name }}{{ $model.Name.GoCase }}{{ if $v.List}}.Count{{ end }}, nil

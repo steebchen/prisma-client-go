@@ -81,8 +81,7 @@ func (e *Engine) Request(ctx context.Context, method string, path string, payloa
 		return nil, fmt.Errorf("raw post: %w", err)
 	}
 	defer func() {
-		err := rawResponse.Body.Close()
-		if err != nil {
+		if err := rawResponse.Body.Close(); err != nil {
 			panic(err)
 		}
 	}()

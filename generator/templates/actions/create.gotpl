@@ -62,7 +62,9 @@
 
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
 		var v createOne{{ $model.Name.GoCase }}Response
-		err := r.query.Exec(ctx, &v)
-		return v.CreateOne{{ $model.Name.GoCase }}, err
+		if err := r.query.Exec(ctx, &v); err != nil {
+			return v.CreateOne{{ $model.Name.GoCase }}, err
+		}
+		return v.CreateOne{{ $model.Name.GoCase }}, nil
 	}
 {{ end }}

@@ -3,11 +3,9 @@ package builder
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/logger"
 )
 
@@ -229,10 +227,6 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 }
 
 func Value(value interface{}) []byte {
-	if v, ok := value.(time.Time); ok {
-		return []byte(fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli)))
-	}
-
 	v, err := json.Marshal(value)
 	if err != nil {
 		panic(err)
