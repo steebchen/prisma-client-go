@@ -29,7 +29,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -73,7 +73,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -91,7 +91,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -146,7 +146,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -208,7 +208,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "123",
 					email: "john@example.com",
 					username: "johndoe",
@@ -260,7 +260,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -278,7 +278,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -351,7 +351,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -400,7 +400,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -485,7 +485,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -503,7 +503,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -578,7 +578,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -596,7 +596,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -678,7 +678,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -696,7 +696,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -779,7 +779,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "post-a",
 					title: "common",
 					content: "stuff",
@@ -847,7 +847,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
@@ -858,7 +858,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				category: createOneCategory(data: {
+				result: createOneCategory(data: {
 					id: "media",
 					name: "Media",
 				}) {
@@ -910,7 +910,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
