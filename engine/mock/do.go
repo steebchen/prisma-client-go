@@ -7,6 +7,9 @@ import (
 )
 
 func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
+	e.expMu.Lock()
+	defer e.expMu.Unlock()
+
 	expectations := *e.expectations
 
 	var n = -1

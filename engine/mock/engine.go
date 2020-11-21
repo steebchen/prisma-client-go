@@ -1,5 +1,9 @@
 package mock
 
+import (
+	"sync"
+)
+
 func New(expectations *[]Expectation) *Engine {
 	return &Engine{
 		expectations: expectations,
@@ -8,6 +12,7 @@ func New(expectations *[]Expectation) *Engine {
 
 type Engine struct {
 	expectations *[]Expectation
+	expMu        sync.Mutex
 }
 
 func (e *Engine) Name() string {
