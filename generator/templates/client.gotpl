@@ -30,7 +30,21 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 func NewClient() *PrismaClient {
 	c := &PrismaClient{}
 
-	c.Engine = engine.NewEngine(schema, hasBinaryTargets)
+	c.Engine = engine.New(schema, hasBinaryTargets)
+
+	{{- range $model := $.DMMF.Datamodel.Models }}
+		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
+	{{- end }}
+
+	c.Actions = &raw.Actions{Client: c}
+
+	return c
+}
+
+func newMockClient(expectations *[]mock.Expectation) *PrismaClient {
+	c := &PrismaClient{}
+
+	c.Engine = mock.New(expectations)
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
@@ -43,8 +57,10 @@ func NewClient() *PrismaClient {
 
 // PrismaClient is the instance of the Prisma Client Go client.
 type PrismaClient struct {
-	// engine spawns and manages the binary
-	*engine.Engine
+	// engine is an abstractions of what happens under the hood
+	// the query engine can spawn and manage the binary and send requests to it,
+	// while a mock engine would collect mocks to verify them later
+	engine.Engine
 
 	*raw.Actions
 
@@ -91,3 +107,12 @@ func (c *PrismaClient) Connect() error {
 func (c *PrismaClient) Disconnect() error {
 	return c.Engine.Disconnect()
 }
+
+func NewMock() (*PrismaClient, *mock.Mock, func(t *testing.T)) {
+	expectations := new([]mock.Expectation)
+	pc := newMockClient(expectations)
+	m := &mock.Mock{Expectations: expectations}
+	return pc, m, m.Ensure
+}
+
+type Mock = mock.Mock

@@ -60,6 +60,10 @@
 		query builder.Query
 	}
 
+	func (p {{ $result }}) ExtractQuery() builder.Query {
+		return p.query
+	}
+
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
 		var v {{ $modelName }}
 		if err := r.query.Exec(ctx, &v); err != nil {

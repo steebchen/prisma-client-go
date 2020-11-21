@@ -30,6 +30,10 @@
 				return r.query
 			}
 
+			func (r {{ $result }}) ExtractQuery() builder.Query {
+				return r.query
+			}
+
 			func (r {{ $result }}) with() {}
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
@@ -205,6 +209,10 @@
 				query builder.Query
 			}
 
+			func (r {{ $updateResult }}) ExtractQuery() builder.Query {
+				return r.query
+			}
+
 			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
 				if err := r.query.Exec(ctx, &v); err != nil {
@@ -227,6 +235,10 @@
 
 			type {{ $deleteResult }} struct {
 				query builder.Query
+			}
+
+			func (r {{ $deleteResult }}) ExtractQuery() builder.Query {
+				return r.query
 			}
 
 			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
