@@ -51,7 +51,7 @@ func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
 		return fmt.Errorf("pql error: %s", first.Message)
 	}
 
-	if err := json.Unmarshal(response.Data, v); err != nil {
+	if err := json.Unmarshal(response.Data.Result, v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
 

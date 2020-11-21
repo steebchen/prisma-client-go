@@ -16,7 +16,7 @@ func TestComposite(t *testing.T) {
 		// language=GraphQL
 		mockDB := test.Start(t, db, client.Engine, []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "user",
 				}) {
 					id
@@ -24,7 +24,7 @@ func TestComposite(t *testing.T) {
 			}
 		`, `
 			mutation {
-				createOneEvent(data: {
+				result: createOneEvent(data: {
 					id: "event",
 				}) {
 					id

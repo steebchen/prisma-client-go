@@ -29,7 +29,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "nullability",
 					email: "john@example.com",
 					username: "johndoe",
@@ -59,7 +59,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "marshal",
 					email: "john@example.com",
 					username: "johndoe",
@@ -89,7 +89,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "findOne1",
 					email: "john@findOne.com",
 					username: "john_doe",
@@ -99,7 +99,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "findOne2",
 					email: "jane@findOne.com",
 					username: "jane_doe",
@@ -121,7 +121,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 				mutation {
-					a: createOneUser(data: {
+				result: createOneUser(data: {
 						id: "findMany1",
 						email: "1",
 						username: "john",
@@ -132,7 +132,7 @@ func TestBasic(t *testing.T) {
 				}
 			`, `
 				mutation {
-					b: createOneUser(data: {
+				result: createOneUser(data: {
 						id: "findMany2",
 						email: "2",
 						username: "john",
@@ -169,7 +169,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 				mutation {
-					a: createOneUser(data: {
+				result: createOneUser(data: {
 						id: "findMany1",
 						email: "1",
 						username: "john",
@@ -180,7 +180,7 @@ func TestBasic(t *testing.T) {
 				}
 			`, `
 				mutation {
-					b: createOneUser(data: {
+				result: createOneUser(data: {
 						id: "findMany2",
 						email: "2",
 						username: "john",
@@ -290,7 +290,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "update",
 					email: "john@example.com",
 					username: "johndoe",
@@ -337,7 +337,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -348,7 +348,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -400,7 +400,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "delete",
 					email: "john@example.com",
 					username: "johndoe",
@@ -436,7 +436,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -447,7 +447,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -481,7 +481,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -491,7 +491,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -525,7 +525,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -535,7 +535,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",

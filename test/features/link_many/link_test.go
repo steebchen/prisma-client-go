@@ -28,7 +28,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "unrelated",
 					email: "unrelated",
 					username: "unrelated",
@@ -110,7 +110,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "new",
 					email: "new",
 					username: "new",
@@ -120,7 +120,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				post1: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "common",
 					content: "a",
@@ -130,7 +130,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				post2: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "common",
 					content: "b",

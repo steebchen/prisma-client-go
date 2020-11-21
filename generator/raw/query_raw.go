@@ -23,12 +23,8 @@ type QueryResult struct {
 }
 
 func (r QueryExec) Exec(ctx context.Context, into interface{}) error {
-	var result QueryResult
-	if err := r.query.Exec(ctx, &result); err != nil {
+	if err := r.query.Exec(ctx, &into); err != nil {
 		return fmt.Errorf("could not send raw query: %w", err)
-	}
-	if err := json.Unmarshal(result.QueryRaw, into); err != nil {
-		return fmt.Errorf("could not decode result.QueryRaw: %w", err)
 	}
 
 	return nil
