@@ -30,7 +30,7 @@
 				return r.query
 			}
 
-			func (r {{ $result }}) ExtractQuery() builder.Query {
+			func (r {{ $result }}) extractQuery() builder.Query {
 				return r.query
 			}
 
@@ -209,7 +209,7 @@
 				query builder.Query
 			}
 
-			func (r {{ $updateResult }}) ExtractQuery() builder.Query {
+			func (r {{ $updateResult }}) extractQuery() builder.Query {
 				return r.query
 			}
 
@@ -237,7 +237,7 @@
 				query builder.Query
 			}
 
-			func (r {{ $deleteResult }}) ExtractQuery() builder.Query {
+			func (r {{ $deleteResult }}) extractQuery() builder.Query {
 				return r.query
 			}
 

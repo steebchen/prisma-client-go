@@ -60,7 +60,7 @@
 		query builder.Query
 	}
 
-	func (p {{ $result }}) ExtractQuery() builder.Query {
+	func (p {{ $result }}) extractQuery() builder.Query {
 		return p.query
 	}
 
