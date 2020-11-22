@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/logger"
 	"github.com/prisma/prisma-client-go/test/cmd"
 	"github.com/prisma/prisma-client-go/test/setup/mysql"
 	"github.com/prisma/prisma-client-go/test/setup/postgresql"
@@ -131,11 +131,12 @@ func run(t *testing.T, dbs []Database, invoke func(t *testing.T, db Database, ct
 func migrate(t *testing.T, schemaPath string) {
 	cleanup(t)
 
-	if err := cli.Run([]string{"migrate", "save", "--experimental", "--schema=./" + schemaPath, "--create-db", "--name", "init"}, logger.Enabled); err != nil {
+	verbose := os.Getenv("PRISMA_CLIENT_GO_TEST_MIGRATE_LOGS") != ""
+	if err := cli.Run([]string{"migrate", "save", "--experimental", "--schema=./" + schemaPath, "--create-db", "--name", "init"}, verbose); err != nil {
 		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 
-	if err := cli.Run([]string{"migrate", "up", "--experimental", "--schema=./" + schemaPath}, logger.Enabled); err != nil {
+	if err := cli.Run([]string{"migrate", "up", "--experimental", "--schema=./" + schemaPath}, verbose); err != nil {
 		t.Fatalf("could not run migrate save --experimental %s", err)
 	}
 }

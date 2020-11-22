@@ -83,6 +83,7 @@ func (q Query) buildQuery() string {
 
 	builder.WriteString(q.Operation + " " + q.Name)
 	builder.WriteString("{")
+	builder.WriteString("result: ")
 
 	builder.WriteString(q.Build())
 
