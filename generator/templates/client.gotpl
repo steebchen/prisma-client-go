@@ -107,12 +107,3 @@ func (c *PrismaClient) Connect() error {
 func (c *PrismaClient) Disconnect() error {
 	return c.Engine.Disconnect()
 }
-
-func NewMock() (*PrismaClient, *mock.Mock, func(t *testing.T)) {
-	expectations := new([]mock.Expectation)
-	pc := newMockClient(expectations)
-	m := &mock.Mock{Expectations: expectations}
-	return pc, m, m.Ensure
-}
-
-type Mock = mock.Mock

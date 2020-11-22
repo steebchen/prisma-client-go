@@ -64,6 +64,8 @@
 		return p.query
 	}
 
+	func (p {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
 		var v {{ $modelName }}
 		if err := r.query.Exec(ctx, &v); err != nil {
