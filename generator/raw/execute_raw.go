@@ -17,15 +17,10 @@ type ExecuteExec struct {
 	query builder.Query
 }
 
-type ExecuteResult struct {
-	ExecuteRaw int `json:"executeRaw"`
-}
-
 func (r ExecuteExec) Exec(ctx context.Context) (int, error) {
-	var result ExecuteResult
+	var result int
 	if err := r.query.Exec(ctx, &result); err != nil {
 		return 0, fmt.Errorf("could not send raw query: %w", err)
 	}
-
-	return result.ExecuteRaw, nil
+	return result, nil
 }

@@ -46,7 +46,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -64,7 +64,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -120,7 +120,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -138,7 +138,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -182,7 +182,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -200,7 +200,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -244,7 +244,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -262,7 +262,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -305,7 +305,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",

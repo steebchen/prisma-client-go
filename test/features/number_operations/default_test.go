@@ -16,7 +16,7 @@ func TestTableCasing(t *testing.T) {
 		// language=GraphQL
 		mockDB := test.Start(t, db, client.Engine, []string{`
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					int: 10,
 					float: 10,
