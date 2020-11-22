@@ -213,6 +213,8 @@
 				return r.query
 			}
 
+			func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+
 			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
 				if err := r.query.Exec(ctx, &v); err != nil {
@@ -240,6 +242,8 @@
 			func (r {{ $deleteResult }}) extractQuery() builder.Query {
 				return r.query
 			}
+
+			func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
 
 			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
 				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
