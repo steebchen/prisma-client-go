@@ -16,7 +16,7 @@ func str(v string) *string {
 	return &v
 }
 
-func TestBasic(t *testing.T) {
+func TestIfPresent(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -28,7 +28,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "update",
 					email: "john@example.com",
 					username: "johndoe",
