@@ -18,6 +18,7 @@ import (
 // in the generated client
 
 type DateTime = runtime.DateTime
+type JSON     = runtime.JSON
 
 type Direction = runtime.Direction
 
