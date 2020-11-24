@@ -132,17 +132,17 @@ func migrate(t *testing.T, schemaPath string) {
 	cleanup(t)
 
 	verbose := os.Getenv("PRISMA_CLIENT_GO_TEST_MIGRATE_LOGS") != ""
-	if err := cli.Run([]string{"migrate", "save", "--experimental", "--schema=./" + schemaPath, "--create-db", "--name", "init"}, verbose); err != nil {
-		t.Fatalf("could not run migrate save --experimental %s", err)
-	}
-
-	if err := cli.Run([]string{"migrate", "up", "--experimental", "--schema=./" + schemaPath}, verbose); err != nil {
-		t.Fatalf("could not run migrate save --experimental %s", err)
+	if err := cli.Run([]string{"db", "push", "--preview-feature", "--schema=./" + schemaPath}, verbose); err != nil {
+		t.Fatalf("could not run db push: %s", err)
 	}
 }
 
 func cleanup(t *testing.T) {
 	if err := cmd.Run("rm", "-rf", "migrations"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := cmd.Run("rm", "-rf", "*.db"); err != nil {
 		t.Fatal(err)
 	}
 }
