@@ -16,4 +16,5 @@ model User {
 	username String
 	name     String?
 	age      Int?
+	age2     Int?
 }

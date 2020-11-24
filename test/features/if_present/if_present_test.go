@@ -24,7 +24,7 @@ func TestIfPresent(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "Update",
+		name: "find and update",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -41,9 +41,8 @@ func TestIfPresent(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			maybeQuery := "johndoe"
 			newUsername := "new-username"
-			email := "john@example.com"
 			_, err := client.User.FindMany(
-				User.Email.Equals(email),
+				User.Email.Equals("john@example.com"),
 				// query for this one
 				User.Username.EqualsIfPresent(&maybeQuery),
 				// ignore this one
@@ -68,7 +67,7 @@ func TestIfPresent(t *testing.T) {
 			expected := UserModel{
 				InternalUser: InternalUser{
 					ID:       "update",
-					Email:    email,
+					Email:    "john@example.com",
 					Username: "new-username",
 					Name:     str("John"),
 				},
@@ -76,7 +75,68 @@ func TestIfPresent(t *testing.T) {
 
 			assert.Equal(t, expected, updated)
 
-			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			actual, err := client.User.FindOne(User.ID.Equals("update")).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "update operations",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "update",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					age: 1,
+					age2: 2,
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			incrementAge := 50
+			var newAge2 int
+			_, err := client.User.FindOne(
+				User.ID.Equals("update"),
+			).Update(
+				// set value
+				User.Age.IncrementIfPresent(&incrementAge),
+				// don't set because nil
+				User.Age2.IncrementIfPresent(&newAge2),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			updated, err := client.User.FindOne(
+				User.ID.Equals("update"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			age := 51
+			age2 := 2
+			expected := UserModel{
+				InternalUser: InternalUser{
+					ID:       "update",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					Age:      &age,
+					Age2:     &age2,
+				},
+			}
+
+			assert.Equal(t, expected, updated)
+
+			actual, err := client.User.FindOne(User.ID.Equals("update")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
