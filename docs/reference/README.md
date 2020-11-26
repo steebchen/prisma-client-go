@@ -17,7 +17,8 @@ Contents
 - [Query for relations](10-relations.md)
 
 - [Raw API fallback](11-raw.md)
-- [Limitations](12-limitations.md)
+- [JSON](12-json.md)
+- [Limitations](13-limitations.md)
 
 ```go
 func main() {
