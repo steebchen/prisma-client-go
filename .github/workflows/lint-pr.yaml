@@ -5,6 +5,8 @@ on:
       - opened
       - edited
       - synchronize
+    paths-ignore:
+      - "docs/**"
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go lint-pr.yaml"
 
