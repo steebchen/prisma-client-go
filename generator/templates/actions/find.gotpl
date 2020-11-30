@@ -180,7 +180,7 @@
 					{{/* TODO consider upcoming non-set methods */}}
 					field := q.field()
 					{{/* if scalar, wrap in 'set' */}}
-					if field.Fields == nil {
+					if field.Value != nil {
 						v := field.Value
 						field.Fields = []builder.Field{
 							{
