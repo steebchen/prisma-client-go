@@ -7,8 +7,10 @@ package {{.Generator.Config.Package}}
 
 import (
 	"context"
+	"testing"
 
 	"github.com/prisma/prisma-client-go/engine"
+	"github.com/prisma/prisma-client-go/engine/mock"
 	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/generator/raw"
 	"github.com/prisma/prisma-client-go/generator/builder"
