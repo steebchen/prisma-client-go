@@ -24,7 +24,7 @@ func TestArrays(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					items: {
 						set: ["a", "b", "c"],

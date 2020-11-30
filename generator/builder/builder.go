@@ -3,11 +3,9 @@ package builder
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 	"time"
 
-	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/logger"
 )
 
@@ -46,6 +44,7 @@ type Field struct {
 
 type Client interface {
 	Do(ctx context.Context, query string, into interface{}) error
+	Name() string
 }
 
 func NewQuery() Query {
@@ -80,20 +79,21 @@ type Query struct {
 	Start time.Time
 }
 
-func (q Query) buildQuery() string {
+func (q Query) Build() string {
 	var builder strings.Builder
 
 	builder.WriteString(q.Operation + " " + q.Name)
 	builder.WriteString("{")
+	builder.WriteString("result: ")
 
-	builder.WriteString(q.Build())
+	builder.WriteString(q.BuildInner())
 
 	builder.WriteString("}")
 
 	return builder.String()
 }
 
-func (q Query) Build() string {
+func (q Query) BuildInner() string {
 	var builder strings.Builder
 
 	builder.WriteString(q.Method + q.Model)
@@ -212,7 +212,7 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 		panic("client.Connect() needs to be called before sending queries")
 	}
 
-	s := q.buildQuery()
+	s := q.Build()
 
 	// TODO use specific log level
 	if logger.Enabled {
@@ -221,7 +221,7 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 
 	logger.Debug.Printf("[timing] building %s", time.Since(q.Start))
 
-	err := q.Client.Do(ctx, s, &v)
+	err := q.Client.Do(ctx, s, v)
 	now := time.Now()
 	totalDuration := now.Sub(q.Start)
 	logger.Debug.Printf("[timing] TOTAL %s", totalDuration)
@@ -229,10 +229,6 @@ func (q Query) Exec(ctx context.Context, v interface{}) error {
 }
 
 func Value(value interface{}) []byte {
-	if v, ok := value.(time.Time); ok {
-		return []byte(fmt.Sprintf(`"%s"`, v.UTC().Format(runtime.RFC3339Milli)))
-	}
-
 	v, err := json.Marshal(value)
 	if err != nil {
 		panic(err)

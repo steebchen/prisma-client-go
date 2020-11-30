@@ -20,7 +20,7 @@ var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInt
 	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
 
 // Do sends the http Request to the query engine and unmarshals the response
-func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
+func (e *QueryEngine) Do(ctx context.Context, query string, v interface{}) error {
 	startReq := time.Now()
 
 	payload := GQLRequest{
@@ -51,7 +51,7 @@ func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
 		return fmt.Errorf("pql error: %s", first.Message)
 	}
 
-	if err := json.Unmarshal(response.Data, v); err != nil {
+	if err := json.Unmarshal(response.Data.Result, v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
 
@@ -60,7 +60,7 @@ func (e *Engine) Do(ctx context.Context, query string, v interface{}) error {
 	return nil
 }
 
-func (e *Engine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
+func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
 	requestBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("payload marshal: %w", err)
@@ -81,8 +81,7 @@ func (e *Engine) Request(ctx context.Context, method string, path string, payloa
 		return nil, fmt.Errorf("raw post: %w", err)
 	}
 	defer func() {
-		err := rawResponse.Body.Close()
-		if err != nil {
+		if err := rawResponse.Body.Close(); err != nil {
 			panic(err)
 		}
 	}()

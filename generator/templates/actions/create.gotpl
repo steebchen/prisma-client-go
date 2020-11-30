@@ -60,9 +60,17 @@
 		query builder.Query
 	}
 
+	func (p {{ $result }}) extractQuery() builder.Query {
+		return p.query
+	}
+
+	func (p {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
-		var v createOne{{ $model.Name.GoCase }}Response
-		err := r.query.Exec(ctx, &v)
-		return v.CreateOne{{ $model.Name.GoCase }}, err
+		var v {{ $modelName }}
+		if err := r.query.Exec(ctx, &v); err != nil {
+			return v, err
+		}
+		return v, nil
 	}
 {{ end }}

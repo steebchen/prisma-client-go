@@ -143,7 +143,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -195,7 +195,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -255,7 +255,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -272,7 +272,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -317,7 +317,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -334,7 +334,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -380,7 +380,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -397,7 +397,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -443,7 +443,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -460,7 +460,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -477,7 +477,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id3",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",

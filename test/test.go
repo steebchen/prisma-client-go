@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/logger"
 	"github.com/prisma/prisma-client-go/test/cmd"
 	"github.com/prisma/prisma-client-go/test/setup/mysql"
 	"github.com/prisma/prisma-client-go/test/setup/postgresql"
@@ -44,22 +44,23 @@ var Databases = []Database{
 
 const schemaTemplate = "schema.temp.%s.prisma"
 
-func replaceSchema(t *testing.T, db Database, e *engine.Engine, schemaPath string, mockDB string) {
-	e.ReplaceSchema(func(schema string) string {
+func replaceSchema(t *testing.T, db Database, e engine.Engine, schemaPath string, mockDB string) {
+	xe := e.(*engine.QueryEngine)
+	xe.ReplaceSchema(func(schema string) string {
 		for _, fromDB := range Databases {
 			schema = strings.ReplaceAll(schema, fmt.Sprintf(`"%s"`, fromDB.Name()), fmt.Sprintf(`"%s"`, db.Name()))
 		}
 		return schema
 	})
-	e.ReplaceSchema(func(schema string) string {
+	xe.ReplaceSchema(func(schema string) string {
 		return strings.ReplaceAll(schema, `env("__REPLACE__")`, fmt.Sprintf(`"%s"`, db.ConnectionString(mockDB)))
 	})
-	if err := ioutil.WriteFile(schemaPath, []byte(e.Schema), 0644); err != nil {
+	if err := ioutil.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
 		t.Fatal(err)
 	}
 }
 
-func Start(t *testing.T, db Database, e *engine.Engine, queries []string) string {
+func Start(t *testing.T, db Database, e engine.Engine, queries []string) string {
 	mockDB := db.SetupDatabase(t)
 
 	schemaPath := fmt.Sprintf(schemaTemplate, db.Name())
@@ -74,8 +75,7 @@ func Start(t *testing.T, db Database, e *engine.Engine, queries []string) string
 
 	for _, b := range queries {
 		var response engine.GQLResponse
-		err := e.Do(context.Background(), b, &response)
-		if err != nil {
+		if err := e.Do(context.Background(), b, &response); err != nil {
 			End(t, db, e, mockDB)
 			t.Fatalf("could not send mock query %s", err)
 		}
@@ -132,17 +132,18 @@ func run(t *testing.T, dbs []Database, invoke func(t *testing.T, db Database, ct
 func migrate(t *testing.T, schemaPath string) {
 	cleanup(t)
 
-	if err := cli.Run([]string{"migrate", "save", "--experimental", "--schema=./" + schemaPath, "--create-db", "--name", "init"}, logger.Enabled); err != nil {
-		t.Fatalf("could not run migrate save --experimental %s", err)
-	}
-
-	if err := cli.Run([]string{"migrate", "up", "--experimental", "--schema=./" + schemaPath}, logger.Enabled); err != nil {
-		t.Fatalf("could not run migrate save --experimental %s", err)
+	verbose := os.Getenv("PRISMA_CLIENT_GO_TEST_MIGRATE_LOGS") != ""
+	if err := cli.Run([]string{"db", "push", "--preview-feature", "--schema=./" + schemaPath}, verbose); err != nil {
+		t.Fatalf("could not run db push: %s", err)
 	}
 }
 
 func cleanup(t *testing.T) {
 	if err := cmd.Run("rm", "-rf", "migrations"); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := cmd.Run("rm", "-rf", "*.db"); err != nil {
 		t.Fatal(err)
 	}
 }
