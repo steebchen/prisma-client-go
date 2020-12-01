@@ -67,3 +67,7 @@ if err := json.Unmarshal(post.Info, &info); err != nil {
 }
 log.Printf("post info: %+v", info)
 ```
+
+## Next steps
+
+Check out how to [dynamically ignore fields](13-if-present-methods.md).
