@@ -73,6 +73,25 @@ db.Post.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
 db.Post.CreatedAt.BeforeEquals(time.Now().Truncate(24 * time.Hour)),
 ```
 
+### Optional type filters
+
+Optional fields are hard to represent in Go, since SQL has NULLs but Go does not have nullable types.
+Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set NULLs by using a pointer, you can use the `XOptional` method variants.
+
+```go
+// set an optional field with a specific string
+db.Post.Content.Equals("John")
+
+// set an optional field by using a pointer, where a nil pointer means
+// to set NULL in the database
+db.Post.Content.EqualsOptional(nil)
+
+// or by using a pointer
+content := "string"
+// ...
+db.Post.Content.EqualsOptional(&content)
+```
+
 ## General
 
 There are a few general filters you can apply. Note that the model has to be used to preserve type information.

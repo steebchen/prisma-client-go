@@ -85,14 +85,12 @@ func main() {
 
 func run() error {
     client := db.NewClient()
-    err := client.Connect()
-    if err != nil {
+    if err := client.Connect(); err != nil {
         return err
     }
 
     defer func() {
-        err := client.Disconnect()
-        if err != nil {
+        if err := client.Disconnect(); err != nil {
             panic(err)
         }
     }()
