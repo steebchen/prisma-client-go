@@ -46,4 +46,4 @@ _, err := client.Post.FindMany(...).Update(
 
 ## Next steps
 
-The go client is still in an early access and has [limitations](14-limitations.md).
+Learn how to write high quality unit tests with [native mocks](14-mocks.md).
