@@ -20,15 +20,10 @@ var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInt
 	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
 
 // Do sends the http Request to the query engine and unmarshals the response
-func (e *QueryEngine) Do(ctx context.Context, query string, v interface{}) error {
+func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}) error {
 	startReq := time.Now()
 
-	payload := GQLRequest{
-		Query:     query,
-		Variables: map[string]interface{}{},
-	}
-
-	body, err := e.Request(ctx, "POST", "/", &payload)
+	body, err := e.Request(ctx, "POST", "/", payload)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}

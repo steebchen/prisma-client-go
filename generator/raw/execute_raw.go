@@ -9,7 +9,7 @@ import (
 
 func (r Actions) ExecuteRaw(query string, params ...interface{}) ExecuteExec {
 	return ExecuteExec{
-		query: raw(r.Client, "executeRaw", query, params...),
+		query: raw(r.Engine, "executeRaw", query, params...),
 	}
 }
 

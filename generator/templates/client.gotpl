@@ -36,7 +36,7 @@ func NewClient() *PrismaClient {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	c.Actions = &raw.Actions{Client: c}
+	c.Actions = &raw.Actions{Engine: c}
 
 	return c
 }
@@ -50,7 +50,7 @@ func newMockClient(expectations *[]mock.Expectation) *PrismaClient {
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	c.Actions = &raw.Actions{Client: c}
+	c.Actions = &raw.Actions{Engine: c}
 
 	return c
 }

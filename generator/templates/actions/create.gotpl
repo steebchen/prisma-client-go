@@ -17,7 +17,7 @@
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()
-		v.query.Client = r.client
+		v.query.Engine = r.client
 
 		v.query.Operation = "mutation"
 		v.query.Method = "createOne"

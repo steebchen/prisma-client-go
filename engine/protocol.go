@@ -17,9 +17,8 @@ type Data struct {
 
 // GQLRequest is the payload for GraphQL queries
 type GQLRequest struct {
-	Query         string                 `json:"query"`
-	Variables     map[string]interface{} `json:"variables"`
-	OperationName *string                `json:"operationName"`
+	Query     string                 `json:"query"`
+	Variables map[string]interface{} `json:"variables"`
 }
 
 // GQLError is a GraphQL Error

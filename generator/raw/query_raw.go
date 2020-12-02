@@ -10,7 +10,7 @@ import (
 
 func (r Actions) QueryRaw(query string, params ...interface{}) QueryExec {
 	return QueryExec{
-		query: raw(r.Client, "queryRaw", query, params...),
+		query: raw(r.Engine, "queryRaw", query, params...),
 	}
 }
 

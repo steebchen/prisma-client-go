@@ -1,16 +1,17 @@
 package raw
 
 import (
+	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 
 type Actions struct {
-	Client builder.Client
+	Engine engine.Engine
 }
 
-func raw(client builder.Client, action string, query string, params ...interface{}) builder.Query {
+func raw(engine engine.Engine, action string, query string, params ...interface{}) builder.Query {
 	q := builder.NewQuery()
-	q.Client = client
+	q.Engine = engine
 	q.Operation = "mutation"
 	q.Method = action
 
