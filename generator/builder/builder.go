@@ -203,25 +203,27 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	return builder.String()
 }
 
-func (q Query) Exec(ctx context.Context, v interface{}) error {
+func (q Query) Exec(ctx context.Context, into interface{}) error {
+	payload := engine.GQLRequest{
+		Query:     q.Build(),
+		Variables: map[string]interface{}{},
+	}
+	return q.exec(ctx, payload, into)
+}
+
+func (q Query) exec(ctx context.Context, payload interface{}, into interface{}) error {
 	if q.Engine == nil {
 		panic("client.Connect() needs to be called before sending queries")
 	}
 
-	query := q.Build()
-
 	// TODO use specific log level
 	if logger.Enabled {
-		logger.Debug.Printf("prisma query: `%q`", query)
+		logger.Debug.Printf("prisma engine payload: `%+v`", payload)
 	}
 
 	logger.Debug.Printf("[timing] building %q", time.Since(q.Start))
 
-	payload := engine.GQLRequest{
-		Query:     query,
-		Variables: map[string]interface{}{},
-	}
-	err := q.Engine.Do(ctx, payload, v)
+	err := q.Engine.Do(ctx, payload, into)
 	now := time.Now()
 	totalDuration := now.Sub(q.Start)
 	logger.Debug.Printf("[timing] TOTAL %q", totalDuration)
