@@ -26,12 +26,6 @@ type Database interface {
 	TeardownDatabase(t *testing.T, mockDBName string)
 }
 
-type Engine interface {
-	Connect() error
-	Disconnect() error
-	Do(context.Context, string, interface{}) error
-}
-
 var MySQL = mysql.MySQL
 var PostgreSQL = postgresql.PostgreSQL
 var SQLite = sqlite.SQLite
@@ -73,9 +67,13 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 		return ""
 	}
 
-	for _, b := range queries {
+	for _, q := range queries {
 		var response engine.GQLResponse
-		if err := e.Do(context.Background(), b, &response); err != nil {
+		payload := engine.GQLRequest{
+			Query:     q,
+			Variables: map[string]interface{}{},
+		}
+		if err := e.Do(context.Background(), payload, &response); err != nil {
 			End(t, db, e, mockDB)
 			t.Fatalf("could not send mock query %s", err)
 		}
@@ -92,7 +90,7 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 	return mockDB
 }
 
-func End(t *testing.T, db Database, e Engine, mockDBName string) {
+func End(t *testing.T, db Database, e engine.Engine, mockDBName string) {
 	defer teardown(t, db, mockDBName)
 
 	if err := e.Disconnect(); err != nil {

@@ -1,6 +1,6 @@
 package jsonrpc
 
-// Manifest describes information for the Prisma Client Go generator for the Prisma CLI.
+// Manifest describes information for the Prisma Engine Go generator for the Prisma CLI.
 type Manifest struct {
 	PrettyName         string   `json:"prettyName"`
 	DefaultOutput      string   `json:"defaultOutput"`
@@ -9,7 +9,7 @@ type Manifest struct {
 	RequiresEngines    []string `json:"requiresEngines"`
 }
 
-// ManifestResponse sets the response Prisma Client Go returns when Prisma asks for the Manifest.
+// ManifestResponse sets the response Prisma Engine Go returns when Prisma asks for the Manifest.
 type ManifestResponse struct {
 	Manifest Manifest `json:"manifest"`
 }

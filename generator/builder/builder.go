@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/logger"
 )
 
@@ -42,11 +43,6 @@ type Field struct {
 	Fields []Field
 }
 
-type Client interface {
-	Do(ctx context.Context, query string, into interface{}) error
-	Name() string
-}
-
 func NewQuery() Query {
 	return Query{
 		Start: time.Now(),
@@ -54,8 +50,8 @@ func NewQuery() Query {
 }
 
 type Query struct {
-	// Client is the generic Photon Client
-	Client Client
+	// Engine holds the implementation of how queries are processed
+	Engine engine.Engine
 
 	// Operation describes the PQL operation: query, mutation or subscription
 	Operation string
@@ -208,23 +204,27 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 }
 
 func (q Query) Exec(ctx context.Context, v interface{}) error {
-	if q.Client == nil {
+	if q.Engine == nil {
 		panic("client.Connect() needs to be called before sending queries")
 	}
 
-	s := q.Build()
+	query := q.Build()
 
 	// TODO use specific log level
 	if logger.Enabled {
-		logger.Debug.Printf("prisma query: `%s`", s)
+		logger.Debug.Printf("prisma query: `%q`", query)
 	}
 
-	logger.Debug.Printf("[timing] building %s", time.Since(q.Start))
+	logger.Debug.Printf("[timing] building %q", time.Since(q.Start))
 
-	err := q.Client.Do(ctx, s, v)
+	payload := engine.GQLRequest{
+		Query:     query,
+		Variables: map[string]interface{}{},
+	}
+	err := q.Engine.Do(ctx, payload, v)
 	now := time.Now()
 	totalDuration := now.Sub(q.Start)
-	logger.Debug.Printf("[timing] TOTAL %s", totalDuration)
+	logger.Debug.Printf("[timing] TOTAL %q", totalDuration)
 	return err
 }
 

@@ -23,7 +23,7 @@ func New(schema string, hasBinaryTargets bool) *QueryEngine {
 type Engine interface {
 	Connect() error
 	Disconnect() error
-	Do(ctx context.Context, query string, into interface{}) error
+	Do(ctx context.Context, payload interface{}, into interface{}) error
 	Name() string
 }
 
