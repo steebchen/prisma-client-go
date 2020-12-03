@@ -35,14 +35,14 @@ type Mock struct {
 	}
 
 	type i{{ $model.Name.GoCase }}MockExpectParams interface {
-		extractQuery() builder.Query
+		ExtractQuery() builder.Query
 		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	func (m *{{ $ns }}) Expect(query i{{ $model.Name.GoCase }}MockExpectParams) *{{ $ns }}Exec {
 		return &{{ $ns }}Exec{
 			mock:  m.mock,
-			query: query.extractQuery(),
+			query: query.ExtractQuery(),
 		}
 	}
 

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -55,14 +56,35 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	return nil
 }
 
+// Do sends the http Request to the query engine and unmarshals the response
+func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
+	body, err := e.Request(ctx, "POST", "/", payload)
+	if err != nil {
+		return fmt.Errorf("request failed: %w", err)
+	}
+
+	log.Printf("batch payload: %+v", payload)
+	log.Printf("batch body: %s", string(body))
+
+	if err := json.Unmarshal(body, &v); err != nil {
+		return fmt.Errorf("json unmarshal: %w", err)
+	}
+
+	return nil
+}
+
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
 	requestBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("payload marshal: %w", err)
 	}
 
-	req, err := http.NewRequest(method, e.url+path, bytes.NewBuffer(requestBody))
+	// TODO use specific log level
+	if logger.Enabled {
+		logger.Debug.Printf("prisma engine payload: `%s`", requestBody)
+	}
 
+	req, err := http.NewRequestWithContext(ctx, method, e.url+path, bytes.NewBuffer(requestBody))
 	if err != nil {
 		return nil, fmt.Errorf("raw post: %w", err)
 	}
@@ -84,7 +106,6 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 	logger.Debug.Printf("[timing] query engine raw request took %s", reqDuration)
 
 	responseBody, err := ioutil.ReadAll(rawResponse.Body)
-
 	if err != nil {
 		return nil, fmt.Errorf("raw read: %w", err)
 	}

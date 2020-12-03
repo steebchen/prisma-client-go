@@ -44,3 +44,8 @@ func (e *Engine) Do(ctx context.Context, payload interface{}, v interface{}) err
 	*e.expectations = expectations
 	return retErr
 }
+
+func (e *Engine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
+	// TODO
+	panic("TODO")
+}
