@@ -40,7 +40,7 @@ func Run(arguments []string, output bool) error {
 			logger.Debug.Printf("overriding %s to %s", engine.Name, env)
 			value = env
 		} else {
-			value = path.Join(dir, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
+			value = path.Join(dir, binaries.EngineVersion, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
 		}
 
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", engine.Env, value))
