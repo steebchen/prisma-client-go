@@ -317,15 +317,23 @@ type Schema struct {
 	// RootQueryType (optional)
 	RootQueryType types.String `json:"rootQueryType"`
 	// RootMutationType (optional)
-	RootMutationType types.String `json:"rootMutationType"`
-	InputTypes       []InputType  `json:"inputTypes"`
-	OutputTypes      []OutputType `json:"outputTypes"`
-	Enums            []SchemaEnum `json:"enums"`
+	RootMutationType  types.String     `json:"rootMutationType"`
+	InputObjectTypes  InputObjectType  `json:"inputObjectTypes"`
+	OutputObjectTypes OutputObjectType `json:"outputObjectTypes"`
+	Enums             []SchemaEnum     `json:"enums"`
+}
+
+type InputObjectType struct {
+	Prisma []InputType `json:"prisma"`
+}
+
+type OutputObjectType struct {
+	Prisma []OutputType `json:"prisma"`
 }
 
 func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 	var inputs []InputType
-	for _, inputType := range s.InputTypes {
+	for _, inputType := range s.InputObjectTypes.Prisma {
 		// check for unique input types
 		if !strings.HasPrefix(string(inputType.Name), model) ||
 			!strings.HasSuffix(string(inputType.Name), "UniqueInput") {
@@ -348,7 +356,7 @@ func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 
 func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType {
 	var inputType InputType
-	for _, i := range s.InputTypes {
+	for _, i := range s.InputObjectTypes.Prisma {
 		if i.Name.String() == name {
 			inputType = i
 			break
@@ -361,7 +369,7 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 	var secondInputTypes []InputType
 
 	// found the input type. now check if the model matches...
-	for _, i := range s.InputTypes {
+	for _, i := range s.InputObjectTypes.Prisma {
 		for _, f := range i.Fields {
 			for _, t := range f.InputTypes {
 				if t.Type.String() == name {
