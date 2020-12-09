@@ -15,7 +15,7 @@ npx prisma version
 mkdir -p node_modules/@prisma/cli/node_modules/@prisma/engines
 cp -R node_modules/@prisma/engines/* node_modules/@prisma/cli/node_modules/@prisma/engines
 
-npx pkg node_modules/@prisma/cli
+npx pkg -t node12-linux,node12-darwin,node12-win node_modules/@prisma/cli
 
 version=$(npx prisma version | grep '^\(@prisma/cli \)' | cut -d : -f 2 | cut -d " " -f 2)
 mv cli-macos "prisma-cli-$version-darwin"
@@ -31,3 +31,6 @@ aws s3 cp "prisma-cli-$version-linux.gz" s3://prisma-photongo --acl public-read
 aws s3 cp "prisma-cli-$version-windows.exe.gz" s3://prisma-photongo --acl public-read
 
 cd ../..
+
+# cleanup
+rm -rf build
