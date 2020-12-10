@@ -52,6 +52,15 @@ type Document struct {
 	Schema    Schema    `json:"schema"`
 }
 
+func (d *Document) GetCreateFields() []SchemaArg {
+	for _, t := range d.Schema.InputObjectTypes.Prisma {
+		if t.Purpose == "CreateOne" {
+			return t.Fields
+		}
+	}
+	panic("didn't find get create fields")
+}
+
 // Operator describes a query operator such as NOT, OR, etc.
 type Operator struct {
 	Name   string
@@ -446,4 +455,7 @@ type InputType struct {
 	// AtMostOne (optional)
 	AtMostOne bool        `json:"atMostOne"`
 	Fields    []SchemaArg `json:"fields"`
+	// Purpose acts as a helper for easier filtering
+	Purpose string `json:"purpose"`
+	Model   string `json:"model"`
 }

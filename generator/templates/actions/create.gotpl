@@ -8,7 +8,9 @@
 
 	// Creates a single user.
 	func (r {{ $ns }}) CreateOne(
-		{{ range $field := $model.Fields -}}
+		{{ range $field := $.DMMF.GetCreateFields -}}\
+			// ??
+			// new, would need to use inputTypes of $field
 			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
 				_{{ $field.Name.GoLowerCase }} {{ $name }}WithPrisma{{ $field.Name.GoCase }}SetParams,
 			{{- end -}}
