@@ -26,10 +26,10 @@ model Comment {
 
 ### Delete a record
 
-To delete a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Delete()`.
+To delete a record, just query for a field using FindUnique or FindMany, and then just chain it by invoking `.Delete()`.
 
 ```go
-deleted, err := client.Post.FindOne(
+deleted, err := client.Post.FindUnique(
     Post.Title.Equals("what up"),
 ).Delete().Exec(ctx)
 ```

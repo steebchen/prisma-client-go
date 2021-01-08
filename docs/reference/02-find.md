@@ -41,7 +41,7 @@ If no records are found, the query above returns an slice array without returnin
 ### Find one record
 
 ```go
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     db.Post.ID.Equals("123"),
 ).Exec(ctx)
 
@@ -57,7 +57,7 @@ This returns an `ErrNotFound` error (exported by the generated client) if there 
 The query operations change based on the data types in your schema. For example, integers and floats will have greater than and less than operations, while strings have prefix and suffix operations.
 
 ```go
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     // query for posts containing the title "hi"
     db.Post.Title.Contains("what up"),
 ).Exec(ctx)

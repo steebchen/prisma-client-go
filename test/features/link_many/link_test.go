@@ -71,7 +71,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, created, UserModel{InternalUser: newUser})
 
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
 			).With(
 				User.Posts.Fetch().Take(2),
@@ -140,7 +140,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			created, err := client.User.FindOne(
+			created, err := client.User.FindUnique(
 				User.ID.Equals("new"),
 			).Update(
 				User.Posts.Link(
@@ -160,7 +160,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, created, UserModel{InternalUser: newUser})
 
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
 			).With(
 				User.Posts.Fetch().Take(2),

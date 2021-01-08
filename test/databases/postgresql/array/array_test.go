@@ -35,7 +35,7 @@ func TestArrays(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.ID.Equals("id1"),
 			).Exec(ctx)
 			if err != nil {

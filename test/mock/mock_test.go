@@ -9,7 +9,7 @@ import (
 
 func TestTypedMock(t *testing.T) {
 	do := func(ctx context.Context, client *PrismaClient) (UserModel, error) {
-		user, err := client.User.FindOne(User.ID.Equals("foo")).Exec(ctx)
+		user, err := client.User.FindUnique(User.ID.Equals("foo")).Exec(ctx)
 		if err != nil {
 			return UserModel{}, err
 		}
@@ -29,7 +29,7 @@ func TestTypedMock(t *testing.T) {
 	client, mock, ensure := NewMock()
 	defer ensure(t)
 	mock.User.Expect(
-		client.User.FindOne(User.ID.Equals("foo")),
+		client.User.FindUnique(User.ID.Equals("foo")),
 	).Returns(expected)
 
 	actual, err := do(context.Background(), client)
@@ -39,7 +39,7 @@ func TestTypedMock(t *testing.T) {
 
 func TestMockError(t *testing.T) {
 	do := func(ctx context.Context, client *PrismaClient) (UserModel, error) {
-		user, err := client.User.FindOne(User.ID.Equals("foo")).Exec(ctx)
+		user, err := client.User.FindUnique(User.ID.Equals("foo")).Exec(ctx)
 		if err != nil {
 			return UserModel{}, err
 		}
@@ -53,7 +53,7 @@ func TestMockError(t *testing.T) {
 	client, mock, ensure := NewMock()
 	defer ensure(t)
 	mock.User.Expect(
-		client.User.FindOne(User.ID.Equals("foo")),
+		client.User.FindUnique(User.ID.Equals("foo")),
 	).Errors(ErrNotFound)
 
 	actual, err := do(context.Background(), client)

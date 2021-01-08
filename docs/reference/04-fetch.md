@@ -30,7 +30,7 @@ model Comment {
 
 ```go
 // find a post
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     Post.Title.Equals("hi"),
 ).With(
     // also fetch 3 of its comments

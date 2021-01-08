@@ -48,7 +48,7 @@
 		}
 	{{ end }}
 
-	{{/* composite keys for FindOne */}}
+	{{/* composite keys for FindUnique */}}
 	{{ $break := false }}
 	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes $model.Name.String }}
 		{{ range $index := $input.Fields }}

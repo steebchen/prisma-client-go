@@ -41,7 +41,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -71,7 +71,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			user, err := client.User.FindUnique(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -85,7 +85,7 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
-		name: "FindOne",
+		name: "FindUnique",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -109,7 +109,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -250,7 +250,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -288,7 +288,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -312,7 +312,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
-			updated, err := client.User.FindOne(
+			updated, err := client.User.FindUnique(
 				User.Email.Equals(email),
 			).Update(
 				// set required value
@@ -335,7 +335,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, updated)
 
-			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -421,7 +421,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
-			deleted, err := client.User.FindOne(
+			deleted, err := client.User.FindUnique(
 				User.Email.Equals(email),
 			).Delete().Exec(ctx)
 			if err != nil {
@@ -438,7 +438,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, deleted)
 
-			_, err = client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			_, err = client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			assert.Equal(t, ErrNotFound, err)
 		},
 	}, {

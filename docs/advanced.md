@@ -173,7 +173,7 @@ few of their comments in just a few lines and fully type-safe:
 
 ```go
 // return a post by its id including 5 of its comments
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     Post.Email.Equals("john@example.com"),
 ).With(
     // also fetch 3 this post's comments
