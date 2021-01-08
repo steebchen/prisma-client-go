@@ -32,7 +32,7 @@ func main() {
 	).Exec(ctx)
 	check(err)
 
-	user, err := client.User.FindOne(
+	user, err := client.User.FindUnique(
 		db.User.Email.Equals("new@email.com"),
 	).Exec(ctx)
 	check(err)

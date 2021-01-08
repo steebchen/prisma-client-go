@@ -65,7 +65,7 @@ func TestTypes(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals(id),
 			).Exec(ctx)
 			if err != nil {

@@ -44,7 +44,7 @@ if err != nil {
 ## Read JSON data
 
 ```go
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     Post.ID.Equals("123"),
 ).Exec(ctx)
 if err != nil {

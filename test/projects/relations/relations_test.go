@@ -51,7 +51,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(),
@@ -308,7 +308,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch().Take(-2),
@@ -417,7 +417,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -446,7 +446,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -469,7 +469,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expectedEmpty, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -533,7 +533,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -626,7 +626,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -726,7 +726,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -808,7 +808,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post-a"),
 			).With(
 				Post.Comments.Fetch().Take(-2),
@@ -884,7 +884,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),
@@ -935,7 +935,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),

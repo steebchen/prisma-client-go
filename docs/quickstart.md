@@ -109,7 +109,7 @@ func run() error {
     fmt.Printf("created post: %s\n", result)
 
     // find a single post
-    post, err := client.Post.FindOne(
+    post, err := client.Post.FindUnique(
         db.Post.ID.Equals(createdPost.ID),
     ).Exec(ctx)
     if err != nil {

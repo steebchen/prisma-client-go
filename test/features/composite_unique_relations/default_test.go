@@ -56,7 +56,7 @@ func TestComposite(t *testing.T) {
 
 		assert.Equal(t, expectedParticipant, actualCreatedParticipant)
 
-		actualFoundParticipant, err := client.Participant.FindOne(
+		actualFoundParticipant, err := client.Participant.FindUnique(
 			Participant.UserIDEventID(
 				Participant.UserID.Equals("user"),
 				Participant.EventID.Equals("event"),

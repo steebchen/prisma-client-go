@@ -57,7 +57,7 @@ func TestIfPresent(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			updated, err := client.User.FindOne(
+			updated, err := client.User.FindUnique(
 				User.ID.Equals("update"),
 			).Exec(ctx)
 			if err != nil {
@@ -75,7 +75,7 @@ func TestIfPresent(t *testing.T) {
 
 			assert.Equal(t, expected, updated)
 
-			actual, err := client.User.FindOne(User.ID.Equals("update")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.ID.Equals("update")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -102,7 +102,7 @@ func TestIfPresent(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			incrementAge := 50
 			var newAge2 int
-			_, err := client.User.FindOne(
+			_, err := client.User.FindUnique(
 				User.ID.Equals("update"),
 			).Update(
 				// set value
@@ -114,7 +114,7 @@ func TestIfPresent(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			updated, err := client.User.FindOne(
+			updated, err := client.User.FindUnique(
 				User.ID.Equals("update"),
 			).Exec(ctx)
 			if err != nil {
@@ -136,7 +136,7 @@ func TestIfPresent(t *testing.T) {
 
 			assert.Equal(t, expected, updated)
 
-			actual, err := client.User.FindOne(User.ID.Equals("update")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.ID.Equals("update")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}

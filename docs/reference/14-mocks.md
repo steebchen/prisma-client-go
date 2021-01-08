@@ -23,7 +23,7 @@ Expectations consist of the exact query or queries you expect, and the result wh
 ```go
 // main.go
 func GetPostTitle(ctx context.Context, client *PrismaClient, postID string) (string, error) {
-    post, err := client.Post.FindOne(
+    post, err := client.Post.FindUnique(
         db.Post.ID.Equals(postID),
     ).Exec(ctx)
     if err != nil {
@@ -55,7 +55,7 @@ func TestGetPostTitle_returns(t *testing.T) {
         // define your exact query as in your tested function
         // call it with the exact arguments which you expect the function to be called with
         // you can copy and paste this from your tested function, and just put specific values into the arguments
-        client.Post.FindOne(
+        client.Post.FindUnique(
             db.Post.ID.Equals("123"),
         ),
     ).Returns(expected) // sets the object which should be returned in the function call
@@ -83,7 +83,7 @@ func TestGetPostTitle_error(t *testing.T) {
     defer ensure(t)
 
     mock.Post.Expect(
-        client.Post.FindOne(
+        client.Post.FindUnique(
             db.Post.ID.Equals("123"),
         ),
     ).Errors(db.ErrNotFound)

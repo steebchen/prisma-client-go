@@ -39,7 +39,7 @@ func TestTableCasing(t *testing.T) {
 			},
 		}
 
-		actualFoundPost, err := client.Post.FindOne(
+		actualFoundPost, err := client.Post.FindUnique(
 			Post.ID.Equals("a"),
 		).Update(
 			Post.Int.Increment(3),
@@ -53,7 +53,7 @@ func TestTableCasing(t *testing.T) {
 
 		assert.Equal(t, expectedPost, actualFoundPost)
 
-		actualUpdatedPost, err := client.Post.FindOne(
+		actualUpdatedPost, err := client.Post.FindUnique(
 			Post.ID.Equals("a"),
 		).Exec(ctx)
 		if err != nil {

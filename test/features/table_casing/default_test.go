@@ -31,7 +31,7 @@ func TestTableCasing(t *testing.T) {
 
 		assert.Equal(t, expectedUser, actualCreatedUser)
 
-		actualFoundUser, err := client.User.FindOne(
+		actualFoundUser, err := client.User.FindUnique(
 			User.ID.Equals("user"),
 		).Exec(ctx)
 		if err != nil {
@@ -55,7 +55,7 @@ func TestTableCasing(t *testing.T) {
 
 		assert.Equal(t, expectedEventLower, actualCreatedEventLower)
 
-		actualFoundEventLower, err := client.EventLower.FindOne(
+		actualFoundEventLower, err := client.EventLower.FindUnique(
 			EventLower.ID.Equals("event"),
 		).Exec(ctx)
 		if err != nil {
@@ -83,7 +83,7 @@ func TestTableCasing(t *testing.T) {
 
 		assert.Equal(t, expectedParticipant, actualCreatedParticipant)
 
-		actualFoundParticipant, err := client.ParticipantUpper.FindOne(
+		actualFoundParticipant, err := client.ParticipantUpper.FindUnique(
 			ParticipantUpper.ID.Equals("participant"),
 		).Exec(ctx)
 		if err != nil {

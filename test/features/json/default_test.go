@@ -53,7 +53,7 @@ func TestJSON(t *testing.T) {
 
 			assert.Equal(t, created, expected)
 
-			actual, err := client.User.FindOne(User.ID.Equals(created.ID)).Exec(ctx)
+			actual, err := client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}

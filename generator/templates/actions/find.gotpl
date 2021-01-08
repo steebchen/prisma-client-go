@@ -43,7 +43,7 @@
 					// deprecated: use FindUnique instead
 				{{- end }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					{{/* only allow equals & unique params for FindOne */}}
+					{{/* only allow equals & unique params for FindUnique */}}
 					params {{ if $v.List }}...{{ end }}i{{ $model.Name.GoCase }}{{ if not $v.List }}Equals{{ end }}Params{{ if not $v.List }}Unique{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
@@ -77,7 +77,7 @@
 							})
 						}
 					{{ else }}
-						{{/* transform this document because the signature of FindOne is different than FindMany */}}
+						{{/* transform this document because the signature of FindUnique is different than FindMany */}}
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
 							Fields: builder.TransformEquals([]builder.Field{params.field()}),
