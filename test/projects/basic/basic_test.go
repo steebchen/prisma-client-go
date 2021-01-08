@@ -120,28 +120,28 @@ func TestBasic(t *testing.T) {
 		name: "FindMany",
 		// language=GraphQL
 		before: []string{`
-				mutation {
+			mutation {
 				result: createOneUser(data: {
-						id: "findMany1",
-						email: "1",
-						username: "john",
-						name: "a",
-					}) {
-						id
-					}
+					id: "findMany1",
+					email: "1",
+					username: "john",
+					name: "a",
+				}) {
+					id
 				}
-			`, `
-				mutation {
+			}
+		`, `
+			mutation {
 				result: createOneUser(data: {
-						id: "findMany2",
-						email: "2",
-						username: "john",
-						name: "b",
-					}) {
-						id
-					}
+					id: "findMany2",
+					email: "2",
+					username: "john",
+					name: "b",
+				}) {
+					id
 				}
-			`},
+			}
+		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
@@ -165,31 +165,31 @@ func TestBasic(t *testing.T) {
 			}}, actual)
 		},
 	}, {
-		name: "FindMany empty",
+		name: "FindMany all",
 		// language=GraphQL
 		before: []string{`
-				mutation {
+			mutation {
 				result: createOneUser(data: {
-						id: "findMany1",
-						email: "1",
-						username: "john",
-						name: "a",
-					}) {
-						id
-					}
+					id: "findMany1",
+					email: "1",
+					username: "john",
+					name: "a",
+				}) {
+					id
 				}
-			`, `
-				mutation {
+			}
+		`, `
+			mutation {
 				result: createOneUser(data: {
-						id: "findMany2",
-						email: "2",
-						username: "john",
-						name: "b",
-					}) {
-						id
-					}
+					id: "findMany2",
+					email: "2",
+					username: "john",
+					name: "b",
+				}) {
+					id
 				}
-			`},
+			}
+		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
@@ -211,6 +211,16 @@ func TestBasic(t *testing.T) {
 					Name:     str("b"),
 				},
 			}}, actual)
+		},
+	}, {
+		name: "FindMany empty",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "Create",

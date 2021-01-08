@@ -145,16 +145,16 @@
 			{{ end }}
 
 			func (r {{ $result }}) Exec(ctx context.Context) (
-				{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
+				{{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model,
 				error,
 			) {
-				var v *{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model
+				var v *{{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model
 				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
+					return {{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
 				}
-				{{ if not $v.List }}
+				{{ if not $v.ReturnList }}
 					if v == nil {
-						return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, ErrNotFound
+						return {{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, ErrNotFound
 					}
 				{{ end }}
 				return *v, nil
