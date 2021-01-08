@@ -39,7 +39,7 @@
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
 
 			{{ if eq $field.Name "" }}
-				{{- if eq $v.Name "One" }}
+				{{- if and (eq $v.Name "One") (eq $v.InternalName "") }}
 					// deprecated: use FindUnique instead
 				{{- end }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
@@ -51,7 +51,7 @@
 					v.query.Engine = r.client
 
 					v.query.Operation = "query"
-					v.query.Method = "find{{ $v.Name.GoCase }}"
+					v.query.Method = "find{{ $v.ActualName.GoCase }}"
 					v.query.Model = "{{ $model.Name.String }}"
 					v.query.Outputs = {{ $name }}Output
 
@@ -176,7 +176,7 @@
 
 			func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
 				r.query.Operation = "mutation"
-				r.query.Method = "update{{ $v.Name.GoCase }}"
+				r.query.Method = "update{{ $v.ActualName.GoCase }}"
 				r.query.Model = "{{ $model.Name.GoCase }}"
 				r.query.Outputs = {{ $outputName }}Output
 
@@ -232,7 +232,7 @@
 				var v {{ $deleteResult }}
 				v.query = r.query
 				v.query.Operation = "mutation"
-				v.query.Method = "delete{{ $v.Name.GoCase }}"
+				v.query.Method = "delete{{ $v.ActualName.GoCase }}"
 				v.query.Model = "{{ $model.Name.String }}"
 				v.query.Outputs = {{ $outputName }}Output
 				return v
