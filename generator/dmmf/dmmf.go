@@ -88,6 +88,8 @@ func (Document) Variations() []ActionType {
 	return []ActionType{{
 		Name: "One",
 	}, {
+		Name: "Unique",
+	}, {
 		Name: "First",
 		List: true,
 	}, {
