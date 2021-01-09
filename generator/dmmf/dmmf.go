@@ -84,14 +84,14 @@ type ActionType struct {
 	ReturnList   bool
 }
 
-func (a *ActionType) ActualName() types.String {
+func (a *ActionType) ActualName() string {
 	if a.InternalName != "" {
-		return a.InternalName
+		return a.InternalName.GoCase()
 	}
-	return a.Name
+	return a.Name.GoCase()
 }
 
-// Variations returns "One" and "Many".
+// Variations contains different query capabilities such as Unique, First and Many
 func (Document) Variations() []ActionType {
 	return []ActionType{{
 		Name: "One",
@@ -99,8 +99,9 @@ func (Document) Variations() []ActionType {
 		Name:         "Unique",
 		InternalName: "One",
 	}, {
-		Name: "First",
-		List: true,
+		Name:         "First",
+		List:         true,
+		InternalName: "Many",
 	}, {
 		Name:       "Many",
 		List:       true,
