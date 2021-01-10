@@ -167,98 +167,100 @@
 				return *v, nil
 			}
 
-			{{ $outputName := $name }}
-			{{ $returnType := print $model.Name.GoCase "Model" }}
-			{{ if $v.List }}
-				{{ $returnType = "int" }}
-				{{ $outputName = "count" }}
-			{{ end }}
+			{{ if ne $v.Name "First" }}
+				{{ $outputName := $name }}
+				{{ $returnType := print $model.Name.GoCase "Model" }}
+				{{ if $v.List }}
+					{{ $returnType = "int" }}
+					{{ $outputName = "count" }}
+				{{ end }}
 
-			{{/* UPDATE */}}
+				{{/* UPDATE */}}
 
-			{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
+				{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
 
-			func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
-				r.query.Operation = "mutation"
-				r.query.Method = "update{{ $v.ActualName }}"
-				r.query.Model = "{{ $model.Name.GoCase }}"
-				r.query.Outputs = {{ $outputName }}Output
+				func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
+					r.query.Operation = "mutation"
+					r.query.Method = "update{{ $v.ActualName }}"
+					r.query.Model = "{{ $model.Name.GoCase }}"
+					r.query.Outputs = {{ $outputName }}Output
 
-				var v {{ $updateResult }}
-				v.query = r.query
-				var fields []builder.Field
-				for _, q := range params {
-					{{/* TODO consider upcoming non-set methods */}}
-					field := q.field()
-					{{/* if scalar, wrap in 'set' */}}
-					if field.Value != nil {
-						v := field.Value
-						field.Fields = []builder.Field{
-							{
-								Name: "set",
-								Value: v,
-							},
+					var v {{ $updateResult }}
+					v.query = r.query
+					var fields []builder.Field
+					for _, q := range params {
+						{{/* TODO consider upcoming non-set methods */}}
+						field := q.field()
+						{{/* if scalar, wrap in 'set' */}}
+						if field.Value != nil {
+							v := field.Value
+							field.Fields = []builder.Field{
+								{
+									Name: "set",
+									Value: v,
+								},
+							}
+
+							field.Value = nil
 						}
 
-						field.Value = nil
+						fields = append(fields, field)
 					}
-
-					fields = append(fields, field)
+					v.query.Inputs = append(v.query.Inputs, builder.Input{
+						Name:   "data",
+						Fields: fields,
+					})
+					return v
 				}
-				v.query.Inputs = append(v.query.Inputs, builder.Input{
-					Name:   "data",
-					Fields: fields,
-				})
-				return v
-			}
 
-			type {{ $updateResult }} struct {
-				query builder.Query
-			}
-
-			func (r {{ $updateResult }}) extractQuery() builder.Query {
-				return r.query
-			}
-
-			func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
-
-			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
-				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+				type {{ $updateResult }} struct {
+					query builder.Query
 				}
-				return v{{ if $v.List }}.Count{{ end }}, nil
-			}
 
-			{{/* DELETE */}}
-
-			func (r {{ $result }}) Delete() {{ $deleteResult }} {
-				var v {{ $deleteResult }}
-				v.query = r.query
-				v.query.Operation = "mutation"
-				v.query.Method = "delete{{ $v.ActualName }}"
-				v.query.Model = "{{ $model.Name.String }}"
-				v.query.Outputs = {{ $outputName }}Output
-				return v
-			}
-
-			type {{ $deleteResult }} struct {
-				query builder.Query
-			}
-
-			func (r {{ $deleteResult }}) extractQuery() builder.Query {
-				return r.query
-			}
-
-			func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
-
-			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
-				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+				func (r {{ $updateResult }}) extractQuery() builder.Query {
+					return r.query
 				}
-				return v{{ if $v.List }}.Count{{ end }}, nil
-			}
+
+				func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+
+				func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+					var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
+					if err := r.query.Exec(ctx, &v); err != nil {
+						return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+					}
+					return v{{ if $v.List }}.Count{{ end }}, nil
+				}
+
+				{{/* DELETE */}}
+
+				func (r {{ $result }}) Delete() {{ $deleteResult }} {
+					var v {{ $deleteResult }}
+					v.query = r.query
+					v.query.Operation = "mutation"
+					v.query.Method = "delete{{ $v.ActualName }}"
+					v.query.Model = "{{ $model.Name.String }}"
+					v.query.Outputs = {{ $outputName }}Output
+					return v
+				}
+
+				type {{ $deleteResult }} struct {
+					query builder.Query
+				}
+
+				func (r {{ $deleteResult }}) extractQuery() builder.Query {
+					return r.query
+				}
+
+				func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+
+				func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
+					var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
+					if err := r.query.Exec(ctx, &v); err != nil {
+						return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+					}
+					return v{{ if $v.List }}.Count{{ end }}, nil
+				}
+			{{ end }}
 		{{ end }}
 	{{ end }}
 {{ end }}
