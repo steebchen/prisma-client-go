@@ -16,7 +16,7 @@ model Post {
 
 ## Querying dynamically
 
-You might want to query dynamically if you have a API and you want the end-user to decide which fields to query. In the following example, the fields title and content are queried, but if a variable is nil, it means that that field  should be ignored.
+You might want to query dynamically if you have an API and you want the end-user to decide which fields to query. In the following example, the fields title and content are queried, but if a variable is nil, it means that that field  should be ignored.
 
 ```go
 var title = "hi"
