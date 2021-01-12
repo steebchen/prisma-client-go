@@ -213,7 +213,7 @@ func (q Query) Exec(ctx context.Context, into interface{}) error {
 
 func (q Query) exec(ctx context.Context, payload interface{}, into interface{}) error {
 	if q.Engine == nil {
-		panic("client.Connect() needs to be called before sending queries")
+		panic("client.Prisma.Connect() needs to be called before sending queries")
 	}
 
 	// TODO use specific log level
