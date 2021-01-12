@@ -20,7 +20,7 @@ type ExecuteExec struct {
 func (r ExecuteExec) Exec(ctx context.Context) (int, error) {
 	var result int
 	if err := r.query.Exec(ctx, &result); err != nil {
-		return 0, fmt.Errorf("could not send raw query: %w", err)
+		return -1, fmt.Errorf("could not send raw query: %w", err)
 	}
 	return result, nil
 }

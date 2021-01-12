@@ -111,24 +111,19 @@ func (Document) Variations() []ActionType {
 
 // Actions returns all possible CRUD operations.
 func (Document) Actions() []Action {
-	return []Action{
-		{
-			"query",
-			"Find",
-		},
-		{
-			"mutation",
-			"Create",
-		},
-		{
-			"mutation",
-			"Update",
-		},
-		{
-			"mutation",
-			"Delete",
-		},
-	}
+	return []Action{{
+		"query",
+		"Find",
+	}, {
+		"mutation",
+		"Create",
+	}, {
+		"mutation",
+		"Update",
+	}, {
+		"mutation",
+		"Delete",
+	}}
 }
 
 // Method defines the method for the virtual types method
