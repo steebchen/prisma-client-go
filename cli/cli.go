@@ -27,7 +27,7 @@ func Run(arguments []string, output bool) error {
 
 	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
-	cmd := exec.Command(path.Join(dir, prisma), arguments...)
+	cmd := exec.Command(path.Join(dir, prisma), arguments...) //nolint:gosec
 	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
 
 	cmd.Env = os.Environ()
