@@ -83,12 +83,12 @@ func main() {
 
 func run() error {
     client := db.NewClient()
-    if err := client.Connect(); err != nil {
+    if err := client.Prisma.Connect(); err != nil {
         return err
     }
 
     defer func() {
-        if err := client.Disconnect(); err != nil {
+        if err := client.Prisma.Disconnect(); err != nil {
             panic(err)
         }
     }()

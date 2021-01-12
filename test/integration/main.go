@@ -15,9 +15,9 @@ func check(err error) {
 
 func main() {
 	client := db.NewClient()
-	check(client.Connect())
+	check(client.Prisma.Connect())
 	defer func() {
-		check(client.Disconnect())
+		check(client.Prisma.Disconnect())
 	}()
 
 	ctx := context.Background()

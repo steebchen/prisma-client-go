@@ -14,14 +14,14 @@ Use `QueryRaw` to query for data and automatically unmarshal it into a user-defi
 
 ```go
 var users []db.UserModel
-err := client.QueryRaw(`SELECT * FROM User`).Exec(ctx, &users)
+err := client.Prisma.QueryRaw(`SELECT * FROM User`).Exec(ctx, &users)
 ```
 
 #### Select specific
 
 ```go
 var users []UserModel
-err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc", "prisma@example.com").Exec(ctx, &users)
+err := client.Prisma.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc", "prisma@example.com").Exec(ctx, &users)
 ```
 
 ### Operations
@@ -29,7 +29,7 @@ err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "123abc"
 Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `count`, which contains the affected rows.
 
 ```go
-count, err := client.ExecuteRaw(`UPDATE User SET name = ? WHERE id = ?`, "John", "123").Exec(ctx)
+count, err := client.Prisma.ExecuteRaw(`UPDATE User SET name = ? WHERE id = ?`, "John", "123").Exec(ctx)
 ```
 
 ## Postgres
@@ -40,14 +40,14 @@ count, err := client.ExecuteRaw(`UPDATE User SET name = ? WHERE id = ?`, "John",
 
 ```go
 var users []UserModel
-err := client.QueryRaw(`SELECT * FROM "User"`).Exec(ctx, &users)
+err := client.Prisma.QueryRaw(`SELECT * FROM "User"`).Exec(ctx, &users)
 ```
 
 #### Select specific
 
 ```go
 var users []UserModel
-err := client.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &users)
+err := client.Prisma.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &users)
 ```
 
 ### Operations
@@ -55,7 +55,7 @@ err := client.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2
 Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `count`, which contains the affected rows.
 
 ```go
-count, err := client.ExecuteRaw(`UPDATE "User" SET name = $1 WHERE id = $2`, "John", "123").Exec(ctx)
+count, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET name = $1 WHERE id = $2`, "John", "123").Exec(ctx)
 ```
 
 ## Next steps

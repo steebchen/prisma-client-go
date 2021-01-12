@@ -5,7 +5,7 @@ import (
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 
-type Actions struct {
+type Raw struct {
 	Engine engine.Engine
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/prisma/prisma-client-go/generator/builder"
 )
 
-func (r Actions) QueryRaw(query string, params ...interface{}) QueryExec {
+func (r Raw) QueryRaw(query string, params ...interface{}) QueryExec {
 	return QueryExec{
 		query: raw(r.Engine, "queryRaw", query, params...),
 	}
