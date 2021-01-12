@@ -36,13 +36,29 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-If no records are found, the query above returns an slice array without returning an error (like usual SQL queries).
+If no records are found, the query above returns a slice without returning an error (like normal SQL queries).
 
-### Find one record
+### Find a unique record
+
+FindUnique finds a record which is guaranteed to be unique, like @id fields or fields marked with @unique.
 
 ```go
 post, err := client.Post.FindUnique(
     db.Post.ID.Equals("123"),
+).Exec(ctx)
+
+if err == db.ErrNotFound {
+    log.Printf("no record with id 123")
+}
+```
+
+### Find a single record
+
+FindFirst finds the first record found. It has the same query capabilities as FindMany, but acts as a convenience method to return just the first record found.
+
+```go
+post, err := client.Post.FindFirst(
+    db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 
 if err == db.ErrNotFound {
