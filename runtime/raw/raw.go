@@ -2,7 +2,7 @@ package raw
 
 import (
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/generator/builder"
+	"github.com/prisma/prisma-client-go/runtime/builder"
 )
 
 type Raw struct {

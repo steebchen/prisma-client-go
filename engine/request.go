@@ -10,8 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/prisma/prisma-client-go/generator/runtime"
 	"github.com/prisma/prisma-client-go/logger"
+	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
 var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
@@ -41,7 +41,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		first := response.Errors[0]
 		if first.Message == internalUpdateNotFoundMessage ||
 			first.Message == internalDeleteNotFoundMessage {
-			return runtime.ErrNotFound
+			return types.ErrNotFound
 		}
 		return fmt.Errorf("pql error: %s", first.Message)
 	}
