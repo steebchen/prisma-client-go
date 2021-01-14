@@ -404,7 +404,7 @@
 				}
 			{{ end }}
 
-			func (r {{ $struct }}) Order(direction runtime.Direction) {{ $name }}Params {
+			func (r {{ $struct }}) Order(direction types.Direction) {{ $name }}Params {
 				return {{ $name }}Params{
 					data: builder.Field{
 						Name:  "{{ $field.Name }}",

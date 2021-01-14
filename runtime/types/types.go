@@ -1,4 +1,4 @@
-package runtime
+package types
 
 import (
 	"encoding/json"

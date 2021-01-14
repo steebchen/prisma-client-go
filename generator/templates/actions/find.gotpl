@@ -110,7 +110,7 @@
 					var fields []builder.Field
 
 					for _, param := range params {
-						direction, _ := param.field().Value.(runtime.Direction)
+						direction, _ := param.field().Value.(types.Direction)
 
 						fields = append(fields, builder.Field{
 							Name: param.field().Name,
