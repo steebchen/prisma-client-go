@@ -57,6 +57,53 @@ func TestTransaction(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "fail",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "exists",
+					email: "email",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			// this will fail...
+			a := client.User.FindUnique(
+				User.ID.Equals("does-not-exist"),
+			).Update(
+				User.Email.Set("foo"),
+			)
+
+			// ...so this should be roll-backed
+			b := client.User.FindUnique(
+				User.ID.Equals("exists"),
+			).Update(
+				User.Email.Set("new"),
+			)
+
+			err := client.Prisma.Transaction(a, b).Exec(ctx)
+			assert.Errorf(t, err, "should error")
+
+			// make sure the existing record wasn't touched
+
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			expected := []UserModel{{
+				InternalUser: InternalUser{
+					ID:    "exists",
+					Email: "email",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
