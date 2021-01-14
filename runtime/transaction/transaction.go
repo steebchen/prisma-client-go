@@ -45,11 +45,13 @@ func (r Exec) Exec(ctx context.Context) error {
 		return fmt.Errorf("could not send raw query: %w", err)
 	}
 	if len(result.Errors) > 0 {
-		// TDOO
+		first := result.Errors[0]
+		return fmt.Errorf("pql error: %s", first.Message)
 	}
 	for _, inner := range result.Result {
 		if len(inner.Errors) > 0 {
-			// TDOO
+			first := result.Errors[0]
+			return fmt.Errorf("pql error: %s", first.Message)
 		}
 	}
 	return nil
