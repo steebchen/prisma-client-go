@@ -32,7 +32,7 @@ func TestTransaction(t *testing.T) {
 				User.ID.Set("b"),
 			)
 
-			if err := client.Transaction(createUserA, createUserB).Exec(ctx); err != nil {
+			if err := client.Prisma.Transaction(createUserA, createUserB).Exec(ctx); err != nil {
 				t.Fatal(err)
 			}
 

@@ -15,7 +15,10 @@ type Data struct {
 	Result json.RawMessage `json:"result"`
 }
 
-type GQLBatchResponse []GQLResponse
+type GQLBatchResponse struct {
+	Errors []GQLError    `json:"errors"`
+	Result []GQLResponse `json:"batchResult"`
+}
 
 // GQLRequest is the payload for GraphQL queries
 type GQLRequest struct {

@@ -15,7 +15,7 @@ import (
 	"github.com/prisma/prisma-client-go/runtime/lifecycle"
 	"github.com/prisma/prisma-client-go/runtime/raw"
 	"github.com/prisma/prisma-client-go/runtime/builder"
-	"github.com/prisma/prisma-client-go/generator/transaction"
+	"github.com/prisma/prisma-client-go/runtime/transaction"
 )
 
 // re-declare variables which are needed in Prisma Client Go but also should be exported

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/generator/builder"
+	"github.com/prisma/prisma-client-go/runtime/builder"
 )
 
 type TX struct {
@@ -43,6 +43,14 @@ func (r Exec) Exec(ctx context.Context) error {
 	}
 	if err := r.engine.Batch(ctx, payload, &result); err != nil {
 		return fmt.Errorf("could not send raw query: %w", err)
+	}
+	if len(result.Errors) > 0 {
+		// TDOO
+	}
+	for _, inner := range result.Result {
+		if len(inner.Errors) > 0 {
+			// TDOO
+		}
 	}
 	return nil
 }
