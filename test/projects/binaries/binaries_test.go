@@ -16,6 +16,6 @@ func TestBinaries(t *testing.T) {
 	_, err := os.Stat("./query-engine-" + platform.BinaryPlatformName() + "_gen.go")
 	assert.Equal(t, err, nil)
 
-	_, err = os.Stat("./query-engine-rhel-openssl-1.1.x_gen.go")
+	_, err = os.Stat("./query-engine-debian-openssl-1.1.x_gen.go")
 	assert.Equal(t, err, nil)
 }

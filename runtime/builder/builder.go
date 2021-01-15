@@ -208,17 +208,12 @@ func (q Query) Exec(ctx context.Context, into interface{}) error {
 		Query:     q.Build(),
 		Variables: map[string]interface{}{},
 	}
-	return q.exec(ctx, payload, into)
+	return q.Do(ctx, payload, into)
 }
 
-func (q Query) exec(ctx context.Context, payload interface{}, into interface{}) error {
+func (q Query) Do(ctx context.Context, payload interface{}, into interface{}) error {
 	if q.Engine == nil {
 		panic("client.Prisma.Connect() needs to be called before sending queries")
-	}
-
-	// TODO use specific log level
-	if logger.Enabled {
-		logger.Debug.Printf("prisma engine payload: `%+v`", payload)
 	}
 
 	logger.Debug.Printf("[timing] building %q", time.Since(q.Start))
