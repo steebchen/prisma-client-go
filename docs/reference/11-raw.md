@@ -60,4 +60,4 @@ count, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET name = $1 WHERE id = $
 
 ## Next steps
 
-Check out how to use [json fields](12-json.md).
+Ensure consistency with [transactions](12-transactions.md).

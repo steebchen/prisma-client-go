@@ -46,4 +46,4 @@ _, err := client.Post.FindMany(...).Update(
 
 ## Next steps
 
-Learn how to write high quality unit tests with [native mocks](14-mocks.md).
+Learn how to write high quality unit tests with [native mocks](15-mocks.md).
