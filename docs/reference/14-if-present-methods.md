@@ -8,9 +8,9 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id    String   @default(cuid()) @id
-    title String
-    info  Json
+    id      String   @default(cuid()) @id
+    title   String
+    content String?
 }
 ```
 

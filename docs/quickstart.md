@@ -120,15 +120,15 @@ func run() error {
     fmt.Printf("post: %s\n", result)
 
     // for optional/nullable values, you need to check the function and create two return values
-    // `name` is a string, and `ok` is a bool whether the record is null or not. If it's null,
-    // `ok` is false, and `name` will default to Go's default values; in this case an empty string (""). Otherwise,
+    // `desc` is a string, and `ok` is a bool whether the record is null or not. If it's null,
+    // `ok` is false, and `desc` will default to Go's default values; in this case an empty string (""). Otherwise,
     // `ok` is true and `desc` will be "my description".
-    name, ok := post.Desc()
+    desc, ok := post.Desc()
     if !ok {
-        return fmt.Errorf("post's name is null")
+        return fmt.Errorf("post's description is null")
     }
 
-    fmt.Printf("The posts's name is: %s\n", name)
+    fmt.Printf("The posts's description is: %s\n", desc)
 
     return nil
 }
@@ -158,7 +158,7 @@ post: {
   "published": true,
   "desc": "Prisma is a database toolkit and makes databases easy."
 }
-The posts's name is: Prisma is a database toolkit and makes databases easy.
+The posts's title is: Prisma is a database toolkit and makes databases easy.
 ```
 
 ### Next steps
