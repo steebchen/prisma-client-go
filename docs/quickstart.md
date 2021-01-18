@@ -19,7 +19,7 @@
     go get github.com/prisma/prisma-client-go
     ```
 
-3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
+3) Prepare your database schema in a `prisma/schema.prisma` file. For example, a simple schema with a sqlite database and
     Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
