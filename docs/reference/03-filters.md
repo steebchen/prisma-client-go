@@ -33,14 +33,14 @@ by type. All of these queries are fully type-safe and independent of the underly
 ### String filters
 
 ```go
-// query for people who are named "John"
-db.Post.Title.Equals("John"),
-// query for names containing the string "oh"
-db.Post.Title.Contains("oh"),
-// query for names starting with "Jo"
-db.Post.Title.HasPrefix("Jo"),
-// query for names ending with "Jo"
-db.Post.Title.HasSuffix("hn"),
+// query for posts where the title ist "my post"
+db.Post.Title.Equals("my post"),
+// query for titles containing the string "post"
+db.Post.Title.Contains("post"),
+// query for titles starting with "my"
+db.Post.Title.HasPrefix("my"),
+// query for titles ending with "post"
+db.Post.Title.HasSuffix("post"),
 ```
 
 ### Number filters
@@ -80,7 +80,7 @@ Usually, the community defaults to using pointers, but providing that everywhere
 
 ```go
 // set an optional field with a specific string
-db.Post.Content.Equals("John")
+db.Post.Content.Equals("my description")
 
 // set an optional field by using a pointer, where a nil pointer means
 // to set NULL in the database

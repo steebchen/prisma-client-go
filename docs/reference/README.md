@@ -19,9 +19,3 @@ Contents
 - [Raw API fallback](11-raw.md)
 - [JSON](12-json.md)
 - [Limitations](15-limitations.md)
-
-```go
-func main() {
-    users, err := client.User.FindUnique().Exec()
-}
-```

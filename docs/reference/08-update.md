@@ -3,12 +3,6 @@
 The examples use the following prisma schema:
 
 ```prisma
-model User {
-    id    String   @default(cuid()) @id
-    name  String
-    posts Post[]
-}
-
 model Post {
     id        String   @default(cuid()) @id
     createdAt DateTime @default(now())
@@ -16,10 +10,6 @@ model Post {
     published Boolean
     title     String
     content   String?
-
-    // optional author
-    user   User @relation(fields: [userID], references: [id])
-    userID String
 
     comments Comment[]
 }
