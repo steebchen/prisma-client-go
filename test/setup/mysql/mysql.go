@@ -10,6 +10,7 @@ import (
 )
 
 const containerName = "go-client-mysql"
+const image = "mysql:5.7"
 
 var MySQL = &mySQL{}
 
@@ -36,14 +37,13 @@ func (*mySQL) TeardownDatabase(t *testing.T, mockDB string) {
 }
 
 func exec(t *testing.T, query string) {
-	if err := cmd.Run("docker", "exec", "-t", containerName,
-		"mysql", "--user=root", "--password=pw", fmt.Sprintf("--execute=%s", query)); err != nil {
+	if err := cmd.Run("docker", "exec", "-t", containerName, "mysql", "--user=root", "--password=pw", fmt.Sprintf("--execute=%s", query)); err != nil {
 		t.Fatal(err)
 	}
 }
 
 func (*mySQL) Setup() {
-	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "3307:3306", "-e", "MYSQL_DATABASE=testing", "-e", "MYSQL_ROOT_PASSWORD=pw", "-d", "mysql:5.6"); err != nil {
+	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "3307:3306", "-e", "MYSQL_DATABASE=testing", "-e", "MYSQL_ROOT_PASSWORD=pw", "-d", image); err != nil {
 		panic(err)
 	}
 }

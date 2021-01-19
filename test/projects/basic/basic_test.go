@@ -29,7 +29,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "nullability",
 					email: "john@example.com",
 					username: "johndoe",
@@ -41,7 +41,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -59,7 +59,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "marshal",
 					email: "john@example.com",
 					username: "johndoe",
@@ -71,7 +71,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(User.Email.Equals("john@example.com")).Exec(ctx)
+			user, err := client.User.FindUnique(User.Email.Equals("john@example.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -85,11 +85,11 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
-		name: "FindOne",
+		name: "FindUnique",
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "findOne1",
 					email: "john@findOne.com",
 					username: "john_doe",
@@ -99,7 +99,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "findOne2",
 					email: "jane@findOne.com",
 					username: "jane_doe",
@@ -109,7 +109,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(User.Email.Equals("jane@findOne.com")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("jane@findOne.com")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -120,28 +120,28 @@ func TestBasic(t *testing.T) {
 		name: "FindMany",
 		// language=GraphQL
 		before: []string{`
-				mutation {
-					a: createOneUser(data: {
-						id: "findMany1",
-						email: "1",
-						username: "john",
-						name: "a",
-					}) {
-						id
-					}
+			mutation {
+				result: createOneUser(data: {
+					id: "findMany1",
+					email: "1",
+					username: "john",
+					name: "a",
+				}) {
+					id
 				}
-			`, `
-				mutation {
-					b: createOneUser(data: {
-						id: "findMany2",
-						email: "2",
-						username: "john",
-						name: "b",
-					}) {
-						id
-					}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "findMany2",
+					email: "2",
+					username: "john",
+					name: "b",
+				}) {
+					id
 				}
-			`},
+			}
+		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(User.Username.Equals("john")).Exec(ctx)
 			if err != nil {
@@ -165,31 +165,31 @@ func TestBasic(t *testing.T) {
 			}}, actual)
 		},
 	}, {
-		name: "FindMany empty",
+		name: "FindMany all",
 		// language=GraphQL
 		before: []string{`
-				mutation {
-					a: createOneUser(data: {
-						id: "findMany1",
-						email: "1",
-						username: "john",
-						name: "a",
-					}) {
-						id
-					}
+			mutation {
+				result: createOneUser(data: {
+					id: "findMany1",
+					email: "1",
+					username: "john",
+					name: "a",
+				}) {
+					id
 				}
-			`, `
-				mutation {
-					b: createOneUser(data: {
-						id: "findMany2",
-						email: "2",
-						username: "john",
-						name: "b",
-					}) {
-						id
-					}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "findMany2",
+					email: "2",
+					username: "john",
+					name: "b",
+				}) {
+					id
 				}
-			`},
+			}
+		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
@@ -211,6 +211,16 @@ func TestBasic(t *testing.T) {
 					Name:     str("b"),
 				},
 			}}, actual)
+		},
+	}, {
+		name: "FindMany empty",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "Create",
@@ -240,7 +250,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -278,7 +288,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(User.Email.Equals("email")).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -290,7 +300,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "update",
 					email: "john@example.com",
 					username: "johndoe",
@@ -302,7 +312,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
-			updated, err := client.User.FindOne(
+			updated, err := client.User.FindUnique(
 				User.Email.Equals(email),
 			).Update(
 				// set required value
@@ -325,7 +335,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, updated)
 
-			actual, err := client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -337,7 +347,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -348,7 +358,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -400,7 +410,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "delete",
 					email: "john@example.com",
 					username: "johndoe",
@@ -411,7 +421,7 @@ func TestBasic(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			email := "john@example.com"
-			deleted, err := client.User.FindOne(
+			deleted, err := client.User.FindUnique(
 				User.Email.Equals(email),
 			).Delete().Exec(ctx)
 			if err != nil {
@@ -428,7 +438,7 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, deleted)
 
-			_, err = client.User.FindOne(User.Email.Equals(email)).Exec(ctx)
+			_, err = client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			assert.Equal(t, ErrNotFound, err)
 		},
 	}, {
@@ -436,7 +446,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -447,7 +457,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -474,16 +484,14 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []UserModel{}
-
-			assert.Equal(t, expected, actual)
+			assert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "NOT operation",
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "username",
@@ -493,7 +501,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "username",
@@ -527,7 +535,7 @@ func TestBasic(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -537,7 +545,7 @@ func TestBasic(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",

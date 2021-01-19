@@ -1,0 +1,19 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("__REPLACE__")
+}
+
+generator db {
+  provider          = "go run github.com/prisma/prisma-client-go"
+  output            = "."
+  disableGoBinaries = true
+  package           = "db"
+}
+
+model Post {
+  id     String @id @default(cuid())
+  int    Int
+  float  Float
+  int2   Int
+  float2 Float
+}

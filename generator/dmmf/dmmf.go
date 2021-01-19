@@ -78,41 +78,52 @@ type Action struct {
 
 // ActionType describes a CRUD operation type.
 type ActionType struct {
-	Name types.String
-	List bool
+	Name         types.String
+	InternalName types.String
+	List         bool
+	ReturnList   bool
 }
 
-// Variations returns "One" and "Many".
+func (a *ActionType) ActualName() string {
+	if a.InternalName != "" {
+		return a.InternalName.GoCase()
+	}
+	return a.Name.GoCase()
+}
+
+// Variations contains different query capabilities such as Unique, First and Many
 func (Document) Variations() []ActionType {
 	return []ActionType{{
-		"One",
-		false,
+		Name: "One",
 	}, {
-		"Many",
-		true,
+		Name:         "Unique",
+		InternalName: "One",
+	}, {
+		Name:         "First",
+		List:         true,
+		InternalName: "Many",
+	}, {
+		Name:       "Many",
+		List:       true,
+		ReturnList: true,
 	}}
 }
 
 // Actions returns all possible CRUD operations.
 func (Document) Actions() []Action {
-	return []Action{
-		{
-			"query",
-			"Find",
-		},
-		{
-			"mutation",
-			"Create",
-		},
-		{
-			"mutation",
-			"Update",
-		},
-		{
-			"mutation",
-			"Delete",
-		},
-	}
+	return []Action{{
+		"query",
+		"Find",
+	}, {
+		"mutation",
+		"Create",
+	}, {
+		"mutation",
+		"Update",
+	}, {
+		"mutation",
+		"Delete",
+	}}
 }
 
 // Method defines the method for the virtual types method
@@ -127,8 +138,31 @@ type Type struct {
 	Methods []Method
 }
 
-// Types provides virtual types and their actions
-func (Document) Types() []Type {
+func (Document) WriteTypes() []Type {
+	number := []Method{{
+		Name:   "Increment",
+		Action: "increment",
+	}, {
+		Name:   "Decrement",
+		Action: "decrement",
+	}, {
+		Name:   "Multiply",
+		Action: "multiply",
+	}, {
+		Name:   "Divide",
+		Action: "divide",
+	}}
+	return []Type{{
+		Name:    "Int",
+		Methods: number,
+	}, {
+		Name:    "Float",
+		Methods: number,
+	}}
+}
+
+// ReadTypes provides virtual types and their actions
+func (Document) ReadTypes() []Type {
 	number := []Method{{
 		Name:   "LT",
 		Action: "lt",
@@ -294,15 +328,23 @@ type Schema struct {
 	// RootQueryType (optional)
 	RootQueryType types.String `json:"rootQueryType"`
 	// RootMutationType (optional)
-	RootMutationType types.String `json:"rootMutationType"`
-	InputTypes       []InputType  `json:"inputTypes"`
-	OutputTypes      []OutputType `json:"outputTypes"`
-	Enums            []SchemaEnum `json:"enums"`
+	RootMutationType  types.String     `json:"rootMutationType"`
+	InputObjectTypes  InputObjectType  `json:"inputObjectTypes"`
+	OutputObjectTypes OutputObjectType `json:"outputObjectTypes"`
+	Enums             []SchemaEnum     `json:"enums"`
+}
+
+type InputObjectType struct {
+	Prisma []InputType `json:"prisma"`
+}
+
+type OutputObjectType struct {
+	Prisma []OutputType `json:"prisma"`
 }
 
 func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 	var inputs []InputType
-	for _, inputType := range s.InputTypes {
+	for _, inputType := range s.InputObjectTypes.Prisma {
 		// check for unique input types
 		if !strings.HasPrefix(string(inputType.Name), model) ||
 			!strings.HasSuffix(string(inputType.Name), "UniqueInput") {
@@ -310,11 +352,13 @@ func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 		}
 
 		for _, field := range inputType.Fields {
-			// check if there's unique compound input type in it
-			if strings.HasSuffix(string(field.InputType.Type), "CompoundUniqueInput") {
-				// if yes, add the full inputType and break
-				inputs = append(inputs, inputType)
-				break
+			for _, input := range field.InputTypes {
+				// check if there's unique compound input type in it
+				if strings.HasSuffix(string(input.Type), "CompoundUniqueInput") {
+					// if yes, add the full inputType and break
+					inputs = append(inputs, inputType)
+					break
+				}
 			}
 		}
 	}
@@ -323,9 +367,8 @@ func (s *Schema) UniqueCompoundTypes(model string) []InputType {
 
 func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType {
 	var inputType InputType
-	for _, i := range s.InputTypes {
+	for _, i := range s.InputObjectTypes.Prisma {
 		if i.Name.String() == name {
-
 			inputType = i
 			break
 		}
@@ -337,10 +380,12 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 	var secondInputTypes []InputType
 
 	// found the input type. now check if the model matches...
-	for _, i := range s.InputTypes {
+	for _, i := range s.InputObjectTypes.Prisma {
 		for _, f := range i.Fields {
-			if f.InputType.Type.String() == name {
-				secondInputTypes = append(secondInputTypes, i)
+			for _, t := range f.InputTypes {
+				if t.Type.String() == name {
+					secondInputTypes = append(secondInputTypes, i)
+				}
 			}
 		}
 	}
@@ -363,8 +408,8 @@ func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType 
 
 // SchemaArg provides the arguments of a given field.
 type SchemaArg struct {
-	Name      types.String    `json:"name"`
-	InputType SchemaInputType `json:"inputType"`
+	Name       types.String      `json:"name"`
+	InputTypes []SchemaInputType `json:"inputTypes"`
 	// IsRelationFilter (optional)
 	IsRelationFilter bool `json:"isRelationFilter"`
 }

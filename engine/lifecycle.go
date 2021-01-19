@@ -15,7 +15,7 @@ import (
 	"github.com/prisma/prisma-client-go/logger"
 )
 
-func (e *Engine) Connect() error {
+func (e *QueryEngine) Connect() error {
 	logger.Debug.Printf("ensure query engine binary...")
 
 	startEngine := time.Now()
@@ -35,7 +35,7 @@ func (e *Engine) Connect() error {
 	return nil
 }
 
-func (e *Engine) Disconnect() error {
+func (e *QueryEngine) Disconnect() error {
 	logger.Debug.Printf("disconnecting...")
 
 	if platform.Name() != "windows" {
@@ -61,7 +61,7 @@ func (e *Engine) Disconnect() error {
 	return nil
 }
 
-func (e *Engine) ensure() (string, error) {
+func (e *QueryEngine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
 	binariesPath := binaries.GlobalUnpackDir()
@@ -141,7 +141,7 @@ func (e *Engine) ensure() (string, error) {
 	return file, nil
 }
 
-func (e *Engine) spawn(file string) error {
+func (e *QueryEngine) spawn(file string) error {
 	port, err := getPort()
 	if err != nil {
 		return fmt.Errorf("get free port: %w", err)
@@ -174,8 +174,7 @@ func (e *Engine) spawn(file string) error {
 
 	logger.Debug.Printf("starting engine...")
 
-	err = e.cmd.Start()
-	if err != nil {
+	if err := e.cmd.Start(); err != nil {
 		return fmt.Errorf("start command: %w", err)
 	}
 

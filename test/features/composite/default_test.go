@@ -44,7 +44,7 @@ func TestComposite(t *testing.T) {
 
 		assert.Equal(t, []UserModel{expected}, users)
 
-		oneUser, err := client.User.FindOne(
+		oneUser, err := client.User.FindUnique(
 			User.FirstNameMiddleNameLastName(
 				User.FirstName.Equals("a"),
 				User.MiddleName.Equals("b"),

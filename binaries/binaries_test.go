@@ -65,7 +65,7 @@ func TestFetch_withCache(t *testing.T) {
 }
 
 func TestFetch_relativeDir(t *testing.T) {
-	err := FetchNative(".")
+	actual := FetchNative(".")
 	expected := fmt.Errorf("toDir must be absolute")
-	assert.Equal(t, expected, err)
+	assert.Equal(t, expected, actual)
 }

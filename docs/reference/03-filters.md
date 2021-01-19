@@ -1,5 +1,29 @@
 # Query filters
 
+The examples use the following prisma schema:
+
+```prisma
+model Post {
+    id        String   @default(cuid()) @id
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    published Boolean
+    title     String
+    content   String?
+
+    comments Comment[]
+}
+
+model Comment {
+    id        String   @default(cuid()) @id
+    createdAt DateTime @default(now())
+    content   String
+
+    post   Post @relation(fields: [postID], references: [id])
+    postID String
+}
+```
+
 ## Type filters
 
 You probably want to build detailed queries, such as if a database column contains a word,
@@ -9,14 +33,14 @@ by type. All of these queries are fully type-safe and independent of the underly
 ### String filters
 
 ```go
-// query for people who are named "John"
-db.Post.Title.Equals("John"),
-// query for names containing the string "oh"
-db.Post.Title.Contains("oh"),
-// query for names starting with "Jo"
-db.Post.Title.HasPrefix("Jo"),
-// query for names ending with "Jo"
-db.Post.Title.HasSuffix("hn"),
+// query for posts where the title ist "my post"
+db.Post.Title.Equals("my post"),
+// query for titles containing the string "post"
+db.Post.Title.Contains("post"),
+// query for titles starting with "my"
+db.Post.Title.HasPrefix("my"),
+// query for titles ending with "post"
+db.Post.Title.HasSuffix("post"),
 ```
 
 ### Number filters
@@ -47,6 +71,25 @@ db.Post.CreatedAt.BeforeEquals(time.Now().Add(-6 * time.Hour)),
 db.Post.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
 // query for all posts which were created until yesterday including right now
 db.Post.CreatedAt.BeforeEquals(time.Now().Truncate(24 * time.Hour)),
+```
+
+### Optional type filters
+
+Optional fields are hard to represent in Go, since SQL has NULLs but Go does not have nullable types.
+Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set NULLs by using a pointer, you can use the `XOptional` method variants.
+
+```go
+// set an optional field with a specific string
+db.Post.Content.Equals("my description")
+
+// set an optional field by using a pointer, where a nil pointer means
+// to set NULL in the database
+db.Post.Content.EqualsOptional(nil)
+
+// or by using a pointer
+content := "string"
+// ...
+db.Post.Content.EqualsOptional(&content)
 ```
 
 ## General
@@ -80,4 +123,4 @@ db.Post.Or(
 
 ## Next steps
 
-In the next article, you can explore how to [fetch for multiple things](./04-fetch.md) at once.
+In the next article, you can explore how to [fetch for multiple things](04-fetch.md) at once.

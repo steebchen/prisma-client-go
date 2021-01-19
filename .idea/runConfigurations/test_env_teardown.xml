@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test env teardown" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="prisma-client-go" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="teardown" />
+    <kind value="PACKAGE" />
+    <filePath value="$PROJECT_DIR$/test/setup/init/setup.go" />
+    <package value="github.com/prisma/prisma-client-go/test/setup/init" />
+    <directory value="$PROJECT_DIR$/" />
+    <method v="2" />
+  </configuration>
+</component>

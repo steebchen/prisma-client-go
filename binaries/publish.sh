@@ -7,16 +7,17 @@ v="$1"
 mkdir -p build
 cd build
 npm init --yes
-npm i "@prisma/cli@$v"
+npm i "pkg" --dev
+npm i "@prisma/cli@$v" --dev
+npm i "@prisma/client@$v"
 npx prisma version
 
-mkdir -p binaries
+mkdir -p node_modules/@prisma/cli/node_modules/@prisma/engines
+cp -R node_modules/@prisma/engines/* node_modules/@prisma/cli/node_modules/@prisma/engines
 
-pkg node_modules/@prisma/cli --out-path binaries/
+npx pkg -t node12-linux,node12-darwin,node12-win node_modules/@prisma/cli
 
-cd binaries
-
-version=$(npx prisma version | grep '^\(prisma2\|@prisma/cli\)' | cut -d : -f 2 | cut -d " " -f 2)
+version=$(npx prisma version | grep '^\(@prisma/cli \)' | cut -d : -f 2 | cut -d " " -f 2)
 mv cli-macos "prisma-cli-$version-darwin"
 mv cli-linux "prisma-cli-$version-linux"
 mv cli-win.exe "prisma-cli-$version-windows.exe"
@@ -30,3 +31,6 @@ aws s3 cp "prisma-cli-$version-linux.gz" s3://prisma-photongo --acl public-read
 aws s3 cp "prisma-cli-$version-windows.exe.gz" s3://prisma-photongo --acl public-read
 
 cd ../..
+
+# cleanup
+rm -rf build

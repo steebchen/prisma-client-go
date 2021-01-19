@@ -13,19 +13,19 @@ type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 type RawUserModel struct {
-	ID       string  `json:"id"`
-	Email    string  `json:"email"`
-	Username string  `json:"username"`
-	Name     *string `json:"name"`
-	Stuff    *string `json:"stuff"`
-	Str      string  `json:"str"`
-	StrOpt   *string `json:"strOpt"`
-	Int      int     `json:"int"`
-	IntOpt   *int    `json:"intOpt"`
-	Float    string  `json:"float"`
-	FloatOpt *string `json:"floatOpt"`
-	Bool     bool    `json:"bool"`
-	BoolOpt  *bool   `json:"boolOpt"`
+	ID       string   `json:"id"`
+	Email    string   `json:"email"`
+	Username string   `json:"username"`
+	Name     *string  `json:"name"`
+	Stuff    *string  `json:"stuff"`
+	Str      string   `json:"str"`
+	StrOpt   *string  `json:"strOpt"`
+	Int      int      `json:"int"`
+	IntOpt   *int     `json:"intOpt"`
+	Float    float64  `json:"float"`
+	FloatOpt *float64 `json:"floatOpt"`
+	Bool     bool     `json:"bool"`
+	BoolOpt  *bool    `json:"boolOpt"`
 }
 
 func TestRaw(t *testing.T) {
@@ -33,7 +33,7 @@ func TestRaw(t *testing.T) {
 
 	strOpt := "strOpt"
 	i := 5
-	f := "5.5"
+	f := 5.5
 	b := false
 
 	tests := []struct {
@@ -45,7 +45,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -63,7 +63,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -82,8 +82,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User`).Exec(ctx, &actual)
-			if err != nil {
+			if err := client.Prisma.QueryRaw(`SELECT * FROM User`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -120,7 +119,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -138,7 +137,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -157,8 +156,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual)
-			if err != nil {
+			if err := client.Prisma.QueryRaw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -183,7 +181,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -201,7 +199,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -220,8 +218,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			err := client.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual)
-			if err != nil {
+			if err := client.Prisma.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
@@ -246,7 +243,7 @@ func TestRaw(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					email: "email1",
 					username: "a",
@@ -264,7 +261,7 @@ func TestRaw(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					email: "email2",
 					username: "b",
@@ -285,12 +282,59 @@ func TestRaw(t *testing.T) {
 			var actual []struct {
 				Count int `json:"count"`
 			}
-			err := client.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual)
-			if err != nil {
+			if err := client.Prisma.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
 			assert.Equal(t, 2, actual[0].Count)
+		},
+	}, {
+		name:   "insert into",
+		before: []string{},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			count, err := client.Prisma.ExecuteRaw(`INSERT INTO "User" ("id", "email", "username", "str", "strOpt", "int", "intOpt", "float", "floatOpt", "bool", "boolOpt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 1, count)
+		},
+	}, {
+		name: "update",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+					str: "str",
+					strOpt: "strOpt",
+					int: 5,
+					intOpt: 5,
+					float: 5.5,
+					floatOpt: 5.5,
+					bool: true,
+					boolOpt: false,
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			count, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "id1").Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 1, count)
+
+			count, err = client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "non-existing").Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, 0, count)
 		},
 	}}
 	for _, tt := range tests {

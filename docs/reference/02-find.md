@@ -36,13 +36,29 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-If no records are found, the query above returns an slice array without returning an error (like usual SQL queries).
+If no records are found, the query above returns a slice without returning an error (like normal SQL queries).
 
-### Find one record
+### Find a unique record
+
+FindUnique finds a record which is guaranteed to be unique, like @id fields or fields marked with @unique.
 
 ```go
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     db.Post.ID.Equals("123"),
+).Exec(ctx)
+
+if err == db.ErrNotFound {
+    log.Printf("no record with id 123")
+}
+```
+
+### Find a single record
+
+FindFirst finds the first record found. It has the same query capabilities as FindMany, but acts as a convenience method to return just the first record found.
+
+```go
+post, err := client.Post.FindFirst(
+    db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 
 if err == db.ErrNotFound {
@@ -57,13 +73,13 @@ This returns an `ErrNotFound` error (exported by the generated client) if there 
 The query operations change based on the data types in your schema. For example, integers and floats will have greater than and less than operations, while strings have prefix and suffix operations.
 
 ```go
-post, err := client.Post.FindOne(
+post, err := client.Post.FindUnique(
     // query for posts containing the title "hi"
     db.Post.Title.Contains("what up"),
 ).Exec(ctx)
 ```
 
-To explore more query filters, see [all possible query filters](./03-filters.md).
+To explore more query filters, see [all possible query filters](03-filters.md).
 
 ### Querying for relations
 
@@ -79,8 +95,8 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-To explore querying for relations in detail, see [more relation query examples](./08-relations.md).
+To explore querying for relations in detail, see [more relation query examples](10-relations.md).
 
 ## Next steps
 
-Read the next article [query filters](./03-filters.md) to explore how to form more complex queries.
+Read the next article [query filters](03-filters.md) to explore how to form more complex queries.

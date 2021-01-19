@@ -17,7 +17,7 @@
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()
-		v.query.Client = r.client
+		v.query.Engine = r.client
 
 		v.query.Operation = "mutation"
 		v.query.Method = "createOne"
@@ -60,13 +60,17 @@
 		query builder.Query
 	}
 
+	func (p {{ $result }}) ExtractQuery() builder.Query {
+		return p.query
+	}
+
+	func (p {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+
 	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
-		var v createOne{{ $model.Name.GoCase }}Response
-		err := r.query.Exec(ctx, &v)
-		if v.Errors != nil {
-			first := v.Errors[0]
-			return {{ $modelName }}{}, fmt.Errorf(first.Message)
+		var v {{ $modelName }}
+		if err := r.query.Exec(ctx, &v); err != nil {
+			return v, err
 		}
-		return v.Data.CreateOne{{ $model.Name.GoCase }}, err
+		return v, nil
 	}
 {{ end }}

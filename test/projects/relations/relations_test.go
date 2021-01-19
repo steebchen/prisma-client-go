@@ -29,7 +29,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -51,7 +51,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(),
@@ -73,7 +73,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -91,7 +91,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -146,7 +146,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -208,7 +208,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				createOneUser(data: {
+				result: createOneUser(data: {
 					id: "123",
 					email: "john@example.com",
 					username: "johndoe",
@@ -260,7 +260,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -278,7 +278,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -308,7 +308,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch().Take(-2),
@@ -351,7 +351,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -400,7 +400,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -417,7 +417,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -446,7 +446,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -469,7 +469,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expectedEmpty, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -479,14 +479,13 @@ func TestRelations(t *testing.T) {
 			}
 
 			assert.Equal(t, expectedEmpty, actual)
-
 		},
 	}, {
 		name: "with and sub query",
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -504,7 +503,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -534,7 +533,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -579,7 +578,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -597,7 +596,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -627,7 +626,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -679,7 +678,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				unrelated: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "nope",
 					title: "nope",
 					content: "nope",
@@ -697,7 +696,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				user: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "relations",
 					email: "john@example.com",
 					username: "johndoe",
@@ -727,7 +726,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -780,7 +779,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "post-a",
 					title: "common",
 					content: "stuff",
@@ -809,7 +808,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post-a"),
 			).With(
 				Post.Comments.Fetch().Take(-2),
@@ -848,7 +847,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
@@ -859,7 +858,7 @@ func TestRelations(t *testing.T) {
 			}
 		`, `
 			mutation {
-				category: createOneCategory(data: {
+				result: createOneCategory(data: {
 					id: "media",
 					name: "Media",
 				}) {
@@ -885,7 +884,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),
@@ -911,7 +910,7 @@ func TestRelations(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				post: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "john",
 					email: "john@example.com",
 					username: "johndoe",
@@ -936,7 +935,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),

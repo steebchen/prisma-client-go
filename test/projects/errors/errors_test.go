@@ -20,16 +20,16 @@ func TestBasic(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "FindOne not found",
+		name: "FindUnique not found",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.User.FindOne(User.Email.Equals("404")).Exec(ctx)
+			_, err := client.User.FindUnique(User.Email.Equals("404")).Exec(ctx)
 
 			assert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Update not found",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.User.FindOne(
+			_, err := client.User.FindUnique(
 				User.Email.Equals("404"),
 			).Update(
 				User.Name.Set("x"),
@@ -40,7 +40,7 @@ func TestBasic(t *testing.T) {
 	}, {
 		name: "Delete not found",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.User.FindOne(
+			_, err := client.User.FindUnique(
 				User.Email.Equals("404"),
 			).Delete().Exec(ctx)
 
