@@ -39,10 +39,10 @@
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
 
 			{{ if eq $field.Name "" }}
+				{{/* only allow equals & unique params for FindUnique */}}
 				{{- if eq $v.Name "One" }}
 					// deprecated: use FindUnique instead
 				{{- end }}
-				{{/* only allow equals & unique params for FindUnique */}}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
 					params {{ if $v.List }}...{{ end }}i{{ $model.Name.GoCase }}{{ if not $v.List }}Equals{{ end }}Params{{ if not $v.List }}Unique{{ end }},
 				) {{ $result }} {
