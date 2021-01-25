@@ -20,6 +20,27 @@ var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInt
 var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
 	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
 
+//type UniqueConstraintViolationError interface {
+//	uniqueConstraintViolationErr()
+//	Error() string
+//}
+
+func IsUniqueConstraintViolationError(err error) (*UniqueConstraintViolationError, bool) {
+	if v, ok := err.(UniqueConstraintViolationError); ok {
+		return &v, true
+	}
+	return nil, false
+}
+
+type UniqueConstraintViolationError struct {
+	Message string
+	Fields  []string
+}
+
+func (e UniqueConstraintViolationError) Error() string {
+	return e.Message
+}
+
 // Do sends the http Request to the query engine and unmarshals the response
 func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}) error {
 	startReq := time.Now()
@@ -32,6 +53,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
 
 	startParse := time.Now()
+	log.Printf("response: %s", body)
 
 	var response GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
@@ -39,12 +61,25 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	}
 
 	if len(response.Errors) > 0 {
-		first := response.Errors[0]
-		if first.Message == internalUpdateNotFoundMessage ||
-			first.Message == internalDeleteNotFoundMessage {
+		e := response.Errors[0]
+
+		if e.Error == internalUpdateNotFoundMessage ||
+			e.Error == internalDeleteNotFoundMessage {
 			return types.ErrNotFound
 		}
-		return fmt.Errorf("pql error: %s", first.Message)
+
+		if e.UserFacingError != nil {
+			if e.UserFacingError.ErrorCode == "P2002" {
+				return UniqueConstraintViolationError{
+					Message: e.UserFacingError.Message,
+					Fields:  e.UserFacingError.Meta.Target,
+				}
+			}
+
+			return fmt.Errorf("user facing error: %s", e.Error)
+		}
+
+		return fmt.Errorf("pql error: %s", e.Error)
 	}
 
 	if err := json.Unmarshal(response.Data.Result, v); err != nil {

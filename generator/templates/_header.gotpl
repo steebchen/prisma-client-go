@@ -11,6 +11,7 @@ import (
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/engine/mock"
+	"github.com/prisma/prisma-client-go/runtime/errors"
 	"github.com/prisma/prisma-client-go/runtime/types"
 	"github.com/prisma/prisma-client-go/runtime/lifecycle"
 	"github.com/prisma/prisma-client-go/runtime/raw"

@@ -46,12 +46,12 @@ func (r Exec) Exec(ctx context.Context) error {
 	}
 	if len(result.Errors) > 0 {
 		first := result.Errors[0]
-		return fmt.Errorf("pql error: %s", first.Message)
+		return fmt.Errorf("pql error: %s", first.Error)
 	}
 	for _, inner := range result.Result {
 		if len(inner.Errors) > 0 {
 			first := result.Errors[0]
-			return fmt.Errorf("pql error: %s", first.Message)
+			return fmt.Errorf("pql error: %s", first.Error)
 		}
 	}
 	return nil

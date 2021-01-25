@@ -32,9 +32,20 @@ type GQLBatchRequest struct {
 	Transaction bool         `json:"transaction"`
 }
 
+type UserFacingError struct {
+	IsPanic   bool   `json:"is_panic"`
+	Message   string `json:"message"`
+	Meta      Meta   `json:"meta"`
+	ErrorCode string `json:"error_code"`
+}
+
+type Meta struct {
+	Target []string `json:"target"`
+}
+
 // GQLError is a GraphQL Error
 type GQLError struct {
-	Message    string                 `json:"error"` // note: the query-engine uses 'error' instead of 'message'
-	Path       []string               `json:"path"`
-	Extensions map[string]interface{} `json:"query"`
+	Error           string           `json:"error"`
+	UserFacingError *UserFacingError `json:"user_facing_error"`
+	Path            []string         `json:"path"`
 }

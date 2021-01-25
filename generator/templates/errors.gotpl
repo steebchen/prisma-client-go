@@ -1,1 +1,3 @@
 var ErrNotFound = types.ErrNotFound
+
+var IsUniqueConstraintViolation = errors.IsUniqueConstraintViolation
