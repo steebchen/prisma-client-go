@@ -167,6 +167,22 @@
 				return *v, nil
 			}
 
+			func (r {{ $result }}) ExecInner(ctx context.Context) (
+				{{ if $v.ReturnList }}[]{{ end }}Internal{{ $model.Name.GoCase }},
+				error,
+			) {
+				var v *{{ if $v.ReturnList }}[]{{ end }}Internal{{ $model.Name.GoCase }}
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return {{ if $v.ReturnList }}[]{{ end }}Internal{{ $model.Name.GoCase }}{}, err
+				}
+				{{ if not $v.ReturnList }}
+					if v == nil {
+						return {{ if $v.ReturnList }}[]{{ end }}Internal{{ $model.Name.GoCase }}{}, ErrNotFound
+					}
+				{{ end }}
+				return *v, nil
+			}
+
 			{{ if ne $v.Name "First" }}
 				{{ $outputName := $name }}
 				{{ $returnType := print $model.Name.GoCase "Model" }}
