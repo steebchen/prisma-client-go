@@ -12,7 +12,7 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-func TestExecInternal(t *testing.T) {
+func TestExecInner(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -40,7 +40,7 @@ func TestExecInternal(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := InternalUser{
+			expected := InnerUser{
 				ID:       "123",
 				Username: "johndoe",
 			}
@@ -66,7 +66,7 @@ func TestExecInternal(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []InternalUser{{
+			expected := []InnerUser{{
 				ID:       "123",
 				Username: "johndoe",
 			}}
@@ -92,7 +92,7 @@ func TestExecInternal(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := InternalUser{
+			expected := InnerUser{
 				ID:       "123",
 				Username: "johndoe",
 			}
