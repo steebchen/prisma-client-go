@@ -44,7 +44,7 @@ func TestGetPostTitle_returns(t *testing.T) {
     defer ensure(t)
 
     expected := PostModel{
-        InternalPost: InternalPost{
+        InnerPost: InnerPost{
             ID:   "123",
             Title: "foo",
         },

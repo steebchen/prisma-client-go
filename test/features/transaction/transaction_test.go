@@ -44,12 +44,12 @@ func TestTransaction(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:    "a",
 					Email: "a",
 				},
 			}, {
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:    "b",
 					Email: "b",
 				},
@@ -96,7 +96,7 @@ func TestTransaction(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:    "exists",
 					Email: "email",
 				},
