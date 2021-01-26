@@ -49,7 +49,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        id,
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -107,7 +107,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:               "id",
 					CreatedAt:        date,
 					UpdatedAt:        date,
@@ -175,7 +175,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -235,7 +235,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -297,7 +297,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -360,7 +360,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -423,7 +423,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -502,7 +502,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id1",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -514,7 +514,7 @@ func TestTypes(t *testing.T) {
 					Type:      "x",
 				},
 			}, {
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id3",
 					CreatedAt: date,
 					UpdatedAt: date,

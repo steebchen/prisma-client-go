@@ -78,15 +78,15 @@ type Action struct {
 
 // ActionType describes a CRUD operation type.
 type ActionType struct {
-	Name         types.String
-	InternalName types.String
-	List         bool
-	ReturnList   bool
+	Name       types.String
+	InnerName  types.String
+	List       bool
+	ReturnList bool
 }
 
 func (a *ActionType) ActualName() string {
-	if a.InternalName != "" {
-		return a.InternalName.GoCase()
+	if a.InnerName != "" {
+		return a.InnerName.GoCase()
 	}
 	return a.Name.GoCase()
 }
@@ -96,12 +96,12 @@ func (Document) Variations() []ActionType {
 	return []ActionType{{
 		Name: "One",
 	}, {
-		Name:         "Unique",
-		InternalName: "One",
+		Name:      "Unique",
+		InnerName: "One",
 	}, {
-		Name:         "First",
-		List:         true,
-		InternalName: "Many",
+		Name:      "First",
+		List:      true,
+		InnerName: "Many",
 	}, {
 		Name:       "Many",
 		List:       true,
