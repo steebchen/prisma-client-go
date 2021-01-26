@@ -19,7 +19,7 @@ func TestTypedMock(t *testing.T) {
 
 	var expectedErr error = nil
 	expected := UserModel{
-		InternalUser: InternalUser{
+		InnerUser: InnerUser{
 			ID:   "123",
 			Name: "foo",
 		},

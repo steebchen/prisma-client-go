@@ -34,7 +34,7 @@ func TestComposite(t *testing.T) {
 		defer test.End(t, db, client.Engine, mockDB)
 
 		expectedParticipant := ParticipantModel{
-			InternalParticipant: InternalParticipant{
+			InnerParticipant: InnerParticipant{
 				ID:      "new-participant",
 				UserID:  "user",
 				EventID: "event",

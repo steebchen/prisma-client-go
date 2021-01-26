@@ -17,7 +17,7 @@ func TestTableCasing(t *testing.T) {
 		defer test.End(t, db, client.Engine, mockDB)
 
 		expectedUser := UserModel{
-			InternalUser: InternalUser{
+			InnerUser: InnerUser{
 				ID: "user",
 			},
 		}
@@ -41,7 +41,7 @@ func TestTableCasing(t *testing.T) {
 		assert.Equal(t, expectedUser, actualFoundUser)
 
 		expectedEventLower := EventLowerModel{
-			InternalEventLower: InternalEventLower{
+			InnerEventLower: InnerEventLower{
 				ID: "event",
 			},
 		}
@@ -65,7 +65,7 @@ func TestTableCasing(t *testing.T) {
 		assert.Equal(t, expectedEventLower, actualFoundEventLower)
 
 		expectedParticipant := ParticipantUpperModel{
-			InternalParticipantUpper: InternalParticipantUpper{
+			InnerParticipantUpper: InnerParticipantUpper{
 				ID:      "participant",
 				EventID: "event",
 			},

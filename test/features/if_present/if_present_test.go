@@ -65,7 +65,7 @@ func TestIfPresent(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    "john@example.com",
 					Username: "new-username",
@@ -124,7 +124,7 @@ func TestIfPresent(t *testing.T) {
 			age := 51
 			age2 := 2
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    "john@example.com",
 					Username: "johndoe",

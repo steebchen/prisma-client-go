@@ -44,7 +44,7 @@ func TestJSON(t *testing.T) {
 
 			var opt JSON = []byte(`"hi"`)
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:      "123",
 					JSON:    data,
 					JSONOpt: &opt,
@@ -84,7 +84,7 @@ func TestJSON(t *testing.T) {
 
 			var opt JSON = []byte(`"hi"`)
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:      "123",
 					JSON:    data,
 					JSONOpt: &opt,

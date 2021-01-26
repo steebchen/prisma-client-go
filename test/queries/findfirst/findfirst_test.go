@@ -42,7 +42,7 @@ func TestFindFirst(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "first",
 					Email:    "john@example.com",
 					Username: "johndoe",

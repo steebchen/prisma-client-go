@@ -124,14 +124,14 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "a",
 					Title:    "common",
 					Content:  str("a"),
 					AuthorID: "relations",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "b",
 					Title:    "common",
 					Content:  str("b"),
@@ -193,7 +193,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -234,7 +234,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := PostModel{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "post",
 					Title:    title,
 					AuthorID: "123",
@@ -318,7 +318,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -326,14 +326,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "d",
 							Title:    "stuff",
 							Content:  str("d"),
@@ -376,14 +376,14 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := PostModel{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "post1",
 					Title:    "hi",
 					AuthorID: "relations",
 				},
 				RelationsPost: RelationsPost{
 					Author: &UserModel{
-						InternalUser: InternalUser{
+						InnerUser: InnerUser{
 							ID:       "relations",
 							Email:    "john@example.com",
 							Username: "johndoe",
@@ -427,7 +427,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -436,7 +436,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Role: &RoleModel{
-						InternalRole: InternalRole{
+						InnerRole: InnerRole{
 							ID:   "admin",
 							Name: "Admin",
 						},
@@ -458,7 +458,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expectedEmpty := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -545,7 +545,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -553,14 +553,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -638,7 +638,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -646,21 +646,21 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "a",
 							Title:    "common",
 							Content:  str("a"),
@@ -740,7 +740,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -748,7 +748,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
@@ -758,7 +758,7 @@ func TestRelations(t *testing.T) {
 							Comments: []CommentModel{},
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -819,7 +819,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			user := UserModel{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "john",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -832,7 +832,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, user, author)
 
 			comments := []CommentModel{{
-				InternalComment: InternalComment{
+				InnerComment: InnerComment{
 					ID:      "comment-a",
 					Content: "this is a comment",
 					UserID:  "john",
@@ -894,7 +894,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expectedCategory := CategoryModel{
-				InternalCategory: InternalCategory{
+				InnerCategory: InnerCategory{
 					ID:   "media",
 					Name: "Media",
 				},
