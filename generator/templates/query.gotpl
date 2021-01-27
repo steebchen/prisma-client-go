@@ -30,7 +30,7 @@
 	}
 
 	{{ range $op := $.DMMF.Operators }}
-		func ({{ $nsQuery }}) {{ $op.Name }}(params ...i{{ $nameUpper }}Params) {{ $name }}Params {
+		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}QueryParams) {{ $name }}Params {
 			var fields []builder.Field
 
 			for _, q := range params {
@@ -58,16 +58,16 @@
 					{{ $break = true }}
 					func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
 						{{- range $f := $i.Fields }}
-							_{{- $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
+							_{{- $f.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}QueryParams,
 						{{ end -}}
-					) i{{ $model.Name.GoCase }}EqualsParamsUnique {
+					) {{ $model.Name.GoCase }}EqualsUniqueQueryParams {
 						var fields []builder.Field
 
 						{{ range $f := $i.Fields }}
 							fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
 						{{- end }}
 
-						return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
+						return {{ $model.Name.GoLowerCase }}EqualsUniqueParams{
 							data: builder.Field{
 								Name:   "{{ $index.Name }}",
 								Fields: builder.TransformEquals(fields),
@@ -101,7 +101,7 @@
 				// @relation
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
-					params ...i{{ $field.Type.GoCase }}Params,
+					params ...{{ $field.Type.GoCase }}QueryParams,
 				) {{ $name }}Params {
 					var fields []builder.Field
 
@@ -126,7 +126,7 @@
 			{{/* With API */}}
 			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Fetch(
 				{{ if $field.IsList }}
-					params ...i{{ $field.Type.GoCase }}Params,
+					params ...{{ $field.Type.GoCase }}QueryParams,
 				{{ end }}
 			) {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
 				var v {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
@@ -162,7 +162,7 @@
 			}
 
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
-				params {{ if $field.IsList }}...{{ end }}i{{ $field.Type.GoCase }}Params,
+				params {{ if $field.IsList }}...{{ end }}{{ $field.Type.GoCase }}QueryParams,
 			) {{ $setReturnStruct }} {
 				var fields []builder.Field
 
@@ -192,7 +192,7 @@
 			}
 
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Create(
-				params ...i{{ $field.Type.GoCase }}Params,
+				params ...{{ $field.Type.GoCase }}MutateParams,
 			) {{ $setReturnStruct }} {
 				var fields []builder.Field
 
@@ -326,7 +326,7 @@
 			{{/* Equals has a special return type for individual fields */}}
 			{{ $equalsReturnStruct := "" }}
 			{{ if or ($field.IsID) ($field.IsUnique) }}
-				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParamsUnique") }}
+				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsUniqueParams") }}
 			{{ else }}
 				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParams") }}
 			{{ end }}
