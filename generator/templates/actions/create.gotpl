@@ -13,7 +13,7 @@
 				_{{ $field.Name.GoLowerCase }} {{ $name }}WithPrisma{{ $field.Name.GoCase }}SetParams,
 			{{- end -}}
 		{{ end }}
-		optional ...{{ $name }}SetParams,
+		optional ...i{{ $model.Name.GoCase }}SetParams,
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()
@@ -33,7 +33,7 @@
 		{{ end }}
 
 		for _, q := range optional {
-			fields = append(fields, q.data)
+			fields = append(fields, q.field())
 		}
 
 		v.query.Inputs = append(v.query.Inputs, builder.Input{
