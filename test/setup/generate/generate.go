@@ -54,8 +54,12 @@ func generate() {
 		log.Fatal(err)
 	}
 
+	maxGoroutines := 5
+	throttle := make(chan struct{}, maxGoroutines)
+
 	for _, file := range files {
 		wg.Add(1)
+		throttle <- struct{}{}
 		go func(file string) {
 			defer wg.Done()
 
@@ -68,6 +72,8 @@ func generate() {
 			}
 
 			log.Printf("%s done", file)
+
+			<-throttle
 		}(file)
 	}
 
