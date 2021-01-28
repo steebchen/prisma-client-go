@@ -27,7 +27,7 @@ var countOutput = []builder.Output{
 		{{ $model.Name.GoLowerCase }}Relation()
 	}
 
-	type {{ $model.Name.GoCase }}QueryParam interface {
+	type {{ $model.Name.GoCase }}WhereParam interface {
 		field() builder.Field
 		getQuery() builder.Query
 		{{ $model.Name.GoLowerCase }}Model()
@@ -118,7 +118,7 @@ var countOutput = []builder.Output{
 		return p.query
 	}
 
-	type {{ $model.Name.GoCase }}EqualsQueryParam interface {
+	type {{ $model.Name.GoCase }}EqualsWhereParam interface {
 		field() builder.Field
 		getQuery() builder.Query
 		equals()
@@ -142,7 +142,7 @@ var countOutput = []builder.Output{
 		return p.query
 	}
 
-	type {{ $model.Name.GoCase }}EqualsUniqueQueryParam interface {
+	type {{ $model.Name.GoCase }}EqualsUniqueWhereParam interface {
 		field() builder.Field
 		getQuery() builder.Query
 		equals()
@@ -168,7 +168,7 @@ var countOutput = []builder.Output{
 		return p.query
 	}
 
-	type {{ $model.Name.GoCase }}MutateParam interface {
+	type {{ $model.Name.GoCase }}SetParam interface {
 		field() builder.Field
 		settable()
 	}
@@ -186,7 +186,7 @@ var countOutput = []builder.Output{
 	{{ range $field := $model.Fields }}
 		{{ $prefix := (print $name "WithPrisma" $field.Name.GoCase) }}
 
-		type {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}EqualsMutateParam interface {
+		type {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}EqualsSetParam interface {
 			field() builder.Field
 			getQuery() builder.Query
 			equals()
@@ -195,7 +195,7 @@ var countOutput = []builder.Output{
 		}
 
 		{{ range $action := $model.Actions }}
-			type {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}{{ if eq $action "Set" }}Mutate{{ else }}Query{{ end }}Param interface {
+			type {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}{{ if eq $action "Set" }}Set{{ else }}Where{{ end }}Param interface {
 				field() builder.Field
 				getQuery() builder.Query
 				{{ $model.Name.GoLowerCase }}Model()

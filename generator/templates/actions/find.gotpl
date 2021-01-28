@@ -44,7 +44,7 @@
 					// deprecated: use FindUnique instead
 				{{- end }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}QueryParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueQueryParam{{ end }},
+					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}WhereParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueWhereParam{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
 					v.query = builder.NewQuery()
@@ -193,7 +193,7 @@
 
 				{{/* UPDATE */}}
 
-				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}MutateParam) {{ $updateResult }} {
+				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.ActualName }}"
 					r.query.Model = "{{ $model.Name.GoCase }}"
