@@ -64,7 +64,7 @@ func TestIfPresent(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    "john@example.com",
@@ -123,7 +123,7 @@ func TestIfPresent(t *testing.T) {
 
 			age := 51
 			age2 := 2
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    "john@example.com",

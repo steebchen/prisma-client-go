@@ -40,7 +40,7 @@ func TestExecInner(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := InnerUser{
+			expected := &InnerUser{
 				ID:       "123",
 				Username: "johndoe",
 			}
@@ -92,7 +92,7 @@ func TestExecInner(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := InnerUser{
+			expected := &InnerUser{
 				ID:       "123",
 				Username: "johndoe",
 			}

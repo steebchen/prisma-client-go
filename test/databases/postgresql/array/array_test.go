@@ -42,7 +42,7 @@ func TestArrays(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:    "id1",
 					Items: []string{"a", "b", "c"},
@@ -62,7 +62,7 @@ func TestArrays(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:    "id",
 					Items: []string{"a", "b", "c"},

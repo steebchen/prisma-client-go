@@ -41,7 +41,7 @@ func TestFindFirst(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "first",
 					Email:    "john@example.com",

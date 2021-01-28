@@ -130,7 +130,7 @@ func TestExportedBuilderFields(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "id",
 					Email:    "email",
@@ -179,7 +179,7 @@ func TestExportedBuilderFields(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    email,

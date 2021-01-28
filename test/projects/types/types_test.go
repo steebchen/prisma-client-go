@@ -48,7 +48,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:        id,
 					CreatedAt: date,
@@ -81,7 +81,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{expected}, actualSlice)
+			assert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "different field casing",
@@ -106,7 +106,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:               "id",
 					CreatedAt:        date,
@@ -136,7 +136,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{expected}, actualSlice)
+			assert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "basic equals",

@@ -233,7 +233,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := PostModel{
+			expected := &PostModel{
 				InnerPost: InnerPost{
 					ID:       "post",
 					Title:    title,
@@ -253,7 +253,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []PostModel{expected}, posts)
+			assert.Equal(t, []PostModel{*expected}, posts)
 		},
 	}, {
 		name: "with simple",
@@ -317,7 +317,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -375,7 +375,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := PostModel{
+			expected := &PostModel{
 				InnerPost: InnerPost{
 					ID:       "post1",
 					Title:    "hi",
@@ -426,7 +426,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -457,7 +457,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expectedEmpty := UserModel{
+			expectedEmpty := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -544,7 +544,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -637,7 +637,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -739,7 +739,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
@@ -818,7 +818,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			user := UserModel{
+			user := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "john",
 					Email:    "john@example.com",
@@ -893,7 +893,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expectedCategory := CategoryModel{
+			expectedCategory := &CategoryModel{
 				InnerCategory: InnerCategory{
 					ID:   "media",
 					Name: "Media",
@@ -946,7 +946,7 @@ func TestRelations(t *testing.T) {
 
 			actualCategory, ok := actual.Category()
 
-			assert.Equal(t, CategoryModel{}, actualCategory)
+			assert.Equal(t, true, actualCategory == nil)
 			assert.Equal(t, false, ok)
 		},
 	}}
