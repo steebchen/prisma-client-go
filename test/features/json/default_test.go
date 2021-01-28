@@ -43,7 +43,7 @@ func TestJSON(t *testing.T) {
 			}
 
 			var opt JSON = []byte(`"hi"`)
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:      "123",
 					JSON:    data,
@@ -51,7 +51,7 @@ func TestJSON(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, created, expected)
+			assert.Equal(t, expected, created)
 
 			actual, err := client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
 			if err != nil {
@@ -91,7 +91,7 @@ func TestJSON(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, created, expected)
+			assert.Equal(t, &expected, created)
 
 			actual, err := client.User.FindMany(
 				User.JSON.Equals(data),

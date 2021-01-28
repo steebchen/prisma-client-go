@@ -69,7 +69,7 @@ func TestRelations(t *testing.T) {
 				Username: "new",
 			}
 
-			assert.Equal(t, created, UserModel{InnerUser: newUser})
+			assert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -81,7 +81,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			authorID := "new"
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: newUser,
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
@@ -158,7 +158,7 @@ func TestRelations(t *testing.T) {
 				Username: "new",
 			}
 
-			assert.Equal(t, created, UserModel{InnerUser: newUser})
+			assert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -170,7 +170,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			authorID := "new"
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: newUser,
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{

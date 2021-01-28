@@ -8,17 +8,17 @@ import (
 )
 
 func TestTypedMock(t *testing.T) {
-	do := func(ctx context.Context, client *PrismaClient) (UserModel, error) {
+	do := func(ctx context.Context, client *PrismaClient) (*UserModel, error) {
 		user, err := client.User.FindUnique(User.ID.Equals("foo")).Exec(ctx)
 		if err != nil {
-			return UserModel{}, err
+			return nil, err
 		}
 
 		return user, nil
 	}
 
 	var expectedErr error = nil
-	expected := UserModel{
+	expected := &UserModel{
 		InnerUser: InnerUser{
 			ID:   "123",
 			Name: "foo",
@@ -30,7 +30,7 @@ func TestTypedMock(t *testing.T) {
 	defer ensure(t)
 	mock.User.Expect(
 		client.User.FindUnique(User.ID.Equals("foo")),
-	).Returns(expected)
+	).Returns(*expected)
 
 	actual, err := do(context.Background(), client)
 	assert.Equal(t, expectedErr, err)
@@ -38,17 +38,16 @@ func TestTypedMock(t *testing.T) {
 }
 
 func TestMockError(t *testing.T) {
-	do := func(ctx context.Context, client *PrismaClient) (UserModel, error) {
+	do := func(ctx context.Context, client *PrismaClient) (*UserModel, error) {
 		user, err := client.User.FindUnique(User.ID.Equals("foo")).Exec(ctx)
 		if err != nil {
-			return UserModel{}, err
+			return nil, err
 		}
 
 		return user, nil
 	}
 
 	expectedErr := ErrNotFound
-	expected := UserModel{}
 
 	client, mock, ensure := NewMock()
 	defer ensure(t)
@@ -58,5 +57,5 @@ func TestMockError(t *testing.T) {
 
 	actual, err := do(context.Background(), client)
 	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, true, actual == nil)
 }

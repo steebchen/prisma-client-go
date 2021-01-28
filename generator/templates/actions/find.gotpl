@@ -152,42 +152,42 @@
 			{{ end }}
 
 			func (r {{ $result }}) Exec(ctx context.Context) (
-				{{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model,
+				{{ if $v.ReturnList }}[]{{ else }}*{{ end }}{{ $model.Name.GoCase }}Model,
 				error,
 			) {
-				var v *{{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model
+				var v {{ if $v.ReturnList }}[]{{ else }}*{{ end }}{{ $model.Name.GoCase }}Model
 				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
+					return nil, err
 				}
 				{{ if not $v.ReturnList }}
 					if v == nil {
-						return {{ if $v.ReturnList }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, ErrNotFound
+						return nil, ErrNotFound
 					}
 				{{ end }}
-				return *v, nil
+				return v, nil
 			}
 
 			func (r {{ $result }}) ExecInner(ctx context.Context) (
-				{{ if $v.ReturnList }}[]{{ end }}Inner{{ $model.Name.GoCase }},
+				{{ if $v.ReturnList }}[]{{ else }}*{{ end }}Inner{{ $model.Name.GoCase }},
 				error,
 			) {
-				var v *{{ if $v.ReturnList }}[]{{ end }}Inner{{ $model.Name.GoCase }}
+				var v {{ if $v.ReturnList }}[]{{ else }}*{{ end }}Inner{{ $model.Name.GoCase }}
 				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.ReturnList }}[]{{ end }}Inner{{ $model.Name.GoCase }}{}, err
+					return nil, err
 				}
 				{{ if not $v.ReturnList }}
 					if v == nil {
-						return {{ if $v.ReturnList }}[]{{ end }}Inner{{ $model.Name.GoCase }}{}, ErrNotFound
+						return nil, ErrNotFound
 					}
 				{{ end }}
-				return *v, nil
+				return v, nil
 			}
 
 			{{ if ne $v.Name "First" }}
 				{{ $outputName := $name }}
 				{{ $returnType := print $model.Name.GoCase "Model" }}
 				{{ if $v.List }}
-					{{ $returnType = "int" }}
+					{{ $returnType = "ManyOpResult" }}
 					{{ $outputName = "count" }}
 				{{ end }}
 
@@ -237,12 +237,12 @@
 
 				func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
 
-				func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-					var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
+				func (r {{ $updateResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
+					var v {{ $returnType }}
 					if err := r.query.Exec(ctx, &v); err != nil {
-						return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+						return nil, err
 					}
-					return v{{ if $v.List }}.Count{{ end }}, nil
+					return &v, nil
 				}
 
 				{{/* DELETE */}}
@@ -267,12 +267,12 @@
 
 				func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
 
-				func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-					var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
+				func (r {{ $deleteResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
+					var v {{ $returnType }}
 					if err := r.query.Exec(ctx, &v); err != nil {
-						return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+						return nil, err
 					}
-					return v{{ if $v.List }}.Count{{ end }}, nil
+					return &v, nil
 				}
 			{{ end }}
 		{{ end }}

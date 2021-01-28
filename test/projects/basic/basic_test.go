@@ -238,7 +238,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "id",
 					Email:    "email",
@@ -276,7 +276,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "id",
 					Email:    "email",
@@ -324,7 +324,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "update",
 					Email:    email,
@@ -369,7 +369,7 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.User.FindMany(
+			result, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Update(
 				User.Name.Set("New Name"),
@@ -378,7 +378,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, count)
+			assert.Equal(t, 2, result.Count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -428,7 +428,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
 					ID:       "delete",
 					Email:    "john@example.com",
@@ -438,8 +438,9 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, deleted)
 
-			_, err = client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
+			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			assert.Equal(t, ErrNotFound, err)
+			assert.Equal(t, true, actual == nil)
 		},
 	}, {
 		name: "Delete many",
@@ -468,14 +469,14 @@ func TestBasic(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.User.FindMany(
+			result, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Delete().Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, count)
+			assert.Equal(t, 2, result.Count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
