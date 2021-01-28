@@ -12,11 +12,11 @@ type TX struct {
 	Engine engine.Engine
 }
 
-type Params interface {
+type Param interface {
 	ExtractQuery() builder.Query
 }
 
-func (r TX) Transaction(queries ...Params) Exec {
+func (r TX) Transaction(queries ...Param) Exec {
 	requests := make([]engine.GQLRequest, len(queries))
 	for i, query := range queries {
 		requests[i] = engine.GQLRequest{

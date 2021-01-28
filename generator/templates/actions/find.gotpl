@@ -12,14 +12,14 @@
 
 			{{ $relationName := $model.Name.GoCase }}
 
-			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+			{{ $orderByParam := (print "i" $model.Name.GoCase "OrderByParam") }}
 
 			{{ if ne $field.Name "" }}
 				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
 				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
 				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
-				{{ $orderByParams = (print "i" $field.Type.GoCase "OrderByParams") }}
+				{{ $orderByParam = (print "i" $field.Type.GoCase "OrderByParam") }}
 			{{ end }}
 
 			type {{ $result }} struct {
@@ -44,7 +44,7 @@
 					// deprecated: use FindUnique instead
 				{{- end }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}QueryParams{{ else }}{{ $model.Name.GoCase }}EqualsUniqueQueryParams{{ end }},
+					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}QueryParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueQueryParam{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
 					v.query = builder.NewQuery()
@@ -106,7 +106,7 @@
 			}
 
 			{{ if $v.List }}
-				func (r {{ $result }}) OrderBy(params ...{{ $orderByParams }}) {{ $result }} {
+				func (r {{ $result }}) OrderBy(params ...{{ $orderByParam }}) {{ $result }} {
 					var fields []builder.Field
 
 					for _, param := range params {
@@ -142,7 +142,7 @@
 					return r
 				}
 
-				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
+				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParam) {{ $result }} {
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "cursor",
 						Fields: []builder.Field{cursor.field()},
@@ -193,7 +193,7 @@
 
 				{{/* UPDATE */}}
 
-				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}MutateParams) {{ $updateResult }} {
+				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}MutateParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.ActualName }}"
 					r.query.Model = "{{ $model.Name.GoCase }}"

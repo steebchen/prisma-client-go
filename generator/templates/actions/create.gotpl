@@ -10,10 +10,10 @@
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
 			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
-				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}MutateParams,
+				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}MutateParam,
 			{{- end -}}
 		{{ end }}
-		optional ...{{ $model.Name.GoCase }}MutateParams,
+		optional ...{{ $model.Name.GoCase }}MutateParam,
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()

@@ -48,7 +48,7 @@ func TestExportedBuilderFields(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var x UserEqualsUniqueQueryParams //nolint:gosimple
+			var x UserEqualsUniqueQueryParam //nolint:gosimple
 			x = User.Email.Equals("jane@findOne.com")
 			actual, err := client.User.FindUnique(x).Exec(ctx)
 			if err != nil {
@@ -84,7 +84,7 @@ func TestExportedBuilderFields(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var x []UserQueryParams
+			var x []UserQueryParam
 			x = append(x, User.Username.Equals("john"))
 			actual, err := client.User.FindMany(x...).Exec(ctx)
 			if err != nil {
@@ -110,13 +110,13 @@ func TestExportedBuilderFields(t *testing.T) {
 	}, {
 		name: "Create",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var email UserWithPrismaEmailMutateParams //nolint:gosimple
+			var email UserWithPrismaEmailMutateParam //nolint:gosimple
 			email = User.Email.Set("email")
 
-			var username UserWithPrismaUsernameMutateParams //nolint:gosimple
+			var username UserWithPrismaUsernameMutateParam //nolint:gosimple
 			username = User.Username.Set("username")
 
-			var optional []UserMutateParams
+			var optional []UserMutateParam
 			optional = append(optional, User.ID.Set("id"))
 			optional = append(optional, User.Name.Set("name"))
 			optional = append(optional, User.Stuff.Set("stuff"))
@@ -165,7 +165,7 @@ func TestExportedBuilderFields(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var params []UserMutateParams
+			var params []UserMutateParam
 			params = append(params, User.Username.Set("new-username"))
 			params = append(params, User.Name.Set("New Name"))
 
