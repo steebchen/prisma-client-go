@@ -296,7 +296,7 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate() bool {
-	return f.IsRequired && !f.IsUpdatedAt && !f.HasDefaultValue
+	return f.IsRequired && !f.IsUpdatedAt && !f.HasDefaultValue && f.RelationName == ""
 }
 
 // RelationMethod describes a method for relations

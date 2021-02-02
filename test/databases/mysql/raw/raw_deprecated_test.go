@@ -13,8 +13,8 @@ func TestRawDeprecated(t *testing.T) {
 	strOpt := "strOpt"
 	i := 5
 	f := 5.5
-	bTrue := true
-	bFalse := false
+	bTrue := 1
+	bFalse := 0
 
 	tests := []struct {
 		name   string

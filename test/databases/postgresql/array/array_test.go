@@ -55,8 +55,8 @@ func TestArrays(t *testing.T) {
 		name: "create one",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			user, err := client.User.CreateOne(
-				User.ID.Set("id"),
 				User.Items.Set([]string{"a", "b", "c"}),
+				User.ID.Set("id"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
