@@ -33,16 +33,9 @@ jobs:
 
       - name: generate
         run: go generate ./...
-        env:
-          DEBUG: "*"
-          PHOTON_GO_LOG: true
 
       - name: setup
         run: go run ./test/setup/init setup
-        env:
-          PHOTON_GO_LOG: true
 
       - name: test
         run: go test ./... -v
-        env:
-          PHOTON_GO_LOG: true

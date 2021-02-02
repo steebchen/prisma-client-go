@@ -8,7 +8,7 @@ generator db {
 	output = "."
 	disableGitignore = true
 	package = "binaries"
-	binaryTargets = ["native", "rhel-openssl-1.1.x"]
+	binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 model User {

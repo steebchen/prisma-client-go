@@ -16,7 +16,7 @@ model a {
 	id String  @id
 
 	// combination 1
-	XRelation b
+	XRelation b?
 }
 
 model b {

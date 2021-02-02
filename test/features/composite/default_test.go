@@ -16,8 +16,8 @@ func TestComposite(t *testing.T) {
 		mockDB := test.Start(t, db, client.Engine, []string{})
 		defer test.End(t, db, client.Engine, mockDB)
 
-		expected := UserModel{
-			InternalUser: InternalUser{
+		expected := &UserModel{
+			InnerUser: InnerUser{
 				FirstName:  "a",
 				MiddleName: "b",
 				LastName:   "c",
@@ -42,9 +42,9 @@ func TestComposite(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, []UserModel{expected}, users)
+		assert.Equal(t, []UserModel{*expected}, users)
 
-		oneUser, err := client.User.FindOne(
+		oneUser, err := client.User.FindUnique(
 			User.FirstNameMiddleNameLastName(
 				User.FirstName.Equals("a"),
 				User.MiddleName.Equals("b"),

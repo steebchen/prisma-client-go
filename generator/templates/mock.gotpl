@@ -1,0 +1,67 @@
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+
+func NewMock() (*PrismaClient, *Mock, func(t *testing.T)) {
+	expectations := new([]mock.Expectation)
+	pc := newMockClient(expectations)
+	m := &Mock{
+		Mock: &mock.Mock{
+			Expectations: expectations,
+		},
+	}
+
+	{{ range $model := $.DMMF.Datamodel.Models }}
+		m.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Mock{
+			mock: m,
+		}
+	{{ end }}
+
+	return pc, m, m.Ensure
+}
+
+type Mock struct {
+	*mock.Mock
+
+	{{ range $model := $.DMMF.Datamodel.Models }}
+		{{ $model.Name.GoCase }} {{ $model.Name.GoLowerCase }}Mock
+	{{ end }}
+}
+
+{{- range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoLowerCase }}
+	{{ $ns := (print $name "Mock") }}
+
+	type {{ $ns }} struct {
+		mock *Mock
+	}
+
+	type i{{ $model.Name.GoCase }}MockExpectParam interface {
+		ExtractQuery() builder.Query
+		{{ $model.Name.GoLowerCase }}Model()
+	}
+
+	func (m *{{ $ns }}) Expect(query i{{ $model.Name.GoCase }}MockExpectParam) *{{ $ns }}Exec {
+		return &{{ $ns }}Exec{
+			mock:  m.mock,
+			query: query.ExtractQuery(),
+		}
+	}
+
+	type {{ $ns }}Exec struct {
+		mock  *Mock
+		query builder.Query
+	}
+
+	func (m *{{ $ns }}Exec) Returns(v {{ $model.Name.GoCase }}Model) {
+		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
+			Query: m.query,
+			Want:  &v,
+		})
+	}
+
+	func (m *{{ $ns }}Exec) Errors(err error) {
+		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
+			Query:   m.query,
+			WantErr: err,
+		})
+	}
+{{- end }}

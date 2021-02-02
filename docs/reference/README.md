@@ -2,23 +2,20 @@
 
 Contents
 
-- [Introduction](./01-introduction.md)
+- [Introduction](01-introduction.md)
 
-- [Find rows](./02-find.md)
-- [Query filters](./03-filters.md)
-- [Fetching multiple things at once](./04-fetch.md)
+- [Find rows](02-find.md)
+- [Query filters](03-filters.md)
+- [Fetching multiple things at once](04-fetch.md)
+- [Limit & Pagination](05-pagination.md)
+- [Order by](06-order-by.md)
 
-- [Create rows](./05-create.md)
-- [Update rows](./06-update.md)
-- [Delete rows](./07-delete.md)
+- [Create rows](07-create.md)
+- [Update rows](08-update.md)
+- [Delete rows](09-delete.md)
 
-- [Query for relations](./08-relations.md)
+- [Query for relations](10-relations.md)
 
-- [Raw API fallback](./09-raw.md)
-- [Limitations](./10-limitations.md)
-
-```go
-func main() {
-    users, err := client.User.FindOne().Exec()
-}
-```
+- [Raw API fallback](11-raw.md)
+- [JSON](12-json.md)
+- [Limitations](15-limitations.md)

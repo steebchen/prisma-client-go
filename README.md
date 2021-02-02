@@ -24,7 +24,7 @@ Prisma Client Go is an **auto-generated query builder** that enables **type-safe
 
 It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access, declarative data modeling, schema migrations and visual data management.
 
-*NOTE*: Prisma Client Go is currently considered alpha software. There will be documented breaking changes with new [releases](https://github.com/prisma/prisma-client-go/releases).
+*NOTE*: Prisma Client Go is currently offered under our [early access program](https://www.prisma.io/docs/about/releases#product-maturity-levels). There will be documented breaking changes with new [releases](https://github.com/prisma/prisma-client-go/releases).
 
 ## Getting started
 

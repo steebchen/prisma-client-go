@@ -24,7 +24,7 @@ func TestArrays(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					items: {
 						set: ["a", "b", "c"],
@@ -35,15 +35,15 @@ func TestArrays(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.ID.Equals("id1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:    "id1",
 					Items: []string{"a", "b", "c"},
 				},
@@ -62,8 +62,8 @@ func TestArrays(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:    "id",
 					Items: []string{"a", "b", "c"},
 				},

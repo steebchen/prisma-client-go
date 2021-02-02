@@ -1,1 +1,1 @@
-var ErrNotFound = runtime.ErrNotFound
+var ErrNotFound = types.ErrNotFound

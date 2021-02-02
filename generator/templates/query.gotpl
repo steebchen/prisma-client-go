@@ -30,14 +30,14 @@
 	}
 
 	{{ range $op := $.DMMF.Operators }}
-		func ({{ $nsQuery }}) {{ $op.Name }}(params ...i{{ $nameUpper }}Params) {{ $name }}Params {
+		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}WhereParam) {{ $name }}Param {
 			var fields []builder.Field
 
 			for _, q := range params {
 				fields = append(fields, q.field())
 			}
 
-			return {{ $name }}Params{
+			return {{ $name }}Param{
 				data: builder.Field{
 					Name:     "{{ $op.Action }}",
 					List:     true,
@@ -48,29 +48,33 @@
 		}
 	{{ end }}
 
-	{{/* composite keys for FindOne */}}
+	{{/* composite keys for FindUnique */}}
+	{{ $break := false }}
 	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes $model.Name.String }}
 		{{ range $index := $input.Fields }}
-			{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $index.InputType.Type.String }}
-			{{ if $i }}
-				func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
-					{{- range $f := $i.Fields }}
-						_{{- $f.Name.GoLowerCase }} i{{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}EqualsParams,
-					{{ end -}}
-				) i{{ $model.Name.GoCase }}EqualsParamsUnique {
-					var fields []builder.Field
+			{{ range $inner := $index.InputTypes }}
+				{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $inner.Type.String }}
+				{{ if and $i (not $break) }}
+					{{ $break = true }}
+					func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
+						{{- range $f := $i.Fields }}
+							_{{- $f.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}WhereParam,
+						{{ end -}}
+					) {{ $model.Name.GoCase }}EqualsUniqueWhereParam {
+						var fields []builder.Field
 
-					{{ range $f := $i.Fields }}
-						fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
-					{{- end }}
+						{{ range $f := $i.Fields }}
+							fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
+						{{- end }}
 
-					return {{ $model.Name.GoLowerCase }}EqualsParamsUnique{
-						data: builder.Field{
-							Name:   "{{ $index.Name }}",
-							Fields: builder.TransformEquals(fields),
-						},
+						return {{ $model.Name.GoLowerCase }}EqualsUniqueParam{
+							data: builder.Field{
+								Name:   "{{ $index.Name }}",
+								Fields: builder.TransformEquals(fields),
+							},
+						}
 					}
-				}
+				{{ end }}
 			{{ end }}
 		{{ end }}
 	{{ end }}
@@ -83,9 +87,9 @@
 
 		{{ $setReturnStruct := "" }}
 		{{ if $field.RequiredOnCreate }}
-			{{ $setReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "SetParams") }}
+			{{ $setReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "SetParam") }}
 		{{ else }}
-			{{ $setReturnStruct = (print $name "SetParams") }}
+			{{ $setReturnStruct = (print $name "SetParam") }}
 		{{ end}}
 
 		{{ if $field.Kind.IsRelation }}
@@ -97,15 +101,15 @@
 				// @relation
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
-					params ...i{{ $field.Type.GoCase }}Params,
-				) {{ $name }}Params {
+					params ...{{ $field.Type.GoCase }}WhereParam,
+				) {{ $name }}Param {
 					var fields []builder.Field
 
 					for _, q := range params {
 						fields = append(fields, q.field())
 					}
 
-					return {{ $name }}Params{
+					return {{ $name }}Param{
 						data: builder.Field{
 							Name:   "{{ $field.Name }}",
 							Fields: []builder.Field{
@@ -122,7 +126,7 @@
 			{{/* With API */}}
 			func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Fetch(
 				{{ if $field.IsList }}
-					params ...i{{ $field.Type.GoCase }}Params,
+					params ...{{ $field.Type.GoCase }}WhereParam,
 				{{ end }}
 			) {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
 				var v {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
@@ -158,7 +162,37 @@
 			}
 
 			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Link(
-				params ...i{{ $field.Type.GoCase }}Params,
+				params {{ if $field.IsList }}...{{ end }}{{ $field.Type.GoCase }}WhereParam,
+			) {{ $setReturnStruct }} {
+				var fields []builder.Field
+
+				{{ if $field.IsList }}
+					for _, q := range params {
+						fields = append(fields, q.field())
+					}
+				{{ else }}
+					fields = append(fields, params.field())
+				{{ end }}
+
+				return {{ $setReturnStruct }}{
+					data: builder.Field{
+						Name: "{{ $field.Name }}",
+						Fields: []builder.Field{
+							{
+								Name:     "connect",
+								Fields:   builder.TransformEquals(fields),
+								{{ if $field.IsList }}
+									List:     true,
+									WrapList: true,
+								{{ end }}
+							},
+						},
+					},
+				}
+			}
+
+			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Create(
+				params ...{{ $field.Type.GoCase }}SetParam,
 			) {{ $setReturnStruct }} {
 				var fields []builder.Field
 
@@ -171,8 +205,8 @@
 						Name: "{{ $field.Name }}",
 						Fields: []builder.Field{
 							{
-								Name:   "connect",
-								Fields: builder.TransformEquals(fields),
+								Name:   "create",
+								Fields: fields,
 							},
 						},
 					},
@@ -222,6 +256,15 @@
 				{{ end }}
 			}
 
+			// Set the optional value of {{ $field.Name.GoCase }} dynamically
+			func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				if value == nil {
+					return {{ $setReturnStruct }}{}
+				}
+
+				return r.Set(*value)
+			}
+
 			{{ if and (not $field.IsRequired) (not $field.IsList) }}
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
@@ -258,6 +301,13 @@
 									},
 								}
 							}
+
+							func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+								if value == nil {
+									return {{ $setReturnStruct }}{}
+								}
+								return r.{{ $method.Name }}(*value)
+							}
 						{{ end }}
 					{{ end }}
 				{{ end }}
@@ -266,9 +316,9 @@
 
 		{{ $returnStruct := "" }}
 		{{ if or ($field.IsID) ($field.IsUnique) }}
-			{{ $returnStruct = (print $name "ParamsUnique") }}
+			{{ $returnStruct = (print $name "ParamUnique") }}
 		{{ else }}
-			{{ $returnStruct = (print $name "Params") }}
+			{{ $returnStruct = (print $name "Param") }}
 		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}
@@ -276,9 +326,9 @@
 			{{/* Equals has a special return type for individual fields */}}
 			{{ $equalsReturnStruct := "" }}
 			{{ if or ($field.IsID) ($field.IsUnique) }}
-				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParamsUnique") }}
+				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsUniqueParam") }}
 			{{ else }}
-				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParams") }}
+				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParam") }}
 			{{ end }}
 			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
 				return {{ $equalsReturnStruct }}{
@@ -292,6 +342,13 @@
 						},
 					},
 				}
+			}
+
+			func (r {{ $struct }}) EqualsIfPresent(value *{{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
+				if value == nil {
+					return {{ $equalsReturnStruct }}{}
+				}
+				return r.Equals(*value)
 			}
 
 			{{/* Provide an `In` method for most types. */}}
@@ -347,8 +404,8 @@
 				}
 			{{ end }}
 
-			func (r {{ $struct }}) Order(direction runtime.Direction) {{ $name }}Params {
-				return {{ $name }}Params{
+			func (r {{ $struct }}) Order(direction types.Direction) {{ $name }}Param {
+				return {{ $name }}Param{
 					data: builder.Field{
 						Name:  "{{ $field.Name }}",
 						Value: direction,
@@ -358,8 +415,8 @@
 
 			{{/* If it's a unique ID, allow using these fields as cursor queries */}}
 			{{ if or ($field.IsID) ($field.IsUnique) }}
-				func (r {{ $struct }}) Cursor(cursor string) {{ $name }}CursorParams {
-					return {{ $name }}CursorParams{
+				func (r {{ $struct }}) Cursor(cursor string) {{ $name }}CursorParam {
+					return {{ $name }}CursorParam{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
 							Value: cursor,
@@ -385,6 +442,13 @@
 								},
 							},
 						}
+					}
+
+					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
+						if value == nil {
+							return {{ $returnStruct }}{}
+						}
+						return r.{{ $method.Name }}(*value)
 					}
 				{{ end }}
 			{{ end }}

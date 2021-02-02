@@ -16,37 +16,60 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 // Example:
 //
 //   client := db.NewClient()
-//   err := client.Connect()
-//   if err != nil {
+//   if err := client.Prisma.Connect(); err != nil {
 //     handle(err)
 //   }
 //
 //   defer func() {
-//     err := client.Disconnect()
-//     if err != nil {
+//     if err := client.Prisma.Disconnect(); err != nil {
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
 func NewClient() *PrismaClient {
-	c := &PrismaClient{}
+	c := newClient()
+	c.Engine = engine.New(schema, hasBinaryTargets)
+	c.Prisma.Lifecycle = &lifecycle.Lifecycle{Engine: c.Engine}
 
-	c.Engine = engine.NewEngine(schema, hasBinaryTargets)
+	return c
+}
+
+func newMockClient(expectations *[]mock.Expectation) *PrismaClient {
+	c := newClient()
+	c.Engine = mock.New(expectations)
+	c.Prisma.Lifecycle = &lifecycle.Lifecycle{Engine: c.Engine}
+
+	return c
+}
+
+func newClient() *PrismaClient {
+	c := &PrismaClient{}
 
 	{{- range $model := $.DMMF.Datamodel.Models }}
 		c.{{ $model.Name.GoCase }} = {{ $model.Name.GoLowerCase }}Actions{client: c}
 	{{- end }}
 
-	c.Actions = &raw.Actions{Client: c}
-
+	c.Prisma = &PrismaActions{
+		Raw: &raw.Raw{Engine: c},
+		TX:  &transaction.TX{Engine: c},
+	}
 	return c
+}
+
+type PrismaActions struct {
+	*lifecycle.Lifecycle
+	*raw.Raw
+	*transaction.TX
 }
 
 // PrismaClient is the instance of the Prisma Client Go client.
 type PrismaClient struct {
-	// engine spawns and manages the binary
-	*engine.Engine
+	// engine is an abstractions of what happens under the hood
+	// the query engine can spawn and manage the binary and send requests to it,
+	// while a mock engine would collect mocks to verify them later
+	engine.Engine
 
-	*raw.Actions
+	// prisma provides prisma-related methods as opposed to model methods, such as Connect, Disconnect or raw queries
+	Prisma *PrismaActions
 
 	{{ range $model := $.DMMF.Datamodel.Models }}
 		// {{ $model.Name.GoCase }} provides access to CRUD methods.
@@ -54,40 +77,22 @@ type PrismaClient struct {
 	{{- end }}
 }
 
-// Connects to the Prisma query engine. Required to call before accessing data.
-// It is recommended to immediately defer calling Disconnect.
-//
-// Example:
-//
-//   err := client.Connect()
-//   if err != nil {
-//     handle(err)
-//   }
-//
-//   defer func() {
-//     err := client.Disconnect()
-//     if err != nil {
-//       panic(fmt.Errorf("could not disconnect: %w", err))
-//     }
-//   }()
+// deprecated: use .Prisma.Connect
 func (c *PrismaClient) Connect() error {
-	return c.Engine.Connect()
+	return c.Prisma.Connect()
 }
 
-// Disconnects from the Prisma query engine.
-// This is usually invoked on kill signals in long running applications (like webservers),
-// or when no database access is needed anymore (like after executing a CLI command).
-//
-// Should be usually invoked directly after calling client.Connect(), for example as follows:
-//
-//   // after client.Connect()
-//
-//   defer func() {
-//     err := client.Disconnect()
-//     if err != nil {
-//       panic(fmt.Errorf("could not disconnect: %w", err))
-//     }
-//   }()
+// deprecated: use .Prisma.Disconnect
 func (c *PrismaClient) Disconnect() error {
-	return c.Engine.Disconnect()
+	return c.Prisma.Disconnect()
+}
+
+// deprecated: use .Prisma.QueryRaw
+func (c *PrismaClient) QueryRaw(query string, params ...interface{}) raw.QueryExec {
+	return c.Prisma.QueryRaw(query, params...)
+}
+
+// deprecated: use .Prisma.ExecuteRaw
+func (c *PrismaClient) ExecuteRaw(query string, params ...interface{}) raw.ExecuteExec {
+	return c.Prisma.ExecuteRaw(query, params...)
 }
