@@ -97,4 +97,4 @@ func TestGetPostTitle_error(t *testing.T) {
 
 ## Next steps
 
-The go client is still in an early access and has [limitations](16-limitations.md).
+Learn how to build up [dynamic queries](16-dynamic-queries.md).
