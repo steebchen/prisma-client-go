@@ -1,9 +1,5 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
-type ManyOpResult struct {
-	Count int `json:"count"`
-}
-
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model represents the {{ $model.Name.Tag }} model and is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
