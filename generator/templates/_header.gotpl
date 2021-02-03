@@ -21,7 +21,7 @@ import (
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
 
-type ManyOpResult = types.ManyOpResult
+type BatchResult = types.BatchResult
 
 type DateTime = types.DateTime
 type JSON     = types.JSON
