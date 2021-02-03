@@ -22,9 +22,9 @@ func main() {
 
 	ctx := context.Background()
 
-	count, err := client.User.FindMany().Delete().Exec(ctx)
+	result, err := client.User.FindMany().Delete().Exec(ctx)
 	check(err)
-	fmt.Printf("remove %d items\n", count)
+	fmt.Printf("remove %d items\n", result.Count)
 
 	_, err = client.User.CreateOne(
 		db.User.Email.Set("new@email.com"),

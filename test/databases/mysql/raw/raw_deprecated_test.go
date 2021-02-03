@@ -272,12 +272,12 @@ func TestRawDeprecated(t *testing.T) {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.ExecuteRaw("INSERT INTO `User` (`id`, `email`, `username`, `str`, `strOpt`, `int`, `intOpt`, `float`, `floatOpt`, `bool`, `boolOpt`) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			result, err := client.ExecuteRaw("INSERT INTO `User` (`id`, `email`, `username`, `str`, `strOpt`, `int`, `intOpt`, `float`, `floatOpt`, `bool`, `boolOpt`) VALUES(?,?,?,?,?,?,?,?,?,?,?)", "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, count)
+			assert.Equal(t, 1, result.Count)
 		},
 	}, {
 		name: "update",
@@ -302,19 +302,19 @@ func TestRawDeprecated(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "id1").Exec(ctx)
+			result, err := client.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "id1").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, count)
+			assert.Equal(t, 1, result.Count)
 
-			count, err = client.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "non-existing").Exec(ctx)
+			result, err = client.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "non-existing").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 0, count)
+			assert.Equal(t, 0, result.Count)
 		},
 	}}
 	for _, tt := range tests {

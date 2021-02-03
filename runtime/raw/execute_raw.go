@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/prisma/prisma-client-go/runtime/builder"
+	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
 func (r Raw) ExecuteRaw(query string, params ...interface{}) ExecuteExec {
@@ -17,10 +18,12 @@ type ExecuteExec struct {
 	query builder.Query
 }
 
-func (r ExecuteExec) Exec(ctx context.Context) (int, error) {
-	var result int
-	if err := r.query.Exec(ctx, &result); err != nil {
-		return -1, fmt.Errorf("could not send raw query: %w", err)
+func (r ExecuteExec) Exec(ctx context.Context) (*types.BatchResult, error) {
+	var count int
+	if err := r.query.Exec(ctx, &count); err != nil {
+		return nil, fmt.Errorf("could not send raw query: %w", err)
 	}
-	return result, nil
+	return &types.BatchResult{
+		Count: count,
+	}, nil
 }
