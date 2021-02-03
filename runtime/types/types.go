@@ -10,6 +10,10 @@ import (
 
 const RFC3339Milli = "2006-01-02T15:04:05.999Z07:00"
 
+type ManyOpResult struct {
+	Count int `json:"count"`
+}
+
 // DateTime is a type alias for time.Time
 type DateTime = time.Time
 
