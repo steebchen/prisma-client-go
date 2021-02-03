@@ -1,4 +1,4 @@
-name-template: v$NEXT_PATCH_VERSION
+name-template: v$NEXT_MINOR_VERSION
 sort-direction: ascending
 
 template: |
