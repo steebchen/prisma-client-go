@@ -24,8 +24,8 @@ type RawUserModel struct {
 	IntOpt   *int     `json:"intOpt"`
 	Float    float64  `json:"float"`
 	FloatOpt *float64 `json:"floatOpt"`
-	Bool     bool     `json:"bool"`
-	BoolOpt  *bool    `json:"boolOpt"`
+	Bool     int      `json:"bool"`
+	BoolOpt  *int     `json:"boolOpt"`
 }
 
 func TestRaw(t *testing.T) {
@@ -34,8 +34,8 @@ func TestRaw(t *testing.T) {
 	strOpt := "strOpt"
 	i := 5
 	f := 5.5
-	bTrue := true
-	bFalse := false
+	bTrue := 1
+	bFalse := 0
 
 	tests := []struct {
 		name   string
