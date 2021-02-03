@@ -292,12 +292,12 @@ func TestRaw(t *testing.T) {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.Prisma.ExecuteRaw(`INSERT INTO "User" ("id", "email", "username", "str", "strOpt", "int", "intOpt", "float", "floatOpt", "bool", "boolOpt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`INSERT INTO "User" ("id", "email", "username", "str", "strOpt", "int", "intOpt", "float", "floatOpt", "bool", "boolOpt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)`, "a", "a", "a", "a", "a", 1, 1, 2.0, 2.0, true, false).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, count)
+			assert.Equal(t, 1, result.Count)
 		},
 	}, {
 		name: "update",
@@ -322,19 +322,19 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			count, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "id1").Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "id1").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, count)
+			assert.Equal(t, 1, result.Count)
 
-			count, err = client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "non-existing").Exec(ctx)
+			result, err = client.Prisma.ExecuteRaw(`UPDATE "User" SET email = "abc" WHERE id = $1`, "non-existing").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 0, count)
+			assert.Equal(t, 0, result.Count)
 		},
 	}}
 	for _, tt := range tests {
