@@ -50,33 +50,25 @@
 
 	{{/* composite keys for FindUnique */}}
 	{{ $break := false }}
-	{{ range $input := $.DMMF.Schema.UniqueCompoundTypes $model.Name.String }}
-		{{ range $index := $input.Fields }}
-			{{ range $inner := $index.InputTypes }}
-				{{ $i := $.DMMF.Schema.UniqueCompoundTypeByName $model.Name.String $inner.Type.String }}
-				{{ if and $i (not $break) }}
-					{{ $break = true }}
-					func ({{ $nsQuery }}) {{ $index.Name.GoCase }}(
-						{{- range $f := $i.Fields }}
-							_{{- $f.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.Name.GoCase }}WhereParam,
-						{{ end -}}
-					) {{ $model.Name.GoCase }}EqualsUniqueWhereParam {
-						var fields []builder.Field
+	{{ range $unique := $model.UniqueIndexes }}
+		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
+			{{- range $f := $unique.Fields }}
+				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
+			{{ end -}}
+		) {{ $model.Name.GoCase }}EqualsUniqueWhereParam {
+			var fields []builder.Field
 
-						{{ range $f := $i.Fields }}
-							fields = append(fields, _{{ $f.Name.GoLowerCase }}.field())
-						{{- end }}
+			{{ range $f := $unique.Fields }}
+				fields = append(fields, _{{ $f.GoLowerCase }}.field())
+			{{- end }}
 
-						return {{ $model.Name.GoLowerCase }}EqualsUniqueParam{
-							data: builder.Field{
-								Name:   "{{ $index.Name }}",
-								Fields: builder.TransformEquals(fields),
-							},
-						}
-					}
-				{{ end }}
-			{{ end }}
-		{{ end }}
+			return {{ $model.Name.GoLowerCase }}EqualsUniqueParam{
+				data: builder.Field{
+					Name:   "{{ $unique.ASTName }}",
+					Fields: builder.TransformEquals(fields),
+				},
+			}
+		}
 	{{ end }}
 
 	{{ range $field := $model.Fields }}

@@ -1,8 +1,6 @@
 package dmmf
 
 import (
-	"strings"
-
 	"github.com/prisma/prisma-client-go/generator/types"
 )
 
@@ -245,14 +243,45 @@ type Datamodel struct {
 	Enums  []Enum  `json:"enums"`
 }
 
+type UniqueIndex struct {
+	InternalName types.String   `json:"name"`
+	Fields       []types.String `json:"fields"`
+}
+
+func (m *UniqueIndex) Name() types.String {
+	if m.InternalName != "" {
+		return m.InternalName
+	}
+	var name string
+	for _, f := range m.Fields {
+		name += f.GoCase()
+	}
+	return types.String(name)
+}
+
+func (m *UniqueIndex) ASTName() types.String {
+	if m.InternalName != "" {
+		return m.InternalName
+	}
+	var name string
+	for i, f := range m.Fields {
+		if i > 0 {
+			name += "_"
+		}
+		name += f.String()
+	}
+	return types.String(name)
+}
+
 // Model describes a Prisma type model, which usually maps to a database table or collection.
 type Model struct {
 	// Name describes the singular name of the model.
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName types.String `json:"dbName"`
-	Fields []Field      `json:"fields"`
+	DBName        types.String  `json:"dbName"`
+	Fields        []Field       `json:"fields"`
+	UniqueIndexes []UniqueIndex `json:"uniqueIndexes"`
 }
 
 func (m Model) Actions() []string {
@@ -340,70 +369,6 @@ type InputObjectType struct {
 
 type OutputObjectType struct {
 	Prisma []OutputType `json:"prisma"`
-}
-
-func (s *Schema) UniqueCompoundTypes(model string) []InputType {
-	var inputs []InputType
-	for _, inputType := range s.InputObjectTypes.Prisma {
-		// check for unique input types
-		if !strings.HasPrefix(string(inputType.Name), model) ||
-			!strings.HasSuffix(string(inputType.Name), "UniqueInput") {
-			continue
-		}
-
-		for _, field := range inputType.Fields {
-			for _, input := range field.InputTypes {
-				// check if there's unique compound input type in it
-				if strings.HasSuffix(string(input.Type), "CompoundUniqueInput") {
-					// if yes, add the full inputType and break
-					inputs = append(inputs, inputType)
-					break
-				}
-			}
-		}
-	}
-	return inputs
-}
-
-func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType {
-	var inputType InputType
-	for _, i := range s.InputObjectTypes.Prisma {
-		if i.Name.String() == name {
-			inputType = i
-			break
-		}
-	}
-	if inputType.Name == "" {
-		return nil
-	}
-
-	var secondInputTypes []InputType
-
-	// found the input type. now check if the model matches...
-	for _, i := range s.InputObjectTypes.Prisma {
-		for _, f := range i.Fields {
-			for _, t := range f.InputTypes {
-				if t.Type.String() == name {
-					secondInputTypes = append(secondInputTypes, i)
-				}
-			}
-		}
-	}
-
-	for _, secondInputType := range secondInputTypes {
-		if secondInputType.Name == "" {
-			continue
-		}
-
-		modelField := strings.Replace(secondInputType.Name.String(), "WhereUniqueInput", "", 1)
-		if modelField != model {
-			continue
-		}
-
-		return &inputType
-	}
-
-	return nil
 }
 
 // SchemaArg provides the arguments of a given field.
