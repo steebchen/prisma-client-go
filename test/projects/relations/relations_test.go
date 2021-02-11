@@ -481,6 +481,94 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expectedEmpty, actual)
 		},
 	}, {
+		name: "update and fetch",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneRole(data: {
+					id: "admin",
+					name: "Admin",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedEmpty := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   nil,
+				},
+			}
+
+			assert.Equal(t, expectedEmpty, actual)
+
+			actual, err = client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Update(
+				User.Role.Link(Role.ID.Equals("admin")),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   str("admin"),
+				},
+				RelationsUser: RelationsUser{
+					Role: &RoleModel{
+						InnerRole: InnerRole{
+							ID:   "admin",
+							Name: "Admin",
+						},
+					},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+
+			actual, err = client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "with and sub query",
 		// language=GraphQL
 		before: []string{`

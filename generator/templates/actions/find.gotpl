@@ -184,11 +184,9 @@
 			}
 
 			{{ if ne $v.Name "First" }}
-				{{ $outputName := $name }}
 				{{ $returnType := print $model.Name.GoCase "Model" }}
 				{{ if $v.List }}
 					{{ $returnType = "BatchResult" }}
-					{{ $outputName = "count" }}
 				{{ end }}
 
 				{{/* UPDATE */}}
@@ -197,7 +195,9 @@
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.ActualName }}"
 					r.query.Model = "{{ $model.Name.GoCase }}"
-					r.query.Outputs = {{ $outputName }}Output
+					{{ if $v.List }}
+						r.query.Outputs = countOutput
+					{{ end }}
 
 					var v {{ $updateResult }}
 					v.query = r.query
@@ -246,14 +246,15 @@
 				}
 
 				{{/* DELETE */}}
-
 				func (r {{ $result }}) Delete() {{ $deleteResult }} {
 					var v {{ $deleteResult }}
 					v.query = r.query
 					v.query.Operation = "mutation"
 					v.query.Method = "delete{{ $v.ActualName }}"
 					v.query.Model = "{{ $model.Name.String }}"
-					v.query.Outputs = {{ $outputName }}Output
+					{{ if $v.List }}
+						v.query.Outputs = countOutput
+					{{ end }}
 					return v
 				}
 
