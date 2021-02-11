@@ -18,6 +18,10 @@ type QueryExec struct {
 	query builder.Query
 }
 
+func (r QueryExec) ExtractQuery() builder.Query {
+	return r.query
+}
+
 type QueryResult struct {
 	QueryRaw json.RawMessage `json:"queryRaw"`
 }
