@@ -18,6 +18,10 @@ type ExecuteExec struct {
 	query builder.Query
 }
 
+func (r ExecuteExec) ExtractQuery() builder.Query {
+	return r.query
+}
+
 func (r ExecuteExec) Exec(ctx context.Context) (*types.BatchResult, error) {
 	var count int
 	if err := r.query.Exec(ctx, &count); err != nil {
