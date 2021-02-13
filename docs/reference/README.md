@@ -17,5 +17,9 @@ Contents
 - [Query for relations](10-relations.md)
 
 - [Raw API fallback](11-raw.md)
-- [JSON](12-json.md)
-- [Limitations](15-limitations.md)
+- [Transactions](12-transactions.md)
+- [JSON](13-json.md)
+- [XIfPresent method variants](14-if-present-methods.md)
+- [Mocks for testing](15-mocks.md)
+- [Dynamic Queries](16-dynamic-queries.md)
+- [Limitations](17-limitations.md)
