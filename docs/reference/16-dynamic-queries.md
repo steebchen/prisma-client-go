@@ -45,7 +45,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
     _, err := client.User.CreateOne(
         db.User.Kind.Set(kind),
         db.User.Email.Set(email),
-        optional...,
+        params...,
     ).Exec(r.Context())
     if err != nil {
         panic(err)
