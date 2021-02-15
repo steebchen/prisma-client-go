@@ -10,8 +10,6 @@ generator db {
   package           = "db"
 }
 
-// this schema tests for unique constraints on relation ids
-
 model User {
   id           String        @id @default(cuid())
   participants Participant[]

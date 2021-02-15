@@ -6,13 +6,13 @@
 	{{ $ns := (print $name "Actions") }}
 	{{ $result := (print $name "Create" "One") }}
 
-	// Creates a single user.
+	// Creates a single {{ $name }}.
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
-			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
+			{{- if $field.RequiredOnCreate -}}
 				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}SetParam,
-			{{- end -}}
-		{{ end }}
+			{{ end }}
+		{{- end }}
 		optional ...{{ $model.Name.GoCase }}SetParam,
 	) {{ $result }} {
 		var v {{ $result }}
@@ -26,11 +26,11 @@
 
 		var fields []builder.Field
 
-		{{ range $field := $model.Fields }}
-			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate -}}
 				fields = append(fields, _{{ $field.Name.GoLowerCase }}.field())
-			{{- end }}
-		{{ end }}
+			{{ end }}
+		{{- end }}
 
 		for _, q := range optional {
 			fields = append(fields, q.field())

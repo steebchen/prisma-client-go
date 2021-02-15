@@ -1,0 +1,38 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("__REPLACE__")
+}
+
+generator db {
+  provider          = "go run github.com/prisma/prisma-client-go"
+  output            = "."
+  disableGoBinaries = true
+  package           = "composite"
+}
+
+model Event {
+  id            String          @id @default(cuid())
+  EventInstance EventInstance[]
+}
+
+model Document {
+  id            String          @id @default(cuid())
+  EventInstance EventInstance[]
+}
+
+model EventInstance {
+  id                      String         @id @default(cuid())
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+  event                   Event          @relation(fields: [eventId], references: [id])
+  eventId                 String
+  start                   DateTime
+  end                     DateTime
+  summary                 Document       @relation(fields: [summaryId], references: [id])
+  summaryId               String
+  previous                EventInstance? @relation("NextPreviousEventInstance", fields: [previousEventInstanceId], references: [id])
+  previousEventInstanceId String?
+  next                    EventInstance? @relation("NextPreviousEventInstance")
+
+  @@unique([eventId, id], name: "EventEventInstance_key")
+}

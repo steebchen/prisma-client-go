@@ -263,14 +263,7 @@ func (m *UniqueIndex) ASTName() types.String {
 	if m.InternalName != "" {
 		return m.InternalName
 	}
-	var name string
-	for i, f := range m.Fields {
-		if i > 0 {
-			name += "_"
-		}
-		name += f.String()
-	}
-	return types.String(name)
+	return concatFieldsToName(m.Fields)
 }
 
 // Model describes a Prisma type model, which usually maps to a database table or collection.
@@ -279,13 +272,26 @@ type Model struct {
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName        types.String  `json:"dbName"`
-	Fields        []Field       `json:"fields"`
-	UniqueIndexes []UniqueIndex `json:"uniqueIndexes"`
+	DBName        types.String   `json:"dbName"`
+	Fields        []Field        `json:"fields"`
+	UniqueIndexes []UniqueIndex  `json:"uniqueIndexes"`
+	IDFields      []types.String `json:"idFields"`
 }
 
 func (m Model) Actions() []string {
 	return []string{"Set", "Equals"}
+}
+
+func (m Model) CompositeIndexes() []UniqueIndex {
+	var indexes []UniqueIndex
+	indexes = append(indexes, m.UniqueIndexes...)
+	if len(m.IDFields) > 0 {
+		indexes = append(indexes, UniqueIndex{
+			InternalName: concatFieldsToName(m.IDFields),
+			Fields:       m.IDFields,
+		})
+	}
+	return indexes
 }
 
 // RelationFieldsPlusOne returns all fields plus an empty one, so it's easier to iterate through it in some gotpl files
@@ -325,7 +331,15 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate() bool {
-	return f.IsRequired && !f.IsUpdatedAt && !f.HasDefaultValue && f.RelationName == ""
+	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly {
+		return false
+	}
+
+	if f.RelationName != "" && f.IsList {
+		return false
+	}
+
+	return true
 }
 
 // RelationMethod describes a method for relations
@@ -422,4 +436,15 @@ type InputType struct {
 	// AtMostOne (optional)
 	AtMostOne bool        `json:"atMostOne"`
 	Fields    []SchemaArg `json:"fields"`
+}
+
+func concatFieldsToName(fields []types.String) types.String {
+	var name types.String
+	for i, f := range fields {
+		if i > 0 {
+			name += "_"
+		}
+		name += f
+	}
+	return name
 }
