@@ -7,6 +7,7 @@
       <env name="LOG_QUERIES" value="y" />
       <env name="DBm" value="mysql://root:pw@localhost:3306/testing" />
       <env name="DB" value="postgresql://postgres:pw@localhost:5432/testing" />
+      <env name="PRISMA_CLIENT_GO_WRITE_DMMF_FILE" value="yes" />
       <env name="PRISMA_CLIENT_GO_TEST_DEV" value="true" />
     </envs>
     <framework value="gotest" />

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -14,6 +15,8 @@ import (
 	"github.com/prisma/prisma-client-go/jsonrpc"
 	"github.com/prisma/prisma-client-go/logger"
 )
+
+var writeDebugFile = os.Getenv("PRISMA_CLIENT_GO_WRITE_DMMF_FILE") != ""
 
 func reply(w io.Writer, data interface{}) error {
 	b, err := json.Marshal(data)
@@ -52,6 +55,12 @@ func invokePrisma() error {
 
 		if err := json.Unmarshal(content, &input); err != nil {
 			return fmt.Errorf("could not open stdin %w", err)
+		}
+
+		if writeDebugFile {
+			if err := ioutil.WriteFile("dmmf.json", content, 0644); err != nil {
+				log.Print(err)
+			}
 		}
 
 		var response interface{}
