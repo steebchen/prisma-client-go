@@ -171,6 +171,7 @@ var countOutput = []builder.Output{
 	type {{ $model.Name.GoCase }}SetParam interface {
 		field() builder.Field
 		settable()
+		{{ $model.Name.GoLowerCase }}Model()
 	}
 
 	type {{ $name }}SetParam struct {
@@ -182,6 +183,8 @@ var countOutput = []builder.Output{
 	func (p {{ $name }}SetParam) field() builder.Field {
 		return p.data
 	}
+
+	func (p {{ $name }}SetParam) {{ $model.Name.GoLowerCase }}Model() {}
 
 	{{ range $field := $model.Fields }}
 		{{ $prefix := (print $name "WithPrisma" $field.Name.GoCase) }}
