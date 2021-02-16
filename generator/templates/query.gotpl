@@ -196,8 +196,9 @@
 						Name: "{{ $field.Name }}",
 						Fields: []builder.Field{
 							{
-								Name:   "create",
-								Fields: fields,
+								Name:             "create",
+								AllowEmptyObject: true,
+								Fields:           fields,
 							},
 						},
 					},

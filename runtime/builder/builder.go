@@ -41,6 +41,8 @@ type Field struct {
 
 	// Fields contains a subselection of fields. If not nil, value will be undefined.
 	Fields []Field
+
+	AllowEmptyObject bool
 }
 
 func NewQuery() Query {
@@ -177,12 +179,15 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 			builder.WriteString("[")
 		}
 
-		if f.Fields != nil {
+		switch {
+		case f.Fields != nil:
 			builder.WriteString(q.buildFields(f.List, f.WrapList, f.Fields))
-		}
-
-		if f.Value != nil {
+		case f.Value != nil:
 			builder.Write(Value(f.Value))
+		default:
+			if f.AllowEmptyObject {
+				builder.Write([]byte("{}"))
+			}
 		}
 
 		if f.List {
