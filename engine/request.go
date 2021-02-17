@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -62,9 +61,6 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
-
-	log.Printf("batch payload: %+v", payload)
-	log.Printf("batch body: %s", string(body))
 
 	if err := json.Unmarshal(body, &v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
