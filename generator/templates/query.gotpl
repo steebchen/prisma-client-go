@@ -162,7 +162,12 @@
 						fields = append(fields, q.field())
 					}
 				{{ else }}
-					fields = append(fields, params.field())
+					f := params.field()
+					if f.Fields == nil && f.Value == nil {
+						return {{ $setReturnStruct }}{}
+					}
+
+					fields = append(fields, f)
 				{{ end }}
 
 				return {{ $setReturnStruct }}{
@@ -176,28 +181,6 @@
 									List:     true,
 									WrapList: true,
 								{{ end }}
-							},
-						},
-					},
-				}
-			}
-
-			func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Create(
-				params ...{{ $field.Type.GoCase }}SetParam,
-			) {{ $setReturnStruct }} {
-				var fields []builder.Field
-
-				for _, q := range params {
-					fields = append(fields, q.field())
-				}
-
-				return {{ $setReturnStruct }}{
-					data: builder.Field{
-						Name: "{{ $field.Name }}",
-						Fields: []builder.Field{
-							{
-								Name:   "create",
-								Fields: fields,
 							},
 						},
 					},

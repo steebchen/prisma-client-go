@@ -17,4 +17,12 @@ model User {
 	name     String?
 	age      Int?
 	age2     Int?
+	posts    Post[]
+}
+
+model Post {
+	id       String  @id @default(cuid())
+	title    String
+	author   User?   @relation(fields: [authorID], references: [id])
+	authorID String?
 }

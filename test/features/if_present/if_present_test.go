@@ -143,6 +143,82 @@ func TestIfPresent(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "with link filled",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "test",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			v := "test"
+			post, err := client.Post.CreateOne(
+				Post.Title.Set("asdf"),
+				Post.Author.Link(
+					User.ID.EqualsIfPresent(&v),
+				),
+				Post.ID.Set("post-1"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &PostModel{
+				InnerPost: InnerPost{
+					ID:       "post-1",
+					Title:    "asdf",
+					AuthorID: str("test"),
+				},
+			}
+
+			assert.Equal(t, expected, post)
+		},
+	}, {
+		name: "with link nil",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "test",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var v *string = nil
+			post, err := client.Post.CreateOne(
+				Post.Title.Set("asdf"),
+				Post.Author.Link(
+					User.ID.EqualsIfPresent(v),
+				),
+				Post.ID.Set("post-1"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &PostModel{
+				InnerPost: InnerPost{
+					ID:       "post-1",
+					Title:    "asdf",
+					AuthorID: nil,
+				},
+			}
+
+			assert.Equal(t, expected, post)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
