@@ -1,0 +1,3 @@
+// +build tools
+
+package templates
