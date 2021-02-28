@@ -83,4 +83,4 @@ if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
 
 ## Next steps
 
-Check out how to use [json fields](13-json.md).
+Check out how to use [json fields](14-json.md).

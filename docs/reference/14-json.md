@@ -70,4 +70,4 @@ log.Printf("post info: %+v", info)
 
 ## Next steps
 
-Check out how to [dynamically ignore fields](14-if-present-methods.md).
+Check out how to [dynamically ignore fields](15-if-present-methods.md).

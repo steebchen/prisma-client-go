@@ -36,4 +36,4 @@ deleted, err := client.Post.FindUnique(
 
 ## Next steps
 
-Check out the details of [querying for relations](10-relations.md).
+Learn how to [upsert documents](10-upsert.md).

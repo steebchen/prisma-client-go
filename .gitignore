@@ -11,7 +11,7 @@ build/
 
 schema.temp.*.prisma
 # sqlite artifacts
-go_client_db_*.db
+*.db
 
 # for development purposes
 schema.graphql

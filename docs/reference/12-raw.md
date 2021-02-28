@@ -84,4 +84,4 @@ count, err := client.Prisma.ExecuteRaw(`UPDATE "Post" SET title = $1 WHERE id = 
 
 ## Next steps
 
-Ensure consistency with [transactions](12-transactions.md).
+Ensure consistency with [transactions](13-transactions.md).
