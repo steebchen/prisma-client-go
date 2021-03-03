@@ -12,12 +12,14 @@ build/
 schema.temp.*.prisma
 # sqlite artifacts
 *.db
+*.db-journal
 
 # for development purposes
 schema.graphql
 .graphqlconfig
 
 # JetBrains
+.idea/**/csv-plugin.xml
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml

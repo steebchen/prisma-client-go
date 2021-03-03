@@ -119,8 +119,8 @@
 				{{ if $field.IsList }}
 					params ...{{ $field.Type.GoCase }}WhereParam,
 				{{ end }}
-			) {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }} {
-				var v {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}One{{ end }}
+			) {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}Unique{{ end }} {
+				var v {{ $name }}To{{ $field.Name.GoCase }}Find{{ if $field.IsList }}Many{{ else }}Unique{{ end }}
 
 				v.query.Operation = "query"
 				v.query.Method = "{{ $field.Name }}"

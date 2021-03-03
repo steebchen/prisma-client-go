@@ -40,9 +40,6 @@
 
 			{{ if eq $field.Name "" }}
 				{{/* only allow equals & unique params for FindUnique */}}
-				{{- if eq $v.Name "One" }}
-					// deprecated: use FindUnique instead
-				{{- end }}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
 					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}WhereParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueWhereParam{{ end }},
 				) {{ $result }} {
@@ -54,7 +51,7 @@
 					{{ if eq $v.Name "First" }}
 						v.query.Method = "findFirst"
 					{{ else }}
-						v.query.Method = "find{{ $v.ActualName }}"
+						v.query.Method = "find{{ $v.Name }}"
 					{{ end }}
 					v.query.Model = "{{ $model.Name.String }}"
 					v.query.Outputs = {{ $name }}Output
@@ -193,7 +190,7 @@
 
 				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
-					r.query.Method = "update{{ $v.ActualName }}"
+					r.query.Method = "update{{ $v.InnerName }}"
 					r.query.Model = "{{ $model.Name.GoCase }}"
 					{{ if $v.List }}
 						r.query.Outputs = countOutput
@@ -250,7 +247,7 @@
 					var v {{ $deleteResult }}
 					v.query = r.query
 					v.query.Operation = "mutation"
-					v.query.Method = "delete{{ $v.ActualName }}"
+					v.query.Method = "delete{{ $v.InnerName }}"
 					v.query.Model = "{{ $model.Name.String }}"
 					{{ if $v.List }}
 						v.query.Outputs = countOutput
