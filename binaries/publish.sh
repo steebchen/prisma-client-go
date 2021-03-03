@@ -12,6 +12,9 @@ npm i "prisma@$v" --dev
 npm i "@prisma/client@$v"
 npx prisma version
 
+mkdir -p node_modules/prisma/node_modules/@prisma/engines
+cp -R node_modules/@prisma/engines/* node_modules/prisma/node_modules/@prisma/engines
+
 npx pkg -t node12-linux,node12-darwin,node12-win node_modules/prisma
 
 version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " -f 2)
