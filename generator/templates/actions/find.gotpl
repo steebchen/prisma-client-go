@@ -237,7 +237,7 @@
 					return r.query
 				}
 
-				func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+				func (r {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
 
 				func (r {{ $updateResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
 					var v {{ $returnType }}
@@ -245,6 +245,24 @@
 						return nil, err
 					}
 					return &v, nil
+				}
+
+				func (r {{ $updateResult }}) Tx() (*{{ $updateResult }}, chan *{{ $returnType }}) {
+					r.query.TxResult = make(chan []byte)
+					c := make(chan *{{ $returnType }})
+					go func() {
+						defer close(c)
+						var v {{ $returnType }}
+						data, ok := <-r.query.TxResult
+						if !ok {
+							return
+						}
+						if err := json.Unmarshal(data, &v); err != nil {
+							panic(err)
+						}
+						c <- &v
+					}()
+					return &r, c
 				}
 
 				{{/* DELETE */}}
@@ -276,6 +294,24 @@
 						return nil, err
 					}
 					return &v, nil
+				}
+
+				func (r {{ $deleteResult }}) Tx() (*{{ $deleteResult }}, chan *{{ $returnType }}) {
+					r.query.TxResult = make(chan []byte)
+					c := make(chan *{{ $returnType }})
+					go func() {
+						defer close(c)
+						var v {{ $returnType }}
+						data, ok := <-r.query.TxResult
+						if !ok {
+							return
+						}
+						if err := json.Unmarshal(data, &v); err != nil {
+							panic(err)
+						}
+						c <- &v
+					}()
+					return &r, c
 				}
 			{{ end }}
 		{{ end }}

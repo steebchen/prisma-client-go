@@ -27,15 +27,24 @@ func (r TX) Transaction(queries ...Param) Exec {
 	return Exec{
 		engine:   r.Engine,
 		requests: requests,
+		queries:  queries,
 	}
 }
 
 type Exec struct {
+	queries  []Param
 	engine   engine.Engine
 	requests []engine.GQLRequest
 }
 
 func (r Exec) Exec(ctx context.Context) error {
+	for _, q := range r.queries {
+		if ch := q.ExtractQuery().TxResult; ch != nil {
+			//goland:noinspection GoDeferInLoop
+			defer close(ch)
+		}
+	}
+
 	var result engine.GQLBatchResponse
 	payload := engine.GQLBatchRequest{
 		Batch:       r.requests,
@@ -48,10 +57,14 @@ func (r Exec) Exec(ctx context.Context) error {
 		first := result.Errors[0]
 		return fmt.Errorf("pql error: %s", first.Message)
 	}
-	for _, inner := range result.Result {
+	for i, inner := range result.Result {
 		if len(inner.Errors) > 0 {
 			first := result.Errors[0]
 			return fmt.Errorf("pql error: %s", first.Message)
+		}
+
+		if ch := r.queries[i].ExtractQuery().TxResult; ch != nil {
+			ch <- inner.Data.Result
 		}
 	}
 	return nil

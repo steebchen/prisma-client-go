@@ -73,4 +73,22 @@
 		}
 		return &v, nil
 	}
+
+	func (r {{ $result }}) Tx() (*{{ $result }}, chan *{{ $modelName }}) {
+		r.query.TxResult = make(chan []byte)
+		c := make(chan *{{ $modelName }})
+		go func() {
+			defer close(c)
+			var v {{ $modelName }}
+			data, ok := <-r.query.TxResult
+			if !ok {
+				return
+			}
+			if err := json.Unmarshal(data, &v); err != nil {
+				panic(err)
+			}
+			c <- &v
+		}()
+		return &r, c
+	}
 {{ end }}
