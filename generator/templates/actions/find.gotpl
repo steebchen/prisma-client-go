@@ -247,22 +247,11 @@
 					return &v, nil
 				}
 
-				func (r {{ $updateResult }}) Tx() (*{{ $updateResult }}, chan *{{ $returnType }}) {
-					r.query.TxResult = make(chan []byte)
-					c := make(chan *{{ $returnType }})
-					go func() {
-						defer close(c)
-						var v {{ $returnType }}
-						data, ok := <-r.query.TxResult
-						if !ok {
-							return
-						}
-						if err := json.Unmarshal(data, &v); err != nil {
-							panic(err)
-						}
-						c <- &v
-					}()
-					return &r, c
+				func (r {{ $updateResult }}) Tx() {{ $name }}TxResult {
+					v := {{ $name }}TxResult{}
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
 				}
 
 				{{/* DELETE */}}
@@ -296,22 +285,11 @@
 					return &v, nil
 				}
 
-				func (r {{ $deleteResult }}) Tx() (*{{ $deleteResult }}, chan *{{ $returnType }}) {
-					r.query.TxResult = make(chan []byte)
-					c := make(chan *{{ $returnType }})
-					go func() {
-						defer close(c)
-						var v {{ $returnType }}
-						data, ok := <-r.query.TxResult
-						if !ok {
-							return
-						}
-						if err := json.Unmarshal(data, &v); err != nil {
-							panic(err)
-						}
-						c <- &v
-					}()
-					return &r, c
+				func (r {{ $result }}) Tx() {{ $name }}TxResult {
+					v := {{ $name }}TxResult{}
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
 				}
 			{{ end }}
 		{{ end }}

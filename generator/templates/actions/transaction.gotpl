@@ -1,0 +1,26 @@
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoLowerCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+
+	type {{ $name }}TxResult struct {
+		query builder.Query
+	}
+
+	func (p {{ $name }}TxResult) ExtractQuery() builder.Query {
+		return p.query
+	}
+
+	func (r {{ $name }}TxResult) Result() *{{ $modelName }} {
+		var v {{ $modelName }}
+		data, ok := <-r.query.TxResult
+		if !ok {
+			return nil
+		}
+		if err := json.Unmarshal(data, &v); err != nil {
+			panic(err)
+		}
+		return &v
+	}
+{{ end }}

@@ -22,12 +22,12 @@ func TestTransactionReturns(t *testing.T) {
 	}{{
 		name: "transaction",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			createUserA, a := client.User.CreateOne(
+			createUserA := client.User.CreateOne(
 				User.Email.Set("a"),
 				User.ID.Set("a"),
 			).Tx()
 
-			createUserB, b := client.User.CreateOne(
+			createUserB := client.User.CreateOne(
 				User.Email.Set("b"),
 				User.ID.Set("b"),
 			).Tx()
@@ -50,8 +50,8 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedA, <-a)
-			assert.Equal(t, expectedB, <-b)
+			assert.Equal(t, expectedA, createUserA.Result())
+			assert.Equal(t, expectedB, createUserB.Result())
 
 			// --
 
@@ -89,14 +89,14 @@ func TestTransactionReturns(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			// this will fail...
-			aOp, a := client.User.FindUnique(
+			aOp := client.User.FindUnique(
 				User.ID.Equals("does-not-exist"),
 			).Update(
 				User.Email.Set("foo"),
 			).Tx()
 
 			// ...so this should be roll-backed
-			bOp, b := client.User.FindUnique(
+			bOp := client.User.FindUnique(
 				User.ID.Equals("exists"),
 			).Update(
 				User.Email.Set("new"),
@@ -106,8 +106,8 @@ func TestTransactionReturns(t *testing.T) {
 			assert.Errorf(t, err, "should error")
 
 			var empty *UserModel
-			assert.Equal(t, empty, <-a)
-			assert.Equal(t, empty, <-b)
+			assert.Equal(t, empty, aOp.Result())
+			assert.Equal(t, empty, bOp.Result())
 
 			// make sure the existing record wasn't touched
 
