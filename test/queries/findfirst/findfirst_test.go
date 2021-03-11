@@ -57,7 +57,7 @@ func TestFindFirst(t *testing.T) {
 			_, err := client.User.FindFirst(
 				User.Email.Equals("john@example.com"),
 			).Exec(ctx)
-			assert.Equal(t, err, ErrNotFound)
+			assert.Equal(t, ErrNotFound, err)
 		},
 	}}
 	for _, tt := range tests {
