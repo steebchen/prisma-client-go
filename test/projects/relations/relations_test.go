@@ -142,6 +142,205 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "find by same field fail",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneCategory(data: {
+					id: "c1",
+					name: "stuff",
+					weight: 5,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+							Category: {
+								connect: {
+									id: "c1",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Posts.Fetch(
+					Post.Category.Where(
+						Category.Weight.GT(3),
+						Category.Weight.LTE(3), // <- this needs to fail this part of the query, so no posts will be fetched
+						Category.Weight.LT(10),
+					),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+				RelationsUser: RelationsUser{
+					Posts: []PostModel{},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "find by same field success",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneCategory(data: {
+					id: "c1",
+					name: "stuff",
+					weight: 5,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+							Category: {
+								connect: {
+									id: "c1",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Posts.Fetch(
+					Post.Category.Where(
+						Category.Weight.GT(1),
+						Category.Weight.GTE(5),
+						Category.Weight.LTE(5),
+						Category.Weight.LT(10),
+					),
+				).With(
+					Post.Category.Fetch(),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			i := 5
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+				RelationsUser: RelationsUser{
+					Posts: []PostModel{{
+						InnerPost: InnerPost{
+							ID:         "a",
+							Title:      "common",
+							Content:    str("a"),
+							AuthorID:   "relations",
+							CategoryID: str("c1"),
+						},
+						RelationsPost: RelationsPost{
+							Category: &CategoryModel{
+								InnerCategory: InnerCategory{
+									ID:     "c1",
+									Name:   "stuff",
+									Weight: &i,
+								},
+							},
+						},
+					}},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "find by to-many relation",
 		// language=GraphQL
 		before: []string{`
