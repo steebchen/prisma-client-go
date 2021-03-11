@@ -217,6 +217,11 @@
 		{{ if $field.Kind.IncludeInStruct }}
 			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
 			func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				{{ if $field.IsList }}
+					if value == nil {
+						value = []{{ $field.Type.Value }}{}
+					}
+				{{ end }}
 				{{/* if scalar list (only postgres) */}}
 				{{ if $field.IsList }}
 					return {{ $setReturnStruct }}{
@@ -315,6 +320,11 @@
 				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParam") }}
 			{{ end }}
 			func (r {{ $struct }}) Equals(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
+				{{ if $field.IsList }}
+					if value == nil {
+						value = []{{ $field.Type.Value }}{}
+					}
+				{{ end }}
 				return {{ $equalsReturnStruct }}{
 					data: builder.Field{
 						Name:   "{{ $field.Name }}",
