@@ -304,7 +304,7 @@
 			{{ else }}
 				{{ $equalsReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "EqualsParam") }}
 			{{ end }}
-			func (r {{ $struct }}) Equals(value {{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
+			func (r {{ $struct }}) Equals(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
 				return {{ $equalsReturnStruct }}{
 					data: builder.Field{
 						Name:   "{{ $field.Name }}",
@@ -318,34 +318,36 @@
 				}
 			}
 
-			func (r {{ $struct }}) EqualsIfPresent(value *{{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
+			func (r {{ $struct }}) EqualsIfPresent(value {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $equalsReturnStruct }} {
 				if value == nil {
 					return {{ $equalsReturnStruct }}{}
 				}
-				return r.Equals(*value)
+				return r.Equals({{ if not $field.IsList }}*{{ end }}value)
 			}
 
-			{{/* Provide an `In` method for most types. */}}
-			func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
-				var fields []builder.Field
-				for _, v := range values {
-					fields = append(fields, builder.Field{
-						Value: v,
-					})
-				}
-				return {{ $returnStruct }}{
-					data: builder.Field{
-						Name:   "{{ $field.Name }}",
-						Fields: []builder.Field{
-							{
-								Name:   "in",
-								List:   true,
-								Fields: fields,
+			{{ if not $field.IsList }}
+				{{/* Provide an `In` method for most types. */}}
+				func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
+					var fields []builder.Field
+					for _, v := range values {
+						fields = append(fields, builder.Field{
+							Value: v,
+						})
+					}
+					return {{ $returnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name }}",
+							Fields: []builder.Field{
+								{
+									Name:   "in",
+									List:   true,
+									Fields: fields,
+								},
 							},
 						},
-					},
+					}
 				}
-			}
+			{{ end }}
 
 			{{ if not $field.IsRequired }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
