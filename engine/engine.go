@@ -4,20 +4,14 @@ import (
 	"context"
 	"net/http"
 	"os/exec"
-	"time"
 )
 
 func New(schema string, hasBinaryTargets bool) *QueryEngine {
-	engine := &QueryEngine{
+	return &QueryEngine{
 		Schema:           schema,
 		hasBinaryTargets: hasBinaryTargets,
+		http:             &http.Client{},
 	}
-
-	engine.http = &http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	return engine
 }
 
 type Engine interface {
