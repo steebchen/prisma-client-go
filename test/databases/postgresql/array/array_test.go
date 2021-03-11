@@ -52,6 +52,38 @@ func TestArrays(t *testing.T) {
 			assert.Equal(t, expected, user)
 		},
 	}, {
+		name: "query by full items",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: ["a", "b", "c"],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindFirst(
+				User.Items.Equals([]string{"a", "b", "c"}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{"a", "b", "c"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
 		name: "create one",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			user, err := client.User.CreateOne(
