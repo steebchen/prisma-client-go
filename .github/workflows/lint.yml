@@ -31,5 +31,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: --enable "gofmt,golint,scopelint,gocritic"
+          args: --timeout "5m0s" --enable "gofmt,golint,scopelint,gocritic"
           version: v1.38

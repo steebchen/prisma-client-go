@@ -3,12 +3,12 @@
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model represents the {{ $model.Name.Tag }} model and is a wrapper for accessing fields and methods
 	type {{ $model.Name.GoCase }}Model struct {
-		Internal{{ $model.Name.GoCase }}
+		Inner{{ $model.Name.GoCase }}
 		Relations{{ $model.Name.GoCase }}
 	}
 
-	// Internal{{ $model.Name.GoCase }} holds the actual data
-	type Internal{{ $model.Name.GoCase }} struct {
+	// Inner{{ $model.Name.GoCase }} holds the actual data
+	type Inner{{ $model.Name.GoCase }} struct {
 		{{ range $field := $model.Fields }}
 			{{- if not $field.Kind.IsRelation -}}
 				{{- if $field.IsRequired }}
@@ -33,12 +33,12 @@
 	{{- range $field := $model.Fields }}
 		{{- if or (not $field.IsRequired) ($field.Kind.IsRelation) }}
 			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (
-				{{- if $field.IsList }}value []{{ else }}value{{ end }} {{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end -}}
+				{{- if $field.IsList }}value []{{ else }}value{{ end }} {{ if and $field.Kind.IsRelation (not $field.IsList) }}*{{ end }}{{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end -}}
 				{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
 					, ok bool
 				{{- end -}}
 			) {
-				if r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Internal{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }} == nil {
+				if r.{{ if $field.Kind.IsRelation }}Relations{{ else }}Inner{{ end }}{{ $model.Name.GoCase }}.{{ $field.Name.GoCase }} == nil {
 					{{- if and ($field.Kind.IsRelation) ($field.IsRequired) }}
 						panic("attempted to access {{ $field.Name.GoLowerCase }} but did not fetch it using the .With() syntax")
 					{{- else }}
@@ -48,8 +48,8 @@
 						{{- end -}}
 					{{- end }}
 				}
-				return {{ if not $field.IsList }}*{{ end }}r.
-					{{- if $field.Kind.IsRelation }}Relations{{ else }}Internal{{ end }}{{ $model.Name.GoCase }}.
+				return {{ if and (not $field.Kind.IsRelation) (not $field.IsList) }}*{{ end }}r.
+					{{- if $field.Kind.IsRelation }}Relations{{ else }}Inner{{ end }}{{ $model.Name.GoCase }}.
 					{{- $field.Name.GoCase -}}
 					{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
 						, true

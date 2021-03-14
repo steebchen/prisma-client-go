@@ -1,5 +1,1 @@
-// ErrNotFound gets returned when a database record does not exist
-var ErrNotFound = errors.New("ErrNotFound")
-
-var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
-var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
+var ErrNotFound = types.ErrNotFound

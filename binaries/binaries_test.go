@@ -59,13 +59,13 @@ func TestFetch_withCache(t *testing.T) {
 
 	log.Printf("second fetchEngine took %s", time.Since(start))
 
-	if time.Since(start) > 10*time.Millisecond {
+	if time.Since(start) > 20*time.Millisecond {
 		t.Fatalf("second fetchEngine took more than 10ms")
 	}
 }
 
 func TestFetch_relativeDir(t *testing.T) {
-	err := FetchNative(".")
+	actual := FetchNative(".")
 	expected := fmt.Errorf("toDir must be absolute")
-	assert.Equal(t, expected, err)
+	assert.Equal(t, expected, actual)
 }

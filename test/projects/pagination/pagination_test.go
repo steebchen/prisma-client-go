@@ -24,7 +24,7 @@ func TestPagination(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "a",
 					content: "a",
@@ -34,7 +34,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "c",
 					title: "c",
 					content: "c",
@@ -44,7 +44,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "b",
 					content: "b",
@@ -62,19 +62,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -88,7 +88,7 @@ func TestPagination(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "a",
 					content: "a",
@@ -98,7 +98,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "c",
 					title: "c",
 					content: "c",
@@ -108,7 +108,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "b",
 					content: "b",
@@ -126,19 +126,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
@@ -152,7 +152,7 @@ func TestPagination(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "a",
 					content: "a",
@@ -162,7 +162,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "c",
 					title: "c",
 					content: "c",
@@ -172,7 +172,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "b",
 					content: "b",
@@ -200,7 +200,7 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -214,7 +214,7 @@ func TestPagination(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "a",
 					content: "a",
@@ -224,7 +224,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "c",
 					title: "c",
 					content: "c",
@@ -234,7 +234,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "b",
 					content: "b",
@@ -261,13 +261,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -281,7 +281,7 @@ func TestPagination(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					title: "a",
 					content: "a",
@@ -291,7 +291,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "c",
 					title: "c",
 					content: "c",
@@ -301,7 +301,7 @@ func TestPagination(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "b",
 					title: "b",
 					content: "b",
@@ -329,13 +329,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",

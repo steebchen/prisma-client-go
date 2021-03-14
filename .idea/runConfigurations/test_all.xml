@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test all" type="GoTestRunConfiguration" factoryName="Go Test">
+    <module name="prisma-client-go" />
+    <working_directory value="$PROJECT_DIR$/" />
+    <envs>
+      <env name="PHOTON_GO_LOG" value="info" />
+      <env name="DEBUG" value="*" />
+      <env name="xLOG_QUERIES" value="y" />
+    </envs>
+    <framework value="gotest" />
+    <kind value="DIRECTORY" />
+    <package value="github.com/prisma/photongo" />
+    <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$/" />
+    <pattern value="./..." />
+    <method v="2" />
+  </configuration>
+</component>

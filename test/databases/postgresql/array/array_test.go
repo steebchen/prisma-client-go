@@ -24,7 +24,7 @@ func TestArrays(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					items: {
 						set: ["a", "b", "c"],
@@ -35,17 +35,147 @@ func TestArrays(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.ID.Equals("id1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:    "id1",
 					Items: []string{"a", "b", "c"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "query by full items",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: ["a", "b", "c"],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindFirst(
+				User.Items.Equals([]string{"a", "b", "c"}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{"a", "b", "c"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "query by empty items",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: [],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindFirst(
+				User.Items.Equals([]string{}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "query by nil items",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: [],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var empty []string
+			user, err := client.User.FindFirst(
+				User.Items.Equals(empty),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "query by empty var items",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: [],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			empty := []string{}
+			user, err := client.User.FindFirst(
+				User.Items.Equals(empty),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{},
 				},
 			}
 
@@ -55,17 +185,79 @@ func TestArrays(t *testing.T) {
 		name: "create one",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			user, err := client.User.CreateOne(
-				User.ID.Set("id"),
 				User.Items.Set([]string{"a", "b", "c"}),
+				User.ID.Set("id"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:    "id",
 					Items: []string{"a", "b", "c"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "create one empty",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.CreateOne(
+				User.Items.Set([]string{}),
+				User.ID.Set("id"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id",
+					Items: []string{},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "create one empty nil var",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var empty []string
+			user, err := client.User.CreateOne(
+				User.Items.Set(empty),
+				User.ID.Set("id"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id",
+					Items: []string{},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "create one empty non-nil var",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			empty := []string{}
+			user, err := client.User.CreateOne(
+				User.Items.Set(empty),
+				User.ID.Set("id"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id",
+					Items: []string{},
 				},
 			}
 

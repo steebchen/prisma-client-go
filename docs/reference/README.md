@@ -2,23 +2,25 @@
 
 Contents
 
-- [Introduction](./01-introduction.md)
+- [Introduction](01-introduction.md)
 
-- [Find rows](./02-find.md)
-- [Query filters](./03-filters.md)
-- [Fetching multiple things at once](./04-fetch.md)
+- [Find rows](02-find.md)
+- [Query filters](03-filters.md)
+- [Fetching multiple things at once](04-fetch.md)
+- [Limit & Pagination](05-pagination.md)
+- [Order by](06-order-by.md)
 
-- [Create rows](./05-create.md)
-- [Update rows](./06-update.md)
-- [Delete rows](./07-delete.md)
+- [Create rows](07-create.md)
+- [Update rows](08-update.md)
+- [Delete rows](09-delete.md)
+- [Delete rows](10-upsert.md)
 
-- [Query for relations](./08-relations.md)
+- [Query for relations](11-relations.md)
 
-- [Raw API fallback](./09-raw.md)
-- [Limitations](./10-limitations.md)
-
-```go
-func main() {
-    users, err := client.User.FindOne().Exec()
-}
-```
+- [Raw API fallback](12-raw.md)
+- [Transactions](13-transactions.md)
+- [JSON](14-json.md)
+- [XIfPresent method variants](15-if-present-methods.md)
+- [Mocks for testing](16-mocks.md)
+- [Dynamic Queries](17-dynamic-queries.md)
+- [Limitations](18-limitations.md)

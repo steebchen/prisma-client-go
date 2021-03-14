@@ -20,6 +20,8 @@ func str(v string) *string {
 func TestTypes(t *testing.T) {
 	t.Parallel()
 
+	date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00+00:00")
+
 	tests := []struct {
 		name   string
 		before []string
@@ -27,7 +29,6 @@ func TestTypes(t *testing.T) {
 	}{{
 		name: "complex strings",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			id := `f"hi"'`
 			s := "\"'`\n\t}{*.,;:!?1234567890-_–=§±][äö€🤪"
 			created, err := client.User.CreateOne(
@@ -47,8 +48,8 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:        id,
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -64,7 +65,7 @@ func TestTypes(t *testing.T) {
 
 			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals(id),
 			).Exec(ctx)
 			if err != nil {
@@ -80,12 +81,11 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{expected}, actualSlice)
+			assert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "different field casing",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			created, err := client.User.CreateOne(
 				User.Str.Set("str"),
 				User.Int.Set(5),
@@ -106,8 +106,8 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:               "id",
 					CreatedAt:        date,
 					UpdatedAt:        date,
@@ -136,14 +136,14 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{expected}, actualSlice)
+			assert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "basic equals",
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -160,8 +160,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
 			users, err := client.User.FindMany(
 				User.ID.Equals("id"),
 				User.StrOpt.Equals("str"),
@@ -177,7 +175,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -197,7 +195,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -214,7 +212,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
 			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
 
 			users, err := client.User.FindMany(
@@ -238,7 +235,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -254,11 +251,53 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, expected, users)
 		},
 	}, {
+		name: "failing query for the same field should lead to ErrNotFound",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id",
+					createdAt: "2000-01-01T00:00:00Z",
+					updatedAt: "2000-01-01T00:00:00Z",
+					str: "",
+					strOpt: "alongstring",
+					bool: true,
+					date: "2000-01-01T00:00:00Z",
+					int: 5,
+					float: 5.5,
+					type: "x",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			before, _ := time.Parse(RFC3339Milli, "1999-01-01T00:00:00Z")
+
+			_, err := client.User.FindFirst(
+				User.StrOpt.Contains("long"),
+				User.Bool.Equals(true),
+				User.Int.GTE(5),
+				User.Int.GT(10), // <- this is the failing part – this ensures all fields are considered in the query
+				User.Int.LTE(5),
+				User.Int.LT(7),
+				User.Float.GTE(5.5),
+				User.Float.GT(10), // <- this is the failing part – this ensures all fields are considered in the query
+				User.Float.LTE(5.5),
+				User.Float.LT(7.3),
+				User.Date.Before(time.Now()),
+				User.Date.After(before),
+				User.CreatedAt.Equals(date),
+				User.UpdatedAt.Equals(date),
+			).Exec(ctx)
+			assert.Equal(t, ErrNotFound, err)
+		},
+	}, {
 		name: "IsNull",
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -275,7 +314,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -292,8 +331,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
 			actual, err := client.User.FindMany(
 				User.StrOpt.IsNull(),
 			).Exec(ctx)
@@ -302,7 +339,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -322,7 +359,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -339,7 +376,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -356,8 +393,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
 			var s *string = nil
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(s),
@@ -367,7 +402,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -387,7 +422,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -404,7 +439,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -421,8 +456,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
 			s := "filled"
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(&s),
@@ -432,7 +465,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id2",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -452,7 +485,7 @@ func TestTypes(t *testing.T) {
 		// language=GraphQL
 		before: []string{`
 			mutation {
-				a: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id1",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -469,7 +502,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				b: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id2",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -486,7 +519,7 @@ func TestTypes(t *testing.T) {
 			}
 		`, `
 			mutation {
-				c: createOneUser(data: {
+				result: createOneUser(data: {
 					id: "id3",
 					createdAt: "2000-01-01T00:00:00Z",
 					updatedAt: "2000-01-01T00:00:00Z",
@@ -503,8 +536,6 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00Z")
-
 			actual, err := client.User.FindMany(
 				User.StrOpt.In([]string{"first", "third"}),
 			).Exec(ctx)
@@ -513,7 +544,7 @@ func TestTypes(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id1",
 					CreatedAt: date,
 					UpdatedAt: date,
@@ -525,7 +556,7 @@ func TestTypes(t *testing.T) {
 					Type:      "x",
 				},
 			}, {
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:        "id3",
 					CreatedAt: date,
 					UpdatedAt: date,

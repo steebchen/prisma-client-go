@@ -1,25 +1,28 @@
 package engine
 
 import (
+	"context"
 	"net/http"
 	"os/exec"
-	"time"
 )
 
-func NewEngine(schema string, hasBinaryTargets bool) *Engine {
-	engine := &Engine{
+func New(schema string, hasBinaryTargets bool) *QueryEngine {
+	return &QueryEngine{
 		Schema:           schema,
 		hasBinaryTargets: hasBinaryTargets,
+		http:             &http.Client{},
 	}
-
-	engine.http = &http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	return engine
 }
 
-type Engine struct {
+type Engine interface {
+	Connect() error
+	Disconnect() error
+	Do(ctx context.Context, payload interface{}, into interface{}) error
+	Batch(ctx context.Context, payload interface{}, into interface{}) error
+	Name() string
+}
+
+type QueryEngine struct {
 	// cmd holds the prisma binary process
 	cmd *exec.Cmd
 
@@ -37,7 +40,11 @@ type Engine struct {
 	hasBinaryTargets bool
 }
 
+func (e *QueryEngine) Name() string {
+	return "query-engine"
+}
+
 // deprecated
-func (e *Engine) ReplaceSchema(replace func(schema string) string) {
+func (e *QueryEngine) ReplaceSchema(replace func(schema string) string) {
 	e.Schema = replace(e.Schema)
 }

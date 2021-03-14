@@ -1,6 +1,6 @@
 ## Advanced usage
 
-In the [quickstart](./quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
+In the [quickstart](quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
 Go client are designed to work with relations between models.
 
 We already created a post model, such as for a blog. Let's assume we want to add comments to a post, and connect these
@@ -93,7 +93,7 @@ log.Printf("post: %+v", post)
 
 // then create a comment
 comments, err := client.Comment.CreateOne(
-    db.Comment.Content.Set("john.doe@example.com"),
+    db.Comment.Content.Set("my description"),
     // link the post we created before
     db.Comment.Post.Link(
         db.Post.ID.Equals(post.ID),
@@ -173,8 +173,8 @@ few of their comments in just a few lines and fully type-safe:
 
 ```go
 // return a post by its id including 5 of its comments
-post, err := client.Post.FindOne(
-    Post.Email.Equals("john@example.com"),
+post, err := client.Post.FindUnique(
+    Post.ID.Equals("123"),
 ).With(
     // also fetch 3 this post's comments
     Post.Comments.Fetch().Take(3),
@@ -186,4 +186,4 @@ log.Printf("post: %+v", post)
 
 ## API reference
 
-To explore all query capabilities, check out the [API reference](./reference).
+To explore all query capabilities, check out the [API reference](reference).

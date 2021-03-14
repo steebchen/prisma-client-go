@@ -16,7 +16,7 @@ func TestTableCasing(t *testing.T) {
 		// language=GraphQL
 		mockDB := test.Start(t, db, client.Engine, []string{`
 			mutation {
-				c: createOnePost(data: {
+				result: createOnePost(data: {
 					id: "a",
 					int: 10,
 					float: 10,
@@ -29,8 +29,8 @@ func TestTableCasing(t *testing.T) {
 		`})
 		defer test.End(t, db, client.Engine, mockDB)
 
-		expectedPost := PostModel{
-			InternalPost: InternalPost{
+		expectedPost := &PostModel{
+			InnerPost: InnerPost{
 				ID:     "a",
 				Int:    13,
 				Float:  7.5,
@@ -39,7 +39,7 @@ func TestTableCasing(t *testing.T) {
 			},
 		}
 
-		actualFoundPost, err := client.Post.FindOne(
+		actualFoundPost, err := client.Post.FindUnique(
 			Post.ID.Equals("a"),
 		).Update(
 			Post.Int.Increment(3),
@@ -53,7 +53,7 @@ func TestTableCasing(t *testing.T) {
 
 		assert.Equal(t, expectedPost, actualFoundPost)
 
-		actualUpdatedPost, err := client.Post.FindOne(
+		actualUpdatedPost, err := client.Post.FindUnique(
 			Post.ID.Equals("a"),
 		).Exec(ctx)
 		if err != nil {

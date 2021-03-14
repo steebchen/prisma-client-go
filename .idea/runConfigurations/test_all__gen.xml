@@ -1,0 +1,23 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test all +gen" type="GoTestRunConfiguration" factoryName="Go Test">
+    <module name="prisma-client-go" />
+    <working_directory value="$PROJECT_DIR$/" />
+    <envs>
+      <env name="PHOTON_GO_LOG" value="info" />
+      <env name="LOG_QUERIES" value="y" />
+      <env name="DBm" value="mysql://root:pw@localhost:3306/testing" />
+      <env name="DB" value="postgresql://postgres:pw@localhost:5432/testing" />
+      <env name="PRISMA_CLIENT_GO_WRITE_DMMF_FILE" value="yes" />
+      <env name="PRISMA_CLIENT_GO_TEST_DEV" value="true" />
+    </envs>
+    <framework value="gotest" />
+    <kind value="DIRECTORY" />
+    <package value="github.com/prisma/photongo" />
+    <directory value="$PROJECT_DIR$/" />
+    <filePath value="$PROJECT_DIR$/" />
+    <pattern value="./..." />
+    <method v="2">
+      <option name="GoBeforeRunTask" command="generate ./..." />
+    </method>
+  </configuration>
+</component>

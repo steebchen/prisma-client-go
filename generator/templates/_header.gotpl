@@ -7,25 +7,30 @@ package {{.Generator.Config.Package}}
 
 import (
 	"context"
-	"errors"
-	"fmt"
+	"testing"
 
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/generator/runtime"
-	"github.com/prisma/prisma-client-go/generator/raw"
-	"github.com/prisma/prisma-client-go/generator/builder"
+	"github.com/prisma/prisma-client-go/engine/mock"
+	"github.com/prisma/prisma-client-go/runtime/types"
+	"github.com/prisma/prisma-client-go/runtime/lifecycle"
+	"github.com/prisma/prisma-client-go/runtime/raw"
+	"github.com/prisma/prisma-client-go/runtime/builder"
+	"github.com/prisma/prisma-client-go/runtime/transaction"
 )
 
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
 
-type DateTime = runtime.DateTime
+type BatchResult = types.BatchResult
 
-type Direction = runtime.Direction
+type DateTime = types.DateTime
+type JSON     = types.JSON
+
+type Direction = types.Direction
 
 const (
-	ASC  Direction = runtime.ASC
-	DESC Direction = runtime.DESC
+	ASC  Direction = types.ASC
+	DESC Direction = types.DESC
 )
 
-const RFC3339Milli = runtime.RFC3339Milli
+const RFC3339Milli = types.RFC3339Milli

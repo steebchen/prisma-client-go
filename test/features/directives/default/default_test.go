@@ -19,8 +19,8 @@ func TestEnums(t *testing.T) {
 		stringOpt := "stringOpt"
 		boolOpt := false
 		testB := TestB
-		expected := UserModel{
-			InternalUser: InternalUser{
+		expected := &UserModel{
+			InnerUser: InnerUser{
 				ID:        "123",
 				String:    "string",
 				StringOpt: &stringOpt,
@@ -45,6 +45,6 @@ func TestEnums(t *testing.T) {
 			t.Fatalf("fail %s", err)
 		}
 
-		assert.Equal(t, []UserModel{expected}, actual)
+		assert.Equal(t, []UserModel{*expected}, actual)
 	})
 }
