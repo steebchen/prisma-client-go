@@ -27,9 +27,9 @@ jobs:
         run: go generate ./...
 
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v1
+        uses: golangci/golangci-lint-action@v2.4.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: --enable "gofmt,golint,scopelint,gocritic"
-          version: v1.29
+          version: v1.38
