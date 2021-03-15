@@ -36,16 +36,19 @@ A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provi
 createPostA := client.Post.CreateOne(
     Post.Title.Set("a"),
     Post.ID.Set("a"),
-)
+).Tx()
 
 createPostB := client.Post.CreateOne(
     Post.Title.Set("b"),
     Post.ID.Set("b"),
-)
+).Tx()
 
 if err := client.Prisma.Transaction(createPostA, createPostB).Exec(ctx); err != nil {
     panic(err)
 }
+
+log.Printf("post a: %+v", createPostA.Result())
+log.Printf("post b: %+v", createPostB.Result())
 ```
 
 ## Failure scenario
@@ -65,14 +68,14 @@ a := client.Post.FindUnique(
     Post.ID.Equals("does-not-exist"),
 ).Update(
     Post.Title.Set("new title"),
-)
+).Tx()
 
 // ...so this should be roll-backed, even though itself it would succeed
 b := client.Post.FindUnique(
     Post.ID.Equals("123"),
 ).Update(
     Post.Title.Set("new title"),
-)
+).Tx()
 
 if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
     // this err will be non-nil and the transaction will rollback,
