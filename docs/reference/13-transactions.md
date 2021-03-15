@@ -33,22 +33,20 @@ A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provi
 ```go
 // create two posts at once and run in a transaction
 
-createPostA := client.Post.CreateOne(
-    Post.Title.Set("a"),
-    Post.ID.Set("a"),
+firstPost := client.Post.CreateOne(
+    Post.Title.Set("First Post"),
 ).Tx()
 
-createPostB := client.Post.CreateOne(
-    Post.Title.Set("b"),
-    Post.ID.Set("b"),
+secondPost := client.Post.CreateOne(
+    Post.Title.Set("Second Post"),
 ).Tx()
 
-if err := client.Prisma.Transaction(createPostA, createPostB).Exec(ctx); err != nil {
+if err := client.Prisma.Transaction(firstPost, secondPost).Exec(ctx); err != nil {
     panic(err)
 }
 
-log.Printf("post a: %+v", createPostA.Result())
-log.Printf("post b: %+v", createPostB.Result())
+log.Printf("first post result: %+v", firstPost.Result())
+log.Printf("second post result: %+v", secondPost.Result())
 ```
 
 ## Failure scenario
@@ -74,7 +72,7 @@ a := client.Post.FindUnique(
 b := client.Post.FindUnique(
     Post.ID.Equals("123"),
 ).Update(
-    Post.Title.Set("new title"),
+    Post.Title.Set("New title"),
 ).Tx()
 
 if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
