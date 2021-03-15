@@ -237,7 +237,7 @@
 					return r.query
 				}
 
-				func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+				func (r {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
 
 				func (r {{ $updateResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
 					var v {{ $returnType }}
@@ -245,6 +245,13 @@
 						return nil, err
 					}
 					return &v, nil
+				}
+
+				func (r {{ $updateResult }}) Tx() {{ $name }}TxResult {
+					v := {{ $name }}TxResult{}
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
 				}
 
 				{{/* DELETE */}}
@@ -276,6 +283,13 @@
 						return nil, err
 					}
 					return &v, nil
+				}
+
+				func (r {{ $result }}) Tx() {{ $name }}TxResult {
+					v := {{ $name }}TxResult{}
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
 				}
 			{{ end }}
 		{{ end }}

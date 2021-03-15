@@ -8,6 +8,7 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"testing"
+	"encoding/json"
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/engine/mock"

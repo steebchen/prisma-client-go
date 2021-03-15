@@ -33,7 +33,7 @@ func TestTransaction(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			e := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = $1 WHERE id = $2`, "new-email", "123")
+			e := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = $1 WHERE id = $2`, "new-email", "123").Tx()
 
 			if err := client.Prisma.Transaction(e).Exec(ctx); err != nil {
 				t.Fatal(err)

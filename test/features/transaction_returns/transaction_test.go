@@ -12,7 +12,7 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-func TestTransaction(t *testing.T) {
+func TestTransactionReturns(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -35,6 +35,23 @@ func TestTransaction(t *testing.T) {
 			if err := client.Prisma.Transaction(createUserA, createUserB).Exec(ctx); err != nil {
 				t.Fatal(err)
 			}
+
+			expectedA := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "a",
+					Email: "a",
+				},
+			}
+
+			expectedB := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "b",
+					Email: "b",
+				},
+			}
+
+			assert.Equal(t, expectedA, createUserA.Result())
+			assert.Equal(t, expectedB, createUserB.Result())
 
 			// --
 
@@ -72,21 +89,25 @@ func TestTransaction(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			// this will fail...
-			a := client.User.FindUnique(
+			aOp := client.User.FindUnique(
 				User.ID.Equals("does-not-exist"),
 			).Update(
 				User.Email.Set("foo"),
 			).Tx()
 
 			// ...so this should be roll-backed
-			b := client.User.FindUnique(
+			bOp := client.User.FindUnique(
 				User.ID.Equals("exists"),
 			).Update(
 				User.Email.Set("new"),
 			).Tx()
 
-			err := client.Prisma.Transaction(a, b).Exec(ctx)
+			err := client.Prisma.Transaction(aOp, bOp).Exec(ctx)
 			assert.Errorf(t, err, "should error")
+
+			var empty *UserModel
+			assert.Equal(t, empty, aOp.Result())
+			assert.Equal(t, empty, bOp.Result())
 
 			// make sure the existing record wasn't touched
 

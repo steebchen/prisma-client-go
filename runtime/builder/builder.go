@@ -73,6 +73,8 @@ type Query struct {
 
 	// Start time of the request for tracing
 	Start time.Time
+
+	TxResult chan []byte
 }
 
 func (q Query) Build() string {
