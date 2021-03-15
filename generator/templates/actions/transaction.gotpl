@@ -12,6 +12,8 @@
 		return p.query
 	}
 
+	func (p {{ $name }}TxResult) IsTx() {}
+
 	func (r {{ $name }}TxResult) Result() *{{ $modelName }} {
 		var v {{ $modelName }}
 		data, ok := <-r.query.TxResult

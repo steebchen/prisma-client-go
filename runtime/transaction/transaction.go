@@ -13,6 +13,7 @@ type TX struct {
 }
 
 type Param interface {
+	IsTx()
 	ExtractQuery() builder.Query
 }
 

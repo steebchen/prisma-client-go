@@ -25,12 +25,12 @@ func TestTransaction(t *testing.T) {
 			createUserA := client.User.CreateOne(
 				User.Email.Set("a"),
 				User.ID.Set("a"),
-			)
+			).Tx()
 
 			createUserB := client.User.CreateOne(
 				User.Email.Set("b"),
 				User.ID.Set("b"),
-			)
+			).Tx()
 
 			if err := client.Prisma.Transaction(createUserA, createUserB).Exec(ctx); err != nil {
 				t.Fatal(err)
@@ -76,14 +76,14 @@ func TestTransaction(t *testing.T) {
 				User.ID.Equals("does-not-exist"),
 			).Update(
 				User.Email.Set("foo"),
-			)
+			).Tx()
 
 			// ...so this should be roll-backed
 			b := client.User.FindUnique(
 				User.ID.Equals("exists"),
 			).Update(
 				User.Email.Set("new"),
-			)
+			).Tx()
 
 			err := client.Prisma.Transaction(a, b).Exec(ctx)
 			assert.Errorf(t, err, "should error")

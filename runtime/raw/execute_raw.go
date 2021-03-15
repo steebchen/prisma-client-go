@@ -9,13 +9,18 @@ import (
 )
 
 func (r Raw) ExecuteRaw(query string, params ...interface{}) ExecuteExec {
+	q := raw(r.Engine, "executeRaw", query, params...)
 	return ExecuteExec{
-		query: raw(r.Engine, "executeRaw", query, params...),
+		query: q,
+		txExec: txExec{
+			query: q,
+		},
 	}
 }
 
 type ExecuteExec struct {
 	query builder.Query
+	txExec
 }
 
 func (r ExecuteExec) ExtractQuery() builder.Query {
