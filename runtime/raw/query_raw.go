@@ -9,22 +9,24 @@ import (
 )
 
 func (r Raw) QueryRaw(query string, params ...interface{}) QueryExec {
-	q := raw(r.Engine, "queryRaw", query, params...)
 	return QueryExec{
-		query: q,
-		txExec: txExec{
-			query: q,
-		},
+		query: raw(r.Engine, "queryRaw", query, params...),
 	}
 }
 
 type QueryExec struct {
 	query builder.Query
-	txExec
 }
 
 func (r QueryExec) ExtractQuery() builder.Query {
 	return r.query
+}
+
+func (r QueryExec) Tx() TxQueryResult {
+	v := TxQueryResult{}
+	v.query = r.query
+	v.query.TxResult = make(chan []byte, 1)
+	return v
 }
 
 type QueryResult struct {
@@ -37,4 +39,19 @@ func (r QueryExec) Exec(ctx context.Context, into interface{}) error {
 	}
 
 	return nil
+}
+
+type TxQueryResult struct {
+	query builder.Query
+}
+
+func (r TxQueryResult) ExtractQuery() builder.Query {
+	return r.query
+}
+
+func (r TxQueryResult) IsTx() {}
+
+func (r TxQueryResult) Into(v interface{}) error {
+	result := <-r.query.TxResult
+	return json.Unmarshal(result, &v)
 }
