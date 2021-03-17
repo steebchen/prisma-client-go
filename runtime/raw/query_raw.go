@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/prisma/prisma-client-go/runtime/builder"
+	"github.com/prisma/prisma-client-go/runtime/transaction"
 )
 
 func (r Raw) QueryRaw(query string, params ...interface{}) QueryExec {
@@ -42,7 +43,8 @@ func (r QueryExec) Exec(ctx context.Context, into interface{}) error {
 }
 
 type TxQueryResult struct {
-	query builder.Query
+	query  builder.Query
+	result transaction.Result
 }
 
 func (r TxQueryResult) ExtractQuery() builder.Query {
@@ -52,6 +54,5 @@ func (r TxQueryResult) ExtractQuery() builder.Query {
 func (r TxQueryResult) IsTx() {}
 
 func (r TxQueryResult) Into(v interface{}) error {
-	result := <-r.query.TxResult
-	return json.Unmarshal(result, &v)
+	return r.result.Get(r.query.TxResult, &v)
 }
