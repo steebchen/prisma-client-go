@@ -40,10 +40,8 @@ type Exec struct {
 
 func (r Exec) Exec(ctx context.Context) error {
 	for _, q := range r.queries {
-		if ch := q.ExtractQuery().TxResult; ch != nil {
-			//goland:noinspection GoDeferInLoop
-			defer close(ch)
-		}
+		//goland:noinspection GoDeferInLoop
+		defer close(q.ExtractQuery().TxResult)
 	}
 
 	var result engine.GQLBatchResponse
@@ -64,9 +62,7 @@ func (r Exec) Exec(ctx context.Context) error {
 			return fmt.Errorf("pql error: %s", first.Message)
 		}
 
-		if ch := r.queries[i].ExtractQuery().TxResult; ch != nil {
-			ch <- inner.Data.Result
-		}
+		r.queries[i].ExtractQuery().TxResult <- inner.Data.Result
 	}
 	return nil
 }
