@@ -4,9 +4,15 @@
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $modelName := (print $model.Name.GoCase "Model") }}
 
+	func New{{ $name }}TxResult() {{ $name }}TxResult {
+		return {{ $name }}TxResult{
+			result: &transaction.Result{},
+		}
+	}
+
 	type {{ $name }}TxResult struct {
 		query builder.Query
-		result transaction.Result
+		result *transaction.Result
 	}
 
 	func (p {{ $name }}TxResult) ExtractQuery() builder.Query {

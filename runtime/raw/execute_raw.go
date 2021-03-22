@@ -24,7 +24,7 @@ func (r ExecuteExec) ExtractQuery() builder.Query {
 }
 
 func (r ExecuteExec) Tx() TxExecuteResult {
-	v := TxExecuteResult{}
+	v := NewTxExecuteResult()
 	v.query = r.query
 	v.query.TxResult = make(chan []byte, 1)
 	return v
@@ -40,9 +40,15 @@ func (r ExecuteExec) Exec(ctx context.Context) (*types.BatchResult, error) {
 	}, nil
 }
 
+func NewTxExecuteResult() TxExecuteResult {
+	return TxExecuteResult{
+		result: &transaction.Result{},
+	}
+}
+
 type TxExecuteResult struct {
 	query  builder.Query
-	result transaction.Result
+	result *transaction.Result
 }
 
 func (r TxExecuteResult) ExtractQuery() builder.Query {

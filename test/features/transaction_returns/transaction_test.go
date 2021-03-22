@@ -75,6 +75,65 @@ func TestTransactionReturns(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "transaction result caching",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			createUserA := client.User.CreateOne(
+				User.Email.Set("a"),
+				User.ID.Set("a"),
+			).Tx()
+
+			createUserB := client.User.CreateOne(
+				User.Email.Set("b"),
+				User.ID.Set("b"),
+			).Tx()
+
+			if err := client.Prisma.Transaction(createUserA, createUserB).Exec(ctx); err != nil {
+				t.Fatal(err)
+			}
+
+			expectedA := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "a",
+					Email: "a",
+				},
+			}
+
+			expectedB := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "b",
+					Email: "b",
+				},
+			}
+
+			assert.Equal(t, expectedA, createUserA.Result())
+			assert.Equal(t, expectedB, createUserB.Result())
+			assert.Equal(t, expectedA, createUserA.Result())
+			assert.Equal(t, expectedB, createUserB.Result())
+			assert.Equal(t, expectedA, createUserA.Result())
+			assert.Equal(t, expectedB, createUserB.Result())
+
+			// --
+
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "a",
+					Email: "a",
+				},
+			}, {
+				InnerUser: InnerUser{
+					ID:    "b",
+					Email: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "fail",
 		// language=GraphQL
 		before: []string{`
@@ -105,9 +164,13 @@ func TestTransactionReturns(t *testing.T) {
 			err := client.Prisma.Transaction(aOp, bOp).Exec(ctx)
 			assert.Errorf(t, err, "should error")
 
-			var empty *UserModel
-			assert.Equal(t, empty, aOp.Result())
-			assert.Equal(t, empty, bOp.Result())
+			assert.Panics(t, func() {
+				aOp.Result()
+			})
+
+			assert.Panics(t, func() {
+				bOp.Result()
+			})
 
 			// make sure the existing record wasn't touched
 
