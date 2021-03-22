@@ -27,6 +27,7 @@ type DateTime = types.DateTime
 type JSON     = types.JSON
 type Bytes    = types.Bytes
 type BigInt   = types.BigInt
+type Decimal  = types.Decimal
 
 type Direction = types.Direction
 

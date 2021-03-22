@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/prisma/prisma-client-go/test"
@@ -12,7 +13,7 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-func TestBytes(t *testing.T) {
+func TestDecimal(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
@@ -20,13 +21,13 @@ func TestBytes(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "bytes create",
+		name: "decimal create",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			a := []byte("a")
-			b := []byte("b")
+			a := decimal.NewFromFloat(1.23456789)
+			b := decimal.NewFromFloat(2.34567891)
 			created, err := client.User.CreateOne(
-				User.Bytes.Set(a),
-				User.BytesOpt.Set(b),
+				User.A.Set(a),
+				User.B.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
@@ -35,9 +36,9 @@ func TestBytes(t *testing.T) {
 
 			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:       "123",
-					Bytes:    a,
-					BytesOpt: &b,
+					ID: "123",
+					A:  a,
+					B:  &b,
 				},
 			}
 
@@ -51,13 +52,13 @@ func TestBytes(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "bytes find by bytes field",
+		name: "decimal find by decimal field",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			a := []byte("a")
-			b := []byte("b")
+			a := decimal.NewFromFloat(1.23456789)
+			b := decimal.NewFromFloat(2.34567891)
 			created, err := client.User.CreateOne(
-				User.Bytes.Set(a),
-				User.BytesOpt.Set(b),
+				User.A.Set(a),
+				User.B.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
@@ -66,17 +67,17 @@ func TestBytes(t *testing.T) {
 
 			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:       "123",
-					Bytes:    a,
-					BytesOpt: &b,
+					ID: "123",
+					A:  a,
+					B:  &b,
 				},
 			}
 
 			assert.Equal(t, expected, created)
 
 			actual, err := client.User.FindFirst(
-				User.Bytes.Equals(a),
-				User.BytesOpt.Equals(b),
+				User.A.Equals(a),
+				User.B.Equals(b),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)

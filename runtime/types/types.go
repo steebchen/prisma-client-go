@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/shopspring/decimal"
 )
 
 const RFC3339Milli = "2006-01-02T15:04:05.999Z07:00"
@@ -16,6 +18,9 @@ type BatchResult struct {
 
 // DateTime is a type alias for time.Time
 type DateTime = time.Time
+
+// Decimal points to github.com/shopspring/decimal.Decimal, as Go does not have a native decimal type
+type Decimal = decimal.Decimal
 
 // Bytes is a type alias for []byte
 type Bytes = []byte
