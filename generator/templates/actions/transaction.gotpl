@@ -6,6 +6,7 @@
 
 	type {{ $name }}TxResult struct {
 		query builder.Query
+		result transaction.Result
 	}
 
 	func (p {{ $name }}TxResult) ExtractQuery() builder.Query {
@@ -15,14 +16,10 @@
 	func (p {{ $name }}TxResult) IsTx() {}
 
 	func (r {{ $name }}TxResult) Result() *{{ $modelName }} {
-		var v {{ $modelName }}
-		data, ok := <-r.query.TxResult
-		if !ok {
-			return nil
-		}
-		if err := json.Unmarshal(data, &v); err != nil {
+		var v *{{ $modelName }}
+		if err := r.result.Get(r.query.TxResult, &v); err != nil {
 			panic(err)
 		}
-		return &v
+		return v
 	}
 {{ end }}

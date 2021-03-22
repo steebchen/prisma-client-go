@@ -2,10 +2,10 @@ package raw
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/prisma/prisma-client-go/runtime/builder"
+	"github.com/prisma/prisma-client-go/runtime/transaction"
 	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
@@ -41,7 +41,8 @@ func (r ExecuteExec) Exec(ctx context.Context) (*types.BatchResult, error) {
 }
 
 type TxExecuteResult struct {
-	query builder.Query
+	query  builder.Query
+	result transaction.Result
 }
 
 func (r TxExecuteResult) ExtractQuery() builder.Query {
@@ -52,11 +53,7 @@ func (r TxExecuteResult) IsTx() {}
 
 func (r TxExecuteResult) Result() *types.BatchResult {
 	var v int
-	data, ok := <-r.query.TxResult
-	if !ok {
-		return nil
-	}
-	if err := json.Unmarshal(data, &v); err != nil {
+	if err := r.result.Get(r.query.TxResult, &v); err != nil {
 		panic(err)
 	}
 	return &types.BatchResult{
