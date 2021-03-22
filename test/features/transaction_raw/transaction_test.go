@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/prisma/prisma-client-go/runtime/types"
 	"github.com/prisma/prisma-client-go/test"
 )
 
@@ -20,7 +21,40 @@ func TestTransaction(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "raw in transaction",
+		name: "query raw",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "123",
+					email: "john@example.com",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			e := client.Prisma.QueryRaw(`SELECT * FROM "User"`).Tx()
+
+			if err := client.Prisma.Transaction(e).Exec(ctx); err != nil {
+				t.Fatal(err)
+			}
+
+			var v []UserModel
+			if err := e.Into(&v); err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "123",
+					Email: "john@example.com",
+				},
+				RelationsUser: RelationsUser{},
+			}}, v)
+		},
+	}, {
+		name: "execute raw",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -38,6 +72,10 @@ func TestTransaction(t *testing.T) {
 			if err := client.Prisma.Transaction(e).Exec(ctx); err != nil {
 				t.Fatal(err)
 			}
+
+			assert.Equal(t, &types.BatchResult{
+				Count: 1,
+			}, e.Result())
 
 			// --
 
