@@ -20,13 +20,13 @@ func TestJSON(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name: "bytes create",
+		name: "bigint create",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			a := []byte("a")
-			b := []byte("b")
+			var a BigInt = 1
+			var b BigInt = 2
 			created, err := client.User.CreateOne(
-				User.Bytes.Set(a),
-				User.BytesOpt.Set(b),
+				User.A.Set(a),
+				User.B.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
@@ -35,9 +35,9 @@ func TestJSON(t *testing.T) {
 
 			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:       "123",
-					Bytes:    a,
-					BytesOpt: &b,
+					ID: "123",
+					A:  a,
+					B:  &b,
 				},
 			}
 
@@ -51,13 +51,13 @@ func TestJSON(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "bytes find by bytes field",
+		name: "bigint find by bigint field",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			a := []byte("a")
-			b := []byte("b")
+			var a BigInt = 1
+			var b BigInt = 2
 			created, err := client.User.CreateOne(
-				User.Bytes.Set(a),
-				User.BytesOpt.Set(b),
+				User.A.Set(a),
+				User.B.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
@@ -66,17 +66,17 @@ func TestJSON(t *testing.T) {
 
 			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:       "123",
-					Bytes:    a,
-					BytesOpt: &b,
+					ID: "123",
+					A:  a,
+					B:  &b,
 				},
 			}
 
 			assert.Equal(t, expected, created)
 
 			actual, err := client.User.FindFirst(
-				User.Bytes.Equals(a),
-				User.BytesOpt.Equals(b),
+				User.A.Equals(a),
+				User.B.Equals(b),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
