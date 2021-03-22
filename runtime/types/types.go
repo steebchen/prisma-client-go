@@ -17,6 +17,10 @@ type BatchResult struct {
 // DateTime is a type alias for time.Time
 type DateTime = time.Time
 
+// DateTime is a type alias for []byte
+type Bytes = []byte
+
+// JSON is a new type which implements the correct internal prisma (un)marshaller
 type JSON json.RawMessage
 
 // MarshalJSON returns m as the JSON encoding of m.

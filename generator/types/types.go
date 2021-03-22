@@ -43,6 +43,7 @@ var builtin = map[string]string{
 	"Float":    "float64",
 	"DateTime": "DateTime",
 	"Json":     "JSON",
+	"Bytes":    "Bytes",
 }
 
 // Type acts as a builtin string but provides useful methods for type DMMF values.

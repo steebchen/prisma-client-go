@@ -25,6 +25,7 @@ type BatchResult = types.BatchResult
 
 type DateTime = types.DateTime
 type JSON     = types.JSON
+type Bytes    = types.Bytes
 
 type Direction = types.Direction
 
