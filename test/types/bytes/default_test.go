@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,31 +22,22 @@ func TestJSON(t *testing.T) {
 	}{{
 		name: "json create",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			x := struct {
-				Attr string `json:"attr"`
-			}{
-				Attr: "stuff",
-			}
-			data, err := json.Marshal(x)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
+			a := []byte("a")
+			b := []byte("b")
 			created, err := client.User.CreateOne(
-				User.JSON.Set(data),
-				User.JSONOpt.Set([]byte(`"hi"`)),
+				User.Bytes.Set(a),
+				User.BytesOpt.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			var opt JSON = []byte(`"hi"`)
 			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:      "123",
-					JSON:    data,
-					JSONOpt: &opt,
+					ID:       "123",
+					Bytes:    a,
+					BytesOpt: &b,
 				},
 			}
 
@@ -63,45 +53,36 @@ func TestJSON(t *testing.T) {
 	}, {
 		name: "json find by json field",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			x := struct {
-				Attr string `json:"attr"`
-			}{
-				Attr: "stuff",
-			}
-			data, err := json.Marshal(x)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
+			a := []byte("a")
+			b := []byte("b")
 			created, err := client.User.CreateOne(
-				User.JSON.Set(data),
-				User.JSONOpt.Set([]byte(`"hi"`)),
+				User.Bytes.Set(a),
+				User.BytesOpt.Set(b),
 				User.ID.Set("123"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			var opt JSON = []byte(`"hi"`)
-			expected := UserModel{
+			expected := &UserModel{
 				InnerUser: InnerUser{
-					ID:      "123",
-					JSON:    data,
-					JSONOpt: &opt,
+					ID:       "123",
+					Bytes:    a,
+					BytesOpt: &b,
 				},
 			}
 
-			assert.Equal(t, &expected, created)
+			assert.Equal(t, expected, created)
 
-			actual, err := client.User.FindMany(
-				User.JSON.Equals(data),
-				User.JSONOpt.Equals(opt),
+			actual, err := client.User.FindFirst(
+				User.Bytes.Equals(a),
+				User.BytesOpt.Equals(b),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual[0])
+			assert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {
