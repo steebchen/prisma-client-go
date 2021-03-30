@@ -85,7 +85,8 @@
 			{{/* TODO re-use */}}
 			field := q.field()
 			{{/* if scalar, wrap in 'set' */}}
-			if field.Value != nil {
+			_, isJson := field.Value.(types.JSON)
+			if field.Value != nil && !isJson {
 				v := field.Value
 				field.Fields = []builder.Field{
 					{
