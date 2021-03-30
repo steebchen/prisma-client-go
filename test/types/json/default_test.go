@@ -103,6 +103,50 @@ func TestJSON(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "json update field",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			var b JSON = []byte(`"hi"`)
+			created, err := client.User.CreateOne(
+				User.JSON.Set(b),
+				User.JSONOpt.Set(b),
+				User.ID.Set("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:      "123",
+					JSON:    b,
+					JSONOpt: &b,
+				},
+			}
+
+			assert.Equal(t, expected, created)
+
+			updated, err := client.User.FindUnique(
+				User.ID.Equals("123"),
+			).Update(
+				User.JSON.Set(b),
+				User.JSONOpt.Set(b),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, updated)
+
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
