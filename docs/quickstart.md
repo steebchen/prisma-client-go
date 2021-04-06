@@ -54,7 +54,7 @@
 
 4) Generate the Prisma Client Go client in your project
 
-     ```shell script
+    ```shell script
     go run github.com/prisma/prisma-client-go generate
     ```
 

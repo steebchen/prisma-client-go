@@ -18,8 +18,8 @@ func TestEnums(t *testing.T) {
 
 		admin := RoleAdmin
 		mod := RoleModerator
-		expected := UserModel{
-			InternalUser: InternalUser{
+		expected := &UserModel{
+			InnerUser: InnerUser{
 				ID:      "123",
 				Role:    admin,
 				RoleOpt: &mod,
@@ -53,6 +53,6 @@ func TestEnums(t *testing.T) {
 			t.Fatalf("fail %s", err)
 		}
 
-		assert.Equal(t, []UserModel{expected}, actual)
+		assert.Equal(t, []UserModel{*expected}, actual)
 	})
 }

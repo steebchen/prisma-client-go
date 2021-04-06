@@ -3,6 +3,7 @@
 Contents
 
 - [Quickstart](quickstart.md)
+- [Advanced usage](advanced.md)
 - [API reference](reference)
 - [Deploy](deploy.md)
 

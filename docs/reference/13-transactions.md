@@ -33,19 +33,20 @@ A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provi
 ```go
 // create two posts at once and run in a transaction
 
-createPostA := client.Post.CreateOne(
-    Post.Title.Set("a"),
-    Post.ID.Set("a"),
-)
+firstPost := client.Post.CreateOne(
+    Post.Title.Set("First Post"),
+).Tx()
 
-createPostB := client.Post.CreateOne(
-    Post.Title.Set("b"),
-    Post.ID.Set("b"),
-)
+secondPost := client.Post.CreateOne(
+    Post.Title.Set("Second Post"),
+).Tx()
 
-if err := client.Prisma.Transaction(createPostA, createPostB).Exec(ctx); err != nil {
+if err := client.Prisma.Transaction(firstPost, secondPost).Exec(ctx); err != nil {
     panic(err)
 }
+
+log.Printf("first post result: %+v", firstPost.Result())
+log.Printf("second post result: %+v", secondPost.Result())
 ```
 
 ## Failure scenario
@@ -65,14 +66,14 @@ a := client.Post.FindUnique(
     Post.ID.Equals("does-not-exist"),
 ).Update(
     Post.Title.Set("new title"),
-)
+).Tx()
 
 // ...so this should be roll-backed, even though itself it would succeed
 b := client.Post.FindUnique(
     Post.ID.Equals("123"),
 ).Update(
-    Post.Title.Set("new title"),
-)
+    Post.Title.Set("New title"),
+).Tx()
 
 if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
     // this err will be non-nil and the transaction will rollback,
@@ -83,4 +84,4 @@ if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
 
 ## Next steps
 
-Check out how to use [json fields](13-json.md).
+Check out how to use [json fields](14-json.md).

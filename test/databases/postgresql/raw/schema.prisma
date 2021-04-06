@@ -16,6 +16,8 @@ model User {
   username String
   str      String
   strOpt   String?
+  date     DateTime
+  dateOpt  DateTime?
   int      Int
   intOpt   Int?
   float    Float

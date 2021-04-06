@@ -63,13 +63,13 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			newUser := InternalUser{
+			newUser := InnerUser{
 				ID:       "new",
 				Email:    "new",
 				Username: "new",
 			}
 
-			assert.Equal(t, created, UserModel{InternalUser: newUser})
+			assert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -81,18 +81,18 @@ func TestRelations(t *testing.T) {
 			}
 
 			authorID := "new"
-			expected := UserModel{
-				InternalUser: newUser,
+			expected := &UserModel{
+				InnerUser: newUser,
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "a",
 							Title:    "common",
 							Content:  str("a"),
 							AuthorID: &authorID,
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
@@ -152,13 +152,13 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			newUser := InternalUser{
+			newUser := InnerUser{
 				ID:       "new",
 				Email:    "new",
 				Username: "new",
 			}
 
-			assert.Equal(t, created, UserModel{InternalUser: newUser})
+			assert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -170,18 +170,18 @@ func TestRelations(t *testing.T) {
 			}
 
 			authorID := "new"
-			expected := UserModel{
-				InternalUser: newUser,
+			expected := &UserModel{
+				InnerUser: newUser,
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "a",
 							Title:    "common",
 							Content:  str("a"),
 							AuthorID: &authorID,
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),

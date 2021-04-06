@@ -41,8 +41,8 @@ func TestFindFirst(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "first",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -57,7 +57,7 @@ func TestFindFirst(t *testing.T) {
 			_, err := client.User.FindFirst(
 				User.Email.Equals("john@example.com"),
 			).Exec(ctx)
-			assert.Equal(t, err, ErrNotFound)
+			assert.Equal(t, ErrNotFound, err)
 		},
 	}}
 	for _, tt := range tests {

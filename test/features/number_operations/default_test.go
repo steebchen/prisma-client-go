@@ -29,8 +29,8 @@ func TestTableCasing(t *testing.T) {
 		`})
 		defer test.End(t, db, client.Engine, mockDB)
 
-		expectedPost := PostModel{
-			InternalPost: InternalPost{
+		expectedPost := &PostModel{
+			InnerPost: InnerPost{
 				ID:     "a",
 				Int:    13,
 				Float:  7.5,

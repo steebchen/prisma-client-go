@@ -55,9 +55,10 @@ model Comment {
 }
 
 model Category {
-  id    String @id @default(cuid())
-  name  String
-  posts Post[]
+  id     String @id @default(cuid())
+  name   String
+  weight Int?
+  posts  Post[]
 }
 
 model Role {

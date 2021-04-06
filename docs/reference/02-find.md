@@ -46,9 +46,10 @@ FindUnique finds a record which is guaranteed to be unique, like @id fields or f
 post, err := client.Post.FindUnique(
     db.Post.ID.Equals("123"),
 ).Exec(ctx)
-
-if err == db.ErrNotFound {
+if errors.Is(err, db.ErrNotFound) {
     log.Printf("no record with id 123")
+} else if err != nil {
+    log.Printf("error occurred: %s", err)
 }
 ```
 
@@ -60,10 +61,13 @@ FindFirst finds the first record found. It has the same query capabilities as Fi
 post, err := client.Post.FindFirst(
     db.Post.Title.Equals("hi"),
 ).Exec(ctx)
-
-if err == db.ErrNotFound {
-    log.Printf("no record with id 123")
+if errors.Is(err, db.ErrNotFound) {
+    log.Printf("no record with title 'hi' found")
+} else if err != nil {
+    log.Printf("error occurred: %s", err)
 }
+
+log.Printf("post: %+v", post)
 ```
 
 This returns an `ErrNotFound` error (exported by the generated client) if there was no such record.

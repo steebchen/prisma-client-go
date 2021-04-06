@@ -38,4 +38,4 @@ jobs:
         run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.31.0
 
       - name: run linter
-        run: ./bin/golangci-lint run ./... -v --enable "gofmt,golint,scopelint,gocritic"
+        run: ./bin/golangci-lint run ./... --timeout "5m0s" --enable "gofmt,golint,scopelint,gocritic"

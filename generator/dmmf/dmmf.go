@@ -1,8 +1,6 @@
 package dmmf
 
 import (
-	"strings"
-
 	"github.com/prisma/prisma-client-go/generator/types"
 )
 
@@ -78,34 +76,26 @@ type Action struct {
 
 // ActionType describes a CRUD operation type.
 type ActionType struct {
-	Name         types.String
-	InternalName types.String
-	List         bool
-	ReturnList   bool
-}
-
-func (a *ActionType) ActualName() string {
-	if a.InternalName != "" {
-		return a.InternalName.GoCase()
-	}
-	return a.Name.GoCase()
+	Name       types.String
+	InnerName  types.String
+	List       bool
+	ReturnList bool
 }
 
 // Variations contains different query capabilities such as Unique, First and Many
 func (Document) Variations() []ActionType {
 	return []ActionType{{
-		Name: "One",
+		Name:      "Unique",
+		InnerName: "One",
 	}, {
-		Name:         "Unique",
-		InternalName: "One",
-	}, {
-		Name:         "First",
-		List:         true,
-		InternalName: "Many",
+		Name:      "First",
+		List:      true,
+		InnerName: "One",
 	}, {
 		Name:       "Many",
 		List:       true,
 		ReturnList: true,
+		InnerName:  "Many",
 	}}
 }
 
@@ -245,18 +235,55 @@ type Datamodel struct {
 	Enums  []Enum  `json:"enums"`
 }
 
+type UniqueIndex struct {
+	InternalName types.String   `json:"name"`
+	Fields       []types.String `json:"fields"`
+}
+
+func (m *UniqueIndex) Name() types.String {
+	if m.InternalName != "" {
+		return m.InternalName
+	}
+	var name string
+	for _, f := range m.Fields {
+		name += f.GoCase()
+	}
+	return types.String(name)
+}
+
+func (m *UniqueIndex) ASTName() types.String {
+	if m.InternalName != "" {
+		return m.InternalName
+	}
+	return concatFieldsToName(m.Fields)
+}
+
 // Model describes a Prisma type model, which usually maps to a database table or collection.
 type Model struct {
 	// Name describes the singular name of the model.
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName types.String `json:"dbName"`
-	Fields []Field      `json:"fields"`
+	DBName        types.String   `json:"dbName"`
+	Fields        []Field        `json:"fields"`
+	UniqueIndexes []UniqueIndex  `json:"uniqueIndexes"`
+	IDFields      []types.String `json:"idFields"`
 }
 
 func (m Model) Actions() []string {
 	return []string{"Set", "Equals"}
+}
+
+func (m Model) CompositeIndexes() []UniqueIndex {
+	var indexes []UniqueIndex
+	indexes = append(indexes, m.UniqueIndexes...)
+	if len(m.IDFields) > 0 {
+		indexes = append(indexes, UniqueIndex{
+			InternalName: concatFieldsToName(m.IDFields),
+			Fields:       m.IDFields,
+		})
+	}
+	return indexes
 }
 
 // RelationFieldsPlusOne returns all fields plus an empty one, so it's easier to iterate through it in some gotpl files
@@ -296,7 +323,15 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate() bool {
-	return f.IsRequired && !f.IsUpdatedAt && !f.HasDefaultValue
+	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly {
+		return false
+	}
+
+	if f.RelationName != "" && f.IsList {
+		return false
+	}
+
+	return true
 }
 
 // RelationMethod describes a method for relations
@@ -340,70 +375,6 @@ type InputObjectType struct {
 
 type OutputObjectType struct {
 	Prisma []OutputType `json:"prisma"`
-}
-
-func (s *Schema) UniqueCompoundTypes(model string) []InputType {
-	var inputs []InputType
-	for _, inputType := range s.InputObjectTypes.Prisma {
-		// check for unique input types
-		if !strings.HasPrefix(string(inputType.Name), model) ||
-			!strings.HasSuffix(string(inputType.Name), "UniqueInput") {
-			continue
-		}
-
-		for _, field := range inputType.Fields {
-			for _, input := range field.InputTypes {
-				// check if there's unique compound input type in it
-				if strings.HasSuffix(string(input.Type), "CompoundUniqueInput") {
-					// if yes, add the full inputType and break
-					inputs = append(inputs, inputType)
-					break
-				}
-			}
-		}
-	}
-	return inputs
-}
-
-func (s *Schema) UniqueCompoundTypeByName(model string, name string) *InputType {
-	var inputType InputType
-	for _, i := range s.InputObjectTypes.Prisma {
-		if i.Name.String() == name {
-			inputType = i
-			break
-		}
-	}
-	if inputType.Name == "" {
-		return nil
-	}
-
-	var secondInputTypes []InputType
-
-	// found the input type. now check if the model matches...
-	for _, i := range s.InputObjectTypes.Prisma {
-		for _, f := range i.Fields {
-			for _, t := range f.InputTypes {
-				if t.Type.String() == name {
-					secondInputTypes = append(secondInputTypes, i)
-				}
-			}
-		}
-	}
-
-	for _, secondInputType := range secondInputTypes {
-		if secondInputType.Name == "" {
-			continue
-		}
-
-		modelField := strings.Replace(secondInputType.Name.String(), "WhereUniqueInput", "", 1)
-		if modelField != model {
-			continue
-		}
-
-		return &inputType
-	}
-
-	return nil
 }
 
 // SchemaArg provides the arguments of a given field.
@@ -457,4 +428,15 @@ type InputType struct {
 	// AtMostOne (optional)
 	AtMostOne bool        `json:"atMostOne"`
 	Fields    []SchemaArg `json:"fields"`
+}
+
+func concatFieldsToName(fields []types.String) types.String {
+	var name types.String
+	for i, f := range fields {
+		if i > 0 {
+			name += "_"
+		}
+		name += f
+	}
+	return name
 }
