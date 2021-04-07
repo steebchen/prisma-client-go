@@ -21,6 +21,7 @@ func TestTypes(t *testing.T) {
 	t.Parallel()
 
 	date, _ := time.Parse(RFC3339Milli, "2000-01-01T00:00:00+00:00")
+	date = date.In(time.UTC)
 
 	tests := []struct {
 		name   string
