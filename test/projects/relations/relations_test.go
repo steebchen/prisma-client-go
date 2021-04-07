@@ -680,6 +680,103 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expectedEmpty, actual)
 		},
 	}, {
+		name: "unlink many",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "user",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneCategory(data: {
+					id: "stuff",
+					name: "Stuff",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "c",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			categoryID := "stuff"
+			actual, err := client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Update(
+				Category.Posts.Unlink(
+					Post.ID.Equals("a"),
+					Post.ID.Equals("c"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedAfter := &CategoryModel{
+				InnerCategory: InnerCategory{
+					ID:   "stuff",
+					Name: "Stuff",
+				},
+				RelationsCategory: RelationsCategory{
+					Posts: []PostModel{{
+						InnerPost: InnerPost{
+							ID:         "b",
+							Title:      "common",
+							AuthorID:   "user",
+							CategoryID: &categoryID,
+						},
+					}},
+				},
+			}
+
+			assert.Equal(t, expectedAfter, actual)
+
+			actual, err = client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expectedAfter, actual)
+		},
+	}, {
 		name: "update and fetch",
 		// language=GraphQL
 		before: []string{`

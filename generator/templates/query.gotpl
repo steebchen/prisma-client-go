@@ -197,19 +197,43 @@
 				}
 			}
 
-			{{ if not $field.IsRequired }}
-				func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Unlink() {{ $setReturnStruct }} {
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name: "{{ $field.Name }}",
-							Fields: []builder.Field{
-								{
-									Name:  "disconnect",
-									Value: true,
+			{{ if or (not $field.IsRequired) (ne $field.RelationName "") }}
+				func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Unlink(
+					{{ if $field.IsList }}params ...{{ $field.Type.GoCase }}WhereParam,{{ end }}
+				) {{ $setReturnStruct }} {
+					var v {{ $setReturnStruct }}
+					{{ if $field.IsList }}
+						var fields []builder.Field
+						for _, q := range params {
+							fields = append(fields, q.field())
+						}
+						v = {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name: "{{ $field.Name }}",
+								Fields: []builder.Field{
+									{
+										Name:     "disconnect",
+										List:     true,
+										WrapList: true,
+										Fields:   builder.TransformEquals(fields),
+									},
 								},
 							},
-						},
-					}
+						}
+					{{ else }}
+						v = {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name: "{{ $field.Name }}",
+								Fields: []builder.Field{
+									{
+										Name:  "disconnect",
+										Value: true,
+									},
+								},
+							},
+						}
+					{{ end }}
+					return v
 				}
 			{{ end }}
 		{{ end }}
