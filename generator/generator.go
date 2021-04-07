@@ -38,7 +38,7 @@ type Generator struct {
 }
 
 type Value struct {
-	FromEnvVar bool         `json:"fromEnvVar"`
+	FromEnvVar string       `json:"fromEnvVar"`
 	Value      types.String `json:"value"`
 }
 
