@@ -2,63 +2,63 @@
 
 ## Setup
 
-1) Initialise a new Go project
+1. Initialise a new Go project
 
-    If you don't have a Go project yet, initialise one using Go modules:
+   If you don't have a Go project yet, initialise one using Go modules:
 
-    ```shell script
-    mkdir demo && cd demo
-    go mod init demo
-    ```
+   ```shell script
+   mkdir demo && cd demo
+   go mod init demo
+   ```
 
-2) Get Prisma Client Go
+2. Get Prisma Client Go
 
-    Install the Go module in your project:
+   Install the Go module in your project:
 
-    ```shell script
-    go get github.com/prisma/prisma-client-go
-    ```
+   ```shell script
+   go get github.com/prisma/prisma-client-go
+   ```
 
-3) Prepare your database schema in a `prisma/schema.prisma` file. For example, a simple schema with a sqlite database and
-    Prisma Client Go as a generator with two models would look like this:
+3. Prepare your database schema in a `prisma/schema.prisma` file. For example, a simple schema with a sqlite database and
+   Prisma Client Go as a generator with two models would look like this:
 
-    ```prisma
-    datasource db {
-        // could be postgresql or mysql
-        provider = "sqlite"
-        url      = "file:dev.db"
-    }
+   ```prisma
+   datasource db {
+       // could be postgresql or mysql
+       provider = "sqlite"
+       url      = "file:dev.db"
+   }
 
-    generator db {
-        provider = "go run github.com/prisma/prisma-client-go"
-    }
+   generator db {
+       provider = "go run github.com/prisma/prisma-client-go"
+   }
 
-    model Post {
-        id        String   @default(cuid()) @id
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        title     String
-        published Boolean
-        desc      String?
-    }
-    ```
+   model Post {
+       id        String   @default(cuid()) @id
+       createdAt DateTime @default(now())
+       updatedAt DateTime @updatedAt
+       title     String
+       published Boolean
+       desc      String?
+   }
+   ```
 
-    To get this up and running in your database, we use the Prisma migration
-    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) (Note: this tool is experimental) to create and migrate our
-    database:
+   To get this up and running in your database, we use the Prisma migration
+   tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) (Note: this tool is experimental) to create and migrate our
+   database:
 
-     ```shell script
-    # sync the database with your schema
-    go run github.com/prisma/prisma-client-go db push --preview-feature
-    ```
+   ```shell script
+   # sync the database with your schema
+   go run github.com/prisma/prisma-client-go db push --preview-feature
+   ```
 
-4) Generate the Prisma Client Go client in your project
+4. Generate the Prisma Client Go client in your project
 
-    ```shell script
-    go run github.com/prisma/prisma-client-go generate
-    ```
+   ```shell script
+   go run github.com/prisma/prisma-client-go generate
+   ```
 
-    If you make changes to your prisma schema, you need to run this command again.
+   If you make changes to your prisma schema, you need to run this command again.
 
 ## Usage
 
