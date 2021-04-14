@@ -1,6 +1,6 @@
 module github.com/prisma/prisma-client-go
 
-go 1.13
+go 1.16
 
 require (
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
