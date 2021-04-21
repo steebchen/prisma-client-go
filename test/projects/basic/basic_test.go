@@ -443,6 +443,44 @@ func TestBasic(t *testing.T) {
 			assert.Equal(t, true, actual == nil)
 		},
 	}, {
+		name: "Delete tx",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "delete",
+					email: "john@example.com",
+					username: "johndoe",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			email := "john@example.com"
+			query := client.User.FindUnique(
+				User.Email.Equals(email),
+			).Delete().Tx()
+
+			if err := client.Prisma.Transaction(query).Exec(ctx); err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "delete",
+					Email:    "john@example.com",
+					Username: "johndoe",
+				},
+			}
+
+			assert.Equal(t, expected, query.Result())
+
+			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
+			assert.Equal(t, ErrNotFound, err)
+			assert.Equal(t, true, actual == nil)
+		},
+	}, {
 		name: "Delete many",
 		// language=GraphQL
 		before: []string{`
