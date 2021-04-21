@@ -116,4 +116,11 @@
 		}
 		return &v, nil
 	}
+
+	func (r {{ $result }}) Tx() {{ $name }}TxResult {
+		v := New{{ $name }}TxResult()
+		v.query = r.query
+		v.query.TxResult = make(chan []byte, 1)
+		return v
+	}
 {{ end }}
