@@ -64,6 +64,9 @@ func (Document) Operators() []Operator {
 	}, {
 		Name:   "Or",
 		Action: "OR",
+	}, {
+		Name:   "And",
+		Action: "AND",
 	}}
 }
 
