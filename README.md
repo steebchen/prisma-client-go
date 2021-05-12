@@ -41,8 +41,13 @@ The go client works slightly different than the normal Prisma tooling. When you'
 ### Running Tests
 
 ```shell
+# requires docker to be installed
+go run ./test/setup/init setup # sets up docker containers for integration testing
 go generate ./...
-go test ./...
+go test ./... -v
+
+# to teardown docker containers:
+go run ./test/setup/init teardown
 ```
 
 ### Writing Commit Messages
