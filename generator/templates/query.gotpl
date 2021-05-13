@@ -30,14 +30,14 @@
 	}
 
 	{{ range $op := $.DMMF.Operators }}
-		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}WhereParam) {{ $name }}Param {
+		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}WhereParam) {{ $name }}DefaultParam {
 			var fields []builder.Field
 
 			for _, q := range params {
 				fields = append(fields, q.field())
 			}
 
-			return {{ $name }}Param{
+			return {{ $name }}DefaultParam{
 				data: builder.Field{
 					Name:     "{{ $op.Action }}",
 					List:     true,
@@ -93,14 +93,14 @@
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
 					params ...{{ $field.Type.GoCase }}WhereParam,
-				) {{ $name }}Param {
+				) {{ $name }}DefaultParam {
 					var fields []builder.Field
 
 					for _, q := range params {
 						fields = append(fields, q.field())
 					}
 
-					return {{ $name }}Param{
+					return {{ $name }}DefaultParam{
 						data: builder.Field{
 							Name:   "{{ $field.Name }}",
 							Fields: []builder.Field{
@@ -331,7 +331,7 @@
 		{{ if or ($field.IsID) ($field.IsUnique) }}
 			{{ $returnStruct = (print $name "ParamUnique") }}
 		{{ else }}
-			{{ $returnStruct = (print $name "Param") }}
+			{{ $returnStruct = (print $name "DefaultParam") }}
 		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}
@@ -424,8 +424,8 @@
 				}
 			{{ end }}
 
-			func (r {{ $struct }}) Order(direction types.Direction) {{ $name }}Param {
-				return {{ $name }}Param{
+			func (r {{ $struct }}) Order(direction types.Direction) {{ $name }}DefaultParam {
+				return {{ $name }}DefaultParam{
 					data: builder.Field{
 						Name:  "{{ $field.Name }}",
 						Value: direction,
