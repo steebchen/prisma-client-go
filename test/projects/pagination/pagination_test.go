@@ -62,19 +62,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -126,19 +126,19 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
@@ -200,7 +200,7 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -261,13 +261,13 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "c",
 					Title:   "c",
 					Content: "c",
@@ -329,16 +329,87 @@ func TestPagination(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "a",
 					Title:   "a",
 					Content: "a",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:      "b",
 					Title:   "b",
 					Content: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "int cursor",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+					intTest: 3,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+					intTest: 1,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+					intTest: 2,
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.
+				Post.
+				FindMany().
+				OrderBy(
+					Post.IntTest.Order(DESC),
+				).
+				Cursor(Post.IntTest.Cursor(2)).
+				Exec(ctx)
+
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			b := 2
+			c := 1
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+					IntTest: &b,
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+					IntTest: &c,
 				},
 			}}
 

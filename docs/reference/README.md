@@ -13,15 +13,14 @@ Contents
 - [Create rows](07-create.md)
 - [Update rows](08-update.md)
 - [Delete rows](09-delete.md)
+- [Delete rows](10-upsert.md)
 
-- [Query for relations](10-relations.md)
+- [Query for relations](11-relations.md)
 
-- [Raw API fallback](11-raw.md)
-- [JSON](12-json.md)
-- [Limitations](13-limitations.md)
-
-```go
-func main() {
-    users, err := client.User.FindOne().Exec()
-}
-```
+- [Raw API fallback](12-raw.md)
+- [Transactions](13-transactions.md)
+- [JSON](14-json.md)
+- [XIfPresent method variants](15-if-present-methods.md)
+- [Mocks for testing](16-mocks.md)
+- [Dynamic Queries](17-dynamic-queries.md)
+- [Limitations](18-limitations.md)

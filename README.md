@@ -24,7 +24,7 @@ Prisma Client Go is an **auto-generated query builder** that enables **type-safe
 
 It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access, declarative data modeling, schema migrations and visual data management.
 
-*NOTE*: Prisma Client Go is currently offered under our [early access program](https://www.prisma.io/docs/about/releases#product-maturity-levels). There will be documented breaking changes with new [releases](https://github.com/prisma/prisma-client-go/releases).
+_NOTE_: Prisma Client Go is currently offered under our [early access program](https://www.prisma.io/docs/about/releases#product-maturity-levels). There will be documented breaking changes with new [releases](https://github.com/prisma/prisma-client-go/releases).
 
 ## Getting started
 
@@ -37,6 +37,20 @@ You also might want to read [deployment tips](./docs/deploy.md) and the [full AP
 The go client works slightly different than the normal Prisma tooling. When you're using the go client, whenever you see Prisma CLI commands such as `prisma ...`, you should always write `go run github.com/prisma/prisma-client-go ...` instead.
 
 ## Contributing
+
+### Running Tests
+
+```shell
+# requires docker to be installed
+go run ./test/setup/init setup # sets up docker containers for integration testing
+go generate ./...
+go test ./... -v
+
+# to teardown docker containers:
+go run ./test/setup/init teardown
+```
+
+### Writing Commit Messages
 
 We use [conventional commits](https://www.conventionalcommits.org) (also known as semantic commits) to ensure consistent and descriptive commit messages.
 

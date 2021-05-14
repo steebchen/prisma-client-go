@@ -61,7 +61,7 @@ posts, err := client.Post.FindMany(
     db.Post.Title.Contains("hi"),
     db.Post.Content.IsNull(),
     db.Post.Desc.Contains(variable),
-    db.Post.Desc.ContainsNullable(pointerVariable),
+    db.Post.Desc.ContainsOptional(pointerVariable),
 ).Exec(ctx)
 ```
 

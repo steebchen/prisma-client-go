@@ -6,18 +6,18 @@
 	{{ $ns := (print $name "Actions") }}
 	{{ $result := (print $name "Create" "One") }}
 
-	// Creates a single user.
+	// Creates a single {{ $name }}.
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
-			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
-				_{{ $field.Name.GoLowerCase }} {{ $name }}WithPrisma{{ $field.Name.GoCase }}SetParams,
-			{{- end -}}
-		{{ end }}
-		optional ...{{ $name }}SetParams,
+			{{- if $field.RequiredOnCreate -}}
+				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}SetParam,
+			{{ end }}
+		{{- end }}
+		optional ...{{ $model.Name.GoCase }}SetParam,
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()
-		v.query.Client = r.client
+		v.query.Engine = r.client
 
 		v.query.Operation = "mutation"
 		v.query.Method = "createOne"
@@ -26,14 +26,14 @@
 
 		var fields []builder.Field
 
-		{{ range $field := $model.Fields }}
-			{{- if and ($field.RequiredOnCreate) (not $field.IsReadOnly) -}}
-				fields = append(fields, _{{ $field.Name.GoLowerCase }}.data)
-			{{- end }}
-		{{ end }}
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate -}}
+				fields = append(fields, _{{ $field.Name.GoLowerCase }}.field())
+			{{ end }}
+		{{- end }}
 
 		for _, q := range optional {
-			fields = append(fields, q.data)
+			fields = append(fields, q.field())
 		}
 
 		v.query.Inputs = append(v.query.Inputs, builder.Input{
@@ -60,17 +60,24 @@
 		query builder.Query
 	}
 
-	func (p {{ $result }}) extractQuery() builder.Query {
+	func (p {{ $result }}) ExtractQuery() builder.Query {
 		return p.query
 	}
 
 	func (p {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
 
-	func (r {{ $result }}) Exec(ctx context.Context) ({{ $modelName }}, error) {
+	func (r {{ $result }}) Exec(ctx context.Context) (*{{ $modelName }}, error) {
 		var v {{ $modelName }}
 		if err := r.query.Exec(ctx, &v); err != nil {
-			return v, err
+			return nil, err
 		}
-		return v, nil
+		return &v, nil
+	}
+
+	func (r {{ $result }}) Tx() {{ $name }}TxResult {
+		v := New{{ $name }}TxResult()
+		v.query = r.query
+		v.query.TxResult = make(chan []byte, 1)
+		return v
 	}
 {{ end }}

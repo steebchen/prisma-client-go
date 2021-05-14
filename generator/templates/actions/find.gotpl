@@ -12,14 +12,14 @@
 
 			{{ $relationName := $model.Name.GoCase }}
 
-			{{ $orderByParams := (print "i" $model.Name.GoCase "OrderByParams") }}
+			{{ $orderByParam := (print "i" $model.Name.GoCase "OrderByParam") }}
 
 			{{ if ne $field.Name "" }}
 				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
 				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
 				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
-				{{ $orderByParams = (print "i" $field.Type.GoCase "OrderByParams") }}
+				{{ $orderByParam = (print "i" $field.Type.GoCase "OrderByParam") }}
 			{{ end }}
 
 			type {{ $result }} struct {
@@ -30,7 +30,7 @@
 				return r.query
 			}
 
-			func (r {{ $result }}) extractQuery() builder.Query {
+			func (r {{ $result }}) ExtractQuery() builder.Query {
 				return r.query
 			}
 
@@ -39,16 +39,20 @@
 			func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
 
 			{{ if eq $field.Name "" }}
+				{{/* only allow equals & unique params for FindUnique */}}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					{{/* only allow equals & unique params for FindOne */}}
-					params {{ if $v.List }}...{{ end }}i{{ $model.Name.GoCase }}{{ if not $v.List }}Equals{{ end }}Params{{ if not $v.List }}Unique{{ end }},
+					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}WhereParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueWhereParam{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
 					v.query = builder.NewQuery()
-					v.query.Client = r.client
+					v.query.Engine = r.client
 
 					v.query.Operation = "query"
-					v.query.Method = "find{{ $v.Name.GoCase }}"
+					{{ if eq $v.Name "First" }}
+						v.query.Method = "findFirst"
+					{{ else }}
+						v.query.Method = "find{{ $v.Name }}"
+					{{ end }}
 					v.query.Model = "{{ $model.Name.String }}"
 					v.query.Outputs = {{ $name }}Output
 
@@ -70,11 +74,16 @@
 						if len(where) > 0 {
 							v.query.Inputs = append(v.query.Inputs, builder.Input{
 								Name:   "where",
-								Fields: where,
+								Fields: []builder.Field{builder.Field{
+									Name:     "AND",
+									List:     true,
+									WrapList: true,
+									Fields:   where,
+								}},
 							})
 						}
 					{{ else }}
-						{{/* transform this document because the signature of FindOne is different than FindMany */}}
+						{{/* transform this document because the signature of FindUnique is different than FindMany */}}
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
 							Fields: builder.TransformEquals([]builder.Field{params.field()}),
@@ -99,11 +108,11 @@
 			}
 
 			{{ if $v.List }}
-				func (r {{ $result }}) OrderBy(params ...{{ $orderByParams }}) {{ $result }} {
+				func (r {{ $result }}) OrderBy(params ...{{ $orderByParam }}) {{ $result }} {
 					var fields []builder.Field
 
 					for _, param := range params {
-						direction, _ := param.field().Value.(runtime.Direction)
+						direction, _ := param.field().Value.(types.Direction)
 
 						fields = append(fields, builder.Field{
 							Name: param.field().Name,
@@ -135,7 +144,7 @@
 					return r
 				}
 
-				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParams) {{ $result }} {
+				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParam) {{ $result }} {
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "cursor",
 						Fields: []builder.Field{cursor.field()},
@@ -145,113 +154,145 @@
 			{{ end }}
 
 			func (r {{ $result }}) Exec(ctx context.Context) (
-				{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model,
+				{{ if $v.ReturnList }}[]{{ else }}*{{ end }}{{ $model.Name.GoCase }}Model,
 				error,
 			) {
-				var v *{{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model
+				var v {{ if $v.ReturnList }}[]{{ else }}*{{ end }}{{ $model.Name.GoCase }}Model
 				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, err
+					return nil, err
 				}
-				{{ if not $v.List }}
+				{{ if not $v.ReturnList }}
 					if v == nil {
-						return {{ if $v.List }}[]{{ end }}{{ $model.Name.GoCase }}Model{}, ErrNotFound
+						return nil, ErrNotFound
 					}
 				{{ end }}
-				return *v, nil
+				return v, nil
 			}
 
-			{{ $outputName := $name }}
-			{{ $returnType := print $model.Name.GoCase "Model" }}
-			{{ if $v.List }}
-				{{ $returnType = "int" }}
-				{{ $outputName = "count" }}
-			{{ end }}
+			func (r {{ $result }}) ExecInner(ctx context.Context) (
+				{{ if $v.ReturnList }}[]{{ else }}*{{ end }}Inner{{ $model.Name.GoCase }},
+				error,
+			) {
+				var v {{ if $v.ReturnList }}[]{{ else }}*{{ end }}Inner{{ $model.Name.GoCase }}
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return nil, err
+				}
+				{{ if not $v.ReturnList }}
+					if v == nil {
+						return nil, ErrNotFound
+					}
+				{{ end }}
+				return v, nil
+			}
 
-			{{/* UPDATE */}}
+			{{ if ne $v.Name "First" }}
+				{{ $returnType := print $model.Name.GoCase "Model" }}
+				{{ if $v.List }}
+					{{ $returnType = "BatchResult" }}
+				{{ end }}
 
-			{{ $setParams := (print "i" $model.Name.GoCase "SetParams") }}
+				{{/* UPDATE */}}
 
-			func (r {{ $result }}) Update(params ...{{ $setParams }}) {{ $updateResult }} {
-				r.query.Operation = "mutation"
-				r.query.Method = "update{{ $v.Name.GoCase }}"
-				r.query.Model = "{{ $model.Name.GoCase }}"
-				r.query.Outputs = {{ $outputName }}Output
+				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
+					r.query.Operation = "mutation"
+					r.query.Method = "update{{ $v.InnerName }}"
+					r.query.Model = "{{ $model.Name.GoCase }}"
+					{{ if $v.List }}
+						r.query.Outputs = countOutput
+					{{ end }}
 
-				var v {{ $updateResult }}
-				v.query = r.query
-				var fields []builder.Field
-				for _, q := range params {
-					{{/* TODO consider upcoming non-set methods */}}
-					field := q.field()
-					{{/* if scalar, wrap in 'set' */}}
-					if field.Value != nil {
-						v := field.Value
-						field.Fields = []builder.Field{
-							{
-								Name: "set",
-								Value: v,
-							},
+					var v {{ $updateResult }}
+					v.query = r.query
+					var fields []builder.Field
+					for _, q := range params {
+						{{/* TODO consider upcoming non-set methods */}}
+						field := q.field()
+						{{/* if scalar, wrap in 'set' */}}
+						_, isJson := field.Value.(types.JSON)
+						if field.Value != nil && !isJson {
+							v := field.Value
+							field.Fields = []builder.Field{
+								{
+									Name: "set",
+									Value: v,
+								},
+							}
+
+							field.Value = nil
 						}
 
-						field.Value = nil
+						fields = append(fields, field)
 					}
-
-					fields = append(fields, field)
+					v.query.Inputs = append(v.query.Inputs, builder.Input{
+						Name:   "data",
+						Fields: fields,
+					})
+					return v
 				}
-				v.query.Inputs = append(v.query.Inputs, builder.Input{
-					Name:   "data",
-					Fields: fields,
-				})
-				return v
-			}
 
-			type {{ $updateResult }} struct {
-				query builder.Query
-			}
-
-			func (r {{ $updateResult }}) extractQuery() builder.Query {
-				return r.query
-			}
-
-			func (p {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
-
-			func (r {{ $updateResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
-				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+				type {{ $updateResult }} struct {
+					query builder.Query
 				}
-				return v{{ if $v.List }}.Count{{ end }}, nil
-			}
 
-			{{/* DELETE */}}
-
-			func (r {{ $result }}) Delete() {{ $deleteResult }} {
-				var v {{ $deleteResult }}
-				v.query = r.query
-				v.query.Operation = "mutation"
-				v.query.Method = "delete{{ $v.Name.GoCase }}"
-				v.query.Model = "{{ $model.Name.String }}"
-				v.query.Outputs = {{ $outputName }}Output
-				return v
-			}
-
-			type {{ $deleteResult }} struct {
-				query builder.Query
-			}
-
-			func (r {{ $deleteResult }}) extractQuery() builder.Query {
-				return r.query
-			}
-
-			func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
-
-			func (r {{ $deleteResult }}) Exec(ctx context.Context) ({{ $returnType }}, error) {
-				var v {{ if $v.List}}count{{ else }}{{ $returnType }}{{ end }}
-				if err := r.query.Exec(ctx, &v); err != nil {
-					return {{ if $v.List }}-1{{ else }}v{{ end }}, err
+				func (r {{ $updateResult }}) ExtractQuery() builder.Query {
+					return r.query
 				}
-				return v{{ if $v.List }}.Count{{ end }}, nil
-			}
+
+				func (r {{ $updateResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+
+				func (r {{ $updateResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
+					var v {{ $returnType }}
+					if err := r.query.Exec(ctx, &v); err != nil {
+						return nil, err
+					}
+					return &v, nil
+				}
+
+				func (r {{ $updateResult }}) Tx() {{ $name }}TxResult {
+					v := New{{ $name }}TxResult()
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
+				}
+
+				{{/* DELETE */}}
+				func (r {{ $result }}) Delete() {{ $deleteResult }} {
+					var v {{ $deleteResult }}
+					v.query = r.query
+					v.query.Operation = "mutation"
+					v.query.Method = "delete{{ $v.InnerName }}"
+					v.query.Model = "{{ $model.Name.String }}"
+					{{ if $v.List }}
+						v.query.Outputs = countOutput
+					{{ end }}
+					return v
+				}
+
+				type {{ $deleteResult }} struct {
+					query builder.Query
+				}
+
+				func (r {{ $deleteResult }}) ExtractQuery() builder.Query {
+					return r.query
+				}
+
+				func (p {{ $deleteResult }}) {{ $model.Name.GoLowerCase }}Model() {}
+
+				func (r {{ $deleteResult }}) Exec(ctx context.Context) (*{{ $returnType }}, error) {
+					var v {{ $returnType }}
+					if err := r.query.Exec(ctx, &v); err != nil {
+						return nil, err
+					}
+					return &v, nil
+				}
+
+				func (r {{ $deleteResult }}) Tx() {{ $name }}TxResult {
+					v := New{{ $name }}TxResult()
+					v.query = r.query
+					v.query.TxResult = make(chan []byte, 1)
+					return v
+				}
+			{{ end }}
 		{{ end }}
 	{{ end }}
 {{ end }}

@@ -13,11 +13,10 @@ COPY . ./
 
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go prefetch
 
-RUN cd test/integration/; go run github.com/prisma/prisma-client-go migrate save --experimental --create-db --name init
-RUN cd test/integration/; go run github.com/prisma/prisma-client-go migrate up --experimental
+RUN cd test/integration/; go run github.com/prisma/prisma-client-go db push --preview-feature --schema schemax.prisma
 
 # generate the client in the integration folder
-RUN cd test/integration/; go run github.com/prisma/prisma-client-go generate
+RUN cd test/integration/; go run github.com/prisma/prisma-client-go generate --schema schemax.prisma
 
 # build the integration binary with all dependencies
 RUN cd test/integration/; go build -o /app/main .

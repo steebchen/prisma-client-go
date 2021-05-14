@@ -51,7 +51,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindOne(
+			user, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(),
@@ -124,20 +124,219 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []PostModel{{
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "a",
 					Title:    "common",
 					Content:  str("a"),
 					AuthorID: "relations",
 				},
 			}, {
-				InternalPost: InternalPost{
+				InnerPost: InnerPost{
 					ID:       "b",
 					Title:    "common",
 					Content:  str("b"),
 					AuthorID: "relations",
 				},
 			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "find by same field fail",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneCategory(data: {
+					id: "c1",
+					name: "stuff",
+					weight: 5,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+							Category: {
+								connect: {
+									id: "c1",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Posts.Fetch(
+					Post.Category.Where(
+						Category.Weight.GT(3),
+						Category.Weight.LTE(3), // <- this needs to fail this part of the query, so no posts will be fetched
+						Category.Weight.LT(10),
+					),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+				RelationsUser: RelationsUser{
+					Posts: []PostModel{},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "find by same field success",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneCategory(data: {
+					id: "c1",
+					name: "stuff",
+					weight: 5,
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "nope",
+					title: "nope",
+					content: "nope",
+					author: {
+						create: {
+							id: "unrelated",
+							email: "unrelated",
+							username: "unrelated",
+							name: "unrelated",
+						}
+					}
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							content: "a",
+							Category: {
+								connect: {
+									id: "c1",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							content: "b",
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Posts.Fetch(
+					Post.Category.Where(
+						Category.Weight.GT(1),
+						Category.Weight.GTE(5),
+						Category.Weight.LTE(5),
+						Category.Weight.LT(10),
+					),
+				).With(
+					Post.Category.Fetch(),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			i := 5
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+				},
+				RelationsUser: RelationsUser{
+					Posts: []PostModel{{
+						InnerPost: InnerPost{
+							ID:         "a",
+							Title:      "common",
+							Content:    str("a"),
+							AuthorID:   "relations",
+							CategoryID: str("c1"),
+						},
+						RelationsPost: RelationsPost{
+							Category: &CategoryModel{
+								InnerCategory: InnerCategory{
+									ID:     "c1",
+									Name:   "stuff",
+									Weight: &i,
+								},
+							},
+						},
+					}},
+				},
+			}
 
 			assert.Equal(t, expected, actual)
 		},
@@ -193,7 +392,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := []UserModel{{
-				InternalUser: InternalUser{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -233,8 +432,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := PostModel{
-				InternalPost: InternalPost{
+			expected := &PostModel{
+				InnerPost: InnerPost{
 					ID:       "post",
 					Title:    title,
 					AuthorID: "123",
@@ -253,7 +452,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []PostModel{expected}, posts)
+			assert.Equal(t, []PostModel{*expected}, posts)
 		},
 	}, {
 		name: "with simple",
@@ -308,7 +507,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch().Take(-2),
@@ -317,8 +516,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -326,14 +525,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "d",
 							Title:    "stuff",
 							Content:  str("d"),
@@ -375,15 +574,15 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := PostModel{
-				InternalPost: InternalPost{
+			expected := &PostModel{
+				InnerPost: InnerPost{
 					ID:       "post1",
 					Title:    "hi",
 					AuthorID: "relations",
 				},
 				RelationsPost: RelationsPost{
 					Author: &UserModel{
-						InternalUser: InternalUser{
+						InnerUser: InnerUser{
 							ID:       "relations",
 							Email:    "john@example.com",
 							Username: "johndoe",
@@ -417,7 +616,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -426,8 +625,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -436,7 +635,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Role: &RoleModel{
-						InternalRole: InternalRole{
+						InnerRole: InnerRole{
 							ID:   "admin",
 							Name: "Admin",
 						},
@@ -446,7 +645,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -457,8 +656,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expectedEmpty := UserModel{
-				InternalUser: InternalUser{
+			expectedEmpty := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -469,7 +668,7 @@ func TestRelations(t *testing.T) {
 
 			assert.Equal(t, expectedEmpty, actual)
 
-			actual, err = client.User.FindOne(
+			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
 			).With(
 				User.Role.Fetch(),
@@ -479,6 +678,191 @@ func TestRelations(t *testing.T) {
 			}
 
 			assert.Equal(t, expectedEmpty, actual)
+		},
+	}, {
+		name: "unlink many",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "user",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneCategory(data: {
+					id: "stuff",
+					name: "Stuff",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "c",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			categoryID := "stuff"
+			actual, err := client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Update(
+				Category.Posts.Unlink(
+					Post.ID.Equals("a"),
+					Post.ID.Equals("c"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedAfter := &CategoryModel{
+				InnerCategory: InnerCategory{
+					ID:   "stuff",
+					Name: "Stuff",
+				},
+				RelationsCategory: RelationsCategory{
+					Posts: []PostModel{{
+						InnerPost: InnerPost{
+							ID:         "b",
+							Title:      "common",
+							AuthorID:   "user",
+							CategoryID: &categoryID,
+						},
+					}},
+				},
+			}
+
+			assert.Equal(t, expectedAfter, actual)
+
+			actual, err = client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expectedAfter, actual)
+		},
+	}, {
+		name: "update and fetch",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "relations",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneRole(data: {
+					id: "admin",
+					name: "Admin",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedEmpty := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   nil,
+				},
+			}
+
+			assert.Equal(t, expectedEmpty, actual)
+
+			actual, err = client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Update(
+				User.Role.Link(Role.ID.Equals("admin")),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "relations",
+					Email:    "john@example.com",
+					Username: "johndoe",
+					Name:     str("John"),
+					RoleID:   str("admin"),
+				},
+				RelationsUser: RelationsUser{
+					Role: &RoleModel{
+						InnerRole: InnerRole{
+							ID:   "admin",
+							Name: "Admin",
+						},
+					},
+				},
+			}
+
+			assert.Equal(t, expected, actual)
+
+			actual, err = client.User.FindUnique(
+				User.ID.Equals("relations"),
+			).With(
+				User.Role.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with and sub query",
@@ -533,7 +917,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -544,8 +928,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -553,14 +937,14 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -626,7 +1010,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -637,8 +1021,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -646,21 +1030,21 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
 							AuthorID: "relations",
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "a",
 							Title:    "common",
 							Content:  str("a"),
@@ -726,7 +1110,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.User.FindOne(
+			actual, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).With(
 				User.Posts.Fetch(
@@ -739,8 +1123,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := UserModel{
-				InternalUser: InternalUser{
+			expected := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "relations",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -748,7 +1132,7 @@ func TestRelations(t *testing.T) {
 				},
 				RelationsUser: RelationsUser{
 					Posts: []PostModel{{
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
@@ -758,7 +1142,7 @@ func TestRelations(t *testing.T) {
 							Comments: []CommentModel{},
 						},
 					}, {
-						InternalPost: InternalPost{
+						InnerPost: InnerPost{
 							ID:       "c",
 							Title:    "common",
 							Content:  str("c"),
@@ -808,7 +1192,7 @@ func TestRelations(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post-a"),
 			).With(
 				Post.Comments.Fetch().Take(-2),
@@ -818,8 +1202,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			user := UserModel{
-				InternalUser: InternalUser{
+			user := &UserModel{
+				InnerUser: InnerUser{
 					ID:       "john",
 					Email:    "john@example.com",
 					Username: "johndoe",
@@ -832,7 +1216,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, user, author)
 
 			comments := []CommentModel{{
-				InternalComment: InternalComment{
+				InnerComment: InnerComment{
 					ID:      "comment-a",
 					Content: "this is a comment",
 					UserID:  "john",
@@ -884,7 +1268,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),
@@ -893,8 +1277,8 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expectedCategory := CategoryModel{
-				InternalCategory: InternalCategory{
+			expectedCategory := &CategoryModel{
+				InnerCategory: InnerCategory{
 					ID:   "media",
 					Name: "Media",
 				},
@@ -935,7 +1319,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			actual, err := client.Post.FindOne(
+			actual, err := client.Post.FindUnique(
 				Post.ID.Equals("post"),
 			).With(
 				Post.Category.Fetch(),
@@ -946,7 +1330,7 @@ func TestRelations(t *testing.T) {
 
 			actualCategory, ok := actual.Category()
 
-			assert.Equal(t, CategoryModel{}, actualCategory)
+			assert.Equal(t, true, actualCategory == nil)
 			assert.Equal(t, false, ok)
 		},
 	}}

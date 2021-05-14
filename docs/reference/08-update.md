@@ -3,12 +3,6 @@
 The examples use the following prisma schema:
 
 ```prisma
-model User {
-    id    String   @default(cuid()) @id
-    name  String
-    posts Post[]
-}
-
 model Post {
     id        String   @default(cuid()) @id
     createdAt DateTime @default(now())
@@ -16,10 +10,6 @@ model Post {
     published Boolean
     title     String
     content   String?
-
-    // optional author
-    user   User @relation(fields: [userID], references: [id])
-    userID String
 
     comments Comment[]
 }
@@ -36,10 +26,10 @@ model Comment {
 
 ### Update a record
 
-To update a record, just query for a field using FindOne or FindMany, and then just chain it by invoking `.Update()`.
+To update a record, just query for a field using FindUnique or FindMany, and then just chain it by invoking `.Update()`.
 
 ```go
-updated, err := client.Post.FindOne(
+updated, err := client.Post.FindUnique(
     Post.Title.Equals("what up"),
 ).Update(
     Post.Desc.Set("new description"),
@@ -54,7 +44,7 @@ updated, err := client.Post.FindOne(
 You can set relations in the same way as when creating records.
 
 ```go
-updated, err := client.Comment.FindOne(
+updated, err := client.Comment.FindUnique(
     Comment.Title.Equals("what up"),
 ).Update(
     Comment.Post.Link(
@@ -68,7 +58,7 @@ updated, err := client.Comment.FindOne(
 For optional relations, you can also unlink the relation, so the foreign key value is set to `NULL`:
 
 ```go
-updated, err := client.Comment.FindOne(
+updated, err := client.Comment.FindUnique(
     Comment.Title.Equals("what up"),
 ).Update(
     Comment.Post.Unlink(),

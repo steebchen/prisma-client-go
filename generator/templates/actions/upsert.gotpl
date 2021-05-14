@@ -1,0 +1,126 @@
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoLowerCase }}
+	{{ $ns := (print $name "Actions") }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+
+	{{ $result := (print $name "UpsertOne") }}
+
+	type {{ $result }} struct {
+		query builder.Query
+	}
+
+	func (r {{ $result }}) getQuery() builder.Query {
+		return r.query
+	}
+
+	func (r {{ $result }}) ExtractQuery() builder.Query {
+		return r.query
+	}
+
+	func (r {{ $result }}) with() {}
+	func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+	func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
+
+	func (r {{ $ns }}) UpsertOne(
+		params {{ $model.Name.GoCase }}EqualsUniqueWhereParam,
+	) {{ $result }} {
+		var v {{ $result }}
+		v.query = builder.NewQuery()
+		v.query.Engine = r.client
+
+		v.query.Operation = "mutation"
+		v.query.Method = "upsertOne"
+		v.query.Model = "{{ $model.Name.String }}"
+		v.query.Outputs = {{ $name }}Output
+
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "where",
+			Fields: builder.TransformEquals([]builder.Field{params.field()}),
+		})
+
+		return v
+	}
+
+	func (r {{ $result }}) Create(
+		{{/* TODO re-use */}}
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate -}}
+				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}SetParam,
+			{{ end }}
+		{{- end }}
+		optional ...{{ $model.Name.GoCase }}SetParam,
+	) {{ $result }} {
+		var v {{ $result }}
+		v.query = r.query
+
+		var fields []builder.Field
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate -}}
+				fields = append(fields, _{{ $field.Name.GoLowerCase }}.field())
+			{{ end }}
+		{{- end }}
+
+		for _, q := range optional {
+			fields = append(fields, q.field())
+		}
+
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "create",
+			Fields: fields,
+		})
+
+		return v
+	}
+
+	func (r {{ $result }}) Update(
+		params ...{{ $model.Name.GoCase }}SetParam,
+	) {{ $result }} {
+		var v {{ $result }}
+		v.query = r.query
+
+		var fields []builder.Field
+		for _, q := range params {
+			{{/* TODO re-use */}}
+			field := q.field()
+			{{/* if scalar, wrap in 'set' */}}
+			_, isJson := field.Value.(types.JSON)
+			if field.Value != nil && !isJson {
+				v := field.Value
+				field.Fields = []builder.Field{
+					{
+						Name: "set",
+						Value: v,
+					},
+				}
+
+				field.Value = nil
+			}
+
+			fields = append(fields, field)
+		}
+
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "update",
+			Fields: fields,
+		})
+
+		return v
+	}
+
+	func (r {{ $result }}) Exec(ctx context.Context) (*{{ $modelName }}, error) {
+		var v {{ $modelName }}
+		if err := r.query.Exec(ctx, &v); err != nil {
+			return nil, err
+		}
+		return &v, nil
+	}
+
+	func (r {{ $result }}) Tx() {{ $name }}TxResult {
+		v := New{{ $name }}TxResult()
+		v.query = r.query
+		v.query.TxResult = make(chan []byte, 1)
+		return v
+	}
+{{ end }}

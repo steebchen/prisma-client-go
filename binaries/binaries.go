@@ -16,11 +16,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.11.0"
+const PrismaVersion = "2.22.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "58369335532e47bdcec77a2f1e7c1fb83a463918"
+const EngineVersion = "60cc71d884972ab4e897f0277c4b84383dddaf6c"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
@@ -95,7 +95,7 @@ func GlobalCacheDir() string {
 func FetchEngine(toDir string, engineName string, binaryPlatformName string) error {
 	logger.Debug.Printf("checking %s...", engineName)
 
-	to := platform.CheckForExtension(binaryPlatformName, path.Join(toDir, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName)))
+	to := platform.CheckForExtension(binaryPlatformName, path.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName)))
 
 	binaryPlatformRemoteName := binaryPlatformName
 	if binaryPlatformRemoteName == "linux" {
@@ -167,7 +167,7 @@ func DownloadCLI(toDir string) error {
 }
 
 func GetEnginePath(dir, engine, binaryName string) string {
-	return platform.CheckForExtension(binaryName, path.Join(dir, fmt.Sprintf("prisma-%s-%s", engine, binaryName)))
+	return platform.CheckForExtension(binaryName, path.Join(dir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engine, binaryName)))
 }
 
 func DownloadEngine(name string, toDir string) (file string, err error) {
@@ -175,7 +175,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 
 	logger.Debug.Printf("checking %s...", name)
 
-	to := platform.CheckForExtension(binaryName, path.Join(toDir, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
+	to := platform.CheckForExtension(binaryName, path.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
 
 	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
 

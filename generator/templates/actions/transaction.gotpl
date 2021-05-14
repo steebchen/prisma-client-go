@@ -1,0 +1,31 @@
+{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+	{{ $name := $model.Name.GoLowerCase }}
+	{{ $modelName := (print $model.Name.GoCase "Model") }}
+
+	func New{{ $name }}TxResult() {{ $name }}TxResult {
+		return {{ $name }}TxResult{
+			result: &transaction.Result{},
+		}
+	}
+
+	type {{ $name }}TxResult struct {
+		query builder.Query
+		result *transaction.Result
+	}
+
+	func (p {{ $name }}TxResult) ExtractQuery() builder.Query {
+		return p.query
+	}
+
+	func (p {{ $name }}TxResult) IsTx() {}
+
+	func (r {{ $name }}TxResult) Result() *{{ $modelName }} {
+		var v *{{ $modelName }}
+		if err := r.result.Get(r.query.TxResult, &v); err != nil {
+			panic(err)
+		}
+		return v
+	}
+{{ end }}
