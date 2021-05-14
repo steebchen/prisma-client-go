@@ -49,7 +49,7 @@
 
      ```shell script
     # sync the database with your schema
-    go run github.com/prisma/prisma-client-go db push --preview-feature
+    go run github.com/prisma/prisma-client-go db push
     ```
 
 4) Generate the Prisma Client Go client in your project
