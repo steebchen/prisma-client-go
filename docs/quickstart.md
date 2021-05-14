@@ -72,7 +72,7 @@ import (
     "encoding/json"
     "fmt"
 
-    "demo/db"
+    "demo/prisma/db"
 )
 
 func main() {
