@@ -127,7 +127,8 @@ func (e *QueryEngine) ensure() (string, error) {
 	logger.Debug.Printf("version check took %s", time.Since(startVersion))
 
 	if v := strings.TrimSpace(strings.Replace(string(out), "query-engine", "", 1)); binaries.EngineVersion != v {
-		msg := fmt.Errorf("expected query engine version `%s` but got `%s`", binaries.EngineVersion, v)
+		note := "Did you forget to run `go run github.com/prisma/prisma-client-go generate`?"
+		msg := fmt.Errorf("expected query engine version `%s` but got `%s`\n%s", binaries.EngineVersion, v, note)
 		if forceVersion {
 			return "", msg
 		}
