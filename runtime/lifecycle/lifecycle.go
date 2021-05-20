@@ -8,7 +8,7 @@ type Lifecycle struct {
 	Engine engine.Engine
 }
 
-// Connects to the Prisma query engine. Required to call before accessing data.
+// Connect connects to the Prisma query engine. Required to call before accessing data.
 // It is recommended to immediately defer calling Disconnect.
 //
 // Example:
@@ -26,7 +26,7 @@ func (c *Lifecycle) Connect() error {
 	return c.Engine.Connect()
 }
 
-// Disconnects from the Prisma query engine.
+// Disconnect disconnects from the Prisma query engine.
 // This is usually invoked on kill signals in long running applications (like webservers),
 // or when no database access is needed anymore (like after executing a CLI command).
 //
