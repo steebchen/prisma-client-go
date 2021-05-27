@@ -74,8 +74,8 @@
 		return &v, nil
 	}
 
-	func (r {{ $result }}) Tx() {{ $name }}TxResult {
-		v := New{{ $name }}TxResult()
+	func (r {{ $result }}) Tx() {{ $name }}UniqueTxResult {
+		v := New{{ $name }}UniqueTxResult()
 		v.query = r.query
 		v.query.TxResult = make(chan []byte, 1)
 		return v

@@ -85,6 +85,10 @@ type ActionType struct {
 	ReturnList bool
 }
 
+func (Document) Types() []string {
+	return []string{"Unique", "Many"}
+}
+
 // Variations contains different query capabilities such as Unique, First and Many
 func (Document) Variations() []ActionType {
 	return []ActionType{{
