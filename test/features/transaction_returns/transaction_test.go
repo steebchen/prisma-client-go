@@ -75,6 +75,40 @@ func TestTransactionReturns(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "transaction find many",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			createUser := client.User.CreateOne(
+				User.Email.Set("a"),
+				User.ID.Set("a"),
+			).Tx()
+
+			update := client.User.FindMany().Update(
+				User.Email.Set("new"),
+			).Tx()
+
+			if err := client.Prisma.Transaction(createUser, update).Exec(ctx); err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, &BatchResult{Count: 1}, update.Result())
+
+			// --
+
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "a",
+					Email: "new",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "transaction result caching",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			createUserA := client.User.CreateOne(
