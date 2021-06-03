@@ -21,6 +21,7 @@ import (
 	_ "github.com/shopspring/decimal"
 	_ "github.com/iancoleman/strcase"
 	_ "github.com/takuoki/gocase"
+	_ "github.com/joho/godotenv"
 )
 
 // re-declare variables which are needed in Prisma Client Go but also should be exported
