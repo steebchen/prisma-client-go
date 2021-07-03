@@ -330,7 +330,7 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate() bool {
-	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly {
+	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList {
 		return false
 	}
 
