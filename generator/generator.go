@@ -28,13 +28,18 @@ type Config struct {
 // Generator describes a generator defined in the Prisma schema.
 type Generator struct {
 	// Output holds the file path of where the client gets generated in.
-	Output        *Value       `json:"output"`
-	Name          types.String `json:"name"`
-	Provider      *Value       `json:"provider"`
-	Config        Config       `json:"config"`
-	BinaryTargets []string     `json:"binaryTargets"`
+	Output        *Value         `json:"output"`
+	Name          types.String   `json:"name"`
+	Provider      *Value         `json:"provider"`
+	Config        Config         `json:"config"`
+	BinaryTargets []BinaryTarget `json:"binaryTargets"`
 	// PinnedBinaryTarget (optional)
 	PinnedBinaryTarget string `json:"pinnedBinaryTarget"`
+}
+
+type BinaryTarget struct {
+	FromEnvVar string `json:"fromEnvVar"`
+	Value      string `json:"value"`
 }
 
 type Value struct {
