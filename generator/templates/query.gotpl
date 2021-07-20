@@ -447,7 +447,7 @@
 		{{ end }}
 
 		{{/* Provide type-specific methods. */}}
-		{{ range $type := $.DMMF.ReadTypes }}
+		{{ range $type := $.AST.Filters }}
 			{{ if eq $field.Type $type.Name }}
 				{{ range $method := $type.Methods }}
 					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {

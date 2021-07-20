@@ -48,6 +48,34 @@ func (v DatamodelFieldKind) IsRelation() bool {
 type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
+	Mappings  Mappings  `json:"mappings"`
+}
+
+type Mappings struct {
+	ModelOperations []ModelOperation `json:"modelOperations"`
+	OtherOperations struct {
+		Read  []string `json:"read"`
+		Write []string `json:"write"`
+	} `json:"otherOperations"`
+}
+
+type ModelOperation struct {
+	Model      types.String `json:"model"`
+	Aggregate  types.String `json:"aggregate"`
+	CreateOne  types.String `json:"createOne"`
+	DeleteMany types.String `json:"deleteMany"`
+	DeleteOne  types.String `json:"deleteOne"`
+	FindFirst  types.String `json:"findFirst"`
+	FindMany   types.String `json:"findMany"`
+	FindUnique types.String `json:"findUnique"`
+	GroupBy    types.String `json:"groupBy"`
+	UpdateMany types.String `json:"updateMany"`
+	UpdateOne  types.String `json:"updateOne"`
+	UpsertOne  types.String `json:"upsertOne"`
+}
+
+func (m *ModelOperation) Namespace() string {
+	return m.Model.GoCase() + "Namespace"
 }
 
 // Operator describes a query operator such as NOT, OR, etc.
@@ -370,22 +398,22 @@ type Schema struct {
 	// RootQueryType (optional)
 	RootQueryType types.String `json:"rootQueryType"`
 	// RootMutationType (optional)
-	RootMutationType  types.String     `json:"rootMutationType"`
-	InputObjectTypes  InputObjectType  `json:"inputObjectTypes"`
-	OutputObjectTypes OutputObjectType `json:"outputObjectTypes"`
-	Enums             []SchemaEnum     `json:"enums"`
+	RootMutationType  types.String    `json:"rootMutationType"`
+	InputObjectTypes  InputObjectType `json:"inputObjectTypes"`
+	OutputObjectTypes OutputObject    `json:"outputObjectTypes"`
+	Enums             []SchemaEnum    `json:"enums"`
 }
 
 type InputObjectType struct {
-	Prisma []InputType `json:"prisma"`
+	Prisma []CoreType `json:"prisma"`
 }
 
-type OutputObjectType struct {
+type OutputObject struct {
 	Prisma []OutputType `json:"prisma"`
 }
 
-// SchemaArg provides the arguments of a given field.
-type SchemaArg struct {
+// OuterInputType provides the arguments of a given field.
+type OuterInputType struct {
 	Name       types.String      `json:"name"`
 	InputTypes []SchemaInputType `json:"inputTypes"`
 	// IsRelationFilter (optional)
@@ -394,10 +422,13 @@ type SchemaArg struct {
 
 // SchemaInputType describes an input type of a given field.
 type SchemaInputType struct {
-	IsRequired bool       `json:"isRequired"`
-	IsList     bool       `json:"isList"`
-	Type       types.Type `json:"type"` // this was declared as ArgType
-	Kind       FieldKind  `json:"kind"`
+	IsRequired bool         `json:"isRequired"`
+	IsList     bool         `json:"isList"`
+	Type       types.Type   `json:"type"` // this was declared as ArgType
+	Kind       FieldKind    `json:"kind"`
+	Namespace  types.String `json:"namespace"`
+	// can be "scalar", "inputObjectTypes" or "outputObjectTypes"
+	Location string `json:"location"`
 }
 
 // OutputType describes a GraphQL/PQL return type.
@@ -412,7 +443,7 @@ type OutputType struct {
 type SchemaField struct {
 	Name       types.String     `json:"name"`
 	OutputType SchemaOutputType `json:"outputType"`
-	Args       []SchemaArg      `json:"args"`
+	Args       []OuterInputType `json:"args"`
 }
 
 // SchemaOutputType describes an output type of a given field.
@@ -423,8 +454,8 @@ type SchemaOutputType struct {
 	Kind       FieldKind    `json:"kind"`
 }
 
-// InputType describes a GraphQL/PQL input type.
-type InputType struct {
+// CoreType describes a GraphQL/PQL input type.
+type CoreType struct {
 	Name types.String `json:"name"`
 	// IsWhereType (optional)
 	IsWhereType bool `json:"isWhereType"`
@@ -433,8 +464,8 @@ type InputType struct {
 	// AtLeastOne (optional)
 	AtLeastOne bool `json:"atLeastOne"`
 	// AtMostOne (optional)
-	AtMostOne bool        `json:"atMostOne"`
-	Fields    []SchemaArg `json:"fields"`
+	AtMostOne bool             `json:"atMostOne"`
+	Fields    []OuterInputType `json:"fields"`
 }
 
 func concatFieldsToName(fields []types.String) types.String {
