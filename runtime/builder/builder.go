@@ -3,6 +3,7 @@ package builder
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -215,7 +216,7 @@ func (q Query) Exec(ctx context.Context, into interface{}) error {
 
 func (q Query) Do(ctx context.Context, payload interface{}, into interface{}) error {
 	if q.Engine == nil {
-		panic("client.Prisma.Connect() needs to be called before sending queries")
+		return fmt.Errorf("client.Prisma.Connect() needs to be called before sending queries")
 	}
 
 	logger.Debug.Printf("[timing] building %q", time.Since(q.Start))
