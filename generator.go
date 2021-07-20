@@ -84,6 +84,8 @@ func invokePrisma() error {
 				return fmt.Errorf("could not unmarshal params into generator.Root type at %s: %w", dir, err)
 			}
 
+			generator.Transform(&params)
+
 			if err := generator.Run(&params); err != nil {
 				return fmt.Errorf("could not generate code. %w", err)
 			}
