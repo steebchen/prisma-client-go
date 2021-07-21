@@ -4,8 +4,6 @@ on:
     branches:
       - master
   pull_request:
-    branches:
-      - master
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go test.yml"
 
