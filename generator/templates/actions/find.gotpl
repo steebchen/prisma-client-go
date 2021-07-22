@@ -201,7 +201,7 @@
 				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.InnerName }}"
-					r.query.Model = "{{ $model.Name.GoCase }}"
+					r.query.Model = "{{ $model.Name.String }}"
 					{{ if $v.List }}
 						r.query.Outputs = countOutput
 					{{ end }}
