@@ -11,7 +11,7 @@ type AST struct {
 	// Scalars describe a list of scalar types, such as Int, String, DateTime, etc.
 	Scalars []string `json:"scalars"`
 	// Filters describe a list of scalar types and the respective read operations
-	Filters []Type `json:"filters"`
+	Filters []Filter `json:"filters"`
 }
 
 func New(document *dmmf.Document) *AST {
