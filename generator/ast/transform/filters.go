@@ -25,7 +25,7 @@ func (r *AST) filters() []Type {
 		var fields []Method
 		for _, field := range p.Fields {
 			// specifically ignore equals, as it gets special handling
-			if field.Name == "equals" || field.Name == "in" {
+			if field.Name == "equals" {
 				continue
 			}
 			fields = append(fields, Method{
