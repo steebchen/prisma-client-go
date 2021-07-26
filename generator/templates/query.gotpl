@@ -422,43 +422,42 @@
 			{{ end }}
 		{{ end }}
 
-		{{/* Provide type-specific methods. */}}
-		{{ range $type := $.AST.Filters }}
-			{{ if eq $field.Type $type.Name }}
-				{{ range $method := $type.Methods }}
-					func (r {{ $struct }}) {{ $method.Name }}(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
-						{{ if $field.IsList }}
-							var fields []builder.Field
-							for _, v := range value {
-								fields = append(fields, builder.Field{
-									Value: v,
-								})
-							}
-						{{ end }}
-						return {{ $returnStruct }}{
-							data: builder.Field{
-								Name:   "{{ $field.Name }}",
-								Fields: []builder.Field{
-									{
-										Name: "{{ $method.Action }}",
-										{{ if $field.IsList }}
-											Fields: fields,
-										{{ else }}
-											Value: value,
-										{{ end }}
-									},
+		{{/* Provide field and type-specific methods. */}}
+		{{ $type := $.AST.Filter $field.Type.String }}
+		{{ if $type }}
+			{{ range $method := $type.Methods }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+					{{ if $field.IsList }}
+						var fields []builder.Field
+						for _, v := range value {
+							fields = append(fields, builder.Field{
+								Value: v,
+							})
+						}
+					{{ end }}
+					return {{ $returnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name }}",
+							Fields: []builder.Field{
+								{
+									Name: "{{ $method.Action }}",
+									{{ if $field.IsList }}
+										Fields: fields,
+									{{ else }}
+										Value: value,
+									{{ end }}
 								},
 							},
-						}
+						},
 					}
+				}
 
-					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
-						if value == nil {
-							return {{ $returnStruct }}{}
-						}
-						return r.{{ $method.Name }}({{ if not $field.IsList }}*{{ end }}value)
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+					if value == nil {
+						return {{ $returnStruct }}{}
 					}
-				{{ end }}
+					return r.{{ $method.Name }}({{ if not $field.IsList }}*{{ end }}value)
+				}
 			{{ end }}
 		{{ end }}
 	{{ end }}

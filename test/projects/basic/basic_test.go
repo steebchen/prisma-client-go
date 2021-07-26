@@ -318,7 +318,7 @@ func TestBasic(t *testing.T) {
 				// set required value
 				User.Username.Set("new-username"),
 				// set optional value
-				User.Name.Set("New Name"),
+				User.Name.Set("New Scalar"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -329,7 +329,7 @@ func TestBasic(t *testing.T) {
 					ID:       "update",
 					Email:    email,
 					Username: "new-username",
-					Name:     str("New Name"),
+					Name:     str("New Scalar"),
 				},
 			}
 
@@ -372,7 +372,7 @@ func TestBasic(t *testing.T) {
 			result, err := client.User.FindMany(
 				User.Username.Equals("username"),
 			).Update(
-				User.Name.Set("New Name"),
+				User.Name.Set("New Scalar"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -392,14 +392,14 @@ func TestBasic(t *testing.T) {
 					ID:       "id1",
 					Email:    "email1",
 					Username: "username",
-					Name:     str("New Name"),
+					Name:     str("New Scalar"),
 				},
 			}, {
 				InnerUser: InnerUser{
 					ID:       "id2",
 					Email:    "email2",
 					Username: "username",
-					Name:     str("New Name"),
+					Name:     str("New Scalar"),
 				},
 			}}
 
