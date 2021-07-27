@@ -12,7 +12,7 @@
 	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
-			{{/* Filter non-relations only for now */}}
+			{{/* ReadFilter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
 				// {{ $field.Name.GoCase }}
 				//
@@ -423,7 +423,7 @@
 		{{ end }}
 
 		{{/* Provide field and type-specific methods. */}}
-		{{ $type := $.AST.Filter $field.Type.String }}
+		{{ $type := $.AST.ReadFilter $field.Type.String }}
 		{{ if $type }}
 			{{ range $method := $type.Methods }}
 				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
