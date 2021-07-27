@@ -17,10 +17,10 @@ type Filter struct {
 	Methods []Method
 }
 
-func (r *AST) filters() []Filter {
+func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
-		p := r.pick(scalar + "Filter")
+		p := r.pick(scalar + "ReadFilter")
 		if p == nil {
 			p = r.pick(scalar + "NullableFilter")
 			if p == nil {
@@ -46,11 +46,11 @@ func (r *AST) filters() []Filter {
 	return filters
 }
 
-// Filter returns a filter by scalar
-func (r *AST) Filter(scalar string) *Filter {
+// Filter returns a filter for a read operation by scalar
+func (r *AST) ReadFilter(scalar string) *Filter {
 	scalar = strings.Replace(scalar, "NullableFilter", "", 1)
-	scalar = strings.Replace(scalar, "Filter", "", 1)
-	for _, filter := range r.Filters {
+	scalar = strings.Replace(scalar, "ReadFilter", "", 1)
+	for _, filter := range r.ReadFilters {
 		if filter.Scalar == scalar {
 			return &filter
 		}
