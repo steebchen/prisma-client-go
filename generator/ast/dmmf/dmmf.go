@@ -186,61 +186,6 @@ func (Document) WriteTypes() []Type {
 	}}
 }
 
-// ReadTypes provides virtual types and their actions
-func (Document) ReadTypes() []Type {
-	number := []Method{{
-		Name:   "LT",
-		Action: "lt",
-	}, {
-		Name:   "GT",
-		Action: "gt",
-	}, {
-		Name:   "LTE",
-		Action: "lte",
-	}, {
-		Name:   "GTE",
-		Action: "gte",
-	}}
-
-	return []Type{{
-		Name: "String",
-		Methods: []Method{{
-			Name:   "Contains",
-			Action: "contains",
-		}, {
-			Name:   "HasPrefix",
-			Action: "starts_with",
-		}, {
-			Name:   "HasSuffix",
-			Action: "ends_with",
-		}},
-	}, {
-		Name:    "Boolean",
-		Methods: []Method{},
-	}, {
-		Name:    "Int",
-		Methods: number,
-	}, {
-		Name:    "Float",
-		Methods: number,
-	}, {
-		Name: "DateTime",
-		Methods: []Method{{
-			Name:   "Before",
-			Action: "lt",
-		}, {
-			Name:   "After",
-			Action: "gt",
-		}, {
-			Name:   "BeforeEquals",
-			Action: "lte",
-		}, {
-			Name:   "AfterEquals",
-			Action: "gte",
-		}},
-	}}
-}
-
 // SchemaEnum describes an enumerated type.
 type SchemaEnum struct {
 	Name   types.String   `json:"name"`
