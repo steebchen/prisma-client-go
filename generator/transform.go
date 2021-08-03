@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"github.com/prisma/prisma-client-go/generator/ast/transform"
@@ -11,7 +12,8 @@ import (
 // Transform builds the AST from the flat DMMF so it can be used properly in templates
 func Transform(input *Root) {
 	input.AST = transform.New(&input.DMMF)
-	fmt.Printf("AST: %+v", input.AST)
+	d, _ := json.MarshalIndent(input.AST, "", "  ")
+	fmt.Printf("AST: %s", string(d))
 }
 
 func (r *Root) Output(name types.String) dmmf.SchemaField {
