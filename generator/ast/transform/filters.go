@@ -46,7 +46,7 @@ func (r *AST) readFilters() []Filter {
 	return filters
 }
 
-// Filter returns a filter for a read operation by scalar
+// ReadFilter returns a filter for a read operation by scalar
 func (r *AST) ReadFilter(scalar string) *Filter {
 	scalar = strings.Replace(scalar, "NullableFilter", "", 1)
 	scalar = strings.Replace(scalar, "ReadFilter", "", 1)
