@@ -16,9 +16,6 @@ func (r *AST) writeFilters() []Filter {
 			if field.Name == "set" {
 				continue
 			}
-			if field.Name == "in" {
-				continue
-			}
 			fields = append(fields, Method{
 				Name:   field.Name.GoCase(),
 				Action: field.Name.String(),
