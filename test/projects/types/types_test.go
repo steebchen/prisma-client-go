@@ -539,7 +539,7 @@ func TestTypes(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			t.Skip()
 			actual, err := client.User.FindMany(
-			//User.StrOpt.In([]string{"first", "third"}), // TODO
+			// User.StrOpt.In([]string{"first", "third"}), // TODO
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)

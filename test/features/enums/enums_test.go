@@ -47,9 +47,9 @@ func TestEnums(t *testing.T) {
 
 		actual, err := client.User.FindMany(
 			User.Role.Equals(RoleAdmin),
-			//User.Role.In([]Role{RoleAdmin}), // TODO
+			// User.Role.In([]Role{RoleAdmin}), // TODO
 			User.RoleOpt.Equals(RoleModerator),
-			//User.RoleOpt.In([]Role{RoleModerator}), // TODO
+			// User.RoleOpt.In([]Role{RoleModerator}), // TODO
 		).Exec(ctx)
 		if err != nil {
 			t.Fatalf("fail %s", err)
