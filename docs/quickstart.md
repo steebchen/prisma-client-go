@@ -31,6 +31,9 @@
 
     generator db {
         provider = "go run github.com/prisma/prisma-client-go"
+   			// set the output folder and package name
+        // output           = "./your-folder"
+        // package          = "yourpackagename"
     }
 
     model Post {
