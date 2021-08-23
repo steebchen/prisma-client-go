@@ -7,13 +7,16 @@ import (
 	"github.com/prisma/prisma-client-go/generator/ast/transform"
 	"github.com/prisma/prisma-client-go/generator/types"
 	"log"
+	"os"
 )
 
 // Transform builds the AST from the flat DMMF so it can be used properly in templates
 func Transform(input *Root) {
 	input.AST = transform.New(&input.DMMF)
 	d, _ := json.MarshalIndent(input.AST, "", "  ")
-	fmt.Printf("AST: %s", string(d))
+	if os.Getenv("DEBUG") != "" {
+		fmt.Printf("AST: %s\n", string(d))
+	}
 }
 
 func (r *Root) Output(name types.String) dmmf.SchemaField {

@@ -188,8 +188,8 @@ func (Document) WriteTypes() []Type {
 
 // SchemaEnum describes an enumerated type.
 type SchemaEnum struct {
-	Name   types.String   `json:"name"`
-	Values []types.String `json:"values"`
+	Name   string   `json:"name"`
+	Values []string `json:"values"`
 	// DBName (optional)
 	DBName types.String `json:"dBName"`
 }
@@ -351,7 +351,11 @@ type Schema struct {
 	RootMutationType  types.String    `json:"rootMutationType"`
 	InputObjectTypes  InputObjectType `json:"inputObjectTypes"`
 	OutputObjectTypes OutputObject    `json:"outputObjectTypes"`
-	Enums             []SchemaEnum    `json:"enums"`
+	EnumTypes         EnumTypes       `json:"enumTypes"`
+}
+
+type EnumTypes struct {
+	Enums []SchemaEnum `json:"model"`
 }
 
 type InputObjectType struct {

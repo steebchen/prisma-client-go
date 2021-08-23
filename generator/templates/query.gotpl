@@ -425,8 +425,8 @@
 		{{ $readType := $.AST.ReadFilter $field.Type.String }}
 		{{ if $readType }}
 			{{ range $method := $readType.Methods }}
-				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
-					{{ if $field.IsList }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+					{{ if $method.IsList }}
 						var fields []builder.Field
 						for _, v := range value {
 							fields = append(fields, builder.Field{
@@ -440,7 +440,7 @@
 							Fields: []builder.Field{
 								{
 									Name: "{{ $method.Action }}",
-									{{ if $field.IsList }}
+									{{ if $method.IsList }}
 										Fields: fields,
 									{{ else }}
 										Value: value,
@@ -451,11 +451,11 @@
 					}
 				}
 
-				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
 					if value == nil {
 						return {{ $returnStruct }}{}
 					}
-					return r.{{ $method.Name }}({{ if not $field.IsList }}*{{ end }}value)
+					return r.{{ $method.Name }}({{ if not $method.IsList }}*{{ end }}value)
 				}
 			{{ end }}
 		{{ end }}
