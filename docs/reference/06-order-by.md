@@ -10,9 +10,9 @@ model Post {
     published Boolean
     title     String
     content   String?
-		
-		// add an index to be able to order by created_at
-		@@index([createdAt])
+
+    // add an index to be able to order by created_at
+    @@index([createdAt])
 }
 ```
 
