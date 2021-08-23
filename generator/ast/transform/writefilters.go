@@ -22,7 +22,7 @@ func (r *AST) writeFilters() []Filter {
 			})
 		}
 		filters = append(filters, Filter{
-			Scalar:  scalar,
+			Name:    scalar,
 			Methods: fields,
 		})
 	}
@@ -32,7 +32,7 @@ func (r *AST) writeFilters() []Filter {
 // WriteFilter returns a filter for a read operation by scalar
 func (r *AST) WriteFilter(scalar string) *Filter {
 	for _, filter := range r.WriteFilters {
-		if filter.Scalar == scalar {
+		if filter.Name == scalar {
 			return &filter
 		}
 	}

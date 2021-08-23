@@ -1,6 +1,7 @@
 package transform
 
 import (
+	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"strings"
 )
 
@@ -16,17 +17,33 @@ func (r *AST) readFilters() []Filter {
 		}
 		var fields []Method
 		for _, field := range p.Fields {
-			// specifically ignore equals, as it gets special handling
-			if field.Name == "equals" {
-				continue
+			if method := convertField(field); method != nil {
+				fields = append(fields, *method)
 			}
-			fields = append(fields, Method{
-				Name:   field.Name.GoCase(),
-				Action: field.Name.String(),
-			})
 		}
 		filters = append(filters, Filter{
-			Scalar:  scalar,
+			Name:    scalar,
+			Methods: fields,
+		})
+	}
+	for _, enum := range r.Enums {
+		p := r.pick("Enum" + enum.Name + "Filter")
+		if p == nil {
+			p = r.pick("Enum" + enum.Name + "NullableFilter")
+			if p == nil {
+				continue
+			}
+		}
+
+		var fields []Method
+		for _, field := range p.Fields {
+			if method := convertField(field); method != nil {
+				fields = append(fields, *method)
+			}
+		}
+
+		filters = append(filters, Filter{
+			Name:    enum.Name,
 			Methods: fields,
 		})
 	}
@@ -38,9 +55,29 @@ func (r *AST) ReadFilter(scalar string) *Filter {
 	scalar = strings.Replace(scalar, "NullableFilter", "", 1)
 	scalar = strings.Replace(scalar, "ReadFilter", "", 1)
 	for _, filter := range r.ReadFilters {
-		if filter.Scalar == scalar {
+		if filter.Name == scalar {
 			return &filter
 		}
 	}
 	return nil
+}
+
+func convertField(field dmmf.OuterInputType) *Method {
+	// specifically ignore equals, as it gets special handling
+	if field.Name == "equals" {
+		return nil
+	}
+	isList := false
+	// check if any of the input types accept a list
+	for _, x := range field.InputTypes {
+		// if yes, consider it a list item, regardless of all other items
+		if x.IsList {
+			isList = true
+		}
+	}
+	return &Method{
+		Name:   field.Name.GoCase(),
+		Action: field.Name.String(),
+		IsList: isList,
+	}
 }
