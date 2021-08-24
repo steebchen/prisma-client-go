@@ -11,8 +11,6 @@ import (
 
 func TestEnums(t *testing.T) {
 	test.RunParallel(t, []test.Database{test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
-		t.Skip()
-
 		client := NewClient()
 
 		mockDB := test.Start(t, db, client.Engine, []string{})

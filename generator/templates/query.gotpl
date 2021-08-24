@@ -441,6 +441,7 @@
 								{
 									Name: "{{ $method.Action }}",
 									{{ if $method.IsList }}
+										List: true,
 										Fields: fields,
 									{{ else }}
 										Value: value,
