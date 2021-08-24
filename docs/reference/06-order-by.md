@@ -11,16 +11,8 @@ model Post {
     title     String
     content   String?
 
-    comments Comment[]
-}
-
-model Comment {
-    id        String   @default(cuid()) @id
-    createdAt DateTime @default(now())
-    content   String
-
-    post   Post @relation(fields: [postID], references: [id])
-    postID String
+    // add an index to be able to order by created_at
+    @@index([createdAt])
 }
 ```
 
