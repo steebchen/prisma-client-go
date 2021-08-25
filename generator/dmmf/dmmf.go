@@ -271,10 +271,15 @@ type Model struct {
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName        types.String   `json:"dbName"`
-	Fields        []Field        `json:"fields"`
-	UniqueIndexes []UniqueIndex  `json:"uniqueIndexes"`
-	IDFields      []types.String `json:"idFields"`
+	DBName        types.String  `json:"dbName"`
+	Fields        []Field       `json:"fields"`
+	UniqueIndexes []UniqueIndex `json:"uniqueIndexes"`
+	PrimaryKey    PrimaryKey    `json:"primaryKey"`
+}
+
+type PrimaryKey struct {
+	Name   types.String   `json:"name"`
+	Fields []types.String `json:"fields"`
 }
 
 func (m Model) Actions() []string {
@@ -284,10 +289,10 @@ func (m Model) Actions() []string {
 func (m Model) CompositeIndexes() []UniqueIndex {
 	var indexes []UniqueIndex
 	indexes = append(indexes, m.UniqueIndexes...)
-	if len(m.IDFields) > 0 {
+	if len(m.PrimaryKey.Fields) > 0 {
 		indexes = append(indexes, UniqueIndex{
-			InternalName: concatFieldsToName(m.IDFields),
-			Fields:       m.IDFields,
+			InternalName: concatFieldsToName(m.PrimaryKey.Fields),
+			Fields:       m.PrimaryKey.Fields,
 		})
 	}
 	return indexes
