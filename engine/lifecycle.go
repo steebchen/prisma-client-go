@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries"
@@ -42,6 +43,8 @@ func (e *QueryEngine) Connect() error {
 
 func (e *QueryEngine) Disconnect() error {
 	logger.Debug.Printf("disconnecting...")
+
+	e.disconnected = true
 
 	if platform.Name() == "windows" {
 		if err := e.cmd.Process.Kill(); err != nil {
@@ -156,6 +159,12 @@ func (e *QueryEngine) spawn(file string) error {
 	e.url = "http://localhost:" + port
 
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
+
+	// prevent passing through of signals
+	// shutdown is handled manually by calling Disconnect()
+	e.cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
 
 	e.cmd.Stdout = os.Stdout
 	e.cmd.Stderr = os.Stderr

@@ -38,6 +38,9 @@ type QueryEngine struct {
 	// hasBinaryTargets can be toggled by generated code from Schema.prisma whether binaryTargets
 	// were specified and thus expects binaries in the local path
 	hasBinaryTargets bool
+
+	// disconnected indicates whether the client has already called disconnect
+	disconnected bool
 }
 
 func (e *QueryEngine) Name() string {

@@ -53,7 +53,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	return nil
 }
 
-// Do sends the http Request to the query engine and unmarshals the response
+// Batch sends a batch request, which is used for transactions
 func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
 	body, err := e.Request(ctx, "POST", "/", payload)
 	if err != nil {
@@ -68,6 +68,10 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 }
 
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
+	if e.disconnected {
+		return nil, fmt.Errorf("already called Disconnect(), please make sure to wait for running queries")
+	}
+
 	requestBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("payload marshal: %w", err)
