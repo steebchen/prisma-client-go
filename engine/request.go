@@ -69,7 +69,7 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
 	if e.disconnected {
-		return nil, fmt.Errorf("already called Disconnect(), please make sure to wait for running queries")
+		return nil, fmt.Errorf("already called Disconnect(), please make sure to wait for running queries before calling Disconnect()")
 	}
 
 	requestBody, err := json.Marshal(payload)
