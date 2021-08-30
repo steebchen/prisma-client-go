@@ -13,7 +13,7 @@ Contents
 - [Create rows](07-create.md)
 - [Update rows](08-update.md)
 - [Delete rows](09-delete.md)
-- [Delete rows](10-upsert.md)
+- [Upsert rows](10-upsert.md)
 
 - [Query for relations](11-relations.md)
 

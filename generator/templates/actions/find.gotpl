@@ -22,6 +22,11 @@
 				{{ $orderByParam = (print "i" $field.Type.GoCase "OrderByParam") }}
 			{{ end }}
 
+			{{ $txResult := "Unique" }}
+			{{ if $v.List }}
+				{{ $txResult = "Many" }}
+			{{ end }}
+
 			type {{ $result }} struct {
 				query builder.Query
 			}
@@ -196,7 +201,7 @@
 				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.InnerName }}"
-					r.query.Model = "{{ $model.Name.GoCase }}"
+					r.query.Model = "{{ $model.Name.String }}"
 					{{ if $v.List }}
 						r.query.Outputs = countOutput
 					{{ end }}
@@ -248,8 +253,8 @@
 					return &v, nil
 				}
 
-				func (r {{ $updateResult }}) Tx() {{ $name }}TxResult {
-					v := New{{ $name }}TxResult()
+				func (r {{ $updateResult }}) Tx() {{ $name }}{{ $txResult }}TxResult {
+					v := New{{ $name }}{{ $txResult }}TxResult()
 					v.query = r.query
 					v.query.TxResult = make(chan []byte, 1)
 					return v
@@ -286,8 +291,8 @@
 					return &v, nil
 				}
 
-				func (r {{ $deleteResult }}) Tx() {{ $name }}TxResult {
-					v := New{{ $name }}TxResult()
+				func (r {{ $deleteResult }}) Tx() {{ $name }}{{ $txResult }}TxResult {
+					v := New{{ $name }}{{ $txResult }}TxResult()
 					v.query = r.query
 					v.query.TxResult = make(chan []byte, 1)
 					return v

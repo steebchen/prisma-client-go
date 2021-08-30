@@ -167,7 +167,7 @@ func TestExportedBuilderFields(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var params []UserSetParam
 			params = append(params, User.Username.Set("new-username"))
-			params = append(params, User.Name.Set("New Name"))
+			params = append(params, User.Name.Set("New Scalar"))
 
 			email := "john@example.com"
 			updated, err := client.User.FindUnique(
@@ -184,7 +184,7 @@ func TestExportedBuilderFields(t *testing.T) {
 					ID:       "update",
 					Email:    email,
 					Username: "new-username",
-					Name:     str("New Name"),
+					Name:     str("New Scalar"),
 				},
 			}
 

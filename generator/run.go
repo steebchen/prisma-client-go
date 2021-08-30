@@ -31,7 +31,11 @@ func addDefaults(input *Root) {
 func Run(input *Root) error {
 	addDefaults(input)
 
-	targets := input.Generator.BinaryTargets
+	var targets []string
+
+	for _, target := range input.Generator.BinaryTargets {
+		targets = append(targets, target.Value)
+	}
 
 	targets = add(targets, "native")
 	targets = add(targets, "linux")

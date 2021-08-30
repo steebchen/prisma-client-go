@@ -76,23 +76,3 @@ type PrismaClient struct {
 		{{ $model.Name.GoCase }} {{ $model.Name.GoLowerCase }}Actions
 	{{- end }}
 }
-
-// deprecated: use .Prisma.Connect
-func (c *PrismaClient) Connect() error {
-	return c.Prisma.Connect()
-}
-
-// deprecated: use .Prisma.Disconnect
-func (c *PrismaClient) Disconnect() error {
-	return c.Prisma.Disconnect()
-}
-
-// deprecated: use .Prisma.QueryRaw
-func (c *PrismaClient) QueryRaw(query string, params ...interface{}) raw.QueryExec {
-	return c.Prisma.QueryRaw(query, params...)
-}
-
-// deprecated: use .Prisma.ExecuteRaw
-func (c *PrismaClient) ExecuteRaw(query string, params ...interface{}) raw.ExecuteExec {
-	return c.Prisma.ExecuteRaw(query, params...)
-}

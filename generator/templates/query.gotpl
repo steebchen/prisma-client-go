@@ -12,7 +12,7 @@
 	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
-			{{/* Filter non-relations only for now */}}
+			{{/* ReadFilter non-relations only for now */}}
 			{{- if $field.Kind.IncludeInStruct -}}
 				// {{ $field.Name.GoCase }}
 				//
@@ -297,31 +297,30 @@
 			{{ end }}
 
 			{{ if not $field.IsList }}
-				{{ range $type := $.DMMF.WriteTypes }}
-					{{ if eq $field.Type $type.Name }}
-						{{ range $method := $type.Methods }}
-							// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-							func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
-								return {{ $setReturnStruct }}{
-									data: builder.Field{
-										Name:   "{{ $field.Name }}",
-										Fields: []builder.Field{
-											builder.Field{
-												Name:   "{{ $method.Action }}",
-												Value:  value,
-											},
+				{{ $writeType := $.AST.WriteFilter $field.Type.String }}
+				{{ if $writeType }}
+					{{ range $method := $writeType.Methods }}
+						// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+						func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
+							return {{ $setReturnStruct }}{
+								data: builder.Field{
+									Name:   "{{ $field.Name }}",
+									Fields: []builder.Field{
+										builder.Field{
+											Name:   "{{ $method.Action }}",
+											Value:  value,
 										},
 									},
-								}
+								},
 							}
+						}
 
-							func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-								if value == nil {
-									return {{ $setReturnStruct }}{}
-								}
-								return r.{{ $method.Name }}(*value)
+						func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+							if value == nil {
+								return {{ $setReturnStruct }}{}
 							}
-						{{ end }}
+							return r.{{ $method.Name }}(*value)
+						}
 					{{ end }}
 				{{ end }}
 			{{ end }}
@@ -368,30 +367,6 @@
 				}
 				return r.Equals({{ if not $field.IsList }}*{{ end }}value)
 			}
-
-			{{ if not $field.IsList }}
-				{{/* Provide an `In` method for most types. */}}
-				func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
-					var fields []builder.Field
-					for _, v := range values {
-						fields = append(fields, builder.Field{
-							Value: v,
-						})
-					}
-					return {{ $returnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Fields: []builder.Field{
-								{
-									Name:   "in",
-									List:   true,
-									Fields: fields,
-								},
-							},
-						},
-					}
-				}
-			{{ end }}
 
 			{{ if not $field.IsRequired }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
@@ -446,31 +421,49 @@
 			{{ end }}
 		{{ end }}
 
-		{{/* Provide type-specific methods. */}}
-		{{ range $type := $.DMMF.ReadTypes }}
-			{{ if eq $field.Type $type.Name }}
-				{{ range $method := $type.Methods }}
-					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-						return {{ $returnStruct }}{
-							data: builder.Field{
-								Name:   "{{ $field.Name }}",
-								Fields: []builder.Field{
-									{
-										Name: "{{ $method.Action }}",
+		{{/* Provide field and type-specific methods. */}}
+		{{ $readType := $.AST.ReadFilter $field.Type.String }}
+		{{ if $readType }}
+			{{ range $method := $readType.Methods }}
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: {{ $method.Deprecated }}
+				{{- end }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+					{{ if $method.IsList }}
+						var fields []builder.Field
+						for _, v := range value {
+							fields = append(fields, builder.Field{
+								Value: v,
+							})
+						}
+					{{ end }}
+					return {{ $returnStruct }}{
+						data: builder.Field{
+							Name:   "{{ $field.Name }}",
+							Fields: []builder.Field{
+								{
+									Name: "{{ $method.Action }}",
+									{{ if $method.IsList }}
+										List: true,
+										Fields: fields,
+									{{ else }}
 										Value: value,
-									},
+									{{ end }}
 								},
 							},
-						}
+						},
 					}
+				}
 
-					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
-						if value == nil {
-							return {{ $returnStruct }}{}
-						}
-						return r.{{ $method.Name }}(*value)
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: {{ $method.Deprecated }}
+				{{- end }}
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+					if value == nil {
+						return {{ $returnStruct }}{}
 					}
-				{{ end }}
+					return r.{{ $method.Name }}({{ if not $method.IsList }}*{{ end }}value)
+				}
 			{{ end }}
 		{{ end }}
 	{{ end }}

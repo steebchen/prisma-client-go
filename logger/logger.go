@@ -19,8 +19,8 @@ func init() {
 
 	Debug = discard
 	if Enabled {
-		Debug = log.New(os.Stdout, "debug: ", log.Flags())
+		Debug = log.New(os.Stdout, "prisma-client-go debug: ", log.Flags())
 	}
 
-	Info = log.New(os.Stdout, "info: ", log.Flags())
+	Info = log.New(os.Stdout, "prisma-client-go info: ", log.Flags())
 }

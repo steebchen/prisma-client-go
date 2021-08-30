@@ -48,6 +48,34 @@ func (v DatamodelFieldKind) IsRelation() bool {
 type Document struct {
 	Datamodel Datamodel `json:"datamodel"`
 	Schema    Schema    `json:"schema"`
+	Mappings  Mappings  `json:"mappings"`
+}
+
+type Mappings struct {
+	ModelOperations []ModelOperation `json:"modelOperations"`
+	OtherOperations struct {
+		Read  []string `json:"read"`
+		Write []string `json:"write"`
+	} `json:"otherOperations"`
+}
+
+type ModelOperation struct {
+	Model      types.String `json:"model"`
+	Aggregate  types.String `json:"aggregate"`
+	CreateOne  types.String `json:"createOne"`
+	DeleteMany types.String `json:"deleteMany"`
+	DeleteOne  types.String `json:"deleteOne"`
+	FindFirst  types.String `json:"findFirst"`
+	FindMany   types.String `json:"findMany"`
+	FindUnique types.String `json:"findUnique"`
+	GroupBy    types.String `json:"groupBy"`
+	UpdateMany types.String `json:"updateMany"`
+	UpdateOne  types.String `json:"updateOne"`
+	UpsertOne  types.String `json:"upsertOne"`
+}
+
+func (m *ModelOperation) Namespace() string {
+	return m.Model.GoCase() + "Namespace"
 }
 
 // Operator describes a query operator such as NOT, OR, etc.
@@ -83,6 +111,10 @@ type ActionType struct {
 	InnerName  types.String
 	List       bool
 	ReturnList bool
+}
+
+func (Document) Types() []string {
+	return []string{"Unique", "Many"}
 }
 
 // Variations contains different query capabilities such as Unique, First and Many
@@ -154,65 +186,10 @@ func (Document) WriteTypes() []Type {
 	}}
 }
 
-// ReadTypes provides virtual types and their actions
-func (Document) ReadTypes() []Type {
-	number := []Method{{
-		Name:   "LT",
-		Action: "lt",
-	}, {
-		Name:   "GT",
-		Action: "gt",
-	}, {
-		Name:   "LTE",
-		Action: "lte",
-	}, {
-		Name:   "GTE",
-		Action: "gte",
-	}}
-
-	return []Type{{
-		Name: "String",
-		Methods: []Method{{
-			Name:   "Contains",
-			Action: "contains",
-		}, {
-			Name:   "HasPrefix",
-			Action: "starts_with",
-		}, {
-			Name:   "HasSuffix",
-			Action: "ends_with",
-		}},
-	}, {
-		Name:    "Boolean",
-		Methods: []Method{},
-	}, {
-		Name:    "Int",
-		Methods: number,
-	}, {
-		Name:    "Float",
-		Methods: number,
-	}, {
-		Name: "DateTime",
-		Methods: []Method{{
-			Name:   "Before",
-			Action: "lt",
-		}, {
-			Name:   "After",
-			Action: "gt",
-		}, {
-			Name:   "BeforeEquals",
-			Action: "lte",
-		}, {
-			Name:   "AfterEquals",
-			Action: "gte",
-		}},
-	}}
-}
-
 // SchemaEnum describes an enumerated type.
 type SchemaEnum struct {
-	Name   types.String   `json:"name"`
-	Values []types.String `json:"values"`
+	Name   string   `json:"name"`
+	Values []string `json:"values"`
 	// DBName (optional)
 	DBName types.String `json:"dBName"`
 }
@@ -267,10 +244,15 @@ type Model struct {
 	Name       types.String `json:"name"`
 	IsEmbedded bool         `json:"isEmbedded"`
 	// DBName (optional)
-	DBName        types.String   `json:"dbName"`
-	Fields        []Field        `json:"fields"`
-	UniqueIndexes []UniqueIndex  `json:"uniqueIndexes"`
-	IDFields      []types.String `json:"idFields"`
+	DBName        types.String  `json:"dbName"`
+	Fields        []Field       `json:"fields"`
+	UniqueIndexes []UniqueIndex `json:"uniqueIndexes"`
+	PrimaryKey    PrimaryKey    `json:"primaryKey"`
+}
+
+type PrimaryKey struct {
+	Name   types.String   `json:"name"`
+	Fields []types.String `json:"fields"`
 }
 
 func (m Model) Actions() []string {
@@ -280,10 +262,10 @@ func (m Model) Actions() []string {
 func (m Model) CompositeIndexes() []UniqueIndex {
 	var indexes []UniqueIndex
 	indexes = append(indexes, m.UniqueIndexes...)
-	if len(m.IDFields) > 0 {
+	if len(m.PrimaryKey.Fields) > 0 {
 		indexes = append(indexes, UniqueIndex{
-			InternalName: concatFieldsToName(m.IDFields),
-			Fields:       m.IDFields,
+			InternalName: concatFieldsToName(m.PrimaryKey.Fields),
+			Fields:       m.PrimaryKey.Fields,
 		})
 	}
 	return indexes
@@ -326,7 +308,7 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate() bool {
-	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly {
+	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList {
 		return false
 	}
 
@@ -366,22 +348,26 @@ type Schema struct {
 	// RootQueryType (optional)
 	RootQueryType types.String `json:"rootQueryType"`
 	// RootMutationType (optional)
-	RootMutationType  types.String     `json:"rootMutationType"`
-	InputObjectTypes  InputObjectType  `json:"inputObjectTypes"`
-	OutputObjectTypes OutputObjectType `json:"outputObjectTypes"`
-	Enums             []SchemaEnum     `json:"enums"`
+	RootMutationType  types.String    `json:"rootMutationType"`
+	InputObjectTypes  InputObjectType `json:"inputObjectTypes"`
+	OutputObjectTypes OutputObject    `json:"outputObjectTypes"`
+	EnumTypes         EnumTypes       `json:"enumTypes"`
+}
+
+type EnumTypes struct {
+	Enums []SchemaEnum `json:"model"`
 }
 
 type InputObjectType struct {
-	Prisma []InputType `json:"prisma"`
+	Prisma []CoreType `json:"prisma"`
 }
 
-type OutputObjectType struct {
+type OutputObject struct {
 	Prisma []OutputType `json:"prisma"`
 }
 
-// SchemaArg provides the arguments of a given field.
-type SchemaArg struct {
+// OuterInputType provides the arguments of a given field.
+type OuterInputType struct {
 	Name       types.String      `json:"name"`
 	InputTypes []SchemaInputType `json:"inputTypes"`
 	// IsRelationFilter (optional)
@@ -390,10 +376,13 @@ type SchemaArg struct {
 
 // SchemaInputType describes an input type of a given field.
 type SchemaInputType struct {
-	IsRequired bool       `json:"isRequired"`
-	IsList     bool       `json:"isList"`
-	Type       types.Type `json:"type"` // this was declared as ArgType
-	Kind       FieldKind  `json:"kind"`
+	IsRequired bool         `json:"isRequired"`
+	IsList     bool         `json:"isList"`
+	Type       types.Type   `json:"type"` // this was declared as ArgType
+	Kind       FieldKind    `json:"kind"`
+	Namespace  types.String `json:"namespace"`
+	// can be "scalar", "inputObjectTypes" or "outputObjectTypes"
+	Location string `json:"location"`
 }
 
 // OutputType describes a GraphQL/PQL return type.
@@ -408,7 +397,7 @@ type OutputType struct {
 type SchemaField struct {
 	Name       types.String     `json:"name"`
 	OutputType SchemaOutputType `json:"outputType"`
-	Args       []SchemaArg      `json:"args"`
+	Args       []OuterInputType `json:"args"`
 }
 
 // SchemaOutputType describes an output type of a given field.
@@ -419,8 +408,8 @@ type SchemaOutputType struct {
 	Kind       FieldKind    `json:"kind"`
 }
 
-// InputType describes a GraphQL/PQL input type.
-type InputType struct {
+// CoreType describes a GraphQL/PQL input type.
+type CoreType struct {
 	Name types.String `json:"name"`
 	// IsWhereType (optional)
 	IsWhereType bool `json:"isWhereType"`
@@ -429,8 +418,8 @@ type InputType struct {
 	// AtLeastOne (optional)
 	AtLeastOne bool `json:"atLeastOne"`
 	// AtMostOne (optional)
-	AtMostOne bool        `json:"atMostOne"`
-	Fields    []SchemaArg `json:"fields"`
+	AtMostOne bool             `json:"atMostOne"`
+	Fields    []OuterInputType `json:"fields"`
 }
 
 func concatFieldsToName(fields []types.String) types.String {

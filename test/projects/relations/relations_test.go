@@ -206,9 +206,9 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Category.Where(
-						Category.Weight.GT(3),
-						Category.Weight.LTE(3), // <- this needs to fail this part of the query, so no posts will be fetched
-						Category.Weight.LT(10),
+						Category.Weight.Gt(3),
+						Category.Weight.Lte(3), // <- this needs to fail this part of the query, so no posts will be fetched
+						Category.Weight.Lt(10),
 					),
 				),
 			).Exec(ctx)
@@ -295,10 +295,10 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Category.Where(
-						Category.Weight.GT(1),
-						Category.Weight.GTE(5),
-						Category.Weight.LTE(5),
-						Category.Weight.LT(10),
+						Category.Weight.Gt(1),
+						Category.Weight.Gte(5),
+						Category.Weight.Lte(5),
+						Category.Weight.Lt(10),
 					),
 				).With(
 					Post.Category.Fetch(),

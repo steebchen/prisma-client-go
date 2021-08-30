@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"path"
@@ -17,6 +18,10 @@ import (
 
 func (e *QueryEngine) Connect() error {
 	logger.Debug.Printf("ensure query engine binary...")
+
+	_ = godotenv.Load(".env")
+	_ = godotenv.Load("db/.env")
+	_ = godotenv.Load("prisma/.env")
 
 	startEngine := time.Now()
 
@@ -38,22 +43,20 @@ func (e *QueryEngine) Connect() error {
 func (e *QueryEngine) Disconnect() error {
 	logger.Debug.Printf("disconnecting...")
 
-	if platform.Name() != "windows" {
-		if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
-			return fmt.Errorf("send signal: %w", err)
-		}
-
-		if err := e.cmd.Wait(); err != nil {
-			// TODO: is this a bug in the query-engine?
-			if err.Error() != "signal: interrupt" {
-				return fmt.Errorf("wait for process: %w", err)
-			}
-		}
-	}
-
 	if platform.Name() == "windows" {
 		if err := e.cmd.Process.Kill(); err != nil {
 			return fmt.Errorf("kill process: %w", err)
+		}
+		return nil
+	}
+
+	if err := e.cmd.Process.Signal(os.Interrupt); err != nil {
+		return fmt.Errorf("send signal: %w", err)
+	}
+
+	if err := e.cmd.Wait(); err != nil {
+		if err.Error() != "signal: interrupt" {
+			return fmt.Errorf("wait for process: %w", err)
 		}
 	}
 
@@ -127,7 +130,8 @@ func (e *QueryEngine) ensure() (string, error) {
 	logger.Debug.Printf("version check took %s", time.Since(startVersion))
 
 	if v := strings.TrimSpace(strings.Replace(string(out), "query-engine", "", 1)); binaries.EngineVersion != v {
-		msg := fmt.Errorf("expected query engine version `%s` but got `%s`", binaries.EngineVersion, v)
+		note := "Did you forget to run `go run github.com/prisma/prisma-client-go generate`?"
+		msg := fmt.Errorf("expected query engine version `%s` but got `%s`\n%s", binaries.EngineVersion, v, note)
 		if forceVersion {
 			return "", msg
 		}

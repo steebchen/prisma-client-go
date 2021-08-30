@@ -14,10 +14,8 @@ import (
 	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
-var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
-	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
-var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding" +
-	" \\'0\\'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
+var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
+var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
 
 // Do sends the http Request to the query engine and unmarshals the response
 func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}) error {
