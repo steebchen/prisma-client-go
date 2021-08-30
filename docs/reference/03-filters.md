@@ -38,9 +38,9 @@ db.Post.Title.Equals("my post"),
 // query for titles containing the string "post"
 db.Post.Title.Contains("post"),
 // query for titles starting with "my"
-db.Post.Title.HasPrefix("my"),
+db.Post.Title.StartsWith("my"),
 // query for titles ending with "post"
-db.Post.Title.HasSuffix("post"),
+db.Post.Title.EndsWith("post"),
 ```
 
 ### Number filters
@@ -49,13 +49,13 @@ db.Post.Title.HasSuffix("post"),
 // query for all posts which have exactly 50 views
 db.Post.Views.Equals(50),
 // query for all posts which have less than or exactly 50 views
-db.Post.Views.LTE(50),
+db.Post.Views.Lte(50),
 // query for all posts which have less than 50 views
-db.Post.Views.LT(50),
+db.Post.Views.Lt(50),
 // query for all posts which have more than or exactly 50 views
-db.Post.Views.GT(50),
+db.Post.Views.Gt(50),
 // query for all posts which have more than 50 views
-db.Post.Views.GTE(50),
+db.Post.Views.Gte(50),
 ```
 
 ### Time filters
@@ -64,13 +64,13 @@ db.Post.Views.GTE(50),
 // query for all posts which equal an exact date
 db.Post.CreatedAt.Equals(yesterday),
 // query for all posts which were created in the last 6 hours
-db.Post.CreatedAt.After(time.Now().Add(-6 * time.Hour)),
+db.Post.CreatedAt.Gt(time.Now().Add(-6 * time.Hour)),
 // query for all posts which were created in the last 6 hours including right now
-db.Post.CreatedAt.BeforeEquals(time.Now().Add(-6 * time.Hour)),
+db.Post.CreatedAt.Lte(time.Now().Add(-6 * time.Hour)),
 // query for all posts which were created until yesterday
-db.Post.CreatedAt.Before(time.Now().Truncate(24 * time.Hour)),
+db.Post.CreatedAt.Lt(time.Now().Truncate(24 * time.Hour)),
 // query for all posts which were created until yesterday including right now
-db.Post.CreatedAt.BeforeEquals(time.Now().Truncate(24 * time.Hour)),
+db.Post.CreatedAt.Lte(time.Now().Truncate(24 * time.Hour)),
 ```
 
 ### Optional type filters
