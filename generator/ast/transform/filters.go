@@ -8,6 +8,9 @@ type Method struct {
 	Action string
 	// IsList defines whether the filter accepts a scalar or a slice of scalars
 	IsList bool
+	// Deprecated contains a description of what else to use, as this method will be removed in the future
+	// If empty, this method is not deprecated
+	Deprecated string
 }
 
 // Filter defines the data struct for the virtual types method
