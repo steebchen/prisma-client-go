@@ -81,3 +81,80 @@ func convertField(field dmmf.OuterInputType) *Method {
 		IsList: isList,
 	}
 }
+
+// deprecatedReadFilters contains a hard-coded list of old filters to not breaking existing users
+// these can be removed at some point in the future
+func (r *AST) deprecatedReadFilters() []Filter {
+	numberFilters := []Method{
+		{
+			Name:       "LT",
+			Action:     "lt",
+			Deprecated: "Use Lt instead.",
+		},
+		{
+			Name:       "LTE",
+			Action:     "lte",
+			Deprecated: "Use Lte instead.",
+		},
+		{
+			Name:       "GT",
+			Action:     "gt",
+			Deprecated: "Use Gt instead.",
+		},
+		{
+			Name:       "GTE",
+			Action:     "gte",
+			Deprecated: "Use Gte instead.",
+		},
+	}
+	return []Filter{
+		{
+			Name:    "Int",
+			Methods: numberFilters,
+		},
+		{
+			Name:    "Float",
+			Methods: numberFilters,
+		},
+		{
+			Name: "String",
+			Methods: []Method{
+				{
+					Name:       "HasPrefix",
+					Action:     "starts_with",
+					Deprecated: "Use StartsWith instead.",
+				},
+				{
+					Name:       "HasSuffix",
+					Action:     "ends_with",
+					Deprecated: "Use EndsWith instead.",
+				},
+			},
+		},
+		{
+			Name: "DateTime",
+			Methods: []Method{
+				{
+					Name:       "Before",
+					Action:     "lt",
+					Deprecated: "Use Lt instead.",
+				},
+				{
+					Name:       "After",
+					Action:     "gt",
+					Deprecated: "Use Gt instead.",
+				},
+				{
+					Name:       "BeforeEquals",
+					Action:     "lte",
+					Deprecated: "Use Lte instead.",
+				},
+				{
+					Name:       "AfterEquals",
+					Action:     "gte",
+					Deprecated: "Use Gte instead.",
+				},
+			},
+		},
+	}
+}

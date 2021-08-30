@@ -425,6 +425,9 @@
 		{{ $readType := $.AST.ReadFilter $field.Type.String }}
 		{{ if $readType }}
 			{{ range $method := $readType.Methods }}
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: {{ $method.Deprecated }}
+				{{- end }}
 				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
 					{{ if $method.IsList }}
 						var fields []builder.Field
@@ -452,6 +455,9 @@
 					}
 				}
 
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: {{ $method.Deprecated }}
+				{{- end }}
 				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
 					if value == nil {
 						return {{ $returnStruct }}{}

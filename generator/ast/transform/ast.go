@@ -33,6 +33,16 @@ func New(document *dmmf.Document) *AST {
 	ast.ReadFilters = ast.readFilters()
 	ast.WriteFilters = ast.writeFilters()
 
+	// add old, deprecated filters which are just added for compatibility reasons
+	// these can be removed at some point
+	for _, filter := range ast.deprecatedReadFilters() {
+		for i, f := range ast.ReadFilters {
+			if f.Name == filter.Name {
+				ast.ReadFilters[i].Methods = append(ast.ReadFilters[i].Methods, filter.Methods...)
+			}
+		}
+	}
+
 	return ast
 }
 
