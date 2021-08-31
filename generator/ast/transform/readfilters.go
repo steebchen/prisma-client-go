@@ -89,22 +89,22 @@ func (r *AST) deprecatedReadFilters() []Filter {
 		{
 			Name:       "LT",
 			Action:     "lt",
-			Deprecated: "Use Lt instead.",
+			Deprecated: "Lt",
 		},
 		{
 			Name:       "LTE",
 			Action:     "lte",
-			Deprecated: "Use Lte instead.",
+			Deprecated: "Lte",
 		},
 		{
 			Name:       "GT",
 			Action:     "gt",
-			Deprecated: "Use Gt instead.",
+			Deprecated: "Gt",
 		},
 		{
 			Name:       "GTE",
 			Action:     "gte",
-			Deprecated: "Use Gte instead.",
+			Deprecated: "Gte",
 		},
 	}
 	return []Filter{
@@ -122,12 +122,12 @@ func (r *AST) deprecatedReadFilters() []Filter {
 				{
 					Name:       "HasPrefix",
 					Action:     "starts_with",
-					Deprecated: "Use StartsWith instead.",
+					Deprecated: "StartsWith",
 				},
 				{
 					Name:       "HasSuffix",
 					Action:     "ends_with",
-					Deprecated: "Use EndsWith instead.",
+					Deprecated: "EndsWith",
 				},
 			},
 		},
@@ -137,22 +137,22 @@ func (r *AST) deprecatedReadFilters() []Filter {
 				{
 					Name:       "Before",
 					Action:     "lt",
-					Deprecated: "Use Lt instead.",
+					Deprecated: "Lt",
 				},
 				{
 					Name:       "After",
 					Action:     "gt",
-					Deprecated: "Use Gt instead.",
+					Deprecated: "Gt",
 				},
 				{
 					Name:       "BeforeEquals",
 					Action:     "lte",
-					Deprecated: "Use Lte instead.",
+					Deprecated: "Lte",
 				},
 				{
 					Name:       "AfterEquals",
 					Action:     "gte",
-					Deprecated: "Use Gte instead.",
+					Deprecated: "Gte",
 				},
 			},
 		},

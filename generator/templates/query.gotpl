@@ -426,7 +426,7 @@
 		{{ if $readType }}
 			{{ range $method := $readType.Methods }}
 				{{ if ne $method.Deprecated "" }}
-					// deprecated: {{ $method.Deprecated }}
+					// deprecated: Use {{ $method.Deprecated }} instead.
 				{{- end }}
 				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
 					{{ if $method.IsList }}
@@ -456,7 +456,7 @@
 				}
 
 				{{ if ne $method.Deprecated "" }}
-					// deprecated: {{ $method.Deprecated }}
+					// deprecated: Use {{ $method.Deprecated }}IfPresent instead.
 				{{- end }}
 				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
 					if value == nil {
