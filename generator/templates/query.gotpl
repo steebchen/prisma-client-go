@@ -1,6 +1,6 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
-{{ range $model := $.DMMF.Datamodel.Models }}
+{{ range $model := $.AST.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
 	{{ $nsQuery := (print $name "Query") }}
@@ -49,7 +49,7 @@
 	{{ end }}
 
 	{{/* composite keys for FindUnique */}}
-	{{ range $unique := $model.CompositeIndexes }}
+	{{ range $unique := $model.OldModel.CompositeIndexes }}
 		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,

@@ -13,6 +13,9 @@ type AST struct {
 	// Enums contains all enums
 	Enums []Enum `json:"enums"`
 
+	// Models contains top-level information including fields and their respective filters
+	Models []Model `json:"models"`
+
 	// ReadFilters describe a list of scalar types and the respective read operations
 	ReadFilters []Filter `json:"readFilters"`
 
@@ -28,6 +31,9 @@ func New(document *dmmf.Document) *AST {
 	// first, fetch types
 	ast.Scalars = ast.scalars()
 	ast.Enums = ast.enums()
+
+	// fetch data
+	ast.Models = ast.models()
 
 	// fetch data which is needed for the query api, which require ast types
 	ast.ReadFilters = ast.readFilters()

@@ -15,7 +15,7 @@ type Method struct {
 
 // Filter defines the data struct for the virtual types method
 type Filter struct {
-	// Name of a type, e.g. String, Int or DateTime, or enum, e.g. Role
+	// Name of a filter, which can be a scala like `Int`, or a field name like `Age`
 	Name string
 	// Methods describe filter methods, such as `Equals`, `In` or `Contains`
 	Methods []Method
