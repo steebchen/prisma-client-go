@@ -2,7 +2,7 @@ name: lint all
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go lint.yml"
