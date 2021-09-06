@@ -49,6 +49,9 @@ func New(document *dmmf.Document) *AST {
 		}
 	}
 
+	ast.applyRelationReadFilters()
+	ast.applyDeprecatedRelationReadFilters()
+
 	return ast
 }
 

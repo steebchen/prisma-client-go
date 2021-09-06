@@ -10,13 +10,15 @@ type Model struct {
 	Fields []Field      `json:"fields"`
 
 	// TODO remove this and apply all required data directly to model
-	OldModel dmmf.Model
+	OldModel dmmf.Model `json:"-"`
 }
 
 type Field struct {
 	// TODO re-declare all fields here instead of embedding dmmf.Field
 
 	dmmf.Field
+
+	RelationReadMethods []Method `json:"relationReadMethods"`
 }
 
 func (r *AST) models() []Model {

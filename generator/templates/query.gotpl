@@ -86,7 +86,10 @@
 		{{ if $field.Kind.IsRelation }}
 			type {{ $nsQuery }}{{ $field.Name.GoCase }}Relations struct {}
 
-			{{ range $method := $field.RelationMethods }}
+			{{ range $method := $field.RelationReadMethods }}
+				{{- if ne $method.Deprecated "" }}
+					// deprecated: Use {{ $method.Deprecated }} instead.
+				{{- end }}
 				// {{ $nameUpper }} -> {{ $field.Name.GoCase }}
 				//
 				// @relation
@@ -107,6 +110,7 @@
 								{
 									Name: "{{ $method.Action }}",
 									Fields: []builder.Field{builder.Field{
+										{{/* TODO what is this for? */}}
 										Name:     "AND",
 										List:     true,
 										WrapList: true,
