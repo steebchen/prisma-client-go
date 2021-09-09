@@ -58,6 +58,13 @@ type Mock struct {
 		})
 	}
 
+	func (m *{{ $ns }}Exec) ReturnsMany(v []{{ $model.Name.GoCase }}Model) {
+		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
+			Query: m.query,
+			Want:  &v,
+		})
+	}
+
 	func (m *{{ $ns }}Exec) Errors(err error) {
 		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
 			Query:   m.query,
