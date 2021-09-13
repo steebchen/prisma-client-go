@@ -49,7 +49,7 @@
 	{{ end }}
 
 	{{/* composite keys for FindUnique */}}
-	{{ range $unique := $model.OldModel.CompositeIndexes }}
+	{{ range $unique := $model.Indexes }}
 		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
@@ -63,7 +63,7 @@
 
 			return {{ $model.Name.GoLowerCase }}EqualsUniqueParam{
 				data: builder.Field{
-					Name:   "{{ $unique.ASTName }}",
+					Name:   "{{ $unique.InternalName }}",
 					Fields: builder.TransformEquals(fields),
 				},
 			}
