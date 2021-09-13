@@ -6,8 +6,9 @@ import (
 )
 
 type Model struct {
-	Name   types.String `json:"name"`
-	Fields []Field      `json:"fields"`
+	Name    types.String `json:"name"`
+	Fields  []Field      `json:"fields"`
+	Indexes []Index      `json:"indexes"`
 
 	// TODO remove this and apply all required data directly to model
 	OldModel dmmf.Model `json:"-"`
@@ -30,11 +31,13 @@ func (r *AST) models() []Model {
 				Field: field,
 			})
 		}
-		models = append(models, Model{
+		m := Model{
 			Name:     model.Name,
 			Fields:   fields,
 			OldModel: model,
-		})
+		}
+		m.Indexes = indexes(model)
+		models = append(models, m)
 	}
 	return models
 }

@@ -216,26 +216,8 @@ type Datamodel struct {
 }
 
 type UniqueIndex struct {
-	InternalName types.String   `json:"name"`
+	InternalName string         `json:"name"`
 	Fields       []types.String `json:"fields"`
-}
-
-func (m *UniqueIndex) Name() types.String {
-	if m.InternalName != "" {
-		return m.InternalName
-	}
-	var name string
-	for _, f := range m.Fields {
-		name += f.GoCase()
-	}
-	return types.String(name)
-}
-
-func (m *UniqueIndex) ASTName() types.String {
-	if m.InternalName != "" {
-		return m.InternalName
-	}
-	return concatFieldsToName(m.Fields)
 }
 
 // Model describes a Prisma type model, which usually maps to a database table or collection.
@@ -257,18 +239,6 @@ type PrimaryKey struct {
 
 func (m Model) Actions() []string {
 	return []string{"Set", "Equals"}
-}
-
-func (m Model) CompositeIndexes() []UniqueIndex {
-	var indexes []UniqueIndex
-	indexes = append(indexes, m.UniqueIndexes...)
-	if len(m.PrimaryKey.Fields) > 0 {
-		indexes = append(indexes, UniqueIndex{
-			InternalName: concatFieldsToName(m.PrimaryKey.Fields),
-			Fields:       m.PrimaryKey.Fields,
-		})
-	}
-	return indexes
 }
 
 // RelationFieldsPlusOne returns all fields plus an empty one, so it's easier to iterate through it in some gotpl files
@@ -396,15 +366,4 @@ type CoreType struct {
 	// AtMostOne (optional)
 	AtMostOne bool             `json:"atMostOne"`
 	Fields    []OuterInputType `json:"fields"`
-}
-
-func concatFieldsToName(fields []types.String) types.String {
-	var name types.String
-	for i, f := range fields {
-		if i > 0 {
-			name += "_"
-		}
-		name += f
-	}
-	return name
 }
