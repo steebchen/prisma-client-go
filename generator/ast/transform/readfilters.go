@@ -1,14 +1,15 @@
 package transform
 
 import (
-	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"strings"
+
+	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 )
 
 func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
-		p := r.pick(scalar + "ReadFilter")
+		p := r.pick(scalar + "Filter")
 		if p == nil {
 			p = r.pick(scalar + "NullableFilter")
 			if p == nil {
