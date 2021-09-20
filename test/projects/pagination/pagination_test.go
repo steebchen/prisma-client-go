@@ -55,6 +55,70 @@ func TestPagination(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
+				Post.Title.Order(SortOrderAsc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "a",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "order by ASC (deprecated)",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(ASC),
 			).Exec(ctx)
 			if err != nil {
@@ -85,6 +149,70 @@ func TestPagination(t *testing.T) {
 		},
 	}, {
 		name: "order by DESC",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
+				Post.Title.Order(SortOrderDesc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "a",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "order by DESC (deprecated)",
 		// language=GraphQL
 		before: []string{`
 			mutation {

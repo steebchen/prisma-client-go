@@ -27,6 +27,8 @@ import (
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
 
+const RFC3339Milli = types.RFC3339Milli
+
 type BatchResult = types.BatchResult
 
 type DateTime = types.DateTime
@@ -35,11 +37,12 @@ type Bytes    = types.Bytes
 type BigInt   = types.BigInt
 type Decimal  = types.Decimal
 
-type Direction = types.Direction
+// deprecated: use SortOrder
+type Direction = SortOrder
 
 const (
-	ASC  Direction = types.ASC
-	DESC Direction = types.DESC
+	// deprecated: use SortOrderAsc
+	ASC  Direction = "asc"
+	// deprecated: use SortOrderDesc
+	DESC Direction = "desc"
 )
-
-const RFC3339Milli = types.RFC3339Milli
