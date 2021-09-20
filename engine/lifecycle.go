@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 
 	"github.com/prisma/prisma-client-go/binaries"
 	"github.com/prisma/prisma-client-go/binaries/platform"
@@ -165,6 +166,7 @@ func (e *QueryEngine) spawn(file string) error {
 		"PRISMA_DML="+e.Schema,
 		"RUST_LOG=error",
 		"RUST_LOG_FORMAT=json",
+		"PRISMA_CLIENT_ENGINE_TYPE=binary",
 	)
 
 	// TODO fine tune this using log levels
