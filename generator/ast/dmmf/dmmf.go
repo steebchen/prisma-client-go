@@ -186,10 +186,10 @@ func (Document) WriteTypes() []Type {
 	}}
 }
 
-// SchemaEnum describes an enumerated type.
+// SchemaEnum describes an enumerated internal prisma type.
 type SchemaEnum struct {
-	Name   string   `json:"name"`
-	Values []string `json:"values"`
+	Name   types.String   `json:"name"`
+	Values []types.String `json:"values"`
 	// DBName (optional)
 	DBName types.String `json:"dBName"`
 }
@@ -301,7 +301,8 @@ type Schema struct {
 }
 
 type EnumTypes struct {
-	Enums []SchemaEnum `json:"model"`
+	Prisma []SchemaEnum `json:"prisma"`
+	Model  []SchemaEnum `json:"model"`
 }
 
 type InputObjectType struct {

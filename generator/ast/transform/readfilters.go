@@ -28,9 +28,9 @@ func (r *AST) readFilters() []Filter {
 		})
 	}
 	for _, enum := range r.Enums {
-		p := r.pick("Enum" + enum.Name + "Filter")
+		p := r.pick("Enum" + enum.Name.String() + "Filter")
 		if p == nil {
-			p = r.pick("Enum" + enum.Name + "NullableFilter")
+			p = r.pick("Enum" + enum.Name.String() + "NullableFilter")
 			if p == nil {
 				continue
 			}
@@ -44,7 +44,7 @@ func (r *AST) readFilters() []Filter {
 		}
 
 		filters = append(filters, Filter{
-			Name:    enum.Name,
+			Name:    enum.Name.String(),
 			Methods: fields,
 		})
 	}

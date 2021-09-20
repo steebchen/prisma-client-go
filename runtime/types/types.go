@@ -68,11 +68,3 @@ func (m *JSON) UnmarshalJSON(data []byte) error {
 	*m = append((*m)[0:0], str...)
 	return nil
 }
-
-// Direction describes
-type Direction string
-
-const (
-	ASC  Direction = "asc"
-	DESC Direction = "desc"
-)
