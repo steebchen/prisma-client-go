@@ -16,11 +16,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "3.0.2"
+const PrismaVersion = "3.1.1"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
-// The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "2452cc6313d52b8b9a96999ac0e974d0aedf88db"
+// The versions can be found under https://github.com/prisma/prisma-engines/commits/master
+const EngineVersion = "c22652b7e418506fab23052d569b85d3aec4883f"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
