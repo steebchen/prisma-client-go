@@ -115,7 +115,7 @@ func TestRelations(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany(
 				Post.Title.Equals("common"),
-				Post.Author.Is(
+				Post.Author.Where(
 					User.Email.Equals("john@example.com"),
 				),
 			).OrderBy(Post.ID.Order(ASC)).Exec(ctx)
@@ -205,7 +205,7 @@ func TestRelations(t *testing.T) {
 				User.ID.Equals("relations"),
 			).With(
 				User.Posts.Fetch(
-					Post.Category.Is(
+					Post.Category.Where(
 						Category.Weight.Gt(3),
 						Category.Weight.Lte(3), // <- this needs to fail this part of the query, so no posts will be fetched
 						Category.Weight.Lt(10),
@@ -294,7 +294,7 @@ func TestRelations(t *testing.T) {
 				User.ID.Equals("relations"),
 			).With(
 				User.Posts.Fetch(
-					Post.Category.Is(
+					Post.Category.Where(
 						Category.Weight.Gt(1),
 						Category.Weight.Gte(5),
 						Category.Weight.Lte(5),
@@ -404,58 +404,6 @@ func TestRelations(t *testing.T) {
 		},
 	}, {
 		name: "create and connect",
-		// language=GraphQL
-		before: []string{`
-			mutation {
-				result: createOneUser(data: {
-					id: "123",
-					email: "john@example.com",
-					username: "johndoe",
-					name: "John",
-				}) {
-					id
-				}
-			}
-		`},
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			title := "What's up?"
-			userID := "123"
-
-			created, err := client.Post.CreateOne(
-				Post.Title.Set(title),
-				Post.Author.Link(
-					User.ID.Equals(userID),
-				),
-				Post.ID.Set("post"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			expected := &PostModel{
-				InnerPost: InnerPost{
-					ID:       "post",
-					Title:    title,
-					AuthorID: "123",
-				},
-			}
-
-			assert.Equal(t, expected, created)
-
-			posts, err := client.Post.FindMany(
-				Post.Title.Equals(title),
-				Post.Author.Is(
-					User.ID.Equals(userID),
-				),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			assert.Equal(t, []PostModel{*expected}, posts)
-		},
-	}, {
-		name: "create and connect with deprecated `Where()`",
 		// language=GraphQL
 		before: []string{`
 			mutation {
