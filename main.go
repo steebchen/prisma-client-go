@@ -8,12 +8,6 @@ import (
 
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/logger"
-
-	// ensure imports can be detected by go.mod
-	_ "github.com/iancoleman/strcase"
-	_ "github.com/joho/godotenv"
-	_ "github.com/shopspring/decimal"
-	_ "github.com/takuoki/gocase"
 )
 
 func main() {
