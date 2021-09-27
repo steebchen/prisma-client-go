@@ -125,6 +125,11 @@ func generateBinaries(input *Root) error {
 		return nil
 	}
 
+	if input.Generator.Config.EngineType == "dataproxy" {
+		logger.Debug.Printf("using data proxy; not fetching any engines")
+		return nil
+	}
+
 	var targets []string
 
 	for _, target := range input.Generator.BinaryTargets {
