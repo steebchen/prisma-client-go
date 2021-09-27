@@ -31,27 +31,6 @@ func addDefaults(input *Root) {
 func Run(input *Root) error {
 	addDefaults(input)
 
-	var targets []string
-
-	for _, target := range input.Generator.BinaryTargets {
-		targets = append(targets, target.Value)
-	}
-
-	targets = add(targets, "native")
-	targets = add(targets, "linux")
-
-	// TODO refactor
-	for _, name := range targets {
-		if name == "native" {
-			name = platform.BinaryPlatformName()
-		}
-
-		// first, ensure they are actually downloaded
-		if err := binaries.FetchEngine(binaries.GlobalCacheDir(), "query-engine", name); err != nil {
-			return fmt.Errorf("failed fetching binaries: %w", err)
-		}
-	}
-
 	var buf bytes.Buffer
 
 	ctx := build.Default
@@ -128,6 +107,27 @@ func Run(input *Root) error {
 	}
 
 	if input.Generator.Config.DisableGoBinaries != "true" {
+		var targets []string
+
+		for _, target := range input.Generator.BinaryTargets {
+			targets = append(targets, target.Value)
+		}
+
+		targets = add(targets, "native")
+		targets = add(targets, "linux")
+
+		// TODO refactor
+		for _, name := range targets {
+			if name == "native" {
+				name = platform.BinaryPlatformName()
+			}
+
+			// first, ensure they are actually downloaded
+			if err := binaries.FetchEngine(binaries.GlobalCacheDir(), "query-engine", name); err != nil {
+				return fmt.Errorf("failed fetching binaries: %w", err)
+			}
+		}
+
 		if err := generateQueryEngineFiles(targets, input.Generator.Config.Package.String(), output); err != nil {
 			return fmt.Errorf("could not write template data to file writer %s: %w", outFile, err)
 		}
