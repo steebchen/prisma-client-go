@@ -45,8 +45,8 @@ type BinaryTarget struct {
 }
 
 type Value struct {
-	FromEnvVar string       `json:"fromEnvVar"`
-	Value      types.String `json:"value"`
+	FromEnvVar string `json:"fromEnvVar"`
+	Value      string `json:"value"`
 }
 
 // ConnectorType describes the Database of this generator.
