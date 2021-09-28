@@ -20,10 +20,11 @@ import (
 	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
-func NewDataProxyEngine(schema string) *DataProxyEngine {
+func NewDataProxyEngine(schema, schemaEnvVarName string) *DataProxyEngine {
 	return &DataProxyEngine{
-		Schema: schema,
-		http:   &http.Client{},
+		Schema:           schema,
+		schemaEnvVarName: schemaEnvVarName,
+		http:             &http.Client{},
 	}
 }
 
@@ -33,6 +34,10 @@ type DataProxyEngine struct {
 
 	// url holds the query-engine url
 	url string
+
+	// schemaEnvVarName is the env var for the datasource url
+	// this is needed internally to extract the api key
+	schemaEnvVarName string
 
 	// Schema contains the prisma Schema
 	Schema string
@@ -46,8 +51,12 @@ func (e *DataProxyEngine) Connect() error {
 	hash := hashSchema(e.Schema)
 	logger.Debug.Printf("local schema hash %s", hash)
 
-	// TODO get env name dynamically from db_gen.go / dmmf
-	connectionString := os.Getenv("DATABASE_URL")
+	logger.Debug.Printf("parsing connection string from database url %s", e.schemaEnvVarName)
+
+	connectionString := os.Getenv(e.schemaEnvVarName)
+	if connectionString == "" {
+		return fmt.Errorf("no connection string found")
+	}
 	u, err := url.Parse(connectionString)
 	if err != nil {
 		return fmt.Errorf("parse prisma string: %w", err)
@@ -123,7 +132,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
 
-	logger.Debug.Printf("[timing] request unmarshaling took %s", time.Since(startParse))
+	logger.Debug.Printf("[timing] request unmarshal took %s", time.Since(startParse))
 
 	return nil
 }
