@@ -66,7 +66,7 @@ func (e *DataProxyEngine) Connect() error {
 		return fmt.Errorf("could not parse api key from data proxy prisma connection string")
 	}
 
-	e.url = getCloudUri(u.Host, hash)
+	e.url = getCloudURI(u.Host, hash)
 	logger.Debug.Printf("using %s as remote URI", e.url)
 	if err := e.uploadSchema(context.Background()); err != nil {
 		return fmt.Errorf("upload schema: %w", err)
@@ -220,6 +220,6 @@ func encodeSchema(schema string) string {
 	return fmt.Sprint(base64.StdEncoding.EncodeToString([]byte(schema + "\n")))
 }
 
-func getCloudUri(host, schemaHash string) string {
+func getCloudURI(host, schemaHash string) string {
 	return "https://" + path.Join(host, binaries.PrismaVersion, schemaHash)
 }

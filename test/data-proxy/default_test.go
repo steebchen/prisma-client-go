@@ -18,8 +18,8 @@ func str(v string) *string {
 	return &v
 }
 
-func TestRemoteDataProxy(t *testing.T) {
-	test.RunSerial(t, []test.Database{test.SQLite}, func(t *testing.T, db test.Database, ctx context.Context) {
+func TestE2ERemoteDataProxy(t *testing.T) {
+	test.RunSerial(t, []test.Database{test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
 		client := NewClient()
 		if err := client.Connect(); err != nil {
 			t.Fatalf("fail %s", err)
