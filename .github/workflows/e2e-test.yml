@@ -37,3 +37,5 @@ jobs:
 
       - name: test
         run: go test ./... -run '^TestE2E.*$' -v
+        env:
+          DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}
