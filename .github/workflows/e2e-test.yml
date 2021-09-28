@@ -1,0 +1,39 @@
+name: e2e test all
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+env:
+  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go e2e-test.yml"
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '1.14'
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache
+          restore-keys: ${{ runner.os }}-go-
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+
+      - name: deps
+        run: go mod download
+
+      - name: generate
+        run: go generate ./...
+
+      - name: setup
+        run: go run ./test/setup/init setup
+
+      - name: test
+        run: go test ./... -run '^TestE2E.*$' -v
