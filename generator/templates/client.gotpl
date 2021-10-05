@@ -28,7 +28,7 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //   }()
 func NewClient() *PrismaClient {
 	c := newClient()
-	{{ if eq $.Generator.Config.EngineType "dataproxy" }}
+	{{ if eq $.GetEngineType "dataproxy" }}
 		c.Engine = engine.NewDataProxyEngine(schema, schemaEnvVarName)
 	{{ else }}
 		c.Engine = engine.NewQueryEngine(schema, hasBinaryTargets)

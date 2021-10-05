@@ -1,6 +1,8 @@
 package generator
 
 import (
+	"os"
+
 	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"github.com/prisma/prisma-client-go/generator/ast/transform"
 	"github.com/prisma/prisma-client-go/generator/types"
@@ -18,6 +20,16 @@ type Root struct {
 	// BinaryPaths (optional)
 	BinaryPaths BinaryPaths    `json:"binaryPaths"`
 	AST         *transform.AST `json:"ast"`
+}
+
+func (r *Root) GetEngineType() string {
+	if str := os.Getenv("PRISMA_CLIENT_ENGINE_TYPE"); str != "" {
+		return str
+	}
+	if str := r.Generator.Config.EngineType; str != "" {
+		return str
+	}
+	return "binary"
 }
 
 // Config describes the options for the Prisma Client Go generator

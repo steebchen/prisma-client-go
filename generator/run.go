@@ -134,7 +134,7 @@ func generateBinaries(input *Root) error {
 		return nil
 	}
 
-	if input.Generator.Config.EngineType == "dataproxy" {
+	if input.GetEngineType() == "dataproxy" {
 		logger.Debug.Printf("using data proxy; not fetching any engines")
 		return nil
 	}
