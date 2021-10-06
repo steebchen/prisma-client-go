@@ -47,21 +47,16 @@
     ```
 
     To get this up and running in your database, we use the Prisma migration
-    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) (Note: this tool is experimental) to create and migrate our
-    database:
+    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate our database:
 
      ```shell script
     # sync the database with your schema
-    go run github.com/prisma/prisma-client-go db push
+    go run github.com/prisma/prisma-client-go migrate dev --name init
     ```
 
-4) Generate the Prisma Client Go client in your project
+    After the migration, the Prisma Client Go client is automatically generated in your project.
 
-    ```shell script
-    go run github.com/prisma/prisma-client-go generate
-    ```
-
-    If you make changes to your prisma schema, you need to run this command again.
+    If you just want to re-generate the client, run `go run github.com/prisma/prisma-client-go generate`.
 
 ## Usage
 
