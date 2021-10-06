@@ -1,6 +1,10 @@
 //go:build e2e
 // +build e2e
 
+//go:generate sed -n "s|__REPLACE__|$DATA_PROXY_DATABASE_URL|g;w schema.out.prisma" schema.template.prisma
+//go:generate go run github.com/prisma/prisma-client-go generate --schema schema.out.prisma
+
+// This test checks whether the data proxy works with the connection string being hardcoded in the prisma schema
 package db
 
 import (
@@ -21,7 +25,7 @@ func str(v string) *string {
 	return &v
 }
 
-func TestE2ERemoteDataProxy(t *testing.T) {
+func TestE2ERemoteDataProxyURLSchema(t *testing.T) {
 	test.RunSerial(t, []test.Database{test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
 		client := NewClient()
 		if err := client.Connect(); err != nil {
