@@ -30,10 +30,7 @@ jobs:
         run: go mod download
 
       - name: generate
-        run: go generate ./...
-
-      - name: setup
-        run: go run ./test/setup/init setup
+        run: go generate -tags e2e ./test/e2e/...
 
       - name: test
         run: go test ./... -run '^TestE2E.*$' -tags e2e -v
