@@ -56,7 +56,7 @@
 
     After the migration, the Prisma Client Go client is automatically generated in your project.
 
-    If you make changes to your prisma schema, you need to run this command again.
+    If you just want to re-generate the client, run `go run github.com/prisma/prisma-client-go generate`.
 
 ## Usage
 
