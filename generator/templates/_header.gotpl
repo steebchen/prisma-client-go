@@ -8,7 +8,7 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"testing"
-	"os"
+	_ "os"
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/engine/mock"
