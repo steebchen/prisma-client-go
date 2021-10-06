@@ -69,11 +69,7 @@ model Post {
 Whenever you make changes to your model, migrate your database and re-generate your prisma code:
 
 ```shell script
-# apply migrations
-go run github.com/prisma/prisma-client-go migrate save --experimental --name "add comment model"
-go run github.com/prisma/prisma-client-go migrate up --experimental
-# generate
-go run github.com/prisma/prisma-client-go generate
+go run github.com/prisma/prisma-client-go migrate dev --name add_comment_model
 ```
 
 In order to create comments, we first need to create a post, and then reference that post when creating a comment.
