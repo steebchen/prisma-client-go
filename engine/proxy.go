@@ -62,8 +62,6 @@ func (e *DataProxyEngine) Connect() error {
 	}
 
 	e.url = getCloudURI(u.Host, hash)
-	// TODO temp: remove this once prisma data proxy works with recent stable versions – right now only 3.0.1 works
-	e.url = "https://" + path.Join(u.Host, "3.0.1", hash)
 	logger.Debug.Printf("using %s as remote URI", e.url)
 	if err := e.uploadSchema(context.Background()); err != nil {
 		return fmt.Errorf("upload schema: %w", err)
