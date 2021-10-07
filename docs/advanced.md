@@ -170,10 +170,10 @@ few of their comments in just a few lines and fully type-safe:
 ```go
 // return a post by its id including 5 of its comments
 post, err := client.Post.FindUnique(
-    Post.ID.Equals("123"),
+    db.Post.ID.Equals("123"),
 ).With(
     // also fetch 3 this post's comments
-    Post.Comments.Fetch().Take(3),
+    db.Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 
 // will log post and its comments
