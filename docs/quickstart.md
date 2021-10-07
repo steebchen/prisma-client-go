@@ -27,6 +27,12 @@
         // could be postgresql or mysql
         provider = "sqlite"
         url      = "file:dev.db"
+
+        // provider = "postgresql"
+        // url      = "postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=SCHEMA"
+
+        // provider = "mysql"
+        // url      = "mysql://USER:PASSWORD@HOST:PORT/DATABASE"
     }
 
     generator db {
@@ -37,7 +43,7 @@
     }
 
     model Post {
-        id        String   @default(cuid()) @id
+        id        String   @id @default(cuid())
         createdAt DateTime @default(now())
         updatedAt DateTime @updatedAt
         title     String
