@@ -1,17 +1,14 @@
 package engine
 
 import (
-	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
-	"strconv"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries"
@@ -155,54 +152,9 @@ func (e *DataProxyEngine) Name() string {
 }
 
 func (e *DataProxyEngine) request(ctx context.Context, method string, path string, payload []byte) ([]byte, error) {
-	// TODO use specific log level
-	if logger.Enabled {
-		logger.Debug.Printf("prisma engine payload: `%s`", payload)
-	}
-
-	req, err := http.NewRequestWithContext(ctx, method, e.url+path, bytes.NewBuffer(payload))
-	if err != nil {
-		return nil, fmt.Errorf("raw post: %w", err)
-	}
-
-	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
-	req = req.WithContext(ctx)
-
-	startReq := time.Now()
-	rawResponse, err := e.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("raw post: %w", err)
-	}
-	defer func() {
-		if err := rawResponse.Body.Close(); err != nil {
-			panic(err)
-		}
-	}()
-	reqDuration := time.Since(startReq)
-	logger.Debug.Printf("[timing] query engine raw request took %s", reqDuration)
-
-	responseBody, err := ioutil.ReadAll(rawResponse.Body)
-	if err != nil {
-		return nil, fmt.Errorf("raw read: %w", err)
-	}
-
-	if rawResponse.StatusCode != http.StatusOK && rawResponse.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("http status code %d with response %s", rawResponse.StatusCode, responseBody)
-	}
-
-	if logger.Enabled {
-		if elapsedRaw := rawResponse.Header["X-Elapsed"]; len(elapsedRaw) > 0 {
-			elapsed, _ := strconv.Atoi(elapsedRaw[0])
-			duration := time.Duration(elapsed) * time.Microsecond
-			logger.Debug.Printf("[timing] elapsed: %s", duration)
-
-			diff := reqDuration - duration
-			logger.Debug.Printf("[timing] just http: %s", diff)
-			logger.Debug.Printf("[timing] http percentage: %.2f%%", float64(diff)/float64(reqDuration)*100)
-		}
-	}
-
-	return responseBody, nil
+	return request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
+	})
 }
 
 func hashSchema(schema string) string {
