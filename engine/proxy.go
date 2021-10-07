@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -152,9 +153,23 @@ func (e *DataProxyEngine) Name() string {
 }
 
 func (e *DataProxyEngine) request(ctx context.Context, method string, path string, payload []byte) ([]byte, error) {
-	return request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
+	res, err := request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
 	})
+	if err != nil {
+		if !errors.Is(err, errNotFound) {
+			return nil, err
+		}
+		logger.Debug.Printf("got status not found in data proxy request; re-uploading schema")
+		if err := e.uploadSchema(ctx); err != nil {
+			return nil, fmt.Errorf("upload schema after 400 request: %w", err)
+		}
+		logger.Debug.Printf("schema re-upload succeeded")
+		return request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
+		})
+	}
+	return res, nil
 }
 
 func hashSchema(schema string) string {

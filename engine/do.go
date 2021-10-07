@@ -12,6 +12,8 @@ import (
 	"github.com/prisma/prisma-client-go/logger"
 )
 
+var errNotFound = fmt.Errorf("not found; re-upload schema")
+
 func request(ctx context.Context, client *http.Client, method string, url string, payload []byte, apply func(*http.Request)) ([]byte, error) {
 	if logger.Enabled {
 		logger.Debug.Printf("prisma engine payload: `%s`", payload)
@@ -42,6 +44,10 @@ func request(ctx context.Context, client *http.Client, method string, url string
 	responseBody, err := ioutil.ReadAll(rawResponse.Body)
 	if err != nil {
 		return nil, fmt.Errorf("raw read: %w", err)
+	}
+
+	if rawResponse.StatusCode == http.StatusNotFound {
+		return nil, errNotFound
 	}
 
 	if rawResponse.StatusCode != http.StatusOK && rawResponse.StatusCode != http.StatusCreated {
