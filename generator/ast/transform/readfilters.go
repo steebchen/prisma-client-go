@@ -9,12 +9,12 @@ import (
 func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
-		p := r.pick(scalar + "Filter")
+		p := r.pick(
+			scalar+"Filter",
+			scalar+"NullableFilter",
+		)
 		if p == nil {
-			p = r.pick(scalar + "NullableFilter")
-			if p == nil {
-				continue
-			}
+			continue
 		}
 		var fields []Method
 		for _, field := range p.Fields {
@@ -28,12 +28,12 @@ func (r *AST) readFilters() []Filter {
 		})
 	}
 	for _, enum := range r.Enums {
-		p := r.pick("Enum" + enum.Name.String() + "Filter")
+		p := r.pick(
+			"Enum"+enum.Name.String()+"Filter",
+			"Enum"+enum.Name.String()+"NullableFilter",
+		)
 		if p == nil {
-			p = r.pick("Enum" + enum.Name.String() + "NullableFilter")
-			if p == nil {
-				continue
-			}
+			continue
 		}
 
 		var fields []Method

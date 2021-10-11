@@ -18,7 +18,7 @@ func Run(name string, args ...string) error {
 			return fmt.Errorf("%s %s exited with status code %d and output %s: %w", name, args, exit.ExitCode(), string(out), err)
 		}
 
-		return fmt.Errorf("command %s %s failed: %w", name, args, err)
+		return fmt.Errorf("command %s %s failed: %w with output: %s", name, args, err, string(out))
 	}
 
 	return nil
