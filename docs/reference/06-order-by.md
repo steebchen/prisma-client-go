@@ -39,9 +39,14 @@ posts, err := client.Post.FindMany().OrderBy(
 #### Combine with pagination
 
 ```go
-posts, err := client.Post.FindMany().Take(5).Cursor(db.Post.ID.Cursor("abc")).OrderBy(
-    db.Post.CreatedAt.Order(db.DESC),
-).Exec(ctx)
+posts, err := client.
+	Post.
+	FindMany().
+	Take(5).
+	Cursor(db.Post.ID.Cursor("abc")).
+	OrderBy(
+		db.Post.CreatedAt.Order(db.DESC),
+	).Exec(ctx)
 ```
 
 ## Next steps
