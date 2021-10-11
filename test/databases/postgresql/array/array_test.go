@@ -280,7 +280,10 @@ func TestArrays(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			user, err := client.User.FindFirst(
-				User.Items.HasSome([]string{"b"}),
+				User.Items.Has("b"),
+				User.Items.HasEvery([]string{"a", "b", "c"}),
+				User.Items.HasSome([]string{"b", "c"}),
+				User.Items.IsEmpty(false),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)

@@ -299,8 +299,12 @@
 			{{ $writeType := $.AST.WriteFilter $field.Type.String $field.IsList }}
 			{{ if $writeType }}
 				{{ range $method := $writeType.Methods }}
+					{{ $type := $method.Type.Value }}
+					{{ if eq $type "" }}
+						{{ $type = $field.Type.Value}}
+					{{ end }}
 					// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					func (r {{ $struct }}) {{ $method.Name }}(value {{ $type }}) {{ $setReturnStruct }} {
 						return {{ $setReturnStruct }}{
 							data: builder.Field{
 								Name:   "{{ $field.Name }}",
@@ -426,7 +430,11 @@
 				{{ if ne $method.Deprecated "" }}
 					// deprecated: Use {{ $method.Deprecated }} instead.
 				{{- end }}
-				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+				{{ $type := $method.Type.Value }}
+				{{ if eq $type "" }}
+					{{ $type = $field.Type.Value}}
+				{{ end }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $returnStruct }} {
 					{{ if $method.IsList }}
 						var fields []builder.Field
 						for _, v := range value {
@@ -456,7 +464,7 @@
 				{{ if ne $method.Deprecated "" }}
 					// deprecated: Use {{ $method.Deprecated }}IfPresent instead.
 				{{- end }}
-				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $type }}) {{ $returnStruct }} {
 					if value == nil {
 						return {{ $returnStruct }}{}
 					}
