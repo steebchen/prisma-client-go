@@ -4,7 +4,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -15,11 +15,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -29,26 +29,26 @@ model Comment {
 ```go
 created, err := client.Post.CreateOne(
     // required fields
-    Post.Title.Set("what up"),
-    Post.Published.Set(true),
+    db.Post.Published.Set(true),
+    db.Post.Title.Set("what up"),
 
     // optional fields
-    Post.ID.Set("id"),
-    Post.Content.Set("stuff"),
+    db.Post.ID.Set("id"),
+    db.Post.Content.Set("stuff"),
 ).Exec(ctx)
 ```
 
 ### Create a record with a relation
 
-Use the `Link` method to connect new records with existing ones. For example, the following query creates a new post and sets the postID attribute of the comment.
+Use the `Link` method to connect new records with existing ones. For example, the following query creates a new comment and sets the postID attribute of the comment.
 
 ```go
 created, err := client.Comment.CreateOne(
-    Comment.Title.Set(title),
-    Comment.Post.Link(
-        Post.ID.Equals(postID),
+    db.Comment.Content.Set("content"),
+    db.Comment.Post.Link(
+        db.Post.ID.Equals("id"),
     ),
-    Comment.ID.Set("post"),
+    db.Comment.ID.Set("post"),
 ).Exec(ctx)
 ```
 
