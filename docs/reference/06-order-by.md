@@ -32,7 +32,7 @@ You can order by any field ein either direction, but it's recommended to use an 
 
 ```go
 posts, err := client.Post.FindMany().OrderBy(
-    db.Post.CreatedAt.Order(db.DESC),
+    db.Post.CreatedAt.Order(db.SortOrderDesc),
 ).Exec(ctx)
 ```
 
@@ -45,7 +45,7 @@ posts, err := client.
     Take(5).
     Cursor(db.Post.ID.Cursor("abc")).
     OrderBy(
-        db.Post.CreatedAt.Order(db.DESC),
+        db.Post.CreatedAt.Order(db.SortOrderDesc),
     ).Exec(ctx)
 ```
 
