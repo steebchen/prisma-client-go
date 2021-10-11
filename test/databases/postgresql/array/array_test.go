@@ -263,6 +263,72 @@ func TestArrays(t *testing.T) {
 
 			assert.Equal(t, expected, user)
 		},
+	}, {
+		name: "read filter",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: ["a", "b", "c"],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindFirst(
+				User.Items.HasSome([]string{"b"}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{"a", "b", "c"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
+	}, {
+		name: "write filter",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					items: {
+						set: ["a", "b", "c"],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			user, err := client.User.FindUnique(
+				User.ID.Equals("id1"),
+			).Update(
+				User.Items.Push("d"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:    "id1",
+					Items: []string{"a", "b", "c", "d"},
+				},
+			}
+
+			assert.Equal(t, expected, user)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

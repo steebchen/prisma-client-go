@@ -10,6 +10,8 @@ func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
 		p := r.pick(
+			scalar+"ListFilter",
+			scalar+"NullableListFilter",
 			scalar+"Filter",
 			scalar+"NullableFilter",
 		)
