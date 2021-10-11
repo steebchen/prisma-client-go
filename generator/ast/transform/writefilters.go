@@ -3,12 +3,12 @@ package transform
 func (r *AST) writeFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
-		p := r.pick(scalar + "FieldUpdateOperationsInput")
+		p := r.pick(
+			scalar+"FieldUpdateOperationsInput",
+			"Nullable"+scalar+"FieldUpdateOperationsInput",
+		)
 		if p == nil {
-			p = r.pick("Nullable" + scalar + "FieldUpdateOperationsInput")
-			if p == nil {
-				continue
-			}
+			continue
 		}
 		var fields []Method
 		for _, field := range p.Fields {

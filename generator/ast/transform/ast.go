@@ -52,10 +52,12 @@ func New(document *dmmf.Document) *AST {
 	return ast
 }
 
-func (r *AST) pick(name string) *dmmf.CoreType {
-	for _, i := range r.dmmf.Schema.InputObjectTypes.Prisma {
-		if string(i.Name) == name {
-			return &i
+func (r *AST) pick(names ...string) *dmmf.CoreType {
+	for _, name := range names {
+		for _, i := range r.dmmf.Schema.InputObjectTypes.Prisma {
+			if string(i.Name) == name {
+				return &i
+			}
 		}
 	}
 	return nil
