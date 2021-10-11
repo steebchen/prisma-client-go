@@ -317,7 +317,7 @@ func TestArrays(t *testing.T) {
 			user, err := client.User.FindUnique(
 				User.ID.Equals("id1"),
 			).Update(
-				User.Items.Push("d"),
+				User.Items.Push([]string{"d"}),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)

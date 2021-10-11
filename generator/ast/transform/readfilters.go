@@ -75,7 +75,7 @@ func convertField(field dmmf.OuterInputType) *Method {
 	var typeName types.Type
 	var isList bool
 	for _, inputType := range field.InputTypes {
-		if inputType.Location == "scalar" && inputType.Type != "Null" {
+		if (inputType.Location == "scalar" || inputType.Location == "enumTypes") && inputType.Type != "Null" {
 			typeName = inputType.Type
 			if inputType.IsList {
 				isList = true
