@@ -6,14 +6,13 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
     title     String
     content   String?
-
-    comments Comment[]
+    views     Int      @default(0)
 }
 ```
 
@@ -24,20 +23,17 @@ Use UpsertOne to query for a document, define what to write when creating the do
 ```go
 post, err := client.Post.UpsertOne(
     // query
-    Post.ID.Equals("upsert"),
+    db.Post.ID.Equals("upsert"),
 ).Create(
     // set these fields if document doesn't exist already
-    Post.Title.Set("title"),
-    Post.Views.Set(0),
-    Post.ID.Set("upsert"),
+    db.Post.Published.Set(true),
+	db.Post.Title.Set("title"),
+    db.Post.ID.Set("upsert"),
 ).Update(
     // update these fields if document already exists
-    Post.Title.Set("new-title"),
-    Post.Views.Increment(1),
+    db.Post.Title.Set("new-title"),
+    db.Post.Views.Increment(1),
 ).Exec(ctx)
-if err != nil {
-    panic(err)
-}
 ```
 
 ## Next steps
