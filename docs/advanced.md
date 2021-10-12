@@ -10,11 +10,11 @@ So let's introduce a new comment model:
 
 ```prisma
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -44,22 +44,22 @@ model Post {
     }
 
     model Post {
-        id        String   @default(cuid()) @id
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        published Boolean
+        id        String    @id @default(cuid())
+        createdAt DateTime  @default(now())
+        updatedAt DateTime  @updatedAt
         title     String
-        content   String?
+        published Boolean
+        desc      String?
 
         comments Comment[]
     }
 
     model Comment {
-        id        String   @default(cuid()) @id
+        id        String   @id @default(cuid())
         createdAt DateTime @default(now())
         content   String
 
-        post   Post @relation(fields: [postID], references: [id])
+        post   Post   @relation(fields: [postID], references: [id])
         postID String
     }
     ```
@@ -155,7 +155,7 @@ orderedComments, err := client.Comment.FindMany(
         db.Post.ID.Equals("123"),
     ),
 ).Take(2).OrderBy(
-    db.Comment.CreatedAt.Order(db.DESC),
+    db.Comment.CreatedAt.Order(db.SortOrderDesc),
 ).Exec(ctx)
 if err != nil {
     return err
