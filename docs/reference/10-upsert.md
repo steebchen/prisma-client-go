@@ -27,7 +27,7 @@ post, err := client.Post.UpsertOne(
 ).Create(
     // set these fields if document doesn't exist already
     db.Post.Published.Set(true),
-	db.Post.Title.Set("title"),
+    db.Post.Title.Set("title"),
     db.Post.ID.Set("upsert"),
 ).Update(
     // update these fields if document already exists
