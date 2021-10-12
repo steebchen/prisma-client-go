@@ -4,7 +4,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -15,11 +15,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -30,7 +30,7 @@ To delete a record, just query for a field using FindUnique or FindMany, and the
 
 ```go
 deleted, err := client.Post.FindUnique(
-    Post.Title.Equals("what up"),
+    db.Post.ID.Equals("id"),
 ).Delete().Exec(ctx)
 ```
 
