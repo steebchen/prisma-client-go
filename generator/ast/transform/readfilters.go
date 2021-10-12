@@ -4,12 +4,15 @@ import (
 	"strings"
 
 	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
+	"github.com/prisma/prisma-client-go/generator/types"
 )
 
 func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
 		p := r.pick(
+			scalar+"ListFilter",
+			scalar+"NullableListFilter",
 			scalar+"Filter",
 			scalar+"NullableFilter",
 		)
@@ -68,17 +71,21 @@ func convertField(field dmmf.OuterInputType) *Method {
 	if field.Name == "equals" {
 		return nil
 	}
-	isList := false
-	// check if any of the input types accept a list
-	for _, x := range field.InputTypes {
-		// if yes, consider it a list item, regardless of all other items
-		if x.IsList {
-			isList = true
+
+	var typeName types.Type
+	var isList bool
+	for _, inputType := range field.InputTypes {
+		if (inputType.Location == "scalar" || inputType.Location == "enumTypes") && inputType.Type != "Null" {
+			typeName = inputType.Type
+			if inputType.IsList {
+				isList = true
+			}
 		}
 	}
 	return &Method{
 		Name:   field.Name.GoCase(),
 		Action: field.Name.String(),
+		Type:   typeName,
 		IsList: isList,
 	}
 }

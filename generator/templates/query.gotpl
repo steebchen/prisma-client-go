@@ -296,32 +296,47 @@
 				}
 			{{ end }}
 
-			{{ if not $field.IsList }}
-				{{ $writeType := $.AST.WriteFilter $field.Type.String }}
-				{{ if $writeType }}
-					{{ range $method := $writeType.Methods }}
-						// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-						func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
-							return {{ $setReturnStruct }}{
-								data: builder.Field{
-									Name:   "{{ $field.Name }}",
-									Fields: []builder.Field{
-										builder.Field{
-											Name:   "{{ $method.Action }}",
-											Value:  value,
-										},
+			{{ $writeType := $.AST.WriteFilter $field.Type.String $field.IsList }}
+			{{ if $writeType }}
+				{{ range $method := $writeType.Methods }}
+					{{ $type := $method.Type.Value }}
+					{{ if eq $type "" }}
+						{{ $type = $field.Type.Value}}
+					{{ end }}
+					// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+					func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $setReturnStruct }} {
+						{{ if $method.IsList }}
+							var fields []builder.Field
+							for _, v := range value {
+								fields = append(fields, builder.Field{
+									Value: v,
+								})
+							}
+						{{ end }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Fields: []builder.Field{
+									builder.Field{
+										Name:   "{{ $method.Action }}",
+										{{ if $method.IsList }}
+											List: true,
+											Fields: fields,
+										{{ else }}
+											Value: value,
+										{{ end }}
 									},
 								},
-							}
+							},
 						}
+					}
 
-						func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-							if value == nil {
-								return {{ $setReturnStruct }}{}
-							}
-							return r.{{ $method.Name }}(*value)
+					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+						if value == nil {
+							return {{ $setReturnStruct }}{}
 						}
-					{{ end }}
+						return r.{{ $method.Name }}({{ if not $method.IsList }}*{{ end }}value)
+					}
 				{{ end }}
 			{{ end }}
 		{{ end }}
@@ -428,7 +443,11 @@
 				{{ if ne $method.Deprecated "" }}
 					// deprecated: Use {{ $method.Deprecated }} instead.
 				{{- end }}
-				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+				{{ $type := $method.Type.Value }}
+				{{ if eq $type "" }}
+					{{ $type = $field.Type.Value}}
+				{{ end }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $returnStruct }} {
 					{{ if $method.IsList }}
 						var fields []builder.Field
 						for _, v := range value {
@@ -458,7 +477,7 @@
 				{{ if ne $method.Deprecated "" }}
 					// deprecated: Use {{ $method.Deprecated }}IfPresent instead.
 				{{- end }}
-				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $returnStruct }} {
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $type }}) {{ $returnStruct }} {
 					if value == nil {
 						return {{ $returnStruct }}{}
 					}
