@@ -22,7 +22,7 @@ The following example would equal to the default behaviour of ordering by ID in 
 
 ```go
 posts, err := client.Post.FindMany().OrderBy(
-    db.Post.ID.Order(db.ASC),
+    db.Post.ID.Order(db.SortOrderAsc),
 ).Exec(ctx)
 ```
 
