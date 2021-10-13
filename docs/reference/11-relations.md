@@ -4,13 +4,13 @@ The examples use the following prisma schema:
 
 ```prisma
 model User {
-    id    String   @default(cuid()) @id
+    id    String @id @default(cuid())
     name  String
     posts Post[]
 }
 
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -18,18 +18,18 @@ model Post {
     content   String?
 
     // optional author
-    user   User @relation(fields: [userID], references: [id])
-    userID String
+    user   User?   @relation(fields: [userID], references: [id])
+    userID String?
 
     comments Comment[]
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -39,11 +39,11 @@ model Comment {
 In a query, you can query for relations by using "Some" or "Every":
 
 ```go
-// get posts which have at least one comment with a title "My Title" and that post's comments are all "What up?"
+// get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"
 posts, err := client.Post.FindMany(
-    Post.Title.Equals("what up"),
-    Post.Comments.Some(
-        Comment.Title.Equals("My Title"),
+    db.Post.Title.Equals("What up?"),
+    db.Post.Comments.Some(
+        db.Comment.Content.Equals("My Content"),
     ),
 ).Exec(ctx)
 ```
@@ -52,9 +52,12 @@ You can nest relation queries as deep as you like:
 
 ```go
 users, err := client.User.FindMany(
-    Post.Title.Equals("what up"),
-    Post.Comments.Some(
-        Comment.Title.Equals("My Title"),
+    db.User.Name.Equals("Author"),
+    db.User.Posts.Some(
+        db.Post.Title.Equals("What up?"),
+        db.Post.Comments.Some(
+            db.Comment.Content.Equals("My Content"),
+        ),
     ),
 ).Exec(ctx)
 ```
