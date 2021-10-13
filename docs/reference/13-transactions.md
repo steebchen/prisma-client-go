@@ -6,7 +6,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -17,11 +17,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -34,11 +34,13 @@ A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provi
 // create two posts at once and run in a transaction
 
 firstPost := client.Post.CreateOne(
-    Post.Title.Set("First Post"),
+    db.Post.Published.Set(true),
+    db.Post.Title.Set("First Post"),
 ).Tx()
 
 secondPost := client.Post.CreateOne(
-    Post.Title.Set("Second Post"),
+    db.Post.Published.Set(false),
+    db.Post.Title.Set("Second Post"),
 ).Tx()
 
 if err := client.Prisma.Transaction(firstPost, secondPost).Exec(ctx); err != nil {
@@ -63,19 +65,19 @@ Let's say we have one post record in the database:
 ```go
 // this will fail, since the record doesn't exist...
 a := client.Post.FindUnique(
-    Post.ID.Equals("does-not-exist"),
+    db.Post.ID.Equals("does-not-exist"),
 ).Update(
-    Post.Title.Set("new title"),
+    db.Post.Title.Set("new title"),
 ).Tx()
 
 // ...so this should be roll-backed, even though itself it would succeed
 b := client.Post.FindUnique(
-    Post.ID.Equals("123"),
+    db.Post.ID.Equals("123"),
 ).Update(
-    Post.Title.Set("New title"),
+    db.Post.Title.Set("New title"),
 ).Tx()
 
-if err := client.Prisma.Transaction(a, b).Exec(ctx); err != nil {
+if err := client.Prisma.Transaction(b, a).Exec(ctx); err != nil {
     // this err will be non-nil and the transaction will rollback,
     // so nothing will be updated in the database
     panic(err)
