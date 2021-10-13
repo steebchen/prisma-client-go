@@ -8,7 +8,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -19,11 +19,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -44,7 +44,7 @@ err := client.Prisma.QueryRaw(`SELECT * FROM Post`).Exec(ctx, &posts)
 #### Select specific
 
 ```go
-var posts []PostModel
+var posts []db.PostModel
 err := client.Prisma.QueryRaw(`SELECT * FROM Post WHERE id = ? AND title = ?`, "123abc", "my post").Exec(ctx, &posts)
 ```
 
@@ -63,14 +63,14 @@ count, err := client.Prisma.ExecuteRaw(`UPDATE Post SET title = ? WHERE id = ?`,
 #### Select all
 
 ```go
-var posts []PostModel
+var posts []db.PostModel
 err := client.Prisma.QueryRaw(`SELECT * FROM "Post"`).Exec(ctx, &posts)
 ```
 
 #### Select specific
 
 ```go
-var posts []PostModel
+var posts []db.PostModel
 err := client.Prisma.QueryRaw(`SELECT * FROM "Post" WHERE id = $1 AND title = $2`, "id2", "title2").Exec(ctx, &posts)
 ```
 
