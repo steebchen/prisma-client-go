@@ -4,7 +4,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id    String   @default(cuid()) @id
+    id    String @id @default(cuid())
     title String
     info  Json
 }
@@ -32,9 +32,9 @@ if err != nil {
 }
 
 _, err = client.Post.CreateOne(
-    Post.Title.Set("what up"),
-    Post.Info.Set(infoBytes),
-    Post.ID.Set("123"),
+    db.Post.Title.Set("what up"),
+    db.Post.Info.Set(infoBytes),
+    db.Post.ID.Set("123"),
 ).Exec(ctx)
 if err != nil {
     panic(err)
@@ -45,7 +45,7 @@ if err != nil {
 
 ```go
 post, err := client.Post.FindUnique(
-    Post.ID.Equals("123"),
+    db.Post.ID.Equals("123"),
 ).Exec(ctx)
 if err != nil {
     panic(err)
