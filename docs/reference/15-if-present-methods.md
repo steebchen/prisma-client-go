@@ -36,7 +36,7 @@ Writing data dynamically works the same way as querying. If a pointer is nil, th
 ```go
 var newTitle *string
 newContent := "hi"
-_, err := client.Post.FindMany(
+_, err := client.Post.FindUnique(
     db.Post.ID.Equals("123"),
 ).Update(
     // don't set because `newTitle` is nil
