@@ -8,7 +8,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id      String   @default(cuid()) @id
+    id      String  @id @default(cuid())
     title   String
     content String?
 }
@@ -16,16 +16,16 @@ model Post {
 
 ## Querying dynamically
 
-You might want to query dynamically if you have an API and you want the end-user to decide which fields to query. In the following example, the fields title and content are queried, but if a variable is nil, it means that that field  should be ignored.
+You might want to query dynamically if you have an API and you want the end-user to decide which fields to query. In the following example, the fields title and content are queried, but if a variable is nil, it means the field should be ignored.
 
 ```go
-var title = "hi"
+title := "hi"
 var content *string
 _, err := client.Post.FindMany(
     // query for this one
-    Post.Title.EqualsIfPresent(&title),
-    // ignore this one, since `content`  nil
-    Post.Content.EqualsIfPresent(content),
+    db.Post.Title.EqualsIfPresent(&title),
+    // ignore this one, since `content` nil
+    db.Post.Content.EqualsIfPresent(content),
 ).Exec(ctx)
 ```
 
@@ -35,12 +35,14 @@ Writing data dynamically works the same way as querying. If a pointer is nil, th
 
 ```go
 var newTitle *string
-var newContent = "hi"
-_, err := client.Post.FindMany(...).Update(
+newContent := "hi"
+_, err := client.Post.FindMany(
+    db.Post.ID.Equals("123"),
+).Update(
     // don't set because `newTitle` is nil
-    Post.Title.SetIfPresent(newTitle),
+    db.Post.Title.SetIfPresent(newTitle),
     // set value
-    Post.Content.SetIfPresent(&newContent),
+    db.Post.Content.SetIfPresent(&newContent),
 ).Exec(ctx)
 ```
 
