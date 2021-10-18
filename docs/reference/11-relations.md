@@ -64,4 +64,4 @@ users, err := client.User.FindMany(
 
 ## Next steps
 
-If the Go client shouldn't support for a query you need to do, read how you can use [raw SQL queries](12-raw.md).
+Explore working with [postgres array fields](12-scalar-lists.md).
