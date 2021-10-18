@@ -68,6 +68,11 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 }
 
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
+	if e.disconnected {
+		logger.Info.Printf("A query was executed after Disconnect() was called. Make sure to not send any queries after disconnecting the client.")
+		return nil, fmt.Errorf("client is disconnected")
+	}
+
 	requestBody, err := json.Marshal(payload)
 	if err != nil {
 		return nil, fmt.Errorf("payload marshal: %w", err)

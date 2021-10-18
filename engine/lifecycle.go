@@ -42,6 +42,7 @@ func (e *QueryEngine) Connect() error {
 }
 
 func (e *QueryEngine) Disconnect() error {
+	e.disconnected = true
 	logger.Debug.Printf("disconnecting...")
 
 	if platform.Name() == "windows" {
