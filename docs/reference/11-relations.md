@@ -64,4 +64,4 @@ users, err := client.User.FindMany(
 
 ## Next steps
 
-Explore working with [postgres array fields](12-scalar-lists.md).
+Explore working with [scalar lists](12-scalar-lists.md).

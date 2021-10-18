@@ -12,6 +12,8 @@ model Post {
 
 ### Querying records by array fields
 
+Note: This only works with postgres.
+
 ```go
 post, err := client.Post.FindFirst(
     // whether the list contains a single field
@@ -39,7 +41,7 @@ post, err := client.Post.FindUnique(
 ).Exec(ctx)
 ```
 
-Add items to an existing list:
+Add items to an existing list (postgres only):
 
 ```go
 post, err := client.Post.FindUnique(
