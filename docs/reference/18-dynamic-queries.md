@@ -57,4 +57,4 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 ## Next steps
 
-The go client is still in an early access and has [limitations](18-limitations.md).
+The go client is still in an early access and has [limitations](19-limitations.md).

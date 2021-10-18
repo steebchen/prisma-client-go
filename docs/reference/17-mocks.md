@@ -97,4 +97,4 @@ func TestGetPostTitle_error(t *testing.T) {
 
 ## Next steps
 
-Learn how to build up [dynamic queries](17-dynamic-queries.md).
+Learn how to build up [dynamic queries](18-dynamic-queries.md).
