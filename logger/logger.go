@@ -1,7 +1,7 @@
 package logger
 
 import (
-	"io"
+	"io/ioutil"
 	"log"
 	"os"
 )
@@ -17,7 +17,7 @@ var Debug *log.Logger
 var Info *log.Logger
 
 func init() {
-	discard := log.New(io.Discard, "", 0)
+	discard := log.New(ioutil.Discard, "", 0)
 
 	Debug = discard
 	if Enabled {
