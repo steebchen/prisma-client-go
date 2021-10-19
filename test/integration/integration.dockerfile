@@ -9,11 +9,6 @@ COPY . ./
 
 RUN cd test/integration/; go install github.com/prisma/prisma-client-go@main
 
-RUN pwd
-RUN ls -l test/integration/
-RUN cat test/integration/go.mod
-RUN cat test/integration/go.sum
-
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go prefetch
 
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go db push --preview-feature --schema schemax.prisma
