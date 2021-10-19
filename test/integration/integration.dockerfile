@@ -7,9 +7,11 @@ ENV DEBUG=*
 
 # add go modules lockfiles
 COPY go.mod go.sum ./
-RUN go mod tidy
+RUN go mod download
 
 COPY . ./
+
+RUN cd test/integration/; go mod tidy
 
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go prefetch
 
