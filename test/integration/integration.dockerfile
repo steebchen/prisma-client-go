@@ -5,23 +5,14 @@ WORKDIR /app
 ENV PHOTON_GO_LOG=info
 ENV DEBUG=*
 
-RUN ls -l
-
-# add go modules lockfiles
-COPY go.mod go.sum ./
-RUN ls -l
-RUN go mod download -x
-
 COPY . ./
 
-RUN ls -l ./
-RUN pwd
-
-RUN cd test/integration/; go mod tidy
+RUN cd test/integration/; go install github.com/prisma/prisma-client-go@main
 
 RUN pwd
 RUN ls -l test/integration/
-RUN cat test/integration/go.mod && cat test/integration/go.sum
+RUN cat test/integration/go.mod
+RUN cat test/integration/go.sum
 
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go prefetch
 
