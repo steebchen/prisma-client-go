@@ -1,10 +1,12 @@
 package logger
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 )
+
+const flag = log.Ldate | log.Lmicroseconds
 
 // TODO add log levels
 
@@ -15,12 +17,12 @@ var Debug *log.Logger
 var Info *log.Logger
 
 func init() {
-	discard := log.New(ioutil.Discard, "", 0)
+	discard := log.New(io.Discard, "", 0)
 
 	Debug = discard
 	if Enabled {
-		Debug = log.New(os.Stdout, "prisma-client-go debug: ", log.Flags())
+		Debug = log.New(os.Stdout, "prisma-client-go debug: ", flag)
 	}
 
-	Info = log.New(os.Stdout, "prisma-client-go info: ", log.Flags())
+	Info = log.New(os.Stdout, "prisma-client-go info: ", flag)
 }
