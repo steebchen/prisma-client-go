@@ -15,11 +15,6 @@ RUN go run github.com/prisma/prisma-client-go migrate dev --name init --schema s
 
 RUN go mod tidy
 
-RUN pwd
-RUN ls -l
-RUN cat go.mod
-RUN cat go.sum
-
 # build the integration binary with all dependencies
 RUN go build -o /app/main .
 
