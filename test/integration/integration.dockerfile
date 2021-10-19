@@ -1,4 +1,4 @@
-FROM golang:1.13 as build
+FROM golang:1.16 as build
 
 WORKDIR /app
 
@@ -22,7 +22,7 @@ RUN cd test/integration/; go run github.com/prisma/prisma-client-go generate --s
 RUN cd test/integration/; go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
-FROM golang:1.13
+FROM golang:1.16
 
 WORKDIR /app
 
