@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+const flag = log.Ldate | log.Lmicroseconds
+
 // TODO add log levels
 
 var v = os.Getenv("PHOTON_GO_LOG")
@@ -19,8 +21,8 @@ func init() {
 
 	Debug = discard
 	if Enabled {
-		Debug = log.New(os.Stdout, "prisma-client-go debug: ", log.Flags())
+		Debug = log.New(os.Stdout, "prisma-client-go debug: ", flag)
 	}
 
-	Info = log.New(os.Stdout, "prisma-client-go info: ", log.Flags())
+	Info = log.New(os.Stdout, "prisma-client-go info: ", flag)
 }
