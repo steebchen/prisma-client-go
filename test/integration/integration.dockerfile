@@ -7,7 +7,12 @@ ENV DEBUG=*
 
 COPY . ./
 
-RUN cd test/integration/; go install github.com/prisma/prisma-client-go@main
+RUN cd test/integration/; go get github.com/prisma/prisma-client-go@main
+
+RUN pwd
+RUN ls -l test/integration/
+RUN cat test/integration/go.mod
+RUN cat test/integration/go.sum
 
 RUN cd test/integration/; go run github.com/prisma/prisma-client-go prefetch
 
