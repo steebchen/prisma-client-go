@@ -11,7 +11,7 @@ WORKDIR /app/test/integration
 
 RUN go get github.com/prisma/prisma-client-go@main
 
-RUN go run github.com/prisma/prisma-client-go migrate dev --name init --schema schemax.prisma
+RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 
 RUN go mod tidy
 
