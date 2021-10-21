@@ -9,7 +9,7 @@ COPY . ./
 
 WORKDIR /app/test/integration
 
-RUN go mod download
+RUN go mod download -x
 
 RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 
