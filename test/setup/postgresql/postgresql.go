@@ -10,7 +10,7 @@ import (
 )
 
 const containerName = "go-client-postgres"
-const image = "postgres:12.5-alpine"
+const image = "postgres:13-alpine"
 
 var PostgreSQL = &postgreSQL{}
 

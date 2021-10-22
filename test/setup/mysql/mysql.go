@@ -10,7 +10,7 @@ import (
 )
 
 const containerName = "go-client-mysql"
-const image = "mysql:5.7"
+const image = "mysql:8.0"
 
 var MySQL = &mySQL{}
 
