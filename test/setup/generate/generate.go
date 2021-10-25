@@ -47,7 +47,7 @@ func generate() {
 	// manually unpack binary
 	log.Printf("unpacking binaries...")
 	cmd = exec.Command("go", "run", "./db")
-	cmd.Env = append(os.Environ(), "PHOTON_GO_LOG=info")
+	cmd.Env = append(os.Environ(), "PRISMA_CLIENT_GO_LOG=info")
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 	if err := cmd.Run(); err != nil {
