@@ -2,7 +2,7 @@ FROM golang:1.16 as build
 
 WORKDIR /app
 
-ENV PHOTON_GO_LOG=info
+ENV PRISMA_CLIENT_GO_LOG=info
 ENV DEBUG=*
 
 COPY . ./
@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=build /app/main /app/main
 COPY --from=build /app/test/integration/dev.db /app/dev.db
 
-ENV PHOTON_GO_LOG=info
+ENV PRISMA_CLIENT_GO_LOG=info
 ENV DEBUG=*
 
 CMD ["/app/main"]

@@ -10,7 +10,7 @@ const flag = log.Ldate | log.Lmicroseconds
 
 // TODO add log levels
 
-var v = os.Getenv("PHOTON_GO_LOG")
+var v = os.Getenv("PRISMA_CLIENT_GO_LOG")
 var Enabled = v != ""
 
 var Debug *log.Logger
