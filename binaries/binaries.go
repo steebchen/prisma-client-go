@@ -68,15 +68,15 @@ var baseDirName = path.Join("prisma", "binaries")
 
 // GlobalTempDir returns the path of where the engines live
 // internally, this is the global temp dir
-func GlobalTempDir() string {
+func GlobalTempDir(version string) string {
 	temp := os.TempDir()
 	logger.Debug.Printf("temp dir: %s", temp)
 
-	return path.Join(temp, baseDirName, "engines", EngineVersion)
+	return path.Join(temp, baseDirName, "engines", version)
 }
 
-func GlobalUnpackDir() string {
-	return path.Join(GlobalTempDir(), "unpacked")
+func GlobalUnpackDir(version string) string {
+	return path.Join(GlobalTempDir(version), "unpacked")
 }
 
 // GlobalCacheDir returns the path of where the CLI lives

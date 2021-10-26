@@ -6,6 +6,8 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+
+	"github.com/prisma/prisma-client-go/binaries"
 )
 
 // TODO go fmt files after creation
@@ -59,9 +61,9 @@ import (
 )
 
 func init() {
-	unpack.Unpack(data, "%s")
+	unpack.Unpack(data, "%s", "%s")
 }
-`, name, constraints, pkg, name)
+`, name, constraints, pkg, name, binaries.EngineVersion)
 	return err
 }
 

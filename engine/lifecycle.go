@@ -69,7 +69,7 @@ func (e *QueryEngine) Disconnect() error {
 func (e *QueryEngine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
-	binariesPath := binaries.GlobalUnpackDir()
+	binariesPath := binaries.GlobalUnpackDir(binaries.EngineVersion)
 	// check for darwin/windows/linux first
 	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
 	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
