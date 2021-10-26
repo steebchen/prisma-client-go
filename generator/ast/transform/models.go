@@ -11,7 +11,7 @@ type Model struct {
 	Indexes []Index      `json:"indexes"`
 
 	// TODO remove this and apply all required data directly to model
-	OldModel dmmf.Model
+	OldModel dmmf.Model `json:"-"`
 }
 
 type Field struct {
