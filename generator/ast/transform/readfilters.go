@@ -7,6 +7,8 @@ import (
 	"github.com/prisma/prisma-client-go/generator/types"
 )
 
+const list = "List"
+
 func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
@@ -21,22 +23,26 @@ func (r *AST) readFilters() []Filter {
 			},
 		}
 
-		var fields []Method
 		for _, c := range combinations {
 			p := r.pick(c...)
 			if p == nil {
 				continue
 			}
+			var fields []Method
 			for _, field := range p.Fields {
 				if method := convertField(field); method != nil {
 					fields = append(fields, *method)
 				}
 			}
+			s := scalar
+			if strings.Contains(p.Name.String(), "ListFilter") {
+				s += list
+			}
+			filters = append(filters, Filter{
+				Name:    s,
+				Methods: fields,
+			})
 		}
-		filters = append(filters, Filter{
-			Name:    scalar,
-			Methods: fields,
-		})
 	}
 	for _, enum := range r.Enums {
 		p := r.pick(
@@ -63,9 +69,12 @@ func (r *AST) readFilters() []Filter {
 }
 
 // ReadFilter returns a filter for a read operation by scalar
-func (r *AST) ReadFilter(scalar string) *Filter {
+func (r *AST) ReadFilter(scalar string, isList bool) *Filter {
 	scalar = strings.Replace(scalar, "NullableFilter", "", 1)
 	scalar = strings.Replace(scalar, "ReadFilter", "", 1)
+	if isList {
+		scalar += list
+	}
 	for _, filter := range r.ReadFilters {
 		if filter.Name == scalar {
 			return &filter

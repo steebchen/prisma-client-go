@@ -441,7 +441,7 @@
 		{{ end }}
 
 		{{/* Provide field and type-specific methods. */}}
-		{{ $readType := $.AST.ReadFilter $field.Type.String }}
+		{{ $readType := $.AST.ReadFilter $field.Type.String $field.IsList }}
 		{{ if $readType }}
 			{{ range $method := $readType.Methods }}
 				{{ if ne $method.Deprecated "" }}
