@@ -76,7 +76,7 @@ func GlobalTempDir(version string) string {
 }
 
 func GlobalUnpackDir(version string) string {
-	return path.Join(GlobalTempDir(version), "unpacked")
+	return path.Join(GlobalTempDir(version), "unpacked", "v2")
 }
 
 // GlobalCacheDir returns the path of where the CLI lives
