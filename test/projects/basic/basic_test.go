@@ -620,6 +620,48 @@ func TestBasic(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "id in",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.ID.In([]string{"id2", "id3"}),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt

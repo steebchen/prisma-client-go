@@ -63,11 +63,11 @@ func generate() {
 		go func(file string) {
 			defer wg.Done()
 
-			cmd := exec.Command("go", "run", "github.com/prisma/prisma-client-go", "generate")
-			cmd.Dir = filepath.Dir(file)
-			cmd.Stderr = os.Stderr
-			cmd.Stdout = os.Stdout
-			if err := cmd.Run(); err != nil {
+			genCmd := exec.Command("go", "run", "github.com/prisma/prisma-client-go", "generate")
+			genCmd.Dir = filepath.Dir(file)
+			genCmd.Stderr = os.Stderr
+			genCmd.Stdout = os.Stdout
+			if err := genCmd.Run(); err != nil {
 				log.Fatal(err)
 			}
 

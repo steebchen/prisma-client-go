@@ -10,19 +10,27 @@ import (
 func (r *AST) readFilters() []Filter {
 	var filters []Filter
 	for _, scalar := range r.Scalars {
-		p := r.pick(
-			scalar+"ListFilter",
-			scalar+"NullableListFilter",
-			scalar+"Filter",
-			scalar+"NullableFilter",
-		)
-		if p == nil {
-			continue
+		combinations := [][]string{
+			{
+				scalar + "ListFilter",
+				scalar + "NullableListFilter",
+			},
+			{
+				scalar + "Filter",
+				scalar + "NullableFilter",
+			},
 		}
+
 		var fields []Method
-		for _, field := range p.Fields {
-			if method := convertField(field); method != nil {
-				fields = append(fields, *method)
+		for _, c := range combinations {
+			p := r.pick(c...)
+			if p == nil {
+				continue
+			}
+			for _, field := range p.Fields {
+				if method := convertField(field); method != nil {
+					fields = append(fields, *method)
+				}
 			}
 		}
 		filters = append(filters, Filter{
