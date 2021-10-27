@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -216,7 +215,7 @@ func download(url string, to string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		out, _ := ioutil.ReadAll(resp.Body)
+		out, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("received code %d from %s: %+v", resp.StatusCode, url, string(out))
 	}
 
@@ -251,12 +250,12 @@ func download(url string, to string) error {
 }
 
 func copyFile(from string, to string) error {
-	input, err := ioutil.ReadFile(from)
+	input, err := os.ReadFile(from)
 	if err != nil {
 		return fmt.Errorf("readfile: %w", err)
 	}
 
-	if err := ioutil.WriteFile(to, input, os.ModePerm); err != nil {
+	if err := os.WriteFile(to, input, os.ModePerm); err != nil {
 		return fmt.Errorf("writefile: %w", err)
 	}
 

@@ -3,7 +3,6 @@ package test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -49,7 +48,7 @@ func replaceSchema(t *testing.T, db Database, e engine.Engine, schemaPath string
 	xe.ReplaceSchema(func(schema string) string {
 		return strings.ReplaceAll(schema, `env("__REPLACE__")`, fmt.Sprintf(`"%s"`, db.ConnectionString(mockDB)))
 	})
-	if err := ioutil.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
+	if err := os.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
 		t.Fatal(err)
 	}
 }

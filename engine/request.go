@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -104,7 +104,7 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 	reqDuration := time.Since(startReq)
 	logger.Debug.Printf("[timing] query engine raw request took %s", reqDuration)
 
-	responseBody, err := ioutil.ReadAll(rawResponse.Body)
+	responseBody, err := io.ReadAll(rawResponse.Body)
 	if err != nil {
 		return nil, fmt.Errorf("raw read: %w", err)
 	}

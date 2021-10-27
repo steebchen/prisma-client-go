@@ -2,7 +2,6 @@ package unpack
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -36,7 +35,7 @@ func Unpack(data []byte, name string, version string) {
 		return
 	}
 
-	if err := ioutil.WriteFile(dir, data, os.ModePerm); err != nil {
+	if err := os.WriteFile(dir, data, os.ModePerm); err != nil {
 		panic(fmt.Errorf("unpack write file: %w", err))
 	}
 	logger.Debug.Printf("unpacked at %s in %s", dir, time.Since(start))
