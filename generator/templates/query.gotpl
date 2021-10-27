@@ -105,15 +105,8 @@
 							Name:   "{{ $field.Name }}",
 							Fields: []builder.Field{
 								{
-									Name: "{{ $method.Action }}",
-									Fields: []builder.Field{
-										{
-											Name:     "AND",
-											List:     true,
-											WrapList: true,
-											Fields:   fields,
-										},
-									},
+									Name:   "{{ $method.Action }}",
+									Fields: fields,
 								},
 							},
 						},
@@ -151,14 +144,7 @@
 					if len(where) > 0 {
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
-							Fields: []builder.Field{
-								{
-									Name:     "AND",
-									List:     true,
-									WrapList: true,
-									Fields:   where,
-								},
-							},
+							Fields: where,
 						})
 					}
 				{{ end }}
