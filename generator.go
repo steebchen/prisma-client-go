@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -52,7 +51,7 @@ func invokePrisma() error {
 		}
 
 		if writeDebugFile {
-			if err := ioutil.WriteFile("dmmf.json", content, 0600); err != nil {
+			if err := os.WriteFile("dmmf.json", content, 0600); err != nil {
 				log.Print(err)
 			}
 		}
