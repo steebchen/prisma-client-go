@@ -1,4 +1,6 @@
-FROM golang:1.16 as build
+ARG ver
+
+FROM golang:$ver as build
 
 WORKDIR /app
 
@@ -17,7 +19,7 @@ RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 RUN go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
-FROM golang:1.16
+FROM golang:$ver
 
 WORKDIR /app
 

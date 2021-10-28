@@ -13,11 +13,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest] # macos is not supported by GitHub actions
-
+        go: [1.17, 1.16]
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: integration
-        run: docker build . -f test/integration/integration.dockerfile -t integration && docker run integration
+        run: |
+          docker build . -f test/integration/integration.dockerfile -t integration --build-arg ver=${{ matrix.go }}
+          docker run integration
