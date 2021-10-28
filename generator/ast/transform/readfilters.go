@@ -65,6 +65,39 @@ func (r *AST) readFilters() []Filter {
 			Methods: fields,
 		})
 	}
+
+	// order by relevance
+
+	for i, m := range r.Models {
+		p := r.pick(m.Name.String() + "OrderByRelevanceInput")
+		if p == nil {
+			continue
+		}
+
+		var methods []Method
+		for _, field := range p.Fields {
+			if method := convertField(field); method != nil {
+				methods = append(methods, *method)
+			}
+		}
+
+		filters = append(filters, Filter{
+			Name:    p.Name.String(),
+			Methods: methods,
+		})
+
+		// add pseudo model field Relevance_, so one can do
+		// db.User.Relevance_.X
+		r.Models[i].Fields = append(r.Models[i].Fields, Field{
+			Prisma: true,
+			Field: dmmf.Field{
+				Name: "relevance",
+				Kind: "scalar",
+				Type: types.Type(p.Name.GoCase()),
+			},
+		})
+	}
+
 	return filters
 }
 

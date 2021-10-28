@@ -13,18 +13,22 @@
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
 			{{/* ReadFilter non-relations only for now */}}
+			{{ $name := $field.Name.GoCase }}
+			{{ if $field.Prisma }}
+				{{ $name = $field.Name.PrismaGoCase }}
+			{{ end }}
 			{{- if $field.Kind.IncludeInStruct -}}
-				// {{ $field.Name.GoCase }}
+				// {{ $name }}
 				//
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				{{- if $field.IsUnique }}
 					// @unique
 				{{- end }}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
+				{{ $name }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{ end }}
 
 			{{- if $field.Kind.IsRelation }}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}Relations
+				{{ $name }} {{ $nsQuery }}{{ $name }}Relations
 			{{ end }}
 		{{- end }}
 	}
@@ -229,46 +233,48 @@
 		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}
-			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-			func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-				{{ if $field.IsList }}
-					if value == nil {
-						value = []{{ $field.Type.Value }}{}
-					}
-				{{ end }}
-				{{/* if scalar list (only postgres) */}}
-				{{ if $field.IsList }}
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Fields: []builder.Field{
-								builder.Field{
-									Name:   "set",
-									Value:  value,
+			{{ if not $field.Prisma }}
+				// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+				func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					{{ if $field.IsList }}
+						if value == nil {
+							value = []{{ $field.Type.Value }}{}
+						}
+					{{ end }}
+					{{/* if scalar list (only postgres) */}}
+					{{ if $field.IsList }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Fields: []builder.Field{
+									builder.Field{
+										Name:   "set",
+										Value:  value,
+									},
 								},
 							},
-						},
-					}
-				{{ else }}
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Value:  value,
-						},
-					}
-				{{ end }}
-			}
-
-			// Set the optional value of {{ $field.Name.GoCase }} dynamically
-			func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-				if value == nil {
-					return {{ $setReturnStruct }}{}
+						}
+					{{ else }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Value:  value,
+							},
+						}
+					{{ end }}
 				}
 
-				return r.Set(*value)
-			}
+				// Set the optional value of {{ $field.Name.GoCase }} dynamically
+				func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					if value == nil {
+						return {{ $setReturnStruct }}{}
+					}
 
-			{{ if and (not $field.IsRequired) (not $field.IsList) }}
+					return r.Set(*value)
+				}
+			{{ end }}
+
+			{{ if and (not $field.IsRequired) (not $field.IsList) (not $field.Prisma) }}
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
 					if value == nil {
@@ -338,7 +344,7 @@
 			{{ $returnStruct = (print $name "DefaultParam") }}
 		{{ end }}
 
-		{{ if $field.Kind.IncludeInStruct }}
+		{{ if and $field.Kind.IncludeInStruct (not $field.Prisma) }}
 			{{/* Provide an `Equals` method for most types. */}}
 			{{/* Equals has a special return type for individual fields */}}
 			{{ $equalsReturnStruct := "" }}
@@ -373,7 +379,7 @@
 				return r.Equals({{ if not $field.IsList }}*{{ end }}value)
 			}
 
-			{{ if not $field.IsRequired }}
+			{{ if and (not $field.IsRequired) (not $field.Prisma) }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
 						data: builder.Field{
@@ -448,7 +454,7 @@
 					{{ end }}
 					return {{ $returnStruct }}{
 						data: builder.Field{
-							Name:   "{{ $field.Name }}",
+							Name:   "{{ if $field.Prisma }}{{ $field.Name.PrismaInternalCase }}{{ else }}{{ $field.Name }}{{ end }}",
 							Fields: []builder.Field{
 								{
 									Name: "{{ $method.Action }}",

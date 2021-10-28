@@ -163,6 +163,8 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		builder.WriteString("{")
 	}
 
+	fmt.Printf("fields: %+v\n", fields)
+
 	var final []Field
 
 	// check for duplicate fields so that multiple queries on the same field will be shared
