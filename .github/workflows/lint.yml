@@ -31,7 +31,7 @@ jobs:
           restore-keys: ${{ runner.os }}-go-${{ matrix.go }}-
 
       - name: download
-        run: go mod download
+        run: go mod download -x
 
       - name: generate
         run: go generate ./...
