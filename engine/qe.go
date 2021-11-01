@@ -5,7 +5,7 @@ import (
 	"os/exec"
 )
 
-func New(schema string, hasBinaryTargets bool) *QueryEngine {
+func NewQueryEngine(schema string, hasBinaryTargets bool) *QueryEngine {
 	return &QueryEngine{
 		Schema:           schema,
 		hasBinaryTargets: hasBinaryTargets,

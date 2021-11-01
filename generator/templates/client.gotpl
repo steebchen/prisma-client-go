@@ -1,6 +1,8 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
+const schemaConnectionURL = "{{ (index .Datasources 0).URL.Value }}"
+const schemaEnvVarName = "{{ (index .Datasources 0).URL.FromEnvVar }}"
 
 {{ $hasBinaryTargets := false }}
 {{ if gt (len .Generator.BinaryTargets) 0 }}
@@ -27,7 +29,20 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //   }()
 func NewClient() *PrismaClient {
 	c := newClient()
-	c.Engine = engine.New(schema, hasBinaryTargets)
+	{{ if eq $.GetEngineType "dataproxy" }}
+		// use the schema connection url if set
+		url := schemaConnectionURL
+		if url == "" {
+			// if not, use the schema env var name
+			url = os.Getenv(schemaEnvVarName)
+			if url == "" {
+				panic("no connection string found")
+			}
+		}
+		c.Engine = engine.NewDataProxyEngine(schema, url)
+	{{ else }}
+		c.Engine = engine.NewQueryEngine(schema, hasBinaryTargets)
+	{{ end }}
 	c.Prisma.Lifecycle = &lifecycle.Lifecycle{Engine: c.Engine}
 
 	return c
