@@ -4,9 +4,13 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    # https://github.com/prisma/prisma-client-go/pull/641#issuecomment-952631905
+    ignore:
+      - dependency-name: "strcase"
+      - dependency-name: "gocase"
 
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/test/integration"
     schedule:
       interval: "daily"
 
