@@ -30,10 +30,15 @@ jobs:
         run: go mod download
 
       - name: generate
-        run: go generate ./...
-
-      - name: setup
-        run: go run ./test/setup/init setup
+        run: |
+          cd test/e2e/
+          go generate -tags e2e ./...
+        env:
+          DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}
 
       - name: test
-        run: go test ./... -run '^TestE2E.*$' -v
+        run: |
+          cd test/e2e/
+          go test ./... -run '^TestE2E.*$' -tags e2e -v
+        env:
+          DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}

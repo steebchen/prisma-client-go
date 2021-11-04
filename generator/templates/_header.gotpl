@@ -8,6 +8,7 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"testing"
+	"os"
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/engine/mock"
@@ -23,6 +24,9 @@ import (
 	_ "github.com/takuoki/gocase"
 	_ "github.com/joho/godotenv"
 )
+
+// ignore unused os import as it may not be needed depending on engine type
+var _ = os.DevNull
 
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
