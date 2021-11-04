@@ -47,6 +47,7 @@ func request(ctx context.Context, client *http.Client, method string, url string
 	}
 
 	if rawResponse.StatusCode == http.StatusNotFound {
+		logger.Debug.Printf("status not found with response body %s", responseBody)
 		return nil, errNotFound
 	}
 

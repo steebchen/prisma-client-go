@@ -75,6 +75,7 @@ func (e *DataProxyEngine) uploadSchema(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("put schema: %w", err)
 	}
+	logger.Debug.Printf("schema upload response: %s", res)
 	type SchemaResponse struct {
 		SchemaHash string `json:"schemaHash"`
 	}
@@ -98,7 +99,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 		return fmt.Errorf("payload marshal: %w", err)
 	}
 
-	body, err := e.request(ctx, "POST", "/graphql", data)
+	body, err := e.retryableRequest(ctx, "POST", "/graphql", data)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
@@ -136,7 +137,7 @@ func (e *DataProxyEngine) Batch(ctx context.Context, payload interface{}, into i
 		return fmt.Errorf("payload marshal: %w", err)
 	}
 
-	body, err := e.request(ctx, "POST", "/graphql", data)
+	body, err := e.retryableRequest(ctx, "POST", "/graphql", data)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
@@ -153,9 +154,15 @@ func (e *DataProxyEngine) Name() string {
 }
 
 func (e *DataProxyEngine) request(ctx context.Context, method string, path string, payload []byte) ([]byte, error) {
-	res, err := request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
+	logger.Debug.Printf("requesting %s", e.url+path)
+	auth := func(req *http.Request) {
 		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
-	})
+	}
+	return request(ctx, e.http, method, e.url+path, payload, auth)
+}
+
+func (e *DataProxyEngine) retryableRequest(ctx context.Context, method string, path string, payload []byte) ([]byte, error) {
+	res, err := e.request(ctx, method, path, payload)
 	if err != nil {
 		if !errors.Is(err, errNotFound) {
 			return nil, err
@@ -165,9 +172,7 @@ func (e *DataProxyEngine) request(ctx context.Context, method string, path strin
 			return nil, fmt.Errorf("upload schema after 400 request: %w", err)
 		}
 		logger.Debug.Printf("schema re-upload succeeded")
-		return request(ctx, e.http, method, e.url+path, payload, func(req *http.Request) {
-			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", e.apiKey))
-		})
+		return e.request(ctx, method, path, payload)
 	}
 	return res, nil
 }
