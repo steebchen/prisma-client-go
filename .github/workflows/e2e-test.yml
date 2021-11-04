@@ -42,3 +42,4 @@ jobs:
           go test ./... -run '^TestE2E.*$' -tags e2e -v
         env:
           DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}
+          PRISMA_CLIENT_GO_LOG: info
