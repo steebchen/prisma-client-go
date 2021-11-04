@@ -20,9 +20,9 @@ import (
 func (e *QueryEngine) Connect() error {
 	logger.Debug.Printf("ensure query engine binary...")
 
-	_ = godotenv.Load(".env")
-	_ = godotenv.Load("db/.env")
-	_ = godotenv.Load("prisma/.env")
+	_ = godotenv.Load("e2e.env")
+	_ = godotenv.Load("db/e2e.env")
+	_ = godotenv.Load("prisma/e2e.env")
 
 	startEngine := time.Now()
 
