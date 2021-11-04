@@ -17,6 +17,9 @@ type Model struct {
 type Field struct {
 	// TODO re-declare all fields here instead of embedding dmmf.Field
 
+	// Prisma indicates whether this is a pseudo field used for Prisma-specific actions, e.g. 'Relevance_'
+	Prisma bool `json:"prisma"`
+
 	dmmf.Field
 }
 

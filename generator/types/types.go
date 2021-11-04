@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/takuoki/gocase"
@@ -34,6 +35,16 @@ func (s String) Tag() string {
 	return fmt.Sprintf("`json:\"%s\"`", s)
 }
 
+// PrismaGoCase transforms `relevance` into `Relevance_`
+func (s String) PrismaGoCase() string {
+	return strings.Title(string(s)) + "_"
+}
+
+// PrismaInternalCase transforms `relevance` into `_relevance`
+func (s String) PrismaInternalCase() string {
+	return "_" + string(s)
+}
+
 // builtin Go types
 var builtin = map[string]string{
 	"ID":       "string",
@@ -58,14 +69,14 @@ func (t Type) String() string {
 func (t Type) Value() string {
 	str := string(t)
 	v, ok := builtin[str]
-	if !ok {
-		return gocase.To(strcase.ToCamel(str))
+	if ok {
+		return v
 	}
 
-	return v
+	return gocase.To(strcase.ToCamel(str))
 }
 
-// GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
+// GoCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (t Type) GoCase() string {
 	return gocase.To(strcase.ToCamel(string(t)))
 }

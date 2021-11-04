@@ -112,11 +112,10 @@
 					var fields []builder.Field
 
 					for _, param := range params {
-						direction, _ := param.field().Value.(SortOrder)
-
 						fields = append(fields, builder.Field{
 							Name: param.field().Name,
-							Value: direction,
+							Value: param.field().Value,
+							Fields: param.field().Fields,
 						})
 					}
 

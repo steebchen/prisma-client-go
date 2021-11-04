@@ -21,6 +21,9 @@ type AST struct {
 
 	// WriteFilters describe a list of scalar types and the respective read operations
 	WriteFilters []Filter `json:"writeFilters"`
+
+	// OrderBys describe a list of what FindMany operations can order by
+	OrderBys []OrderBy `json:"orderBys"`
 }
 
 func New(document *dmmf.Document) *AST {

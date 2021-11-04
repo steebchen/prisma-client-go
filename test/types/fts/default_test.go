@@ -75,6 +75,38 @@ func TestFullTextSearch(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "relevance",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "123",
+					name: "john doe",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			users, err := client.User.FindMany().OrderBy(
+				User.Relevance_.Search("hn"),
+				User.Relevance_.Fields([]UserOrderByRelevanceFieldEnum{UserOrderByRelevanceFieldEnumName}),
+				User.Relevance_.Sort(SortOrderDesc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:   "123",
+					Name: "john doe",
+				},
+			}
+
+			assert.Equal(t, []UserModel{*expected}, users)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
