@@ -88,6 +88,8 @@ actual, err := client.User.FindFirst(
 ).Exec(ctx)
 ```
 
+For more information about all json filters and more example queries, check out the [Prisma JSON filters documentation](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields).
+
 ## Next steps
 
 Check out how to [dynamically ignore fields](16-if-present-methods.md).
