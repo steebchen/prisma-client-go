@@ -3,10 +3,11 @@
 The examples use the following prisma schema:
 
 ```prisma
-model Post {
-    id    String @id @default(cuid())
-    title String
-    info  Json
+model Log {
+    id      String   @id @default(cuid())
+    date    DateTime @default(now())
+    message String
+    meta    Json
 }
 ```
 
@@ -19,22 +20,22 @@ You can work with []bytes directly, but usually you marshal this data from an ex
 ## Write JSON data
 
 ```go
-type PostInfo struct {
-    Content string `json:"content"`
+type LogInfo struct {
+    Service string `json:"service"`
 }
 
-postInfo := &PostInfo{
-    Content: "hi",
+logInfo := &LogInfo{
+    Service: "deployment/api",
 }
-infoBytes, err := json.Marshal(postInfo)
+infoBytes, err := json.Marshal(logInfo)
 if err != nil {
     panic(err)
 }
 
-_, err = client.Post.CreateOne(
-    db.Post.Title.Set("what up"),
-    db.Post.Info.Set(infoBytes),
-    db.Post.ID.Set("123"),
+_, err = client.Log.CreateOne(
+    db.Log.Message.Set("/api/graphql: status code 400"),
+    db.Log.Info.Set(infoBytes),
+    db.Log.ID.Set("123"),
 ).Exec(ctx)
 if err != nil {
     panic(err)
@@ -44,29 +45,50 @@ if err != nil {
 ## Read JSON data
 
 ```go
-post, err := client.Post.FindUnique(
-    db.Post.ID.Equals("123"),
+log, err := client.Log.FindUnique(
+    db.Log.ID.Equals("123"),
 ).Exec(ctx)
 if err != nil {
     panic(err)
 }
 
-// post.Info is of type json.RawMessage, so this will contain binary data such as [123 34 97 116 116 ...]
+// log.Info is of type json.RawMessage, so this will contain binary data such as [123 34 97 116 116 ...]
 // however, if we format it with %s, we can convert the contents to a string to see what's inside:
-log.Printf("post info: %s", post.Info)
+log.Printf("log info: %s", log.Info)
 
 // to unmarshal this information into a specific struct, we make use of Go's usual handling of json data:
 
-type PostInfo struct {
-    Content string `json:"content"`
+type LogInfo struct {
+    Service string `json:"service"`
 }
 
-var info PostInfo
-if err := json.Unmarshal(post.Info, &info); err != nil {
+var info LogInfo
+if err := json.Unmarshal(log.Info, &info); err != nil {
     panic(err)
 }
-log.Printf("post info: %+v", info)
+log.Printf("log info: %+v", info)
 ```
+
+## Query JSON
+
+You can filter JSON fields by using a combination of `Path` and a JSON query. Note that the syntax differs between databases.
+
+```go
+actual, err := client.User.FindFirst(
+    User.Meta.Path([]string{"service"}),
+    User.Meta.StringContains("api"),
+).Exec(ctx)
+```
+
+```go
+actual, err := client.User.FindFirst(
+    User.Meta.Path([]string{"service"}),
+    // Note that Equals accepts JSON, so strings need to be surrounded with quotes
+    User.Meta.Equals(JSON(`"deployment/api"`)),
+).Exec(ctx)
+```
+
+For more information about all json filters and more example queries, check out the [Prisma JSON filters documentation](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields).
 
 ## Next steps
 
