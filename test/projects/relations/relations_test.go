@@ -142,7 +142,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "find by same field fail",
+		name: "find by same field override",
 		// language=GraphQL
 		before: []string{`
 			mutation {
