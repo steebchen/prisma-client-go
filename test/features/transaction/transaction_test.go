@@ -58,7 +58,7 @@ func TestTransaction(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "fail",
+		name: "rollback tx",
 		// language=GraphQL
 		before: []string{`
 			mutation {
