@@ -4,6 +4,7 @@
     <working_directory value="$PROJECT_DIR$/" />
     <go_parameters value="-run '$TestE2E.*$' -tags e2e" />
     <envs>
+      <env name="PRISMA_CLIENT_GO_LOG" value="info" />
       <env name="PHOTON_GO_LOG" value="info" />
       <env name="LOG_QUERIES" value="y" />
       <env name="DBm" value="mysql://root:pw@localhost:3306/testing" />
