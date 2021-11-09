@@ -122,6 +122,7 @@
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "orderBy",
 						Fields: fields,
+						WrapList: true,
 					})
 
 					return r

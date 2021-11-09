@@ -212,6 +212,71 @@ func TestPagination(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "order by many fields",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "1",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "y",
+					content: "2",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "z",
+					content: "2",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
+				Post.Content.Order(SortOrderDesc),
+				Post.Title.Order(SortOrderDesc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "z",
+					Content: "2",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "y",
+					Content: "2",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "1",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "order by DESC (deprecated)",
 		// language=GraphQL
 		before: []string{`
