@@ -12,9 +12,10 @@ import (
 )
 
 type Input struct {
-	Name   string
-	Fields []Field
-	Value  interface{}
+	Name     string
+	Fields   []Field
+	Value    interface{}
+	WrapList bool
 }
 
 // Output can be a single Name or can have nested fields
@@ -123,7 +124,13 @@ func (q Query) buildInputs(inputs []Input) string {
 		if i.Value != nil {
 			builder.Write(Value(i.Value))
 		} else {
-			builder.WriteString(q.buildFields(false, false, i.Fields))
+			if i.WrapList {
+				builder.WriteString("[")
+			}
+			builder.WriteString(q.buildFields(i.WrapList, i.WrapList, i.Fields))
+			if i.WrapList {
+				builder.WriteString("]")
+			}
 		}
 
 		builder.WriteString(",")

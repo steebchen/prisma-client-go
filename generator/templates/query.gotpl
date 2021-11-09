@@ -419,17 +419,14 @@
 				}
 			}
 
-			{{/* If it's a unique ID, allow using these fields as cursor queries */}}
-			{{ if or ($field.IsID) ($field.IsUnique) }}
-				func (r {{ $struct }}) Cursor(cursor {{ $field.Type.Value }}) {{ $name }}CursorParam {
-					return {{ $name }}CursorParam{
-						data: builder.Field{
-							Name:  "{{ $field.Name }}",
-							Value: cursor,
-						},
-					}
+			func (r {{ $struct }}) Cursor(cursor {{ $field.Type.Value }}) {{ $name }}CursorParam {
+				return {{ $name }}CursorParam{
+					data: builder.Field{
+						Name:  "{{ $field.Name }}",
+						Value: cursor,
+					},
 				}
-			{{ end }}
+			}
 		{{ end }}
 
 		{{/* Provide field and type-specific methods. */}}
