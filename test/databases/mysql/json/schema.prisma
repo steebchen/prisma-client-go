@@ -12,7 +12,7 @@ generator db {
 }
 
 model User {
-  id      String @id @default(cuid()) @map("_id")
+  id      String @id @default(cuid())
   json    Json
   jsonOpt Json?
 }

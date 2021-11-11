@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("__REPLACE__")
 }
 
@@ -8,11 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["filterJson"]
 }
 
-model User {
-  id      String @id @default(cuid())
-  json    Json
-  jsonOpt Json?
+model Post {
+  id      String @id @default(cuid()) @map("_id")
+  title   String @unique
+  content String
+  intTest Int?   @unique
 }

@@ -8,6 +8,7 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "linkmany"
+  previewFeatures = ["mongoDb"]
 }
 
 model User {

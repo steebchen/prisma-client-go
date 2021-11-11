@@ -112,6 +112,10 @@ func TestComposite(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
+				if db == test.MongoDB {
+					// TODO
+					t.Skip()
+				}
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

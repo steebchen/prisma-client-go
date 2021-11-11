@@ -16,7 +16,7 @@ func str(v string) *string {
 	return &v
 }
 
-func TestRelations(t *testing.T) {
+func TestLinkMany(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {

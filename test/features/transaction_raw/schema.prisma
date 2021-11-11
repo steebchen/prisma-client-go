@@ -8,11 +8,10 @@ generator db {
 	output = "."
 	disableGoBinaries = true
 	package = "db"
-  previewFeatures = ["mongoDb"]
 }
 
 model User {
-	id       String  @id @default(cuid()) @map("_id")
+	id       String  @id @default(cuid())
 	email    String
 	name     String?
 }
