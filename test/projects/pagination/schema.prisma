@@ -8,10 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "pagination"
+  previewFeatures = ["mongoDb"]
 }
 
 model Post {
-  id      String @id @default(cuid())
+  id      String @id @default(cuid()) @map("_id")
   title   String @unique
   content String
   intTest Int?   @unique

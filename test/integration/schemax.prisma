@@ -9,7 +9,7 @@ generator db {
 }
 
 model User {
-	id        String   @default(cuid()) @id
+	id        String   @default(cuid()) @id @map("_id")
 	createdAt DateTime @default(now())
 	email     String   @unique
 	name      String?
@@ -19,7 +19,7 @@ model User {
 }
 
 model Post {
-	id        String   @default(cuid()) @id
+	id        String   @default(cuid()) @id @map("_id")
 	createdAt DateTime @default(now())
 	updatedAt DateTime @updatedAt
 	published Boolean

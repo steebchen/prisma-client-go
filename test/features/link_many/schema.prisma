@@ -11,7 +11,7 @@ generator db {
 }
 
 model User {
-  id       String  @id @default(cuid())
+  id       String  @id @default(cuid()) @map("_id")
   email    String  @unique
   username String
   name     String?
@@ -20,7 +20,7 @@ model User {
 }
 
 model Post {
-  id      String  @id @default(cuid())
+  id      String  @id @default(cuid()) @map("_id")
   title   String
   content String?
 

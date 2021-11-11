@@ -11,6 +11,6 @@ generator db {
 }
 
 model User {
-  id    String   @id @default(cuid())
+  id    String   @id @default(cuid()) @map("_id")
   items String[]
 }

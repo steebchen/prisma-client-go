@@ -8,10 +8,11 @@ generator db {
 	output = "."
 	disableGoBinaries = true
 	package = "composite"
+  previewFeatures = ["mongoDb"]
 }
 
 model User {
-	id  String @default(cuid()) @id
+	id  String @default(cuid()) @id @map("_id")
 	foo String
 	bar String
 
@@ -19,7 +20,7 @@ model User {
 }
 
 model Post {
-	id  String @default(cuid()) @id
+	id  String @default(cuid()) @id @map("_id")
 	foo String
 	bar String
 

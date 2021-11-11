@@ -8,11 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["filterJson"]
+  previewFeatures = ["mongoDb", "filterJson"]
 }
 
 model User {
-  id      String @id @default(cuid())
+  id      String @id @default(cuid()) @map("_id")
   json    Json
   jsonOpt Json?
 }

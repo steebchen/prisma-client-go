@@ -8,11 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["nativeTypes"]
+  previewFeatures = ["mongoDb", "nativeTypes"]
 }
 
 model User {
-  id String @id @default(cuid())
+  id String @id @default(cuid()) @map("_id")
   a  String @db.VarChar(5)
   b  String? @db.VarChar(50)
 }

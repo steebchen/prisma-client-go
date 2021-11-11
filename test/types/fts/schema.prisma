@@ -8,10 +8,10 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures   = ["fullTextSearch"]
+  previewFeatures   = ["mongoDb", "fullTextSearch"]
 }
 
 model User {
-  id   String @id @default(cuid())
+  id   String @id @default(cuid()) @map("_id")
   name String
 }

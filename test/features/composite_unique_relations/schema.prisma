@@ -8,15 +8,16 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
+  previewFeatures = ["mongoDb"]
 }
 
 model User {
-  id           String        @id @default(cuid())
+  id           String        @id @default(cuid()) @map("_id")
   participants Participant[]
 }
 
 model Participant {
-  id      String  @id @default(cuid())
+  id      String  @id @default(cuid()) @map("_id")
   unused1 String? @unique
   unused2 String? @unique
   user    User    @relation(fields: [userId], references: [id])

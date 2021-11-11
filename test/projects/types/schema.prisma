@@ -21,7 +21,7 @@ model Type {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

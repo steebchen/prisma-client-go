@@ -19,6 +19,6 @@ model Product {
 }
 
 model ProductManufacturer {
-  id       String    @id @default(cuid())
+  id       String    @id @default(cuid()) @map("_id")
   products Product[]
 }
