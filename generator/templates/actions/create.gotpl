@@ -43,7 +43,7 @@
 		return v
 	}
 
-	func (r {{ $result }}) With(params ...i{{ $model.Name.GoCase }}RelationWith) {{ $result }} {
+	func (r {{ $result }}) With(params ...{{ $model.Name.GoCase }}RelationWith) {{ $result }} {
 		for _, q := range params {
 			query := q.getQuery()
 			r.query.Outputs = append(r.query.Outputs, builder.Output{
