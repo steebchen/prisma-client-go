@@ -8,20 +8,21 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "composite"
+  previewFeatures = ["mongoDb"]
 }
 
 model Event {
-  id            String          @id @default(cuid())
+  id            String          @id @default(cuid()) @map("_id")
   EventInstance EventInstance[]
 }
 
 model Document {
-  id            String          @id @default(cuid())
+  id            String          @id @default(cuid()) @map("_id")
   EventInstance EventInstance[]
 }
 
 model EventInstance {
-  id                      String         @id @default(cuid())
+  id                      String         @id @default(cuid()) @map("_id")
   createdAt               DateTime       @default(now())
   updatedAt               DateTime       @updatedAt
   event                   Event          @relation(fields: [eventId], references: [id])

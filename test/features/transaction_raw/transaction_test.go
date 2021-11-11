@@ -13,7 +13,7 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-func TestTransaction(t *testing.T) {
+func TestTransactionRaw(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {

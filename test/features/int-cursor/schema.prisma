@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("__REPLACE__")
 }
 
@@ -8,11 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["mongoDb", "filterJson"]
 }
 
-model User {
+model Post {
   id      String @id @default(cuid()) @map("_id")
-  json    Json
-  jsonOpt Json?
+  title   String @unique
+  content String
+  intTest Int?   @unique
 }

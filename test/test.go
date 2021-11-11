@@ -11,6 +11,7 @@ import (
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/test/cmd"
+	"github.com/prisma/prisma-client-go/test/setup/mongodb"
 	"github.com/prisma/prisma-client-go/test/setup/mysql"
 	"github.com/prisma/prisma-client-go/test/setup/postgresql"
 	"github.com/prisma/prisma-client-go/test/setup/sqlite"
@@ -28,11 +29,13 @@ type Database interface {
 var MySQL = mysql.MySQL
 var PostgreSQL = postgresql.PostgreSQL
 var SQLite = sqlite.SQLite
+var MongoDB = mongodb.MongoDB
 
 var Databases = []Database{
-	mysql.MySQL,
-	postgresql.PostgreSQL,
-	sqlite.SQLite,
+	MySQL,
+	PostgreSQL,
+	SQLite,
+	MongoDB,
 }
 
 const schemaTemplate = "schema.temp.%s.prisma"

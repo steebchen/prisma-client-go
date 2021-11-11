@@ -9,19 +9,20 @@ generator db {
   disableGitignore  = true
   disableGoBinaries = true
   package           = "types"
+  previewFeatures = ["mongoDb"]
 }
 
 model Client {
-  id String @id
+  id String @id @map("_id")
 }
 
 // test for a reserved go keyword as model name
 model Type {
-  id String @id
+  id String @id @map("_id")
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(cuid()) @map("_id")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

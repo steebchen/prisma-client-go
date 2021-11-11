@@ -8,10 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "enums"
+  previewFeatures = ["mongoDb"]
 }
 
 model User {
-  id      String @id @default(cuid())
+  id      String @id @default(cuid()) @map("_id")
   role    Role
   roleOpt Role?
   stuff1  Stuff

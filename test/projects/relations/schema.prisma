@@ -8,10 +8,11 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "relations"
+  previewFeatures = ["mongoDb"]
 }
 
 model User {
-  id       String  @id @default(cuid())
+  id       String  @id @default(cuid()) @map("_id")
   email    String  @unique
   username String
   name     String?
@@ -26,7 +27,7 @@ model User {
 }
 
 model Post {
-  id      String  @id @default(cuid())
+  id      String  @id @default(cuid()) @map("_id")
   title   String
   content String?
 
@@ -44,7 +45,7 @@ model Post {
 }
 
 model Comment {
-  id      String @id @default(cuid())
+  id      String @id @default(cuid()) @map("_id")
   content String
 
   by     User   @relation(fields: [userID], references: [id])
@@ -55,14 +56,14 @@ model Comment {
 }
 
 model Category {
-  id     String @id @default(cuid())
+  id     String @id @default(cuid()) @map("_id")
   name   String
   weight Int?
   posts  Post[]
 }
 
 model Role {
-  id    String @id @default(cuid())
+  id    String @id @default(cuid()) @map("_id")
   name  String
   posts User[]
 }
