@@ -14,7 +14,7 @@ func (e *Engine) Do(ctx context.Context, payload interface{}, v interface{}) err
 
 	expectations := *e.expectations
 
-	var n = -1
+	n := -1
 	for i, e := range expectations {
 		req := payload.(engine.GQLRequest)
 		if e.Query.Build() == req.Query {
@@ -25,7 +25,7 @@ func (e *Engine) Do(ctx context.Context, payload interface{}, v interface{}) err
 	if n == -1 {
 		panic("could not find query")
 	}
-	var retErr error = nil
+	var retErr error
 	switch {
 	case expectations[n].Want != nil:
 		r, err := json.Marshal(expectations[n].Want)

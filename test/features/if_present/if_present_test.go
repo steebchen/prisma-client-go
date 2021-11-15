@@ -197,7 +197,7 @@ func TestIfPresent(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var v *string = nil
+			var v *string
 			post, err := client.Post.CreateOne(
 				Post.Title.Set("asdf"),
 				Post.Author.Link(
