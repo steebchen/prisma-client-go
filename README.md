@@ -1,7 +1,9 @@
-<br />
+## The Prisma Go Client is no longer Officially Maintained. Read [this issue](https://github.com/prisma/prisma-client-go/issues/707) to learn more.
+
+---
 
 <div align="center">
-    <h1>Prisma Client Go</h1>
+    <h2>Prisma Client Go</h2>
     <p><h3 align="center">Typesafe database access for Go</h3></p>
     <div>
         <a href="https://github.com/prisma/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/prisma/prisma-client-go" /></a>
