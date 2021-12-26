@@ -1,7 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="GitToolBoxProjectSettings">
+    <option name="commitMessageIssueKeyValidationOverride">
+      <BoolValueOverride>
+        <option name="enabled" value="true" />
+        <option name="value" value="true" />
+      </BoolValueOverride>
+    </option>
     <option name="commitMessageValidation" value="true" />
+    <option name="commitMessageValidationConfigOverride">
+      <CommitMessageValidationOverride>
+        <option name="enabled" value="true" />
+        <option name="value">
+          <CommitMessageValidationConfig>
+            <option name="enabled" value="true" />
+            <option name="regexConfig">
+              <RegexConfig>
+                <option name="expression" value="(?:fix|chore|docs|feat|refactor|style|test|ci)(?:\(.*\))?: (.|\s)*" />
+                <option name="testInput" value="fix(engine): adapt stuff" />
+              </RegexConfig>
+            </option>
+          </CommitMessageValidationConfig>
+        </option>
+      </CommitMessageValidationOverride>
+    </option>
     <option name="commitMessageValidationRegex" value="(?:fix|chore|docs|feat|refactor|style|test|ci)(?:\(.*\))?: (.|\s)*" />
   </component>
 </project>

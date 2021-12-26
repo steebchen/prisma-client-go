@@ -2,6 +2,8 @@
 
 set -eux
 
+S3_BUCKET="prisma-photongo"
+
 v="$1"
 
 mkdir -p build
@@ -26,9 +28,9 @@ gzip "prisma-cli-$version-darwin"
 gzip "prisma-cli-$version-linux"
 gzip "prisma-cli-$version-windows.exe"
 
-aws s3 cp "prisma-cli-$version-darwin.gz" s3://prisma-photongo --acl public-read
-aws s3 cp "prisma-cli-$version-linux.gz" s3://prisma-photongo --acl public-read
-aws s3 cp "prisma-cli-$version-windows.exe.gz" s3://prisma-photongo --acl public-read
+aws s3 cp "prisma-cli-$version-darwin.gz" "s3://$S3_BUCKET" --acl public-read
+aws s3 cp "prisma-cli-$version-linux.gz" "s3://$S3_BUCKET" --acl public-read
+aws s3 cp "prisma-cli-$version-windows.exe.gz" "s3://$S3_BUCKET" --acl public-read
 
 cd ../..
 
