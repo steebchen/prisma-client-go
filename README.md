@@ -1,6 +1,4 @@
-## The Prisma Go Client is no longer Officially Maintained. Read [this issue](https://github.com/prisma/prisma-client-go/issues/707) to learn more.
 
----
 
 <div align="center">
     <h2>Prisma Client Go</h2>
@@ -34,6 +32,12 @@
 </div>
 
 <hr>
+
+## Deprecation note
+
+**Prisma Client Go is no longer officially maintained**. Read [this issue](https://github.com/prisma/prisma-client-go/issues/707) to learn more.
+
+## Description
 
 Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most database-specific tools.
 
