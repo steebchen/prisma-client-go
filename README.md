@@ -57,21 +57,7 @@ The go client works slightly different than the normal Prisma tooling. When you'
 
 ## Contributing
 
-### Running Tests
-
-```shell
-# requires docker to be installed
-go run ./test/setup/init setup # sets up docker containers for integration testing
-go generate ./...
-go test ./... -v
-
-# to teardown docker containers:
-go run ./test/setup/init teardown
-```
-
-### Writing Commit Messages
-
-We use [conventional commits](https://www.conventionalcommits.org) (also known as semantic commits) to ensure consistent and descriptive commit messages.
+Check out our [advanced contributing guide](./CONTRIBUTING.md).
 
 ## Security
 
