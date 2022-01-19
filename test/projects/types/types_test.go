@@ -394,7 +394,7 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var s *string = nil
+			var s *string
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(s),
 			).Exec(ctx)

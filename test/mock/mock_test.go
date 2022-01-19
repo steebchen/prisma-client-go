@@ -17,7 +17,7 @@ func TestTypedMockReturns(t *testing.T) {
 		return user, nil
 	}
 
-	var expectedErr error = nil
+	var expectedErr error
 	expected := &UserModel{
 		InnerUser: InnerUser{
 			ID:   "123",
@@ -42,7 +42,7 @@ func TestTypedMockReturnsMany(t *testing.T) {
 		return client.User.FindMany(User.Name.Equals("foo")).Exec(ctx)
 	}
 
-	var expectedErr error = nil
+	var expectedErr error
 	expected := []UserModel{
 		{
 			InnerUser: InnerUser{
