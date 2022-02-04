@@ -177,7 +177,8 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	uniques := make(map[string]*Field)
 	for i, f := range fields {
 		if _, ok := uniques[f.Name]; ok {
-			if f.Fields != nil {
+			// check if field is a model operation
+			if f.Fields != nil && f.Name != "AND" && f.Name != "OR" && f.Name != "NOT" {
 				// field already exists, join sub-fields
 				uniques[f.Name].Fields = append(uniques[f.Name].Fields, f.Fields...)
 			} else {
