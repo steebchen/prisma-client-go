@@ -252,7 +252,7 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, expected, users)
 		},
 	}, {
-		name: "failing query for the same field should lead to ErrNotFound",
+		name: "invalid query for the same field should lead to ErrNotFound",
 		// language=GraphQL
 		before: []string{`
 			mutation {
