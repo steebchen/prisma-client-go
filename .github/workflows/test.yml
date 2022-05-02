@@ -1,9 +1,5 @@
 name: test all
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: push
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go test.yml"
 
