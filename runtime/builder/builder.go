@@ -171,6 +171,8 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	}
 
 	var final []Field
+	// remember the order in which the unique fields where added to the map
+	var uniqueNames []string
 
 	// check for duplicate fields so that multiple queries on the same field will be shared
 	// this is necessary for json filters and more
@@ -188,11 +190,13 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 			}
 		} else {
 			uniques[f.Name] = &fields[i]
+			uniqueNames = append(uniqueNames, f.Name)
 		}
 	}
 
-	for _, unique := range uniques {
-		final = append(final, *unique)
+	// use the list of unique names to add the unique fields in a deterministic order
+	for _, name := range uniqueNames {
+		final = append(final, *uniques[name])
 	}
 
 	for _, f := range final {
