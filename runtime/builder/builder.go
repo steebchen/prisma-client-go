@@ -170,10 +170,10 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		builder.WriteString("{")
 	}
 
-	var final []Field
+	var final []*Field
 
 	// check for duplicate fields so that multiple queries on the same field will be shared
-	// this is necessary for json filters and more
+	// this is necessary for json filters, query modes and more
 	uniques := make(map[string]*Field)
 	for i, f := range fields {
 		if _, ok := uniques[f.Name]; ok {
@@ -184,15 +184,12 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 			} else {
 				// if it's a list or just contains a value, just add it, which may result in a duplicate
 				// this is necessary for some operations, e.g. linking multiple records
-				final = append(final, f)
+				final = append(final, &fields[i])
 			}
 		} else {
 			uniques[f.Name] = &fields[i]
+			final = append(final, &fields[i])
 		}
-	}
-
-	for _, unique := range uniques {
-		final = append(final, *unique)
 	}
 
 	for _, f := range final {
