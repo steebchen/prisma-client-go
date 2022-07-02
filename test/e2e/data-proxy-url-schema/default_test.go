@@ -27,6 +27,8 @@ func str(v string) *string {
 
 func TestE2ERemoteDataProxyURLSchema(t *testing.T) {
 	test.RunSerial(t, []test.Database{test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+		t.Skip("data proxy is unmaintained")
+
 		client := NewClient()
 		if err := client.Connect(); err != nil {
 			t.Fatalf("fail %s", err)
