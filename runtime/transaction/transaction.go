@@ -54,12 +54,12 @@ func (r Exec) Exec(ctx context.Context) error {
 	}
 	if len(result.Errors) > 0 {
 		first := result.Errors[0]
-		return fmt.Errorf("pql error: %s", first.Message)
+		return fmt.Errorf("pql error: %s", first.RawMessage())
 	}
 	for i, inner := range result.Result {
 		if len(inner.Errors) > 0 {
 			first := result.Errors[0]
-			return fmt.Errorf("pql error: %s", first.Message)
+			return fmt.Errorf("pql error: %s", first.RawMessage())
 		}
 
 		r.queries[i].ExtractQuery().TxResult <- inner.Data.Result

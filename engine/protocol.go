@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 // GQLResponse is the default GraphQL response
@@ -37,4 +38,8 @@ type GQLError struct {
 	Message    string                 `json:"error"` // note: the query-engine uses 'error' instead of 'message'
 	Path       []string               `json:"path"`
 	Extensions map[string]interface{} `json:"query"`
+}
+
+func (e *GQLError) RawMessage() string {
+	return strings.ReplaceAll(e.Message, "\n", " ")
 }
