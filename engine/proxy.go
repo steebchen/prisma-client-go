@@ -115,11 +115,11 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 
 	if len(response.Errors) > 0 {
 		first := response.Errors[0]
-		if first.Message == internalUpdateNotFoundMessage ||
-			first.Message == internalDeleteNotFoundMessage {
+		if first.RawMessage() == internalUpdateNotFoundMessage ||
+			first.RawMessage() == internalDeleteNotFoundMessage {
 			return types.ErrNotFound
 		}
-		return fmt.Errorf("pql error: %s", first.Message)
+		return fmt.Errorf("pql error: %s", first.RawMessage())
 	}
 
 	if err := json.Unmarshal(response.Data.Result, into); err != nil {

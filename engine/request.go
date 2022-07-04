@@ -11,8 +11,8 @@ import (
 	"github.com/prisma/prisma-client-go/runtime/types"
 )
 
-var internalUpdateNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
-var internalDeleteNotFoundMessage = "Error occurred during query execution:\nInterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
+var internalUpdateNotFoundMessage = "Error occurred during query execution: InterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to update not found.\"))))"
+var internalDeleteNotFoundMessage = "Error occurred during query execution: InterpretationError(\"Error for binding '0'\", Some(QueryGraphBuilderError(RecordNotFound(\"Record to delete does not exist.\"))))"
 
 // Do sends the http Request to the query engine and unmarshals the response
 func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}) error {
@@ -34,11 +34,11 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 
 	if len(response.Errors) > 0 {
 		first := response.Errors[0]
-		if first.Message == internalUpdateNotFoundMessage ||
-			first.Message == internalDeleteNotFoundMessage {
+		if first.RawMessage() == internalUpdateNotFoundMessage ||
+			first.RawMessage() == internalDeleteNotFoundMessage {
 			return types.ErrNotFound
 		}
-		return fmt.Errorf("pql error: %s", first.Message)
+		return fmt.Errorf("pql error: %s", first.RawMessage())
 	}
 
 	if err := json.Unmarshal(response.Data.Result, v); err != nil {
