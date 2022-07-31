@@ -22,7 +22,7 @@ const PrismaVersion = "3.13.0"
 const EngineVersion = "efdf9b1183dddfd4258cd181a72125755215ab7b"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
-var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
+var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s-x64.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://binaries.prisma.sh/all_commits/%s/%s/%s.gz"
@@ -60,7 +60,7 @@ func init() {
 // PrismaCLIName returns the local file path of where the CLI lives
 func PrismaCLIName() string {
 	variation := platform.Name()
-	return fmt.Sprintf("prisma-cli-%s", variation)
+	return fmt.Sprintf("prisma-cli-%s-x64", variation)
 }
 
 var baseDirName = path.Join("prisma", "binaries")
