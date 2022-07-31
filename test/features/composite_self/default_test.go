@@ -104,7 +104,7 @@ func TestCompositeSelf(t *testing.T) {
 			}
 
 			_, err = client.EventInstance.CreateOne(
-				EventInstance.Event.Link(Event.ID.Equals("event-1")),
+				EventInstance.Event.Link(Event.ID.Equals("event-2")),
 				EventInstance.Start.Set(time.Now()),
 				EventInstance.End.Set(time.Now()),
 				EventInstance.Summary.Link(Document.ID.Equals("doc-2")),

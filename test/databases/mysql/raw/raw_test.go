@@ -298,13 +298,15 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count int `json:"count"`
+				Count struct {
+					Value string `json:"prisma__value"`
+				} `json:"count"`
 			}
 			if err := client.Prisma.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, actual[0].Count)
+			assert.Equal(t, "2", actual[0].Count.Value)
 		},
 	}, {
 		name:   "insert into",

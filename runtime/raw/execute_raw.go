@@ -58,11 +58,13 @@ func (r TxExecuteResult) ExtractQuery() builder.Query {
 func (r TxExecuteResult) IsTx() {}
 
 func (r TxExecuteResult) Result() *types.BatchResult {
-	var v int
+	var v struct {
+		Value int `json:"prisma__value"`
+	}
 	if err := r.result.Get(r.query.TxResult, &v); err != nil {
 		panic(err)
 	}
 	return &types.BatchResult{
-		Count: v,
+		Count: v.Value,
 	}
 }

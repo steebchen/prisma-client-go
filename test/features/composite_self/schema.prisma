@@ -8,7 +8,6 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "composite"
-  previewFeatures = ["mongoDb"]
 }
 
 model Event {
@@ -26,13 +25,13 @@ model EventInstance {
   createdAt               DateTime       @default(now())
   updatedAt               DateTime       @updatedAt
   event                   Event          @relation(fields: [eventId], references: [id])
-  eventId                 String
+  eventId                 String         @unique
   start                   DateTime
   end                     DateTime
   summary                 Document       @relation(fields: [summaryId], references: [id])
   summaryId               String
   previous                EventInstance? @relation("NextPreviousEventInstance", fields: [previousEventInstanceId], references: [id])
-  previousEventInstanceId String?
+  previousEventInstanceId String?        @unique
   next                    EventInstance? @relation("NextPreviousEventInstance")
 
   @@unique([eventId, id], name: "EventEventInstance_key")

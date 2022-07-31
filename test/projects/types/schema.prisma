@@ -9,7 +9,6 @@ generator db {
   disableGitignore  = true
   disableGoBinaries = true
   package           = "types"
-  previewFeatures = ["mongoDb"]
 }
 
 model Client {

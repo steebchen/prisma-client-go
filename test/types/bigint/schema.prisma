@@ -8,7 +8,6 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["mongoDb"]
 }
 
 model User {
