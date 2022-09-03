@@ -95,7 +95,7 @@ func (e *QueryEngine) ensure() (string, error) {
 	if prismaQueryEngineBinary != "" {
 		logger.Debug.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
 
-		if _, err := os.Stat(prismaQueryEngineBinary); err == nil {
+		if _, err := os.Stat(prismaQueryEngineBinary); err != nil {
 			return "", fmt.Errorf("PRISMA_QUERY_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
 		}
 
