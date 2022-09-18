@@ -19,3 +19,12 @@ model Post {
     published Boolean
     desc      String?
 }
+
+model User {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    name      String
+    gender    Boolean
+    desc      String?
+}

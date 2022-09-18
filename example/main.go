@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/prisma/prisma-client-go/engine"
+	"github.com/prisma/prisma-client-go/engine/migrate"
 )
 
 const schmea = `
@@ -35,9 +36,15 @@ func main() {
 	// if err := run(); err != nil {
 	// 	panic(err)
 	// }
+	engine := migrate.NewMigrationEngine()
 
-	testDmmf()
-	testSdl()
+	engine.Push("schema.prisma")
+	engine.Push2("schema.prisma")
+	engine.Push("schema.prisma")
+	engine.Push2("schema.prisma")
+
+	// testDmmf()
+	// testSdl()
 }
 
 func testDmmf() {
@@ -65,6 +72,7 @@ func testSdl() {
 		panic(err)
 	}
 	fmt.Println(string(sdl))
+
 }
 
 // func run() error {
