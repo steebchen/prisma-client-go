@@ -5,11 +5,11 @@ import (
 	"github.com/prisma/prisma-client-go/binaries"
 	"github.com/prisma/prisma-client-go/binaries/platform"
 	"github.com/prisma/prisma-client-go/logger"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -19,6 +19,10 @@ import (
 	"context"
 	"encoding/json"
 )
+
+func InitEngine() {
+
+}
 
 func NewIntrospectEngine() *IntrospectEngine {
 	// TODO:这里可以设置默认值
@@ -86,68 +90,64 @@ func (e *IntrospectEngine) ensure() (string, error) {
 	return file, nil
 }
 
-func (e *IntrospectEngine) Pull(schemaPath string) error {
+func (e *IntrospectEngine) Pull(schema string) (string, error) {
 	startParse := time.Now()
-	// 可以缓存到改引擎中？
-	schema, err := ioutil.ReadFile(schemaPath)
-	if err != nil {
-		log.Fatalln("load prisma schema", err)
-		return err
-	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*50)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*600)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
-	//cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
+	cmd := exec.CommandContext(ctx, e.path)
 
 	pipe, err := cmd.StdinPipe() // 标准输入流
 	if err != nil {
 		log.Fatalln("introspect engine std in pipe", err)
-		return err
-		// return "", err
+		return "", err
 	}
 	defer pipe.Close()
 	// 构建一个json-rpc 请求参数
 	req := IntrospectRequest{
 		Id:      1,
 		Jsonrpc: "2.0",
-		Method:  "compositeTypeDepth",
-		Params: IntrospectRequestParams{
-			CompositeTypeDepth: -1,
-			Schema:             string(schema),
+		Method:  "introspect",
+		Params: []map[string]interface{}{
+			{
+				"schema":             string(schema),
+				"compositeTypeDepth": -1,
+			},
 		},
 	}
 
 	data, err := json.Marshal(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	// 入参追加到管道中
 	_, err = pipe.Write(append(data, []byte("\n")...))
 	if err != nil {
 		// return "", err
-		return err
+		return "", err
 	}
-	// 开始执行
-	err = cmd.Start()
-	if err != nil {
-		return err
-	}
-
-	var response IntrospectResponse
 
 	out, err := cmd.StdoutPipe()
 	if err != nil {
 		log.Fatalln("Introspect std out pipe", err)
 	}
 	r := bufio.NewReader(out)
+
+	// 开始执行
+	err = cmd.Start()
+	if err != nil {
+		return "", err
+	}
+
+	//var response IntrospectResponse
+	var response IntrospectResponse
+
 	outBuf := &bytes.Buffer{}
-	// {\"jsonrpc\":\"2.0\",\"result\":{\"executedSteps\":1,\"unexecutable\":[],\"warnings\":[]},\"id\":1}\n
 	// 这一段的意思是，每100ms读取一次结果，直到超时或有结果
 	for {
 		// 等待100 ms
-		time.Sleep(time.Millisecond * 100)
+		//time.Sleep(time.Millisecond * 100)
 		b, err := r.ReadByte()
 		if err != nil {
 			log.Fatalln("introspect ReadByte", err)
@@ -161,7 +161,7 @@ func (e *IntrospectEngine) Pull(schemaPath string) error {
 			// 解析响应结果
 			err = json.Unmarshal(outBuf.Bytes(), &response)
 			if err != nil {
-				return err
+				return "", err
 			}
 			if response.Error == nil {
 				log.Println("introspect successful")
@@ -171,25 +171,27 @@ func (e *IntrospectEngine) Pull(schemaPath string) error {
 		}
 		// 如果超时了？跳出读取？
 		if err := ctx.Err(); err != nil {
-			return err
+			return "", err
 		}
 	}
 	log.Printf("[timing] introspect took %s", time.Since(startParse))
 	if response.Error != nil {
-		return fmt.Errorf("introspect error: %s", response.Error.Message)
+		return "", fmt.Errorf("introspect error: %s", response.Error.Message)
 	}
-	return nil
+	dataModel := strings.Replace(response.Result.DataModel, " Bytes", " String", -1)
+	//dataModel := strings.Replace(response.Result.DataModel, " Bytes", " String", -1)
+	return dataModel, nil
 }
 
 func (e *IntrospectEngine) Pull2(schemaPath string) error {
 	startParse := time.Now()
 
 	// 可以缓存到改引擎中？
-	schema, err := ioutil.ReadFile(schemaPath)
-	if err != nil {
-		log.Fatalln("load prisma schema", err)
-		return err
-	}
+	//schema, err := ioutil.ReadFile(schemaPath)
+	//if err != nil {
+	//	log.Fatalln("load prisma schema", err)
+	//	return err
+	//}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*50)
 	defer cancel()
@@ -209,10 +211,10 @@ func (e *IntrospectEngine) Pull2(schemaPath string) error {
 		Id:      1,
 		Jsonrpc: "2.0",
 		Method:  "introspect",
-		Params: IntrospectRequestParams{
-			CompositeTypeDepth: -1,
-			Schema:             string(schema),
-		},
+		//Params: IntrospectRequestParams{
+		//	CompositeTypeDepth: -1,
+		//	Schema:             string(schema),
+		//},
 	}
 
 	data, err := json.Marshal(req)

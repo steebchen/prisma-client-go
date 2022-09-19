@@ -153,7 +153,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 	// 这一段的意思是，每100ms读取一次结果，直到超时或有结果
 	for {
 		// 等待100 ms
-		time.Sleep(time.Millisecond * 100)
+		//time.Sleep(time.Millisecond * 100)
 		b, err := r.ReadByte()
 		if err != nil {
 			log.Fatalln("migration ReadByte", err)

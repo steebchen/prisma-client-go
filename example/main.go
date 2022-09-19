@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/prisma/prisma-client-go/engine"
-	"github.com/prisma/prisma-client-go/engine/introspection"
-	"github.com/prisma/prisma-client-go/engine/migrate"
 )
 
 const schmea = `
@@ -32,25 +30,53 @@ datasource db {
     }
 `
 
+const mysqlSchema = `generator db {
+  provider          = "go run github.com/prisma/prisma-client-go"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://root:shaoxiong123456@8.142.115.204:3306/main"
+}
+
+model oauth_user {
+  id                  String    @id @db.VarChar(50)
+  name                String?   @default("") @db.VarChar(50)
+  nick_name           String?   @default("") @db.VarChar(50)
+  user_name           String?   @unique(map: "name_index") @default("") @db.VarChar(50)
+  encryption_password String?   @default("") @db.VarChar(250)
+  mobile              String?   @default("") @db.VarChar(11)
+  email               String?   @default("") @db.VarChar(50)
+  mate_data           String?   @db.Text
+  last_login_time     DateTime? @db.Timestamp(0)
+  status              Int?      @default(0) @db.TinyInt
+  create_time         DateTime? @default(now()) @db.Timestamp(0)
+  update_time         DateTime? @db.Timestamp(0)
+  is_del              Int?      @default(0) @db.UnsignedTinyInt
+}
+`
+
 func main() {
 	// if err := run(); err != nil {
 	// 	panic(err)
 	// }
-	migrationEngine := migrate.NewMigrationEngine()
-
+	//migrationEngine := migrate.NewMigrationEngine()
+	//
 	//migrationEngine.Push("schema2.prisma")
 	//migrationEngine.Push2("schema1.prisma")
 	//migrationEngine.Push("schema2.prisma")
 	//migrationEngine.Push2("schema2.prisma")
 
-	introspectionEngine := introspection.NewIntrospectEngine()
+	//introspectionEngine := introspection.NewIntrospectEngine()
 	//introspectionEngine.Pull("schema1.prisma")
-	introspectionEngine.Pull2("schema1.prisma")
+	//ntrospectionEngine.Pull2("schema1.prisma")
 	//introspectionEngine.Pull("schema1.prisma")
 	//introspectionEngine.Pull2("schema1.prisma")
-
+	//engine.Push("schema1.prisma")
+	engine.Pull("schema2.prisma")
 	// testDmmf()
-	//testSdl()
+	//engine.QueryDMMF(mysqlSchema)
+	//testSdl1()
 }
 
 func testDmmf() {
@@ -66,18 +92,58 @@ func testDmmf() {
 	fmt.Println(dmmf.Datamodel)
 }
 
+var querySchema = `{ result:findFirstoauth_user {id name nick_name}}`
+
+type OauthUser struct {
+	ID                 string `json:"id"`                  // id
+	Name               string `json:"name"`                // 姓名
+	NickName           string `json:"nick_name"`           // 昵称
+	UserName           string `json:"user_name"`           // 用户名
+	EncryptionPassword string `json:"encryption_password"` // 加密后密码
+	Mobile             string `json:"mobile"`              // 手机号
+	Email              string `json:"email"`               // 邮箱
+	LastLoginTime      string `json:"last_login_time"`     // 最后一次登陆时间
+	Status             int64  `json:"status"`              // 状态
+	MateData           string `json:"mate_data"`           // 其他信息(json字符串保存)
+	CreateTime         string `json:"create_time"`         // 创建时间
+	UpdateTime         string `json:"update_time"`         // 修改时间
+	IsDel              int64  `json:"isDel"`               // 是否删除
+}
+
+func testSdl1() {
+
+	queryEngine := engine.GetQueryEngineOnce(mysqlSchema)
+	ctx := context.TODO()
+	//var result OauthUser
+
+	var response OauthUser
+	payload := engine.GQLRequest{
+		Query:     querySchema,
+		Variables: map[string]interface{}{},
+	}
+	err := queryEngine.Do(ctx, payload, &response)
+	//result, err := engine.Do(ctx, querySchema)
+	//fmt.Print(result)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func testSdl() {
-	engine := engine.NewQueryEngine(schmea, false)
+	engine := engine.NewQueryEngine(mysqlSchema, false)
 	defer engine.Disconnect()
 	if err := engine.Connect(); err != nil {
 		panic(err)
 	}
 	ctx := context.TODO()
-	sdl, err := engine.IntrospectSDL(ctx)
+	var result OauthUser
+	err := engine.Do(ctx, querySchema, result)
+	//sdl, err := engine.IntrospectSDL(ctx)
+
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(sdl))
+	//fmt.Println(string(sdl))
 }
 
 // func run() error {

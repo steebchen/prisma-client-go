@@ -87,9 +87,7 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 }
 
 func (e *QueryEngine) IntrospectDMMF(ctx context.Context) (*dmmf.Document, error) {
-
 	startReq := time.Now()
-
 	body, err := e.Request(ctx, "GET", "/dmmf", nil)
 	if err != nil {
 		logger.Info.Printf("dmmf request failed:  %s", err)

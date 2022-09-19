@@ -1,10 +1,17 @@
 package introspection
 
+//type IntrospectRequest struct {
+//	Id      int                     `json:"id"`
+//	Jsonrpc string                  `json:"jsonrpc"`
+//	Method  string                  `json:"method"`
+//	Params  IntrospectRequestParams `json:"params"`
+//}
+
 type IntrospectRequest struct {
-	Id      int                     `json:"id"`
-	Jsonrpc string                  `json:"jsonrpc"`
-	Method  string                  `json:"method"`
-	Params  IntrospectRequestParams `json:"params"`
+	Id      int                      `json:"id"`
+	Jsonrpc string                   `json:"jsonrpc"`
+	Method  string                   `json:"method"`
+	Params  []map[string]interface{} `json:"params"`
 }
 
 type IntrospectRequestParams struct {
@@ -19,7 +26,10 @@ type IntrospectResponse struct {
 }
 
 type IntrospectResponseResult struct {
-	ExecutedSteps int `json:"executedSteps"`
+	ExecutedSteps int         `json:"executedSteps"`
+	DataModel     string      `json:"dataModel"`
+	Marnings      interface{} `json:"marnings"`
+	Version       string      `json:"version"`
 }
 
 type IntrospectResponseError struct {
