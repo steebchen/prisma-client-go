@@ -1,26 +1,28 @@
-package migrate
+package introspection
 
 import (
-	"bufio"
-	"bytes"
-	"context"
-	"encoding/json"
 	"fmt"
+	"github.com/prisma/prisma-client-go/binaries"
+	"github.com/prisma/prisma-client-go/binaries/platform"
+	"github.com/prisma/prisma-client-go/logger"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"path"
 	"time"
-
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
 )
 
-func NewMigrationEngine() *MigrationEngine {
+import (
+	"bufio"
+	"bytes"
+	"context"
+	"encoding/json"
+)
+
+func NewIntrospectEngine() *IntrospectEngine {
 	// TODO:这里可以设置默认值
-	engine := &MigrationEngine{
+	engine := &IntrospectEngine{
 		// path: path,
 	}
 	file, err := engine.ensure() //确保引擎一定安装了
@@ -31,15 +33,11 @@ func NewMigrationEngine() *MigrationEngine {
 	return engine
 }
 
-type MigrationEngine struct {
+type IntrospectEngine struct {
 	path string
 }
 
-// func (e *MigrationEngine) Name() string {
-// 	return "migration-engine"
-// }
-
-func (e *MigrationEngine) ensure() (string, error) {
+func (e *IntrospectEngine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
 	dir := binaries.GlobalCacheDir()
@@ -54,21 +52,19 @@ func (e *MigrationEngine) ensure() (string, error) {
 	// forceVersion saves whether a version check should be done, which should be disabled
 	// when providing a custom query engine value
 	// forceVersion := true
-
-	name := "prisma-migration-engine-"
+	name := "prisma-introspection-engine-"
 	globalPath := path.Join(dir, binaries.EngineVersion, name+binaryName)
 
-	logger.Debug.Printf("expecting global migration engine `%s` ", globalPath)
+	logger.Debug.Printf("expecting global introspection engine `%s` ", globalPath)
 
 	// TODO write tests for all cases
-
 	// first, check if the query engine binary is being overridden by PRISMA_MIGRATION_ENGINE_BINARY
-	prismaQueryEngineBinary := os.Getenv("PRISMA_MIGRATION_ENGINE_BINARY")
+	prismaQueryEngineBinary := os.Getenv("PRISMA_INTROSPECTION_ENGINE_BINARY")
 	if prismaQueryEngineBinary != "" {
-		logger.Debug.Printf("PRISMA_MIGRATION_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
+		logger.Debug.Printf("PRISMA_INTROSPECTION_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
 
 		if _, err := os.Stat(prismaQueryEngineBinary); err != nil {
-			return "", fmt.Errorf("PRISMA_MIGRATION_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
+			return "", fmt.Errorf("PRISMA_INTROSPECTION_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
 		}
 
 		file = prismaQueryEngineBinary
@@ -84,14 +80,13 @@ func (e *MigrationEngine) ensure() (string, error) {
 		// TODO log instructions on how to fix this problem
 		return "", fmt.Errorf("no binary found ")
 	}
-
-	logger.Debug.Printf("using migration engine at %s", file)
-	logger.Debug.Printf("ensure migration engine took %s", time.Since(ensureEngine))
+	logger.Debug.Printf("using introspection engine at %s", file)
+	logger.Debug.Printf("ensure introspection engine took %s", time.Since(ensureEngine))
 
 	return file, nil
 }
 
-func (e *MigrationEngine) Push(schemaPath string) error {
+func (e *IntrospectEngine) Pull(schemaPath string) error {
 	startParse := time.Now()
 	// 可以缓存到改引擎中？
 	schema, err := ioutil.ReadFile(schemaPath)
@@ -104,22 +99,23 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
+	//cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
 
 	pipe, err := cmd.StdinPipe() // 标准输入流
 	if err != nil {
-		log.Fatalln("migration engine std in pipe", err)
+		log.Fatalln("introspect engine std in pipe", err)
 		return err
 		// return "", err
 	}
 	defer pipe.Close()
 	// 构建一个json-rpc 请求参数
-	req := MigrationRequest{
+	req := IntrospectRequest{
 		Id:      1,
 		Jsonrpc: "2.0",
-		Method:  "schemaPush",
-		Params: MigrationRequestParams{
-			Force:  true,
-			Schema: string(schema),
+		Method:  "compositeTypeDepth",
+		Params: IntrospectRequestParams{
+			CompositeTypeDepth: -1,
+			Schema:             string(schema),
 		},
 	}
 
@@ -133,21 +129,19 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 		// return "", err
 		return err
 	}
-
-	out, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatalln("migration std out pipe", err)
-	}
-	r := bufio.NewReader(out)
-
 	// 开始执行
 	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
-	var response MigrationResponse
+	var response IntrospectResponse
 
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		log.Fatalln("Introspect std out pipe", err)
+	}
+	r := bufio.NewReader(out)
 	outBuf := &bytes.Buffer{}
 	// {\"jsonrpc\":\"2.0\",\"result\":{\"executedSteps\":1,\"unexecutable\":[],\"warnings\":[]},\"id\":1}\n
 	// 这一段的意思是，每100ms读取一次结果，直到超时或有结果
@@ -156,11 +150,11 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 		time.Sleep(time.Millisecond * 100)
 		b, err := r.ReadByte()
 		if err != nil {
-			log.Fatalln("migration ReadByte", err)
+			log.Fatalln("introspect ReadByte", err)
 		}
 		err = outBuf.WriteByte(b)
 		if err != nil {
-			log.Fatalln("migration writeByte", err)
+			log.Fatalln("introspect writeByte", err)
 		}
 
 		if b == '\n' {
@@ -170,7 +164,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 				return err
 			}
 			if response.Error == nil {
-				log.Println("Migration successful")
+				log.Println("introspect successful")
 			}
 			fmt.Print("ende ")
 			break
@@ -180,14 +174,14 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 			return err
 		}
 	}
-	log.Printf("[timing] migrate took %s", time.Since(startParse))
+	log.Printf("[timing] introspect took %s", time.Since(startParse))
 	if response.Error != nil {
-		return fmt.Errorf("migrate error: %s", response.Error.Message)
+		return fmt.Errorf("introspect error: %s", response.Error.Message)
 	}
 	return nil
 }
 
-func (e *MigrationEngine) Push2(schemaPath string) error {
+func (e *IntrospectEngine) Pull2(schemaPath string) error {
 	startParse := time.Now()
 
 	// 可以缓存到改引擎中？
@@ -200,23 +194,24 @@ func (e *MigrationEngine) Push2(schemaPath string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*50)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
+	//cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
+	cmd := exec.CommandContext(ctx, e.path)
 
 	pipe, err := cmd.StdinPipe() // 标准输入流
 	if err != nil {
-		log.Fatalln("migration engine std in pipe", err)
+		log.Fatalln("Introspect engine std in pipe", err)
 		return err
 		// return "", err
 	}
 	defer pipe.Close()
 	// 构建一个json-rpc 请求参数
-	req := MigrationRequest{
+	req := IntrospectRequest{
 		Id:      1,
 		Jsonrpc: "2.0",
-		Method:  "schemaPush",
-		Params: MigrationRequestParams{
-			Force:  true,
-			Schema: string(schema),
+		Method:  "introspect",
+		Params: IntrospectRequestParams{
+			CompositeTypeDepth: -1,
+			Schema:             string(schema),
 		},
 	}
 
@@ -233,10 +228,10 @@ func (e *MigrationEngine) Push2(schemaPath string) error {
 	}
 	out, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Fatalln("migration std out pipe", err)
+		log.Fatalln("Introspect std out pipe", err)
 	}
 
-	var response MigrationResponse
+	var response IntrospectResponse
 
 	go func() {
 		r := bufio.NewReader(out)
@@ -248,11 +243,11 @@ func (e *MigrationEngine) Push2(schemaPath string) error {
 			time.Sleep(time.Millisecond * 100)
 			b, err := r.ReadByte()
 			if err != nil {
-				log.Fatalln("migration ReadByte", err)
+				log.Fatalln("Introspect ReadByte", err)
 			}
 			err = outBuf.WriteByte(b)
 			if err != nil {
-				log.Fatalln("migration writeByte", err)
+				log.Fatalln("Introspect writeByte", err)
 			}
 
 			if b == '\n' {
@@ -260,7 +255,7 @@ func (e *MigrationEngine) Push2(schemaPath string) error {
 				// 解析响应结果
 				err = json.Unmarshal(outBuf.Bytes(), &response)
 				if err != nil {
-					log.Fatalln("migration unmarshal response", err)
+					log.Fatalln("Introspect unmarshal response", err)
 					return
 				}
 				fmt.Print("read complete ")
@@ -270,14 +265,14 @@ func (e *MigrationEngine) Push2(schemaPath string) error {
 	}()
 	// 阻塞运行
 	err = cmd.Run()
-	log.Printf("[timing] migrate2 took %s", time.Since(startParse))
+	log.Printf("[timing] Introspect2 took %s", time.Since(startParse))
 
 	if err != nil && ctx.Err() == nil {
-		log.Println("migration engine run", err)
-		return fmt.Errorf("migrate error: %s", err)
+		log.Println("Introspect engine run", err)
+		return fmt.Errorf("introspect error: %s", err)
 	}
 	if response.Error != nil {
-		return fmt.Errorf("migrate error: %s", response.Error.Message)
+		return fmt.Errorf("introspect error: %s", response.Error.Message)
 	}
 	return nil
 }

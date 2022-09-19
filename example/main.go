@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-
 	"github.com/prisma/prisma-client-go/engine"
+	"github.com/prisma/prisma-client-go/engine/introspection"
 	"github.com/prisma/prisma-client-go/engine/migrate"
 )
 
@@ -36,15 +36,21 @@ func main() {
 	// if err := run(); err != nil {
 	// 	panic(err)
 	// }
-	engine := migrate.NewMigrationEngine()
+	migrationEngine := migrate.NewMigrationEngine()
 
-	engine.Push("schema.prisma")
-	engine.Push2("schema.prisma")
-	engine.Push("schema.prisma")
-	engine.Push2("schema.prisma")
+	//migrationEngine.Push("schema2.prisma")
+	//migrationEngine.Push2("schema1.prisma")
+	//migrationEngine.Push("schema2.prisma")
+	//migrationEngine.Push2("schema2.prisma")
+
+	introspectionEngine := introspection.NewIntrospectEngine()
+	//introspectionEngine.Pull("schema1.prisma")
+	introspectionEngine.Pull2("schema1.prisma")
+	//introspectionEngine.Pull("schema1.prisma")
+	//introspectionEngine.Pull2("schema1.prisma")
 
 	// testDmmf()
-	// testSdl()
+	//testSdl()
 }
 
 func testDmmf() {
@@ -72,7 +78,6 @@ func testSdl() {
 		panic(err)
 	}
 	fmt.Println(string(sdl))
-
 }
 
 // func run() error {
