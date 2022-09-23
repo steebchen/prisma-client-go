@@ -16,35 +16,25 @@ import (
 	"os/exec"
 	"path"
 	"strings"
-	"sync"
 	"time"
 )
 
-var globalQueryEngine *QueryEngine
-var queryEngineOnce sync.Once
-
-func GetQueryEngineOnce(schemaPath string) *QueryEngine {
-	if globalQueryEngine.disconnected == true {
-		queryEngineOnce.Do(func() {
-			if err := Pull(schemaPath); err != nil {
-				logger.Debug.Printf("connect fail err : ", err)
-			}
-			bytes, _ := ioutil.ReadFile(schemaPath)
-			globalQueryEngine = NewQueryEngine(string(bytes), false)
-			if err := globalQueryEngine.ConnectSDK(); err != nil {
-				logger.Debug.Printf("connect fail err : ", err)
-			}
-		})
+func NewDMFQueryEngine(path string) *QueryEngine {
+	if err := Pull(path); err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
 	}
-	return globalQueryEngine
+	bytes, _ := ioutil.ReadFile(path)
+	queryEngine := NewQueryEngine(string(bytes), false)
+	if err := queryEngine.ConnectSDK(); err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
+	}
+	return queryEngine
 }
 
-func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
-	// 先释放掉老的资源
-	if globalQueryEngine != nil {
-		globalQueryEngine.Disconnect()
-	}
-	queryEngineOnce.Do(func() {
+var globalQueryEngine *QueryEngine
+
+func GetQueryEngineOnce(schemaPath string) *QueryEngine {
+	if globalQueryEngine == nil {
 		if err := Pull(schemaPath); err != nil {
 			logger.Debug.Printf("connect fail err : ", err)
 		}
@@ -53,14 +43,24 @@ func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 		if err := globalQueryEngine.ConnectSDK(); err != nil {
 			logger.Debug.Printf("connect fail err : ", err)
 		}
-	})
+	}
 	return globalQueryEngine
 }
 
-func DisConnectQueryEngineOnce() {
-	if globalQueryEngine != nil {
-		globalQueryEngine.Disconnect()
+func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
+	// 先释放掉老的资源
+	globalQueryEngine.Disconnect()
+	// 内省
+	if err := Pull(schemaPath); err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
 	}
+
+	bytes, _ := ioutil.ReadFile(schemaPath)
+	globalQueryEngine = NewQueryEngine(string(bytes), false)
+	if err := globalQueryEngine.ConnectSDK(); err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
+	}
+	return globalQueryEngine
 }
 
 func Push(schemaPath string) error {
