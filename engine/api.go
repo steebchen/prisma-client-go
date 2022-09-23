@@ -10,7 +10,6 @@ import (
 	"github.com/prisma/prisma-client-go/engine/migrate"
 	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"github.com/prisma/prisma-client-go/logger"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -19,12 +18,9 @@ import (
 	"time"
 )
 
-func NewDMFQueryEngine(path string) *QueryEngine {
-	if err := Pull(path); err != nil {
-		logger.Debug.Printf("connect fail err : ", err)
-	}
-	bytes, _ := ioutil.ReadFile(path)
-	queryEngine := NewQueryEngine(string(bytes), false)
+func NewDMFQueryEngine(schema string) *QueryEngine {
+	content := Pull(schema)
+	queryEngine := NewQueryEngine(content, false)
 	if err := queryEngine.ConnectSDK(); err != nil {
 		logger.Debug.Printf("connect fail err : ", err)
 	}
@@ -33,13 +29,10 @@ func NewDMFQueryEngine(path string) *QueryEngine {
 
 var globalQueryEngine *QueryEngine
 
-func GetQueryEngineOnce(schemaPath string) *QueryEngine {
+func GetQueryEngineOnce(schema string) *QueryEngine {
 	if globalQueryEngine == nil {
-		if err := Pull(schemaPath); err != nil {
-			logger.Debug.Printf("connect fail err : ", err)
-		}
-		bytes, _ := ioutil.ReadFile(schemaPath)
-		globalQueryEngine = NewQueryEngine(string(bytes), false)
+		content := Pull(schema)
+		globalQueryEngine = NewQueryEngine(content, false)
 		if err := globalQueryEngine.ConnectSDK(); err != nil {
 			logger.Debug.Printf("connect fail err : ", err)
 		}
@@ -47,16 +40,13 @@ func GetQueryEngineOnce(schemaPath string) *QueryEngine {
 	return globalQueryEngine
 }
 
-func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
+func ReloadQueryEngineOnce(schema string) *QueryEngine {
 	// 先释放掉老的资源
 	globalQueryEngine.Disconnect()
 	// 内省
-	if err := Pull(schemaPath); err != nil {
-		logger.Debug.Printf("connect fail err : ", err)
-	}
+	content := Pull(schema)
 
-	bytes, _ := ioutil.ReadFile(schemaPath)
-	globalQueryEngine = NewQueryEngine(string(bytes), false)
+	globalQueryEngine = NewQueryEngine(content, false)
 	if err := globalQueryEngine.ConnectSDK(); err != nil {
 		logger.Debug.Printf("connect fail err : ", err)
 	}
@@ -68,18 +58,25 @@ func Push(schemaPath string) error {
 	return migrationEngine.Push(schemaPath)
 }
 
-func Pull(schemaPath string) error {
+func Pull(schema string) string {
+	//migrationEngine := introspection.NewIntrospectEngine()
+	//// 可以缓存到改引擎中？
+	//schema, err := ioutil.ReadFile(schemaPath)
+	//if err != nil {
+	//	log.Fatalln("load prisma schema", err)
+	//}
+	//content, err := migrationEngine.Pull(string(schema))
+	//if err != nil {
+	//	log.Fatalln("load prisma schema", err)
+	//}
+	//return ioutil.WriteFile(schemaPath, []byte(content), 0664)
 	migrationEngine := introspection.NewIntrospectEngine()
 	// 可以缓存到改引擎中？
-	schema, err := ioutil.ReadFile(schemaPath)
+	content, err := migrationEngine.Pull(schema)
 	if err != nil {
 		log.Fatalln("load prisma schema", err)
 	}
-	content, err := migrationEngine.Pull(string(schema))
-	if err != nil {
-		log.Fatalln("load prisma schema", err)
-	}
-	return ioutil.WriteFile(schemaPath, []byte(content), 0664)
+	return content
 }
 
 func QuerySchema(dbSchemaPath, querySchema string, result interface{}) error {

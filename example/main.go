@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/prisma/prisma-client-go/engine"
+	"io/ioutil"
 )
 
 const schmea = `
@@ -72,7 +73,8 @@ func main() {
 	//ntrospectionEngine.Pull2("schema1.prisma")
 	//introspectionEngine.Pull("schema1.prisma")
 	//introspectionEngine.Pull2("schema1.prisma")
-	engine.Push("schema1.prisma")
+	ss, _ := ioutil.ReadFile("schema1.prisma")
+	engine.Push(string(ss))
 	//engine.Pull("schema2.prisma")
 	// testDmmf()
 	//engine.QueryDMMF(mysqlSchema)
