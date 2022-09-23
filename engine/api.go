@@ -60,6 +60,7 @@ func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 func DisConnectQueryEngineOnce() {
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
+		globalQueryEngine = nil
 	}
 }
 
