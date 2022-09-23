@@ -97,7 +97,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 	// 可以缓存到改引擎中？
 	schema, err := ioutil.ReadFile(schemaPath)
 	if err != nil {
-		log.Fatalln("load prisma schema", err)
+		err = fmt.Errorf("load prisma schema: %s", err.Error())
 		return err
 	}
 
@@ -108,7 +108,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 
 	pipe, err := cmd.StdinPipe() // 标准输入流
 	if err != nil {
-		log.Fatalln("migration engine std in pipe", err)
+		err = fmt.Errorf("migration engine std in pipe: %s", err.Error())
 		return err
 		// return "", err
 	}
@@ -137,7 +137,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 
 	out, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Fatalln("migration std out pipe", err)
+		err = fmt.Errorf("migration std out pipe: %s", err.Error())
 	}
 	r := bufio.NewReader(out)
 
@@ -157,11 +157,11 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 		//time.Sleep(time.Millisecond * 100)
 		b, err := r.ReadByte()
 		if err != nil {
-			log.Fatalln("migration ReadByte", err)
+			err = fmt.Errorf("migration ReadByte: %s", err.Error())
 		}
 		err = outBuf.WriteByte(b)
 		if err != nil {
-			log.Fatalln("migration writeByte", err)
+			err = fmt.Errorf("migration writeByte: %s", err.Error())
 		}
 
 		if b == '\n' {
@@ -182,101 +182,6 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 		}
 	}
 	log.Printf("[timing] migrate took %s", time.Since(startParse))
-	if response.Error != nil {
-		return fmt.Errorf("migrate error: %s", response.Error.Message)
-	}
-	return nil
-}
-
-func (e *MigrationEngine) Push2(schemaPath string) error {
-	startParse := time.Now()
-
-	// 可以缓存到改引擎中？
-	schema, err := ioutil.ReadFile(schemaPath)
-	if err != nil {
-		log.Fatalln("load prisma schema", err)
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*50)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, e.path, "--datamodel", schemaPath)
-
-	pipe, err := cmd.StdinPipe() // 标准输入流
-	if err != nil {
-		log.Fatalln("migration engine std in pipe", err)
-		return err
-		// return "", err
-	}
-	defer pipe.Close()
-	// 构建一个json-rpc 请求参数
-	req := MigrationRequest{
-		Id:      1,
-		Jsonrpc: "2.0",
-		Method:  "schemaPush",
-		Params: MigrationRequestParams{
-			Force:  true,
-			Schema: string(schema),
-		},
-	}
-
-	data, err := json.Marshal(req)
-	if err != nil {
-		// return "", err
-		return err
-
-	}
-	// 入参追加到管道中
-	_, err = pipe.Write(append(data, []byte("\n")...))
-	if err != nil {
-		return err
-	}
-	out, err := cmd.StdoutPipe()
-	if err != nil {
-		log.Fatalln("migration std out pipe", err)
-	}
-
-	var response MigrationResponse
-
-	go func() {
-		r := bufio.NewReader(out)
-		outBuf := &bytes.Buffer{}
-		// {\"jsonrpc\":\"2.0\",\"result\":{\"executedSteps\":1,\"unexecutable\":[],\"warnings\":[]},\"id\":1}\n
-		// 这一段的意思是，每100ms读取一次结果，直到超时或有结果
-		for {
-			// 等待100 ms
-			time.Sleep(time.Millisecond * 100)
-			b, err := r.ReadByte()
-			if err != nil {
-				log.Fatalln("migration ReadByte", err)
-			}
-			err = outBuf.WriteByte(b)
-			if err != nil {
-				log.Fatalln("migration writeByte", err)
-			}
-
-			if b == '\n' {
-				cancel() //终止进程
-				// 解析响应结果
-				err = json.Unmarshal(outBuf.Bytes(), &response)
-				if err != nil {
-					log.Fatalln("migration unmarshal response", err)
-					return
-				}
-				fmt.Print("read complete ")
-				return
-			}
-		}
-	}()
-	// 阻塞运行
-	err = cmd.Run()
-	log.Printf("[timing] migrate2 took %s", time.Since(startParse))
-
-	if err != nil && ctx.Err() == nil {
-		log.Println("migration engine run", err)
-		return fmt.Errorf("migrate error: %s", err)
-	}
 	if response.Error != nil {
 		return fmt.Errorf("migrate error: %s", response.Error.Message)
 	}

@@ -10,7 +10,6 @@ import (
 	"github.com/prisma/prisma-client-go/engine/migrate"
 	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
 	"github.com/prisma/prisma-client-go/logger"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -59,22 +58,11 @@ func Push(schemaPath string) error {
 }
 
 func Pull(schema string) string {
-	//migrationEngine := introspection.NewIntrospectEngine()
-	//// 可以缓存到改引擎中？
-	//schema, err := ioutil.ReadFile(schemaPath)
-	//if err != nil {
-	//	log.Fatalln("load prisma schema", err)
-	//}
-	//content, err := migrationEngine.Pull(string(schema))
-	//if err != nil {
-	//	log.Fatalln("load prisma schema", err)
-	//}
-	//return ioutil.WriteFile(schemaPath, []byte(content), 0664)
 	migrationEngine := introspection.NewIntrospectEngine()
 	// 可以缓存到改引擎中？
 	content, err := migrationEngine.Pull(schema)
 	if err != nil {
-		log.Fatalln("load prisma schema", err)
+		err = fmt.Errorf("load prisma schema: %s", err.Error())
 	}
 	return content
 }
