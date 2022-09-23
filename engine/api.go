@@ -43,6 +43,7 @@ func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 	// 先释放掉老的资源
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
+		globalQueryEngine = nil
 	}
 	queryEngineOnce.Do(func() {
 		if err := Pull(schemaPath); err != nil {
