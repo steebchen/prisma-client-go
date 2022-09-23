@@ -23,10 +23,14 @@ import (
 var globalQueryEngine *QueryEngine
 var queryEngineOnce sync.Once
 
-func GetqueryEngineOnce(schema string) *QueryEngine {
+func GetQueryEngineOnce(schemaPath string) *QueryEngine {
 	if globalQueryEngine == nil {
 		queryEngineOnce.Do(func() {
-			globalQueryEngine = NewQueryEngine(schema, false)
+			if err := Pull(schemaPath); err != nil {
+				logger.Debug.Printf("connect fail err : ", err)
+			}
+			bytes, _ := ioutil.ReadFile(schemaPath)
+			globalQueryEngine = NewQueryEngine(string(bytes), false)
 			if err := globalQueryEngine.ConnectSDK(); err != nil {
 				logger.Debug.Printf("connect fail err : ", err)
 			}
@@ -35,13 +39,17 @@ func GetqueryEngineOnce(schema string) *QueryEngine {
 	return globalQueryEngine
 }
 
-func ReloadqueryEngineOnce(schema string) *QueryEngine {
+func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 	// 先释放掉老的资源
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
 	}
 	queryEngineOnce.Do(func() {
-		globalQueryEngine = NewQueryEngine(schema, false)
+		if err := Pull(schemaPath); err != nil {
+			logger.Debug.Printf("connect fail err : ", err)
+		}
+		bytes, _ := ioutil.ReadFile(schemaPath)
+		globalQueryEngine = NewQueryEngine(string(bytes), false)
 		if err := globalQueryEngine.ConnectSDK(); err != nil {
 			logger.Debug.Printf("connect fail err : ", err)
 		}
@@ -49,18 +57,18 @@ func ReloadqueryEngineOnce(schema string) *QueryEngine {
 	return globalQueryEngine
 }
 
-func DisconnectqueryEngineOnce() {
+func DisConnectQueryEngineOnce() {
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
 	}
 }
 
-func Push(schemaPath string) {
+func Push(schemaPath string) error {
 	migrationEngine := migrate.NewMigrationEngine()
-	migrationEngine.Push(schemaPath)
+	return migrationEngine.Push(schemaPath)
 }
 
-func Pull(schemaPath string) {
+func Pull(schemaPath string) error {
 	migrationEngine := introspection.NewIntrospectEngine()
 	// 可以缓存到改引擎中？
 	schema, err := ioutil.ReadFile(schemaPath)
@@ -71,11 +79,11 @@ func Pull(schemaPath string) {
 	if err != nil {
 		log.Fatalln("load prisma schema", err)
 	}
-	ioutil.WriteFile(schemaPath, []byte(content), 0664)
+	return ioutil.WriteFile(schemaPath, []byte(content), 0664)
 }
 
-func QuerySchema(dbSchema, querySchema string, result interface{}) error {
-	queryEngine := GetqueryEngineOnce(dbSchema)
+func QuerySchema(dbSchemaPath, querySchema string, result interface{}) error {
+	queryEngine := GetQueryEngineOnce(dbSchemaPath)
 	ctx := context.TODO()
 	payload := GQLRequest{
 		Query:     querySchema,
@@ -88,8 +96,8 @@ func QuerySchema(dbSchema, querySchema string, result interface{}) error {
 	return nil
 }
 
-func QuerySDL(dbSchema, sdlSchema string, result interface{}) error {
-	queryEngine := GetqueryEngineOnce(dbSchema)
+func QuerySDL(dbSchemaPath, sdlSchema string, result interface{}) error {
+	queryEngine := GetQueryEngineOnce(dbSchemaPath)
 	ctx := context.TODO()
 	payload := GQLRequest{
 		Query:     sdlSchema,
@@ -102,8 +110,8 @@ func QuerySDL(dbSchema, sdlSchema string, result interface{}) error {
 	return nil
 }
 
-func QueryDMMF(dbSchema string) (*dmmf.Document, error) {
-	queryEngine := GetqueryEngineOnce(dbSchema)
+func QueryDMMF(dbSchemaPath string) (*dmmf.Document, error) {
+	queryEngine := GetQueryEngineOnce(dbSchemaPath)
 	return queryEngine.IntrospectDMMF(context.TODO())
 }
 

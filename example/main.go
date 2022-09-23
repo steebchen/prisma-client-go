@@ -72,8 +72,8 @@ func main() {
 	//ntrospectionEngine.Pull2("schema1.prisma")
 	//introspectionEngine.Pull("schema1.prisma")
 	//introspectionEngine.Pull2("schema1.prisma")
-	//engine.Push("schema1.prisma")
-	engine.Pull("schema2.prisma")
+	engine.Push("schema1.prisma")
+	//engine.Pull("schema2.prisma")
 	// testDmmf()
 	//engine.QueryDMMF(mysqlSchema)
 	//testSdl1()
@@ -110,24 +110,24 @@ type OauthUser struct {
 	IsDel              int64  `json:"isDel"`               // 是否删除
 }
 
-func testSdl1() {
-
-	queryEngine := engine.GetQueryEngineOnce(mysqlSchema)
-	ctx := context.TODO()
-	//var result OauthUser
-
-	var response OauthUser
-	payload := engine.GQLRequest{
-		Query:     querySchema,
-		Variables: map[string]interface{}{},
-	}
-	err := queryEngine.Do(ctx, payload, &response)
-	//result, err := engine.Do(ctx, querySchema)
-	//fmt.Print(result)
-	if err != nil {
-		panic(err)
-	}
-}
+//func testSdl1() {
+//
+//	queryEngine := engine.GetQueryEngineOnce(mysqlSchema)
+//	ctx := context.TODO()
+//	//var result OauthUser
+//
+//	var response OauthUser
+//	payload := engine.GQLRequest{
+//		Query:     querySchema,
+//		Variables: map[string]interface{}{},
+//	}
+//	err := queryEngine.Do(ctx, payload, &response)
+//	//result, err := engine.Do(ctx, querySchema)
+//	//fmt.Print(result)
+//	if err != nil {
+//		panic(err)
+//	}
+//}
 
 func testSdl() {
 	engine := engine.NewQueryEngine(mysqlSchema, false)

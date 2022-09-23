@@ -11,6 +11,14 @@ generator db {
     // package          = "yourpackagename"
 }
 
+model Post {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    title     String
+    published Boolean
+    desc      String?
+}
 model oauth_user {
   id                  String    @id @db.VarChar(50)
   name                String?   @default("") @db.VarChar(50)
