@@ -48,7 +48,8 @@ func (e *MigrationEngine) ensure() (string, error) {
 		return "", fmt.Errorf("could not fetch binaries: %w", err)
 	}
 	// check for darwin/windows/linux first
-	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
+	//binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
+	binaryName := platform.BinaryPlatformName()
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled

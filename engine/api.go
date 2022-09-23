@@ -124,7 +124,9 @@ func (e *QueryEngine) ensureSDK() (string, error) {
 		return "", fmt.Errorf("could not fetch binaries: %w", err)
 	}
 	binariesPath := path.Join(dir, binaries.EngineVersion)
-	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
+	//binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
+	binaryName := platform.BinaryPlatformName()
+
 	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
 
 	var file string
