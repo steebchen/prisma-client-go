@@ -24,7 +24,7 @@ var globalQueryEngine *QueryEngine
 var queryEngineOnce sync.Once
 
 func GetQueryEngineOnce(schemaPath string) *QueryEngine {
-	if globalQueryEngine == nil {
+	if globalQueryEngine.disconnected == true {
 		queryEngineOnce.Do(func() {
 			if err := Pull(schemaPath); err != nil {
 				logger.Debug.Printf("connect fail err : ", err)
@@ -43,7 +43,6 @@ func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 	// 先释放掉老的资源
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
-		globalQueryEngine = nil
 	}
 	queryEngineOnce.Do(func() {
 		if err := Pull(schemaPath); err != nil {
@@ -61,7 +60,6 @@ func ReloadQueryEngineOnce(schemaPath string) *QueryEngine {
 func DisConnectQueryEngineOnce() {
 	if globalQueryEngine != nil {
 		globalQueryEngine.Disconnect()
-		globalQueryEngine = nil
 	}
 }
 
