@@ -70,13 +70,7 @@ func Push(schemaPath string) error {
 
 func Pull(schema string) (string, error) {
 	migrationEngine := introspection.NewIntrospectEngine()
-	// 可以缓存到改引擎中？
-	content, err := migrationEngine.Pull(schema)
-	if err != nil {
-		//err = fmt.Errorf("load prisma schema: %s", err.Error())
-		return "", err
-	}
-	return content, nil
+	return migrationEngine.Pull(schema)
 }
 
 func InitQueryEngine(schema string) error {
@@ -94,7 +88,6 @@ func InitQueryEngine(schema string) error {
 }
 
 func QuerySchema(querySchema string, result interface{}) error {
-	//queryEngine := GetQueryEngineOnce(dbSchemaPath)
 	ctx := context.TODO()
 	payload := GQLRequest{
 		Query:     querySchema,
