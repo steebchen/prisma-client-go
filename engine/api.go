@@ -48,7 +48,10 @@ func GetQueryEngineOnce(schema string) *QueryEngine {
 
 func ReloadQueryEngineOnce(schema string) (*QueryEngine, error) {
 	// 先释放掉老的资源
-	globalQueryEngine.Disconnect()
+	if globalQueryEngine != nil {
+		globalQueryEngine.Disconnect()
+		globalQueryEngine = nil
+	}
 	// 内省
 	content, err := Pull(schema)
 	if err != nil {
