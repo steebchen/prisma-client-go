@@ -183,7 +183,7 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 	}
 	log.Printf("[timing] migrate took %s", time.Since(startParse))
 	if response.Error != nil {
-		return fmt.Errorf("migrate error: %s", response.Error.Message)
+		return fmt.Errorf("migrate error: %s", response.Error.Data.Message)
 	}
 	return nil
 }

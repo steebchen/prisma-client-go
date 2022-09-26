@@ -176,7 +176,7 @@ func (e *IntrospectEngine) Pull(schema string) (string, error) {
 	}
 	log.Printf("[timing] introspect took %s", time.Since(startParse))
 	if response.Error != nil {
-		return "", fmt.Errorf("introspect error: %s", response.Error.Message)
+		return "", fmt.Errorf("introspect error: %s", response.Error.Data.Message)
 	}
 	dataModel := strings.Replace(response.Result.DataModel, " Bytes", " String", -1)
 	//dataModel := strings.Replace(response.Result.DataModel, " Bytes", " String", -1)
