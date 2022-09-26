@@ -17,20 +17,27 @@ import (
 	"time"
 )
 
-func NewDMFQueryEngine(schema string) *QueryEngine {
-	content := Pull(schema)
+func NewDMFQueryEngine(schema string) (*QueryEngine, error) {
+	content, err := Pull(schema)
+	if err != nil {
+		return nil, err
+	}
 	queryEngine := NewQueryEngine(content, false)
 	if err := queryEngine.ConnectSDK(); err != nil {
 		logger.Debug.Printf("connect fail err : ", err)
+		return nil, err
 	}
-	return queryEngine
+	return queryEngine, nil
 }
 
 var globalQueryEngine *QueryEngine
 
 func GetQueryEngineOnce(schema string) *QueryEngine {
 	if globalQueryEngine == nil {
-		content := Pull(schema)
+		content, err := Pull(schema)
+		if err != nil {
+			logger.Debug.Printf("connect fail err : ", err)
+		}
 		globalQueryEngine = NewQueryEngine(content, false)
 		if err := globalQueryEngine.ConnectSDK(); err != nil {
 			logger.Debug.Printf("connect fail err : ", err)
@@ -39,17 +46,21 @@ func GetQueryEngineOnce(schema string) *QueryEngine {
 	return globalQueryEngine
 }
 
-func ReloadQueryEngineOnce(schema string) *QueryEngine {
+func ReloadQueryEngineOnce(schema string) (*QueryEngine, error) {
 	// 先释放掉老的资源
 	globalQueryEngine.Disconnect()
 	// 内省
-	content := Pull(schema)
+	content, err := Pull(schema)
+	if err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
+		return nil, err
+	}
 
 	globalQueryEngine = NewQueryEngine(content, false)
 	if err := globalQueryEngine.ConnectSDK(); err != nil {
 		logger.Debug.Printf("connect fail err : ", err)
 	}
-	return globalQueryEngine
+	return globalQueryEngine, nil
 }
 
 func Push(schemaPath string) error {
@@ -57,24 +68,39 @@ func Push(schemaPath string) error {
 	return migrationEngine.Push(schemaPath)
 }
 
-func Pull(schema string) string {
+func Pull(schema string) (string, error) {
 	migrationEngine := introspection.NewIntrospectEngine()
 	// 可以缓存到改引擎中？
 	content, err := migrationEngine.Pull(schema)
 	if err != nil {
-		err = fmt.Errorf("load prisma schema: %s", err.Error())
+		//err = fmt.Errorf("load prisma schema: %s", err.Error())
+		return "", err
 	}
-	return content
+	return content, nil
 }
 
-func QuerySchema(dbSchemaPath, querySchema string, result interface{}) error {
-	queryEngine := GetQueryEngineOnce(dbSchemaPath)
+func InitQueryEngine(schema string) error {
+	content, err := Pull(schema)
+	if err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
+		return err
+	}
+	globalQueryEngine = NewQueryEngine(content, false)
+	if err := globalQueryEngine.ConnectSDK(); err != nil {
+		logger.Debug.Printf("connect fail err : ", err)
+		return err
+	}
+	return nil
+}
+
+func QuerySchema(querySchema string, result interface{}) error {
+	//queryEngine := GetQueryEngineOnce(dbSchemaPath)
 	ctx := context.TODO()
 	payload := GQLRequest{
 		Query:     querySchema,
 		Variables: map[string]interface{}{},
 	}
-	err := queryEngine.Do(ctx, payload, result)
+	err := globalQueryEngine.Do(ctx, payload, result)
 	if err != nil {
 		return err
 	}
