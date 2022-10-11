@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/prisma/prisma-client-go/logger"
-	"github.com/prisma/prisma-client-go/runtime/types"
 	"strconv"
 	"time"
 )
@@ -111,29 +110,36 @@ func (e *QueryEngine) DoQuery(ctx context.Context, payload interface{}, v interf
 
 	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
 
-	startParse := time.Now()
-
-	var response GQLResult
-	if err := json.Unmarshal(body, &response); err != nil {
+	if err := json.Unmarshal(body, v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
-
-	if len(response.Errors) > 0 {
-		first := response.Errors[0]
-		if first.RawMessage() == internalUpdateNotFoundMessage ||
-			first.RawMessage() == internalDeleteNotFoundMessage {
-			return types.ErrNotFound
-		}
-		return fmt.Errorf("pql error: %s", first.RawMessage())
-	}
-
-	if err := json.Unmarshal([]byte(InterfaceToString(response.Data)), v); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
-	}
-
-	logger.Debug.Printf("[timing] request unmarshaling took %s", time.Since(startParse))
-
 	return nil
+	//startParse := time.Now()
+	//var response GQLResult
+	//if err := json.Unmarshal(body, &response); err != nil {
+	//	return fmt.Errorf("json unmarshal: %w", err)
+	//}
+	//
+	//if len(response.Errors) > 0 {
+	//	if err := json.Unmarshal([]byte(InterfaceToString(response.Errors)), v); err != nil {
+	//		return fmt.Errorf("json unmarshal: %w", err)
+	//	}
+	//	return nil
+	//	//first := response.Errors[0]
+	//	//if first.RawMessage() == internalUpdateNotFoundMessage ||
+	//	//	first.RawMessage() == internalDeleteNotFoundMessage {
+	//	//	return types.ErrNotFound
+	//	//}
+	//	//return fmt.Errorf("pql error: %s", first.RawMessage())
+	//}
+	//
+	//if err := json.Unmarshal([]byte(InterfaceToString(response.Data)), v); err != nil {
+	//	return fmt.Errorf("json unmarshal: %w", err)
+	//}
+	//
+	//logger.Debug.Printf("[timing] request unmarshaling took %s", time.Since(startParse))
+	//
+	//return nil
 }
 
 func InterfaceToString(i interface{}) string {
