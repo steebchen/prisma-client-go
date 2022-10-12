@@ -55,7 +55,10 @@ func (q *QueryEngineFactory) GetPrismaQueryEngine() (*QueryEngine, error) {
 
 func (q *QueryEngineFactory) ReloadPrismaQueryEngine() error {
 	// 先销毁旧的引擎
-	prismaQueryEngineMap[q.Key].Disconnect()
+	if _, ok := prismaQueryEngineMap[q.Key]; ok {
+		prismaQueryEngineMap[q.Key].Disconnect()
+	}
+
 	// 创建新引擎
 	content, err := Pull(q.DBSchema)
 	if err != nil {
