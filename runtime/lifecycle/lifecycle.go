@@ -13,15 +13,15 @@ type Lifecycle struct {
 //
 // Example:
 //
-//   if err := client.Prisma.Connect(); err != nil {
-//     handle(err)
-//   }
+//	if err := client.Prisma.Connect(); err != nil {
+//	  handle(err)
+//	}
 //
-//   defer func() {
-//     if err := client.Prisma.Disconnect(); err != nil {
-//       panic(fmt.Errorf("could not disconnect: %w", err))
-//     }
-//   }()
+//	defer func() {
+//	  if err := client.Prisma.Disconnect(); err != nil {
+//	    panic(fmt.Errorf("could not disconnect: %w", err))
+//	  }
+//	}()
 func (c *Lifecycle) Connect() error {
 	return c.Engine.Connect()
 }
@@ -32,13 +32,13 @@ func (c *Lifecycle) Connect() error {
 //
 // Should be usually invoked directly after calling client.Prisma.Connect(), for example as follows:
 //
-//   // after client.Prisma.Connect()
+//	// after client.Prisma.Connect()
 //
-//   defer func() {
-//     if err := client.Prisma.Disconnect(); err != nil {
-//       panic(fmt.Errorf("could not disconnect: %w", err))
-//     }
-//   }()
+//	defer func() {
+//	  if err := client.Prisma.Disconnect(); err != nil {
+//	    panic(fmt.Errorf("could not disconnect: %w", err))
+//	  }
+//	}()
 func (c *Lifecycle) Disconnect() error {
 	return c.Engine.Disconnect()
 }
