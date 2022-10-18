@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/takuoki/gocase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // String acts as a builtin string but provides useful casing methods.
@@ -37,7 +38,7 @@ func (s String) Tag() string {
 
 // PrismaGoCase transforms `relevance` into `Relevance_`
 func (s String) PrismaGoCase() string {
-	return strings.Title(string(s)) + "_"
+	return cases.Title(language.Und, cases.NoLower).String(string(s)) + "_"
 }
 
 // PrismaInternalCase transforms `relevance` into `_relevance`
