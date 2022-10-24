@@ -184,12 +184,6 @@ func (e *IntrospectEngine) ensure() (string, error) {
 //}
 
 func (e *IntrospectEngine) Pull(schema string) (string, error) {
-	//schema := fmt.Sprintf(
-	//	`datasource db {
-	// provider = "%s"
-	// url      = "%s"
-	//}`,
-	//	provider, url)
 	startParse := time.Now()
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*60)
@@ -235,6 +229,13 @@ func (e *IntrospectEngine) Pull(schema string) (string, error) {
 	if err := cmd.Start(); err != nil {
 		return "", err
 	}
+
+	// 使用cmd.wait关闭子进程
+	go func() {
+		if err := cmd.Wait(); err != nil {
+			fmt.Sprintf("Child proess %d exit with err :%v \n", cmd.Process.Pid, err)
+		}
+	}()
 
 	reader := bufio.NewReader(stdout)
 

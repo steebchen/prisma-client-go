@@ -147,6 +147,13 @@ func (e *MigrationEngine) Push(schemaPath string) error {
 		return err
 	}
 
+	// 使用cmd.wait关闭子进程
+	go func() {
+		if err := cmd.Wait(); err != nil {
+			fmt.Sprintf("Child proess %d exit with err :%v \n", cmd.Process.Pid, err)
+		}
+	}()
+
 	var response MigrationResponse
 
 	outBuf := &bytes.Buffer{}
