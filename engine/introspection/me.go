@@ -52,7 +52,9 @@ func (e *IntrospectEngine) ensure() (string, error) {
 	// check for darwin/windows/linux first
 	//binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
 	binaryName := platform.BinaryPlatformName()
-
+	if platform.Name() == "windows" {
+		binaryName = fmt.Sprintf("%s.exe", binaryName)
+	}
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
 	// when providing a custom query engine value
