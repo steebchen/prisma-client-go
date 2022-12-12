@@ -130,7 +130,7 @@ func (e *QueryEngine) ensureSDK() (string, error) {
 	if err := binaries.FetchNative(dir); err != nil {
 		return "", fmt.Errorf("could not fetch binaries: %w", err)
 	}
-	binariesPath := filepath.Join(dir, binaries.EngineVersion)
+	binariesPath := filepath.ToSlash(filepath.Join(dir, binaries.EngineVersion))
 	//binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
 	binaryName := platform.BinaryPlatformName()
 
@@ -140,10 +140,10 @@ func (e *QueryEngine) ensureSDK() (string, error) {
 	forceVersion := true
 
 	name := "prisma-query-engine-"
-	localPath := filepath.Join("./", name+binaryName)
-	localExactPath := filepath.Join("./", name+exactBinaryName)
-	globalPath := filepath.Join(binariesPath, name+binaryName)
-	globalExactPath := filepath.Join(binariesPath, name+exactBinaryName)
+	localPath := filepath.ToSlash(filepath.Join("./", name+binaryName))
+	localExactPath := filepath.ToSlash(filepath.Join("./", name+exactBinaryName))
+	globalPath := filepath.ToSlash(filepath.Join(binariesPath, name+binaryName))
+	globalExactPath := filepath.ToSlash(filepath.Join(binariesPath, name+exactBinaryName))
 
 	logger.Debug.Printf("expecting local query engine `%s` or `%s`", localPath, localExactPath)
 	logger.Debug.Printf("expecting global query engine `%s` or `%s`", globalPath, globalExactPath)

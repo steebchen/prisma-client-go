@@ -67,7 +67,7 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput: filepath.Join(".", "db"),
+					DefaultOutput: filepath.ToSlash(filepath.Join(".", "db")),
 					PrettyName:    "Prisma Client Go",
 				},
 			}

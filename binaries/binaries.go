@@ -73,11 +73,11 @@ func GlobalTempDir(version string) string {
 	temp := os.TempDir()
 	logger.Debug.Printf("temp dir: %s", temp)
 
-	return filepath.Join(temp, baseDirName, "engines", version)
+	return filepath.ToSlash(filepath.Join(temp, baseDirName, "engines", version))
 }
 
 func GlobalUnpackDir(version string) string {
-	return filepath.Join(GlobalTempDir(version), "unpacked", "v2")
+	return filepath.ToSlash(filepath.Join(GlobalTempDir(version), "unpacked", "v2"))
 }
 
 // GlobalCacheDir returns the path of where the CLI lives
@@ -90,13 +90,13 @@ func GlobalCacheDir() string {
 
 	logger.Debug.Printf("global cache dir: %s", cache)
 
-	return filepath.Join(cache, baseDirName, "cli", PrismaVersion)
+	return filepath.ToSlash(filepath.Join(cache, baseDirName, "cli", PrismaVersion))
 }
 
 func FetchEngine(toDir string, engineName string, binaryPlatformName string) error {
 	logger.Debug.Printf("checking %s...", engineName)
 
-	to := platform.CheckForExtension(binaryPlatformName, filepath.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName)))
+	to := platform.CheckForExtension(binaryPlatformName, filepath.ToSlash(filepath.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName))))
 
 	binaryPlatformRemoteName := binaryPlatformName
 	if binaryPlatformRemoteName == "linux" {
@@ -147,7 +147,7 @@ func FetchNative(toDir string) error {
 
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
-	to := platform.CheckForExtension(platform.Name(), filepath.Join(toDir, cli))
+	to := platform.CheckForExtension(platform.Name(), filepath.ToSlash(filepath.Join(toDir, cli)))
 	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
 	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, to, url)
@@ -168,7 +168,7 @@ func DownloadCLI(toDir string) error {
 }
 
 func GetEnginePath(dir, engine, binaryName string) string {
-	return platform.CheckForExtension(binaryName, filepath.Join(dir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engine, binaryName)))
+	return platform.CheckForExtension(binaryName, filepath.ToSlash(filepath.Join(dir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engine, binaryName))))
 }
 
 func DownloadEngine(name string, toDir string) (file string, err error) {
@@ -176,7 +176,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 
 	logger.Debug.Printf("checking %s...", name)
 
-	to := platform.CheckForExtension(binaryName, filepath.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
+	to := platform.CheckForExtension(binaryName, filepath.ToSlash(filepath.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", name, binaryName))))
 
 	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
 

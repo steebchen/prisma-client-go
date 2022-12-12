@@ -188,5 +188,5 @@ func encodeSchema(schema string) string {
 }
 
 func getCloudURI(host, schemaHash string) string {
-	return "https://" + filepath.Join(host, binaries.PrismaVersion, schemaHash)
+	return "https://" + filepath.ToSlash(filepath.Join(host, binaries.PrismaVersion, schemaHash))
 }

@@ -24,7 +24,7 @@ func Unpack(data []byte, name string, version string) {
 
 	tempDir := binaries.GlobalUnpackDir(version)
 
-	dir := platform.CheckForExtension(platform.Name(), filepath.Join(tempDir, file))
+	dir := platform.CheckForExtension(platform.Name(), filepath.ToSlash(filepath.ToSlash(filepath.Join(tempDir, file))))
 
 	if err := os.MkdirAll(tempDir, os.ModePerm); err != nil {
 		panic(fmt.Errorf("mkdirall failed: %w", err))

@@ -24,9 +24,9 @@ func Run(arguments []string, output bool) error {
 
 	prisma := binaries.PrismaCLIName()
 
-	logger.Debug.Printf("running %s %+v", filepath.Join(dir, prisma), arguments)
+	logger.Debug.Printf("running %s %+v", filepath.ToSlash(filepath.Join(dir, prisma)), arguments)
 
-	cmd := exec.Command(filepath.Join(dir, prisma), arguments...) //nolint:gosec
+	cmd := exec.Command(filepath.ToSlash(filepath.Join(dir, prisma)), arguments...) //nolint:gosec
 	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
 
 	cmd.Env = os.Environ()
@@ -40,7 +40,7 @@ func Run(arguments []string, output bool) error {
 			logger.Debug.Printf("overriding %s to %s", engine.Name, env)
 			value = env
 		} else {
-			value = filepath.Join(dir, binaries.EngineVersion, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
+			value = filepath.ToSlash(filepath.Join(dir, binaries.EngineVersion, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName)))
 		}
 
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", engine.Env, value))

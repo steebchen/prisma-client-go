@@ -60,7 +60,7 @@ func (e *MigrationEngine) ensure() (string, error) {
 	// forceVersion := true
 
 	name := "prisma-migration-engine-"
-	globalPath := filepath.Join(dir, binaries.EngineVersion, name+binaryName)
+	globalPath := filepath.ToSlash(filepath.Join(dir, binaries.EngineVersion, name+binaryName))
 
 	logger.Debug.Printf("expecting global migration engine `%s` ", globalPath)
 
