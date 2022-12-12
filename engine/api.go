@@ -12,6 +12,7 @@ import (
 	"github.com/prisma/prisma-client-go/logger"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )

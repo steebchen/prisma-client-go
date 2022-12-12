@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries"
