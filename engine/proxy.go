@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"path"
 	"time"
 
 	"github.com/prisma/prisma-client-go/binaries"
@@ -188,5 +187,5 @@ func encodeSchema(schema string) string {
 }
 
 func getCloudURI(host, schemaHash string) string {
-	return "https://" + path.Join(host, binaries.PrismaVersion, schemaHash)
+	return "https://" + filepath.Join(host, binaries.PrismaVersion, schemaHash)
 }

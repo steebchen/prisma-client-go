@@ -9,7 +9,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
 	"time"
 )
@@ -60,7 +59,7 @@ func (e *IntrospectEngine) ensure() (string, error) {
 	// when providing a custom query engine value
 	// forceVersion := true
 	name := "prisma-introspection-engine-"
-	globalPath := path.Join(dir, binaries.EngineVersion, name+binaryName)
+	globalPath := filepath.Join(dir, binaries.EngineVersion, name+binaryName)
 
 	logger.Debug.Printf("expecting global introspection engine `%s` ", globalPath)
 

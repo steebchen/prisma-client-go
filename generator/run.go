@@ -7,7 +7,6 @@ import (
 	"go/build"
 	"go/format"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -37,7 +36,7 @@ func Run(input *Root) error {
 		if err := os.MkdirAll(input.Generator.Output.Value, os.ModePerm); err != nil {
 			return fmt.Errorf("could not create output directory: %w", err)
 		}
-		if err := os.WriteFile(path.Join(input.Generator.Output.Value, ".gitignore"), []byte(gitignore), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(input.Generator.Output.Value, ".gitignore"), []byte(gitignore), 0644); err != nil {
 			return fmt.Errorf("could not write .gitignore: %w", err)
 		}
 	}
@@ -124,7 +123,7 @@ func generateClient(input *Root) error {
 	}
 
 	// TODO make this configurable
-	outFile := path.Join(output, "db_gen.go")
+	outFile := filepath.Join(output, "db_gen.go")
 	if err := os.WriteFile(outFile, formatted, 0644); err != nil {
 		return fmt.Errorf("could not write template data to file writer %s: %w", outFile, err)
 	}
@@ -184,7 +183,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 		}
 
 		filename := fmt.Sprintf("query-engine-%s_gen.go", name)
-		to := path.Join(outputDir, filename)
+		to := filepath.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
 		if err := bindata.WriteFile(strings.ReplaceAll(name, "-", "_"), pkg, pt, enginePath, to); err != nil {

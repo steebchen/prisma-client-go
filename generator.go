@@ -5,14 +5,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"log"
-	"os"
-	"path"
-
 	"github.com/prisma/prisma-client-go/generator"
 	"github.com/prisma/prisma-client-go/jsonrpc"
 	"github.com/prisma/prisma-client-go/logger"
+	"io"
+	"log"
+	"os"
+	"path/filepath"
 )
 
 var writeDebugFile = os.Getenv("PRISMA_CLIENT_GO_WRITE_DMMF_FILE") != ""
@@ -68,7 +67,7 @@ func invokePrisma() error {
 		case "getManifest":
 			response = jsonrpc.ManifestResponse{
 				Manifest: jsonrpc.Manifest{
-					DefaultOutput: path.Join(".", "db"),
+					DefaultOutput: filepath.Join(".", "db"),
 					PrettyName:    "Prisma Client Go",
 				},
 			}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path"
 	"strings"
 	"time"
 
@@ -80,10 +79,10 @@ func (e *QueryEngine) ensure() (string, error) {
 	forceVersion := true
 
 	name := "prisma-query-engine-"
-	localPath := path.Join("./", name+binaryName)
-	localExactPath := path.Join("./", name+exactBinaryName)
-	globalPath := path.Join(binariesPath, name+binaryName)
-	globalExactPath := path.Join(binariesPath, name+exactBinaryName)
+	localPath := filepath.Join("./", name+binaryName)
+	localExactPath := filepath.Join("./", name+exactBinaryName)
+	globalPath := filepath.Join(binariesPath, name+binaryName)
+	globalExactPath := filepath.Join(binariesPath, name+exactBinaryName)
 
 	logger.Debug.Printf("expecting local query engine `%s` or `%s`", localPath, localExactPath)
 	logger.Debug.Printf("expecting global query engine `%s` or `%s`", globalPath, globalExactPath)

@@ -2,13 +2,12 @@ package cli
 
 import (
 	"fmt"
-	"os"
-	"os/exec"
-	"path"
-
 	"github.com/prisma/prisma-client-go/binaries"
 	"github.com/prisma/prisma-client-go/binaries/platform"
 	"github.com/prisma/prisma-client-go/logger"
+	"os"
+	"os/exec"
+	"path/filepath"
 )
 
 // Run the prisma CLI with given arguments
@@ -25,9 +24,9 @@ func Run(arguments []string, output bool) error {
 
 	prisma := binaries.PrismaCLIName()
 
-	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
+	logger.Debug.Printf("running %s %+v", filepath.Join(dir, prisma), arguments)
 
-	cmd := exec.Command(path.Join(dir, prisma), arguments...) //nolint:gosec
+	cmd := exec.Command(filepath.Join(dir, prisma), arguments...) //nolint:gosec
 	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
 
 	cmd.Env = os.Environ()
@@ -41,7 +40,7 @@ func Run(arguments []string, output bool) error {
 			logger.Debug.Printf("overriding %s to %s", engine.Name, env)
 			value = env
 		} else {
-			value = path.Join(dir, binaries.EngineVersion, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
+			value = filepath.Join(dir, binaries.EngineVersion, fmt.Sprintf("prisma-%s-%s", engine.Name, binaryName))
 		}
 
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", engine.Env, value))
