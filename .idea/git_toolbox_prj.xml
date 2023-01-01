@@ -24,6 +24,11 @@
         </option>
       </CommitMessageValidationOverride>
     </option>
+    <option name="commitMessageValidationEnabledOverride">
+      <BoolValueOverride>
+        <option name="enabled" value="true" />
+      </BoolValueOverride>
+    </option>
     <option name="commitMessageValidationRegex" value="(?:fix|chore|docs|feat|refactor|style|test|ci)(?:\(.*\))?: (.|\s)*" />
   </component>
 </project>
