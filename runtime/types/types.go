@@ -45,6 +45,14 @@ func (m *BigInt) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON converts the input to a Prisma value
+func (m *BigInt) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return []byte("null"), nil
+	}
+	return []byte(fmt.Sprintf("\"%d\"", *m)), nil
+}
+
 // JSON is a new type which implements the correct internal prisma (un)marshaller
 type JSON json.RawMessage
 
