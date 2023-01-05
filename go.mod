@@ -8,5 +8,5 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.1
 	github.com/takuoki/gocase v1.0.0
-	golang.org/x/text v0.4.0
+	golang.org/x/text v0.6.0
 )
