@@ -19,8 +19,16 @@ func BinaryPlatformName() string {
 	}
 
 	platform := Name()
+	// Refer to https://github.dev/prisma/prisma/tree/main/packages/cli/src/utils
+	// Not well test for !win & !mac
+	arch := Arch()
 
 	if platform != "linux" {
+		if platform == "darwin" {
+			if arch == "arm64" {
+				return fmt.Sprintf("%s-%s", platform, arch)
+			}
+		}
 		return platform
 	}
 
@@ -33,6 +41,11 @@ func BinaryPlatformName() string {
 	ssl := getOpenSSL()
 
 	name := fmt.Sprintf("%s-openssl-%s", distro, ssl)
+	if arch == "arm64" {
+		name = fmt.Sprintf("%s--arm64-openssl-%s", distro, ssl)
+	} else if arch == "arm" {
+		name = fmt.Sprintf("%s-arm-openssl-%s", distro, ssl)
+	}
 
 	binaryNameWithSSLCache = name
 
@@ -42,6 +55,10 @@ func BinaryPlatformName() string {
 // Name returns the platform name
 func Name() string {
 	return runtime.GOOS
+}
+
+func Arch() string {
+	return runtime.GOARCH
 }
 
 // CheckForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
