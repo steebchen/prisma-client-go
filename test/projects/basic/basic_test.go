@@ -81,7 +81,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := `{"id":"marshal","email":"john@example.com","username":"johndoe","name":"John","stuff":null}`
+			expected := `{"id":"marshal","email":"john@example.com","username":"johndoe","name":"John"}`
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
