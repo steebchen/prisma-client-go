@@ -32,7 +32,10 @@ func (s String) CamelCase() string {
 }
 
 // Tag returns the struct tag value of a field.
-func (s String) Tag() string {
+func (s String) Tag(isRequired bool) string {
+	if !isRequired {
+		return fmt.Sprintf("`json:\"%s,omitempty\"`", s)
+	}
 	return fmt.Sprintf("`json:\"%s\"`", s)
 }
 
