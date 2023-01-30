@@ -14,6 +14,7 @@ model Post {
     published Boolean
     title     String
     content   String?
+    views     Int      @default(0)
 
     comments Comment[]
 }

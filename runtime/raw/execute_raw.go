@@ -11,7 +11,7 @@ import (
 
 func (r Raw) ExecuteRaw(query string, params ...interface{}) ExecuteExec {
 	return ExecuteExec{
-		query: raw(r.Engine, "executeRaw", query, params...),
+		query: doRaw(r.Engine, "executeRaw", query, params...),
 	}
 }
 
