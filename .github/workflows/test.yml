@@ -25,11 +25,8 @@ jobs:
       - name: deps
         run: go mod download
 
-      - name: generate
-        run: go generate ./...
-
-      - name: setup
-        run: go run ./test/setup/init setup
+      - name: setup & generate
+        run: go generate -tags setup ./...
 
       - name: test
         run: go test ./... -v

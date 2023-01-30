@@ -20,8 +20,6 @@ import (
 type Database interface {
 	Name() string
 	ConnectionString(mockDBName string) string
-	Setup()
-	Teardown()
 	SetupDatabase(t *testing.T) string
 	TeardownDatabase(t *testing.T, mockDBName string)
 }
