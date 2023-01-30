@@ -55,6 +55,14 @@ You also might want to read [deployment tips](./docs/deploy.md) and the [full AP
 
 The go client works slightly different than the normal Prisma tooling. When you're using the go client, whenever you see Prisma CLI commands such as `prisma ...`, you should always write `go run github.com/prisma/prisma-client-go ...` instead.
 
+If you just work with the Go client and don't have (or want) the NodeJS Prisma CLI installed, you can set up an alias so that you can write `prisma` commands as usual, but it'll invoke the real locally bundled Prisma CLI. To do that, edit your `~/.bashrc` or `~/.zshrc` and add:
+
+```
+alias prisma="go run github.com/prisma/prisma-client-go"
+```
+
+Now `prisma generate` and any other command will work, and it'll just run 1`go run github.com/prisma/prisma-client-go generate` under the hood.
+
 ## Contributing
 
 Check out our [advanced contributing guide](./CONTRIBUTING.md).

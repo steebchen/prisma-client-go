@@ -95,28 +95,28 @@ func (e *QueryEngine) ensure() (string, error) {
 	if prismaQueryEngineBinary != "" {
 		logger.Debug.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
 
-		if _, err := os.Stat(prismaQueryEngineBinary); err == nil {
+		if _, err := os.Stat(prismaQueryEngineBinary); err != nil {
 			return "", fmt.Errorf("PRISMA_QUERY_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
 		}
 
 		file = prismaQueryEngineBinary
 		forceVersion = false
-	}
+	} else {
+		if _, err := os.Stat(localExactPath); err == nil {
+			logger.Debug.Printf("exact query engine found in working directory")
+			file = localExactPath
+		} else if _, err := os.Stat(localPath); err == nil {
+			logger.Debug.Printf("query engine found in working directory")
+			file = localPath
+		}
 
-	if _, err := os.Stat(localExactPath); err == nil {
-		logger.Debug.Printf("exact query engine found in working directory")
-		file = localExactPath
-	} else if _, err := os.Stat(localPath); err == nil {
-		logger.Debug.Printf("query engine found in working directory")
-		file = localPath
-	}
-
-	if _, err := os.Stat(globalExactPath); err == nil {
-		logger.Debug.Printf("query engine found in global path")
-		file = globalExactPath
-	} else if _, err := os.Stat(globalPath); err == nil {
-		logger.Debug.Printf("exact query engine found in global path")
-		file = globalPath
+		if _, err := os.Stat(globalExactPath); err == nil {
+			logger.Debug.Printf("query engine found in global path")
+			file = globalExactPath
+		} else if _, err := os.Stat(globalPath); err == nil {
+			logger.Debug.Printf("exact query engine found in global path")
+			file = globalPath
+		}
 	}
 
 	if file == "" {

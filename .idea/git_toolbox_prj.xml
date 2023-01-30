@@ -4,10 +4,8 @@
     <option name="commitMessageIssueKeyValidationOverride">
       <BoolValueOverride>
         <option name="enabled" value="true" />
-        <option name="value" value="true" />
       </BoolValueOverride>
     </option>
-    <option name="commitMessageValidation" value="true" />
     <option name="commitMessageValidationConfigOverride">
       <CommitMessageValidationOverride>
         <option name="enabled" value="true" />
@@ -27,8 +25,8 @@
     <option name="commitMessageValidationEnabledOverride">
       <BoolValueOverride>
         <option name="enabled" value="true" />
+        <option name="value" value="true" />
       </BoolValueOverride>
     </option>
-    <option name="commitMessageValidationRegex" value="(?:fix|chore|docs|feat|refactor|style|test|ci)(?:\(.*\))?: (.|\s)*" />
   </component>
 </project>

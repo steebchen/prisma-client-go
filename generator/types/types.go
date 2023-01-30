@@ -2,10 +2,11 @@ package types
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/iancoleman/strcase"
 	"github.com/takuoki/gocase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // String acts as a builtin string but provides useful casing methods.
@@ -31,13 +32,16 @@ func (s String) CamelCase() string {
 }
 
 // Tag returns the struct tag value of a field.
-func (s String) Tag() string {
+func (s String) Tag(isRequired bool) string {
+	if !isRequired {
+		return fmt.Sprintf("`json:\"%s,omitempty\"`", s)
+	}
 	return fmt.Sprintf("`json:\"%s\"`", s)
 }
 
 // PrismaGoCase transforms `relevance` into `Relevance_`
 func (s String) PrismaGoCase() string {
-	return strings.Title(string(s)) + "_"
+	return cases.Title(language.Und, cases.NoLower).String(string(s)) + "_"
 }
 
 // PrismaInternalCase transforms `relevance` into `_relevance`

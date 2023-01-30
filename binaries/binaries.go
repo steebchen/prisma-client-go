@@ -22,7 +22,7 @@ const PrismaVersion = "4.1.1"
 const EngineVersion = "8d8414deb360336e4698a65aa45a1fbaf1ce13d8"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
-var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s-x64.gz"
+var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://binaries.prisma.sh/all_commits/%s/%s/%s.gz"

@@ -9,13 +9,15 @@ We use [conventional commits](https://www.conventionalcommits.org) (also known a
 ### Running tests
 
 ```shell
-# requires docker to be installed
-go run ./test/setup/init setup # sets up docker containers for integration testing
+# setup deps & generate code – requires docker to be installed
+# this starts a docker compose stack with all required databases
+go generate -tags setup ./...
+# if you already ran setup, just run the following
 go generate ./...
 go test ./... -v
 
 # to teardown docker containers:
-go run ./test/setup/init teardown
+go generate -tags teardown ./...
 ```
 
 ### How integration tests work
