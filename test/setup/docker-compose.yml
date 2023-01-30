@@ -1,0 +1,32 @@
+version: '3.7'
+
+services:
+  postgresql:
+    container_name: go-client-postgres
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_PASSWORD: pw
+    ports:
+      - '5433:5432'
+
+  mysql:
+    container_name: go-client-mysql
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: testing
+      MYSQL_ROOT_PASSWORD: pw
+    ports:
+      - '3307:3306'
+
+  # MongoDB Replica Set (required for Prisma Client)
+  mongodb:
+    container_name: go-client-mongodb
+    build:
+      dockerfile: mongodb.dockerfile
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: prisma
+      MONGO_INITDB_ROOT_PASSWORD: pw
+      MONGO_REPLICA_HOST: localhost
+      MONGO_REPLICA_PORT: 27016
+    ports:
+      - '27016:27016'
