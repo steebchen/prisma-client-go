@@ -28,9 +28,9 @@ func (r *Time) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
-	if v.Type != "datetime" {
+	if v.Type != "date" && v.Type != "datetime" {
 		return fmt.Errorf("invalid type %s, expected date", v.Type)
 	}
-	*r = Time{v.Value}
+	*r = Time{Time: v.Value}
 	return nil
 }

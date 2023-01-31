@@ -1,8 +1,14 @@
 package raw
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
+	"time"
+
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/runtime/builder"
+	"github.com/prisma/prisma-client-go/runtime/types/raw"
 )
 
 type Raw struct {
@@ -26,9 +32,20 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 		if i > 0 {
 			newParams += ","
 		}
-		newParams += string(builder.Value(param))
+		switch p := param.(type) {
+		case time.Time, raw.Time:
+			data, err := json.Marshal(p)
+			if err != nil {
+				panic(err)
+			}
+			newParams += fmt.Sprintf(`{"prisma__type":"date","prisma__value":%s}`, string(data))
+		default:
+			newParams += string(builder.Value(p))
+		}
 	}
 	newParams += "]"
+
+	log.Printf("newParams: %s", newParams)
 
 	q.Inputs = append(q.Inputs, builder.Input{
 		Name:  "parameters",

@@ -357,7 +357,7 @@ func TestRaw(t *testing.T) {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt") values ($1,$2,$3,$4,$5,cast($6 as timestamp),cast($7 as timestamp),$8,$9,$10,$11,$12,$13,$14,$15)`, "a", "a", "a", "a", "a", dateOrig, dateOrig, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`, "a", "a", "a", "a", "a", date, date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -455,7 +455,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`select * from "User" where "time" = cast($1 as timestamp)`, dateOrig).Exec(ctx, &actual); err != nil {
+			if err := client.Prisma.QueryRaw(`select * from "User" where "time" = $1`, date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 

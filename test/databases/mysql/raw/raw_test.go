@@ -32,7 +32,7 @@ type RawUserModel struct {
 }
 
 func TestRaw(t *testing.T) {
-	// t.Parallel() // TODO re-enable when removing deprecated tests
+	t.Parallel()
 
 	var strOpt raw.String = "strOpt"
 	var i raw.Int = 5
@@ -234,7 +234,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw("select * from `user` where id = ? and email = ?", "id2", "email2").Exec(ctx, &actual); err != nil {
+			if err := client.Prisma.QueryRaw("select * from `User` where id = ? and email = ?", "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
