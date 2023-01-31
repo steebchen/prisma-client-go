@@ -12,10 +12,6 @@ type prismaStringValue struct {
 
 type String string
 
-func (r *String) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%q", *r)), nil
-}
-
 func (r *String) UnmarshalJSON(data []byte) error {
 	var v prismaStringValue
 	if err := json.Unmarshal(data, &v); err != nil {

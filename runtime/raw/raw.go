@@ -1,12 +1,15 @@
 package raw
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"time"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/prisma/prisma-client-go/engine"
+	"github.com/prisma/prisma-client-go/logger"
 	"github.com/prisma/prisma-client-go/runtime/builder"
 	"github.com/prisma/prisma-client-go/runtime/types/raw"
 )
@@ -32,20 +35,25 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 		if i > 0 {
 			newParams += ","
 		}
+		data, err := json.Marshal(param)
+		if err != nil {
+			panic(err)
+		}
 		switch p := param.(type) {
-		case time.Time, raw.Time:
-			data, err := json.Marshal(p)
-			if err != nil {
-				panic(err)
-			}
+		case time.Time, raw.DateTime:
 			newParams += fmt.Sprintf(`{"prisma__type":"date","prisma__value":%s}`, string(data))
+		case decimal.Decimal, raw.Decimal:
+			newParams += fmt.Sprintf(`{"prisma__type":"decimal","prisma__value":%q}`, string(data))
+		case json.RawMessage, raw.JSON:
+			encoded := base64.URLEncoding.EncodeToString(data)
+			newParams += fmt.Sprintf(`{"prisma__type":"json","prisma__value":%q}`, encoded)
 		default:
 			newParams += string(builder.Value(p))
 		}
 	}
 	newParams += "]"
 
-	log.Printf("newParams: %s", newParams)
+	logger.Debug.Printf("raw params: %s", newParams)
 
 	q.Inputs = append(q.Inputs, builder.Input{
 		Name:  "parameters",

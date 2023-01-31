@@ -27,8 +27,8 @@ type RawUserModel struct {
 	Float    raw.Float   `json:"float"`
 	FloatOpt *raw.Float  `json:"floatOpt"`
 	// bools are ints in mysql, but thanks to internal Prisma types they can be converted to actual bools
-	Bool    raw.Bool  `json:"bool"`
-	BoolOpt *raw.Bool `json:"boolOpt"`
+	Bool    raw.Boolean  `json:"bool"`
+	BoolOpt *raw.Boolean `json:"boolOpt"`
 }
 
 func TestRaw(t *testing.T) {
@@ -37,8 +37,8 @@ func TestRaw(t *testing.T) {
 	var strOpt raw.String = "strOpt"
 	var i raw.Int = 5
 	var f raw.Float = 5.5
-	var bTrue raw.Bool = true
-	var bFalse raw.Bool = false
+	var bTrue raw.Boolean = true
+	var bFalse raw.Boolean = false
 
 	tests := []struct {
 		name   string

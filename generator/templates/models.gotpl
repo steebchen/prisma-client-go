@@ -20,6 +20,19 @@
 		{{ end }}
 	}
 
+	// Raw{{ $model.Name.GoCase }} is a struct for {{ $model.Name }} when used in raw queries
+	type Raw{{ $model.Name.GoCase }} struct {
+		{{ range $field := $model.Fields }}
+			{{- if not $field.Kind.IsRelation -}}
+				{{- if $field.IsRequired }}
+					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}Raw{{ $field.Type.GoCase }} {{ $field.Name.Tag $field.IsRequired }}
+				{{- else }}
+					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}Raw{{ $field.Type.GoCase }} {{ $field.Name.Tag $field.IsRequired }}
+				{{- end }}
+			{{- end -}}
+		{{ end }}
+	}
+
 	// Relations{{ $model.Name.GoCase }} holds the relation data separately
 	type Relations{{ $model.Name.GoCase }} struct {
 		{{ range $field := $model.Fields }}

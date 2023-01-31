@@ -11,26 +11,26 @@ type prismaTimeValue struct {
 	Type  string    `json:"prisma__type"`
 }
 
-type Time struct {
+type DateTime struct {
 	time.Time
 }
 
-func (r *Time) String() string {
+func (r *DateTime) String() string {
 	return r.Time.String()
 }
 
-func (r *Time) MarshalJSON() ([]byte, error) {
+func (r *DateTime) MarshalJSON() ([]byte, error) {
 	return r.Time.MarshalJSON()
 }
 
-func (r *Time) UnmarshalJSON(data []byte) error {
+func (r *DateTime) UnmarshalJSON(data []byte) error {
 	var v prismaTimeValue
 	if err := json.Unmarshal(data, &v); err != nil {
 		return err
 	}
 	if v.Type != "date" && v.Type != "datetime" {
-		return fmt.Errorf("invalid type %s, expected date", v.Type)
+		return fmt.Errorf("invalid type %s, expected date or datetime", v.Type)
 	}
-	*r = Time{Time: v.Value}
+	*r = DateTime{Time: v.Value}
 	return nil
 }

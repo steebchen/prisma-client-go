@@ -22,12 +22,12 @@ func TestTime_UnmarshalJSON(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		expected Time
+		expected DateTime
 		args     args
 		wantErr  bool
 	}{{
 		name:     "date value",
-		expected: Time{Time: parse("2023-05-05T05:05:05Z")},
+		expected: DateTime{Time: parse("2023-05-05T05:05:05Z")},
 		args: args{
 			b: []byte(`{"prisma__type":"date","prisma__value":"2023-05-05T05:05:05Z"}`),
 		},
@@ -39,7 +39,7 @@ func TestTime_UnmarshalJSON(t *testing.T) {
 		},
 	}, {
 		name:     "datetime value",
-		expected: Time{Time: parse("2023-05-05T05:05:05Z")},
+		expected: DateTime{Time: parse("2023-05-05T05:05:05Z")},
 		args: args{
 			b: []byte(`{"prisma__type":"datetime","prisma__value":"2023-05-05T05:05:05Z"}`),
 		},
@@ -58,7 +58,7 @@ func TestTime_UnmarshalJSON(t *testing.T) {
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var v Time
+			var v DateTime
 			if err := json.Unmarshal(tt.args.b, &v); (err != nil) != tt.wantErr {
 				t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}

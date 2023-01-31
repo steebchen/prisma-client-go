@@ -24,6 +24,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	}
 
 	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
+	logger.Debug.Printf("[timing] query engine response %s", body)
 
 	startParse := time.Now()
 

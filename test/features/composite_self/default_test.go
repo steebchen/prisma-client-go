@@ -20,8 +20,6 @@ func TestCompositeSelf(t *testing.T) {
 		name:   "self unchecked scalar",
 		before: nil,
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			t.Skip()
-
 			_, err := client.Document.CreateOne(
 				Document.ID.Set("doc-1"),
 			).Exec(ctx)

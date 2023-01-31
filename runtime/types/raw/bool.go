@@ -11,13 +11,9 @@ type prismaBoolValue struct {
 	Type  string      `json:"prisma__type"`
 }
 
-type Bool bool
+type Boolean bool
 
-func (r *Bool) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("%t", *r)), nil
-}
-
-func (r *Bool) UnmarshalJSON(b []byte) error {
+func (r *Boolean) UnmarshalJSON(b []byte) error {
 	var v prismaBoolValue
 	if err := json.Unmarshal(b, &v); err != nil {
 		return err
@@ -40,6 +36,6 @@ func (r *Bool) UnmarshalJSON(b []byte) error {
 	default:
 		return fmt.Errorf("invalid type: %T", d)
 	}
-	*r = Bool(n)
+	*r = Boolean(n)
 	return nil
 }

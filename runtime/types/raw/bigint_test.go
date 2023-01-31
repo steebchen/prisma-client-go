@@ -7,55 +7,43 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestBool_UnmarshalJSON(t *testing.T) {
+func TestBigInt_UnmarshalJSON(t *testing.T) {
 	type args struct {
 		b []byte
 	}
 	tests := []struct {
 		name     string
-		expected Boolean
+		expected BigInt
 		args     args
 		wantErr  bool
 	}{{
-		name:     "true",
-		expected: true,
+		name:     "zero",
+		expected: 0,
 		args: args{
-			b: []byte(`{"prisma__type":"bool","prisma__value":true}`),
+			b: []byte(`{"prisma__type":"bigint","prisma__value":"0"}`),
 		},
 	}, {
-		name:     "false",
-		expected: false,
+		name:     "value",
+		expected: -5,
 		args: args{
-			b: []byte(`{"prisma__type":"bool","prisma__value":false}`),
-		},
-	}, {
-		name:     "int 1",
-		expected: true,
-		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":1}`),
-		},
-	}, {
-		name:     "int 0",
-		expected: false,
-		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":0}`),
+			b: []byte(`{"prisma__type":"bigint","prisma__value":"-5"}`),
 		},
 	}, {
 		name:    "error on wrong type",
 		wantErr: true,
 		args: args{
-			b: []byte(`{"prisma__type":"double","prisma__value":0}`),
+			b: []byte(`{"prisma__type":"string","prisma__value":"5"}`),
 		},
 	}, {
 		name:    "error on wrong data",
 		wantErr: true,
 		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":"0"}`),
+			b: []byte(`{"prisma__type":"bigint","prisma__value":"true"}`),
 		},
 	}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var v Boolean
+			var v BigInt
 			if err := json.Unmarshal(tt.args.b, &v); (err != nil) != tt.wantErr {
 				t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}

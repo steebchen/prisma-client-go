@@ -15,19 +15,19 @@ type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 type RawUserModel struct {
-	ID       raw.String  `json:"id"`
-	Email    raw.String  `json:"email"`
-	Username raw.String  `json:"username"`
-	Name     *raw.String `json:"name"`
-	Stuff    *raw.String `json:"stuff"`
-	Str      raw.String  `json:"str"`
-	StrOpt   *raw.String `json:"strOpt"`
-	Int      raw.Int     `json:"int"`
-	IntOpt   *raw.Int    `json:"intOpt"`
-	Float    raw.Float   `json:"float"`
-	FloatOpt *raw.Float  `json:"floatOpt"`
-	Bool     raw.Bool    `json:"bool"`
-	BoolOpt  *raw.Bool   `json:"boolOpt"`
+	ID       raw.String   `json:"id"`
+	Email    raw.String   `json:"email"`
+	Username raw.String   `json:"username"`
+	Name     *raw.String  `json:"name"`
+	Stuff    *raw.String  `json:"stuff"`
+	Str      raw.String   `json:"str"`
+	StrOpt   *raw.String  `json:"strOpt"`
+	Int      raw.Int      `json:"int"`
+	IntOpt   *raw.Int     `json:"intOpt"`
+	Float    raw.Float    `json:"float"`
+	FloatOpt *raw.Float   `json:"floatOpt"`
+	Bool     raw.Boolean  `json:"bool"`
+	BoolOpt  *raw.Boolean `json:"boolOpt"`
 }
 
 func TestRaw(t *testing.T) {
@@ -36,7 +36,7 @@ func TestRaw(t *testing.T) {
 	var strOpt raw.String = "strOpt"
 	var i raw.Int = 5
 	var f raw.Float = 5.5
-	var b raw.Bool = false
+	var b raw.Boolean = false
 
 	tests := []struct {
 		name   string
@@ -325,7 +325,6 @@ func TestRaw(t *testing.T) {
 		},
 	}, {
 		name: "update",
-		// language=GraphQL
 		before: []string{`
 			mutation {
 				result: createOneUser(data: {

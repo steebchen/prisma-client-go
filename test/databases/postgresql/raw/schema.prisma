@@ -26,4 +26,6 @@ model User {
   boolOpt    Boolean?
   decimal    Decimal
   decimalOpt Decimal?
+  json       Json
+  jsonOpt    Json?
 }
