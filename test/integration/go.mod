@@ -10,5 +10,4 @@ require (
 	github.com/prisma/prisma-client-go v0.0.0-00010101000000-000000000000
 	github.com/shopspring/decimal v1.3.1
 	github.com/takuoki/gocase v1.0.0
-	golang.org/x/text v0.4.0
 )
