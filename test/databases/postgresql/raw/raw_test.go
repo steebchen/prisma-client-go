@@ -15,28 +15,6 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type RawUserModel struct {
-	ID         raw.String    `json:"id"`
-	Email      raw.String    `json:"email"`
-	Username   raw.String    `json:"username"`
-	Name       *raw.String   `json:"name"`
-	Stuff      *raw.String   `json:"stuff"`
-	Str        raw.String    `json:"str"`
-	StrOpt     *raw.String   `json:"strOpt"`
-	Int        raw.Int       `json:"int"`
-	IntOpt     *raw.Int      `json:"intOpt"`
-	Float      raw.Float     `json:"float"`
-	FloatOpt   *raw.Float    `json:"floatOpt"`
-	Bool       raw.Boolean   `json:"bool"`
-	BoolOpt    *raw.Boolean  `json:"boolOpt"`
-	Time       raw.DateTime  `json:"time"`
-	TimeOpt    *raw.DateTime `json:"timeOpt"`
-	Decimal    raw.Decimal   `json:"decimal"`
-	DecimalOpt *raw.Decimal  `json:"decimalOpt"`
-	JSON       raw.JSON      `json:"json"`
-	JSONOpt    *raw.JSON     `json:"jsonOpt"`
-}
-
 func TestRaw(t *testing.T) {
 	t.Parallel()
 
@@ -47,6 +25,8 @@ func TestRaw(t *testing.T) {
 	d := raw.Decimal{Decimal: decimal.NewFromFloat(5.5)}
 	json := raw.JSON(`{"field":"value"}`)
 	jsonOpt := &json
+	bytes := raw.Bytes(`{"field":"value"}`)
+	bytesOpt := &bytes
 
 	dateOrig, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
 	if err != nil {
@@ -82,6 +62,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -106,18 +88,20 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []RawUser
 			if err := client.Prisma.QueryRaw(`select * from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []RawUser{{
 				ID:         "id1",
 				Email:      "email1",
 				Username:   "a",
@@ -135,6 +119,8 @@ func TestRaw(t *testing.T) {
 				TimeOpt:    &date,
 				JSON:       json,
 				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}, {
 				ID:         "id2",
 				Email:      "email2",
@@ -153,6 +139,8 @@ func TestRaw(t *testing.T) {
 				TimeOpt:    &date,
 				JSON:       json,
 				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
 			massert.Equal(t, expected, actual)
@@ -180,6 +168,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -204,18 +194,20 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []RawUser
 			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []RawUser{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -233,6 +225,8 @@ func TestRaw(t *testing.T) {
 				TimeOpt:    &date,
 				JSON:       json,
 				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
 			massert.Equal(t, expected, actual)
@@ -260,6 +254,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -284,18 +280,20 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []RawUser
 			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1 and email = $2`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []RawUser{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -313,6 +311,8 @@ func TestRaw(t *testing.T) {
 				TimeOpt:    &date,
 				JSON:       json,
 				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
 			massert.Equal(t, expected, actual)
@@ -340,6 +340,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -364,6 +366,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -371,21 +375,19 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count struct {
-					Value string `json:"prisma__value"`
-				} `json:"count"`
+				Count raw.BigInt `json:"count"`
 			}
 			if err := client.Prisma.QueryRaw(`select count(*) as count from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			massert.Equal(t, "2", actual[0].Count.Value)
+			massert.Equal(t, 2, actual[0].Count)
 		},
 	}, {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)`, "a", "a", "a", "a", "a", date, date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, json, json).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, "a", "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, json, jsonOpt, bytes, bytesOpt).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -414,6 +416,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -457,6 +461,8 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -481,18 +487,20 @@ func TestRaw(t *testing.T) {
 					boolOpt: false,
 					json: "{\"field\":\"value\"}",
 					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []RawUser
 			if err := client.Prisma.QueryRaw(`select * from "User" where "time" = $1`, date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []RawUser{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -510,13 +518,14 @@ func TestRaw(t *testing.T) {
 				TimeOpt:    &date,
 				JSON:       json,
 				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
 			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query with json parameter",
-		// language=GraphQL
 		before: []string{`
 			mutation {
 				result: createOneUser(data: {
@@ -535,8 +544,10 @@ func TestRaw(t *testing.T) {
 					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
-					json: "{\"field\":\"value\"}",
-					jsonOpt: "{\"field\":\"value\"}",
+					json: "{\"field\":\"a\"}",
+					jsonOpt: "{\"field\":\"a\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -559,20 +570,24 @@ func TestRaw(t *testing.T) {
 					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
-					json: "{\"field\":\"value\"}",
-					jsonOpt: "{\"field\":\"value\"}",
+					json: "{\"field\":\"b\"}",
+					jsonOpt: "{\"field\":\"b\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`select * from "User" where "json" = $1`, json).Exec(ctx, &actual); err != nil {
+			j := raw.JSON(`{"field":"b"}`)
+
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User" where "json"->>'field' = 'b'`, j).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []RawUser{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -588,8 +603,10 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
-				JSONOpt:    jsonOpt,
+				JSON:       j,
+				JSONOpt:    &j,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
 			massert.Equal(t, expected, actual)

@@ -20,19 +20,19 @@ func TestBytes_UnmarshalJSON(t *testing.T) {
 		name:     "object",
 		expected: []byte(`{"some":5}`),
 		args: args{
-			b: []byte(`{"prisma__type":"bytes","prisma__value":{"some":5}}`),
+			b: []byte(`{"prisma__type":"bytes","prisma__value":"eyJzb21lIjo1fQ=="}`),
 		},
 	}, {
 		name:     "string",
 		expected: []byte(`"asdf"`),
 		args: args{
-			b: []byte(`{"prisma__type":"bytes","prisma__value":"asdf"}`),
+			b: []byte(`{"prisma__type":"bytes","prisma__value":"ImFzZGYi"}`),
 		},
 	}, {
 		name:     "number",
 		expected: []byte("5"),
 		args: args{
-			b: []byte(`{"prisma__type":"bytes","prisma__value":5}`),
+			b: []byte(`{"prisma__type":"bytes","prisma__value":"NQ=="}`),
 		},
 	}, {
 		name:    "error on wrong type",

@@ -1,13 +1,14 @@
 package raw
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 )
 
 type prismaBytesValue struct {
-	Value []uint8 `json:"prisma__value"`
-	Type  string  `json:"prisma__type"`
+	Value string `json:"prisma__value"`
+	Type  string `json:"prisma__type"`
 }
 
 type Bytes []byte
@@ -20,6 +21,14 @@ func (r *Bytes) UnmarshalJSON(b []byte) error {
 	if v.Type != "bytes" {
 		return fmt.Errorf("invalid type %s, expected bytes", v.Type)
 	}
-	*r = v.Value
+
+	dst := make([]byte, base64.StdEncoding.DecodedLen(len(v.Value)))
+	n, err := base64.StdEncoding.Decode(dst, []byte(v.Value))
+	if err != nil {
+		return err
+	}
+	dst = dst[:n]
+
+	*r = dst
 	return nil
 }
