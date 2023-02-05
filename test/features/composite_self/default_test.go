@@ -3,7 +3,6 @@ package composite
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/prisma/prisma-client-go/test"
 )
@@ -20,45 +19,16 @@ func TestCompositeSelf(t *testing.T) {
 		name:   "self unchecked scalar",
 		before: nil,
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.Document.CreateOne(
-				Document.ID.Set("doc-1"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.Document.CreateOne(
-				Document.ID.Set("doc-2"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.Event.CreateOne(
+			_, err := client.Event.CreateOne(
 				Event.ID.Set("event-1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			_, err = client.EventInstance.CreateOne(
-				EventInstance.Event.Link(Event.ID.Equals("event-1")),
-				EventInstance.Start.Set(time.Now()),
-				EventInstance.End.Set(time.Now()),
-				EventInstance.Summary.Link(Document.ID.Equals("doc-1")),
-				EventInstance.ID.Set("event-instance-1"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.EventInstance.CreateOne(
-				EventInstance.Event.Link(Event.ID.Equals("event-1")),
-				EventInstance.Start.Set(time.Now()),
-				EventInstance.End.Set(time.Now()),
-				EventInstance.Summary.Link(Document.ID.Equals("doc-2")),
-				EventInstance.ID.Set("event-instance-2"),
-				EventInstance.PreviousEventInstanceID.Set("event-instance-1"),
+			_, err = client.Event.CreateOne(
+				Event.ID.Set("event-instance-2"),
+				Event.PreviousEventID.Set("event-1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
@@ -69,45 +39,16 @@ func TestCompositeSelf(t *testing.T) {
 		name:   "self link",
 		before: nil,
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.Document.CreateOne(
-				Document.ID.Set("doc-1"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.Document.CreateOne(
-				Document.ID.Set("doc-2"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.Event.CreateOne(
+			_, err := client.Event.CreateOne(
 				Event.ID.Set("event-1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			_, err = client.EventInstance.CreateOne(
-				EventInstance.Event.Link(Event.ID.Equals("event-1")),
-				EventInstance.Start.Set(time.Now()),
-				EventInstance.End.Set(time.Now()),
-				EventInstance.Summary.Link(Document.ID.Equals("doc-1")),
-				EventInstance.ID.Set("event-instance-1"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			_, err = client.EventInstance.CreateOne(
-				EventInstance.Event.Link(Event.ID.Equals("event-2")),
-				EventInstance.Start.Set(time.Now()),
-				EventInstance.End.Set(time.Now()),
-				EventInstance.Summary.Link(Document.ID.Equals("doc-2")),
-				EventInstance.Previous.Link(
-					EventInstance.ID.Equals("event-instance-1"),
+			_, err = client.Event.CreateOne(
+				Event.Previous.Link(
+					Event.ID.Equals("event-1"),
 				),
 			).Exec(ctx)
 			if err != nil {
