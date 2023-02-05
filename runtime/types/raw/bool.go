@@ -24,11 +24,12 @@ func (r *Boolean) UnmarshalJSON(b []byte) error {
 	var n bool
 	switch d := v.Value.(type) {
 	case float64:
-		if d == 1 {
+		switch d {
+		case 1:
 			n = true
-		} else if d == 0 {
+		case 0:
 			n = false
-		} else {
+		default:
 			return fmt.Errorf("invalid value: %f", d)
 		}
 	case bool:
