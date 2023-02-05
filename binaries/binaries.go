@@ -148,7 +148,7 @@ func DownloadCLI(toDir string) error {
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
 	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
-	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, to, url)
+	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
@@ -192,7 +192,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 		return "", fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.Debug.Printf("download() took %s", time.Since(startDownload))
+	logger.Debug.Printf("%s engine download took %s", name, time.Since(startDownload))
 
 	logger.Debug.Printf("%s done", name)
 

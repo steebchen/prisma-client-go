@@ -102,26 +102,26 @@ func (e *QueryEngine) ensure() (string, error) {
 		file = prismaQueryEngineBinary
 		forceVersion = false
 	} else {
-		if _, err := os.Stat(localExactPath); err == nil {
-			logger.Debug.Printf("exact query engine found in working directory")
+		if info, err := os.Stat(localExactPath); err == nil {
 			file = localExactPath
-		} else if _, err := os.Stat(localPath); err == nil {
-			logger.Debug.Printf("query engine found in working directory")
+			logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
+		} else if info, err = os.Stat(localPath); err == nil {
 			file = localPath
+			logger.Debug.Printf("query engine found in working directory: %s %+v", file, info)
 		}
 
-		if _, err := os.Stat(globalExactPath); err == nil {
-			logger.Debug.Printf("query engine found in global path")
+		if info, err := os.Stat(globalExactPath); err == nil {
 			file = globalExactPath
-		} else if _, err := os.Stat(globalPath); err == nil {
-			logger.Debug.Printf("exact query engine found in global path")
+			logger.Debug.Printf("query engine found in global path: %s %+v", file, info)
+		} else if info, err = os.Stat(globalPath); err == nil {
 			file = globalPath
+			logger.Debug.Printf("exact query engine found in global path: %s %+v", file, info)
 		}
 	}
 
 	if file == "" {
 		// TODO log instructions on how to fix this problem
-		return "", fmt.Errorf("no binary found ")
+		return "", fmt.Errorf("no binary found")
 	}
 
 	startVersion := time.Now()
