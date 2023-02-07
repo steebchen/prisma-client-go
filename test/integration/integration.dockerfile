@@ -13,6 +13,8 @@ RUN go mod download -x
 
 RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 
+RUN ls -Rlah /app/test/integration
+
 # build the integration binary with all dependencies
 RUN go build -o /app/main .
 
@@ -24,7 +26,7 @@ WORKDIR /app
 COPY --from=build /app/main /app/main
 COPY --from=build /app/test/integration/dev.db /app/dev.db
 
-ENV PRISMA_CLIENT_GO_LOG=info
+ENV PRISMA_CLIENT_GO_LOG=debug
 ENV DEBUG=*
 
 CMD ["/app/main"]
