@@ -10,6 +10,7 @@ COPY . ./
 WORKDIR /app/test/integration
 
 # for testing purposes; this prevents failing dependency updates for the main repo
+RUN go mod tidy 
 RUN go get github.com/prisma/prisma-client-go
 RUN go mod tidy
 
