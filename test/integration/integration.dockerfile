@@ -10,7 +10,6 @@ COPY . ./
 WORKDIR /app/test/integration
 
 # for testing purposes; this prevents failing dependency updates for the main repo
-RUN go get ./...
 RUN go mod tidy
 RUN ls
 RUN cat go.mod
