@@ -15,11 +15,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "4.9.0"
+const PrismaVersion = "4.7.1"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engines/commits/master
-const EngineVersion = "ceb5c99003b99c9ee2c1d2e618e359c14aef2ea5"
+const EngineVersion = "272861e07ab64f234d3ffc4094e32bd61775599c"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
