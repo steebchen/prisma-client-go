@@ -15,11 +15,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "3.13.0"
+const PrismaVersion = "4.1.1"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engines/commits/master
-const EngineVersion = "efdf9b1183dddfd4258cd181a72125755215ab7b"
+const EngineVersion = "8d8414deb360336e4698a65aa45a1fbaf1ce13d8"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
@@ -148,7 +148,7 @@ func DownloadCLI(toDir string) error {
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
 	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
-	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, to, url)
+	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
@@ -192,7 +192,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 		return "", fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.Debug.Printf("download() took %s", time.Since(startDownload))
+	logger.Debug.Printf("%s engine download took %s", name, time.Since(startDownload))
 
 	logger.Debug.Printf("%s done", name)
 

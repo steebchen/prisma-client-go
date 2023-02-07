@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -24,6 +25,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	}
 
 	logger.Debug.Printf("[timing] query engine request took %s", time.Since(startReq))
+	logger.Debug.Printf("[timing] query engine response %s", body)
 
 	startParse := time.Now()
 
@@ -41,6 +43,8 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		return fmt.Errorf("pql error: %s", first.RawMessage())
 	}
 
+	response.Data.Result = transformResponse(response.Data.Result)
+
 	if err := json.Unmarshal(response.Data.Result, v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
@@ -50,18 +54,26 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 	return nil
 }
 
-// Do sends the http Request to the query engine and unmarshals the response
+// Batch sends a batch request to the query engine; used for transactions
 func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
 	body, err := e.Request(ctx, "POST", "/", payload)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
 
+	body = transformResponse(body)
+
 	if err := json.Unmarshal(body, &v); err != nil {
 		return fmt.Errorf("json unmarshal: %w", err)
 	}
 
 	return nil
+}
+
+func transformResponse(data []byte) []byte {
+	// hack for raw queries
+	replace := []byte(`{"prisma__type":"null","prisma__value":null}`)
+	return bytes.ReplaceAll(data, replace, []byte("null"))
 }
 
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {

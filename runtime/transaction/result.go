@@ -3,6 +3,8 @@ package transaction
 import (
 	"encoding/json"
 	"fmt"
+
+	"github.com/prisma/prisma-client-go/logger"
 )
 
 type Result struct {
@@ -21,6 +23,7 @@ func (r *Result) Get(c <-chan []byte, v interface{}) error {
 		res = data
 		r.cache = data
 	}
+	logger.Debug.Printf("tx result: %s", res)
 	if err := json.Unmarshal(res, &v); err != nil {
 		return err
 	}

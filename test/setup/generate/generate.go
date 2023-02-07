@@ -4,6 +4,7 @@ package main
 //go:generate go run .
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -24,7 +25,7 @@ func generate() {
 	var files []string
 	err := filepath.Walk("../..", func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return err
+			return fmt.Errorf("file %s: %s", path+info.Name(), err)
 		}
 		if !strings.Contains(path, "migrations") && info.Name() == "schema.prisma" {
 			files = append(files, path)
@@ -68,7 +69,7 @@ func generate() {
 			genCmd.Stderr = os.Stderr
 			genCmd.Stdout = os.Stdout
 			if err := genCmd.Run(); err != nil {
-				log.Fatal(err)
+				log.Fatal(fmt.Errorf("generate %s: %s", file, err))
 			}
 
 			log.Printf("%s done", file)

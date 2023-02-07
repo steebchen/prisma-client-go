@@ -5,37 +5,35 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/shopspring/decimal"
 
+	"github.com/prisma/prisma-client-go/runtime/types/raw"
 	"github.com/prisma/prisma-client-go/test"
+	"github.com/prisma/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type RawUserModel struct {
-	ID       string   `json:"id"`
-	Email    string   `json:"email"`
-	Username string   `json:"username"`
-	Name     *string  `json:"name"`
-	Stuff    *string  `json:"stuff"`
-	Str      string   `json:"str"`
-	StrOpt   *string  `json:"strOpt"`
-	Int      int      `json:"int"`
-	IntOpt   *int     `json:"intOpt"`
-	Float    float64  `json:"float"`
-	FloatOpt *float64 `json:"floatOpt"`
-	Bool     bool     `json:"bool"`
-	BoolOpt  *bool    `json:"boolOpt"`
-}
-
 func TestRaw(t *testing.T) {
 	t.Parallel()
 
-	strOpt := "strOpt"
-	i := 5
-	f := 5.5
-	b := false
+	var strOpt raw.String = "strOpt"
+	var i raw.Int = 5
+	var f raw.Float = 5.5
+	var b raw.Boolean = false
+	d := raw.Decimal{Decimal: decimal.NewFromFloat(5.5)}
+	json := raw.JSON(`{"field":"value"}`)
+	jsonOpt := &json
+	bytes := raw.Bytes(`{"field":"value"}`)
+	bytesOpt := &bytes
+
+	dateOrig, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	date := raw.DateTime{Time: dateOrig}
 
 	tests := []struct {
 		name   string
@@ -52,14 +50,20 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -72,52 +76,74 @@ func TestRaw(t *testing.T) {
 					username: "b",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM "User"`).Exec(ctx, &actual); err != nil {
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
-				ID:       "id1",
-				Email:    "email1",
-				Username: "a",
-				Str:      "str",
-				StrOpt:   &strOpt,
-				Int:      i,
-				IntOpt:   &i,
-				Float:    f,
-				FloatOpt: &f,
-				Bool:     true,
-				BoolOpt:  &b,
+			expected := []RawUser{{
+				ID:         "id1",
+				Email:      "email1",
+				Username:   "a",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       json,
+				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}, {
-				ID:       "id2",
-				Email:    "email2",
-				Username: "b",
-				Str:      "str",
-				StrOpt:   &strOpt,
-				Int:      i,
-				IntOpt:   &i,
-				Float:    f,
-				FloatOpt: &f,
-				Bool:     true,
-				BoolOpt:  &b,
+				ID:         "id2",
+				Email:      "email2",
+				Username:   "b",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       json,
+				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query with parameter",
@@ -130,14 +156,20 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -150,40 +182,54 @@ func TestRaw(t *testing.T) {
 					username: "b",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM "User" WHERE id = $1`, "id2").Exec(ctx, &actual); err != nil {
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
-				ID:       "id2",
-				Email:    "email2",
-				Username: "b",
-				Str:      "str",
-				StrOpt:   &strOpt,
-				Int:      i,
-				IntOpt:   &i,
-				Float:    f,
-				FloatOpt: &f,
-				Bool:     true,
-				BoolOpt:  &b,
+			expected := []RawUser{{
+				ID:         "id2",
+				Email:      "email2",
+				Username:   "b",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       json,
+				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query with multiple parameters",
@@ -196,14 +242,20 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -216,40 +268,54 @@ func TestRaw(t *testing.T) {
 					username: "b",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM "User" WHERE id = $1 AND email = $2`, "id2", "email2").Exec(ctx, &actual); err != nil {
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1 and email = $2`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
-				ID:       "id2",
-				Email:    "email2",
-				Username: "b",
-				Str:      "str",
-				StrOpt:   &strOpt,
-				Int:      i,
-				IntOpt:   &i,
-				Float:    f,
-				FloatOpt: &f,
-				Bool:     true,
-				BoolOpt:  &b,
+			expected := []RawUser{{
+				ID:         "id2",
+				Email:      "email2",
+				Username:   "b",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       json,
+				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query count",
@@ -262,14 +328,20 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -282,14 +354,20 @@ func TestRaw(t *testing.T) {
 					username: "b",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -297,32 +375,27 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count int `json:"count"`
+				Count raw.BigInt `json:"count"`
 			}
-			if err := client.Prisma.QueryRaw(`SELECT COUNT(*) AS count FROM "User"`).Exec(ctx, &actual); err != nil {
+			if err := client.Prisma.QueryRaw(`select count(*) as count from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, actual[0].Count)
+			massert.Equal(t, 2, actual[0].Count)
 		},
 	}, {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
-			if err != nil {
-				t.Fatal(err)
-			}
-			result, err := client.Prisma.ExecuteRaw(`INSERT INTO "User" ("id", "email", "username", "str", "strOpt", "date", "dateOpt", "int", "intOpt", "float", "floatOpt", "bool", "boolOpt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`, "a", "a", "a", "a", "a", date, date, 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, "a", "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, json, jsonOpt, bytes, bytesOpt).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, result.Count)
+			massert.Equal(t, 1, result.Count)
 		},
 	}, {
 		name: "update",
-		// language=GraphQL
 		before: []string{`
 			mutation {
 				result: createOneUser(data: {
@@ -331,33 +404,39 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = 'abc' WHERE id = $1`, "id1").Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`update "User" set email = 'abc' where id = $1`, "id1").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, result.Count)
+			massert.Equal(t, 1, result.Count)
 
-			result, err = client.Prisma.ExecuteRaw(`UPDATE "User" SET email = 'abc' WHERE id = $1`, "non-existing").Exec(ctx)
+			result, err = client.Prisma.ExecuteRaw(`update "User" set email = 'abc' where id = $1`, "non-existing").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 0, result.Count)
+			massert.Equal(t, 0, result.Count)
 		},
 	}, {
 		name: "raw query with time parameter",
@@ -370,14 +449,20 @@ func TestRaw(t *testing.T) {
 					username: "a",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2010-01-01T00:00:00Z",
-					dateOpt: "2010-01-01T00:00:00Z",
+					time: "2010-01-01T00:00:00Z",
+					timeOpt: "2010-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
@@ -390,44 +475,141 @@ func TestRaw(t *testing.T) {
 					username: "b",
 					str: "str",
 					strOpt: "strOpt",
-					date: "2020-01-01T00:00:00Z",
-					dateOpt: "2020-01-01T00:00:00Z",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
 					int: 5,
 					intOpt: 5,
 					float: 5.5,
 					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
 					bool: true,
 					boolOpt: false,
+					json: "{\"field\":\"value\"}",
+					jsonOpt: "{\"field\":\"value\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
 				}) {
 					id
 				}
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			date, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
-			if err != nil {
-				t.Fatal(err)
-			}
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM "User" WHERE date = $1`, date).Exec(ctx, &actual); err != nil {
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User" where "time" = $1`, date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
-				ID:       "id2",
-				Email:    "email2",
-				Username: "b",
-				Str:      "str",
-				StrOpt:   &strOpt,
-				Int:      i,
-				IntOpt:   &i,
-				Float:    f,
-				FloatOpt: &f,
-				Bool:     true,
-				BoolOpt:  &b,
+			expected := []RawUser{{
+				ID:         "id2",
+				Email:      "email2",
+				Username:   "b",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       json,
+				JSONOpt:    jsonOpt,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "raw query with json parameter",
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+					str: "str",
+					strOpt: "strOpt",
+					time: "2010-01-01T00:00:00Z",
+					timeOpt: "2010-01-01T00:00:00Z",
+					int: 5,
+					intOpt: 5,
+					float: 5.5,
+					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
+					bool: true,
+					boolOpt: false,
+					json: "{\"field\":\"a\"}",
+					jsonOpt: "{\"field\":\"a\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+					str: "str",
+					strOpt: "strOpt",
+					time: "2020-01-01T00:00:00Z",
+					timeOpt: "2020-01-01T00:00:00Z",
+					int: 5,
+					intOpt: 5,
+					float: 5.5,
+					floatOpt: 5.5,
+					decimal: 5.5,
+					decimalOpt: 5.5,
+					bool: true,
+					boolOpt: false,
+					json: "{\"field\":\"b\"}",
+					jsonOpt: "{\"field\":\"b\"}",
+					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
+					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			j := raw.JSON(`{"field":"b"}`)
+
+			var actual []RawUser
+			if err := client.Prisma.QueryRaw(`select * from "User" where "json"->>'field' = 'b'`, j).Exec(ctx, &actual); err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []RawUser{{
+				ID:         "id2",
+				Email:      "email2",
+				Username:   "b",
+				Str:        "str",
+				StrOpt:     &strOpt,
+				Int:        i,
+				IntOpt:     &i,
+				Float:      f,
+				FloatOpt:   &f,
+				Decimal:    d,
+				DecimalOpt: &d,
+				Bool:       true,
+				BoolOpt:    &b,
+				Time:       date,
+				TimeOpt:    &date,
+				JSON:       j,
+				JSONOpt:    &j,
+				Bytes:      bytes,
+				BytesOpt:   bytesOpt,
+			}}
+
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

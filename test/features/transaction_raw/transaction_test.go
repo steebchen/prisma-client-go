@@ -4,10 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/prisma/prisma-client-go/runtime/types"
 	"github.com/prisma/prisma-client-go/test"
+	"github.com/prisma/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -34,23 +33,20 @@ func TestTransactionRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			e := client.Prisma.QueryRaw(`SELECT * FROM "User"`).Tx()
+			e := client.Prisma.QueryRaw(`select * from "User"`).Tx()
 
 			if err := client.Prisma.Transaction(e).Exec(ctx); err != nil {
 				t.Fatal(err)
 			}
 
-			var v []UserModel
+			var v []RawUser
 			if err := e.Into(&v); err != nil {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, []UserModel{{
-				InnerUser: InnerUser{
-					ID:    "123",
-					Email: "john@example.com",
-				},
-				RelationsUser: RelationsUser{},
+			massert.Equal(t, []RawUser{{
+				ID:    "123",
+				Email: "john@example.com",
 			}}, v)
 		},
 	}, {
@@ -67,13 +63,13 @@ func TestTransactionRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			e := client.Prisma.ExecuteRaw(`UPDATE "User" SET email = $1 WHERE id = $2`, "new-email", "123").Tx()
+			e := client.Prisma.ExecuteRaw(`update "User" set email = $1 where id = $2`, "new-email", "123").Tx()
 
 			if err := client.Prisma.Transaction(e).Exec(ctx); err != nil {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, &types.BatchResult{
+			massert.Equal(t, &types.BatchResult{
 				Count: 1,
 			}, e.Result())
 
@@ -84,14 +80,12 @@ func TestTransactionRaw(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			expected := []UserModel{{
-				InnerUser: InnerUser{
-					ID:    "123",
-					Email: "new-email",
-				},
+			expected := []RawUser{{
+				ID:    "123",
+				Email: "new-email",
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

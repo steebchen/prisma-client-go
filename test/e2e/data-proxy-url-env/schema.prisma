@@ -9,7 +9,6 @@ generator db {
   output           = "."
   disableGitignore = true
   package          = "db"
-  previewFeatures = ["dataProxy"]
 }
 
 model Link {

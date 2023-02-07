@@ -8,7 +8,6 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "composite"
-  previewFeatures   = ["mongoDb"]
 }
 
 model Event {
@@ -16,6 +15,6 @@ model Event {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
   previous        Event?   @relation("NextPreviousEvent", fields: [previousEventId], references: [id])
-  previousEventId String?
+  previousEventId String?  @unique
   next            Event?   @relation("NextPreviousEvent")
 }

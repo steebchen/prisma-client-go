@@ -9,6 +9,8 @@
 			{{ $enum.Name.GoCase }}{{ $v.Name.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v.Name }}"
 		{{ end }}
 	)
+
+	type Raw{{ $enum.Name.GoCase }} {{ $enum.Name.GoCase }}
 {{ end }}
 
 {{/* internal prisma enums */}}

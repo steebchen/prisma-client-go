@@ -11,17 +11,31 @@ generator db {
 }
 
 model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
-  username String
-  str      String
-  strOpt   String?
-  date     DateTime
-  dateOpt  DateTime?
-  int      Int
-  intOpt   Int?
-  float    Float
-  floatOpt Float?
-  bool     Boolean
-  boolOpt  Boolean?
+  id           String    @id @default(cuid())
+  email        String    @unique
+  username     String
+  str          String
+  strOpt       String?
+  strEmpty     String?
+  time         DateTime
+  timeOpt      DateTime?
+  timeEmpty    DateTime?
+  int          Int
+  intOpt       Int?
+  intEmpty     Int?
+  float        Float
+  floatOpt     Float?
+  floatEmpty   Float?
+  bool         Boolean
+  boolOpt      Boolean?
+  boolEmpty    Boolean?
+  decimal      Decimal
+  decimalOpt   Decimal?
+  decimalEmpty Decimal?
+  json         Json
+  jsonOpt      Json?
+  jsonEmpty    Json?
+  bytes        Bytes
+  bytesOpt     Bytes?
+  bytesEmpty   Bytes?
 }
