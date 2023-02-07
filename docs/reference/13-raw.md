@@ -79,7 +79,7 @@ println(result.Count) // 1
 
 ### Query
 
-#### Select all
+#### Select all for a model
 
 ```go
 var posts []db.RawPost
@@ -109,7 +109,8 @@ err := client.Prisma.QueryRaw(`SELECT post_id, count(*) as comments FROM "Commen
 Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `count`, which contains the affected rows.
 
 ```go
-count, err := client.Prisma.ExecuteRaw(`UPDATE "Post" SET title = $1 WHERE id = $2`, "my post", "123").Exec(ctx)
+result, err := client.Prisma.ExecuteRaw(`UPDATE "Post" SET title = $1 WHERE id = $2`, "my post", "123").Exec(ctx)
+println(result.Count) // 1
 ```
 
 ## Next steps
