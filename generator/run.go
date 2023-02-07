@@ -149,7 +149,6 @@ func generateBinaries(input *Root) error {
 	}
 
 	targets = add(targets, "native")
-	targets = add(targets, "linux")
 
 	// TODO refactor
 	for _, name := range targets {
@@ -178,6 +177,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 
 		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
 
+		// TODO change
 		pt := name
 		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
 			pt = "linux"
@@ -187,7 +187,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 		to := path.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
-		if err := bindata.WriteFile(strings.ReplaceAll(name, "-", "_"), pkg, pt, enginePath, to); err != nil {
+		if err := bindata.WriteFile(name, pkg, pt, enginePath, to); err != nil {
 			return fmt.Errorf("generate write go file: %w", err)
 		}
 
