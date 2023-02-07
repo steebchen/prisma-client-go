@@ -10,10 +10,7 @@ COPY . ./
 WORKDIR /app/test/integration
 
 # for testing purposes; this prevents failing dependency updates for the main repo
-RUN go mod tidy
-RUN ls
-RUN cat go.mod
-RUN cat go.sum
+RUN go get github.com/prisma/prisma-client-go
 
 RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 
