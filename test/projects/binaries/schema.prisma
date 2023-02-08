@@ -1,20 +1,20 @@
 datasource db {
-	provider = "sqlite"
-	url      = env("__REPLACE__")
+  provider = "sqlite"
+  url      = env("__REPLACE__")
 }
 
 generator db {
-	provider = "go run github.com/prisma/prisma-client-go"
-	output = "."
-	disableGitignore = true
-	package = "binaries"
-	binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider         = "go run github.com/prisma/prisma-client-go"
+  output           = "."
+  disableGitignore = true
+  package          = "binaries"
+  binaryTargets    = ["debian-openssl-1.1.x"]
 }
 
 model User {
-	id       String  @id @default(cuid()) @map("_id")
-	email    String  @unique
-	username String
-	name     String?
-	stuff    String?
+  id       String  @id @default(cuid()) @map("_id")
+  email    String  @unique
+  username String
+  name     String?
+  stuff    String?
 }
