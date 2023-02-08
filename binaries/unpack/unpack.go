@@ -13,6 +13,8 @@ import (
 
 // TODO check checksum after expanding file
 
+const FileEnv = "PRISMA_INTERNAL_QUERY_ENGINE_DIR"
+
 // noinspection GoUnusedExportedFunction
 func Unpack(data []byte, name string, version string) {
 	start := time.Now()
@@ -53,4 +55,8 @@ func Unpack(data []byte, name string, version string) {
 	}
 
 	logger.Debug.Printf("unpacked at %s in %s", file, time.Since(start))
+
+	if err := os.Setenv(FileEnv, file); err != nil {
+		panic(err)
+	}
 }
