@@ -94,6 +94,4 @@ type BinaryPaths struct {
 	MigrationEngine map[string]string `json:"migrationEngine"` // key target, value path
 	// QueryEngine (optional)
 	QueryEngine map[string]string `json:"queryEngine"`
-	// IntrospectionEngine (optional)
-	IntrospectionEngine map[string]string `json:"introspectionEngine"`
 }
