@@ -8,7 +8,8 @@ generator db {
   output           = "."
   disableGitignore = true
   package          = "binaries"
-  binaryTargets    = ["debian-openssl-1.1.x"]
+  // GitHub actions uses debian with OpenSSL 3.0.x
+  binaryTargets    = ["debian-openssl-3.0.x"]
 }
 
 model User {
