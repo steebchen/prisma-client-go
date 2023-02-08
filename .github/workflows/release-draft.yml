@@ -8,7 +8,7 @@ env:
 
 jobs:
   update-release-draft:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: release-drafter/release-drafter@v5
         with:
