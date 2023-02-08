@@ -143,12 +143,20 @@ func generateBinaries(input *Root) error {
 	}
 
 	var targets []string
+	var isNonLinux bool
 
 	for _, target := range input.Generator.BinaryTargets {
 		targets = append(targets, target.Value)
+		if target.Value == "darwin" || target.Value == "windows" {
+			isNonLinux = true
+		}
 	}
 
-	targets = add(targets, "native")
+	// add native by default if native binary is darwin or linux
+	// this prevents conflicts when building on linux
+	if isNonLinux || len(targets) == 0 {
+		targets = add(targets, "native")
+	}
 
 	// TODO refactor
 	for _, name := range targets {
