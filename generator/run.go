@@ -191,7 +191,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 
 		// TODO change
 		pt := name
-		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
+		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
 			pt = "linux"
 		}
 
