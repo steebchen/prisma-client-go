@@ -145,6 +145,8 @@ func generateBinaries(input *Root) error {
 	var targets []string
 	var isNonLinux bool
 
+	logger.Debug.Printf("defined binary targets: %v", input.Generator.BinaryTargets)
+
 	for _, target := range input.Generator.BinaryTargets {
 		targets = append(targets, target.Value)
 		if target.Value == "darwin" || target.Value == "windows" {
@@ -157,6 +159,8 @@ func generateBinaries(input *Root) error {
 	if isNonLinux || len(targets) == 0 {
 		targets = add(targets, "native")
 	}
+
+	logger.Debug.Printf("final binary targets: %v", targets)
 
 	// TODO refactor
 	for _, name := range targets {
