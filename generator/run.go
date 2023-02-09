@@ -24,6 +24,16 @@ func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = DefaultPackageName
 	}
+
+	if binaryTargets := os.Getenv("PRISMA_CLI_BINARY_TARGETS"); binaryTargets != "" {
+		s := strings.Split(binaryTargets, ",")
+		var targets []BinaryTarget
+		for _, t := range s {
+			targets = append(targets, BinaryTarget{Value: t})
+		}
+		input.Generator.BinaryTargets = targets
+		logger.Debug.Printf("overriding binary targets: %+v", targets)
+	}
 }
 
 // Run invokes the generator, which builds the templates and writes to the specified output file.
