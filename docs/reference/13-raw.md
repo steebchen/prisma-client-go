@@ -44,7 +44,7 @@ Use `QueryRaw` to query for data and automatically unmarshal it into a slice of 
 
 ```go
 var posts []db.RawPost
-err := client.Prisma.QueryRaw(`SELECT * FROM "Post"`).Exec(ctx, &posts)
+err := client.Prisma.QueryRaw(`SELECT * FROM `Post``).Exec(ctx, &posts)
 ```
 
 #### Select specific
@@ -52,7 +52,7 @@ err := client.Prisma.QueryRaw(`SELECT * FROM "Post"`).Exec(ctx, &posts)
 ```go
 // note the usage of RawPost instead of PostModel
 var posts []db.RawPost
-err := client.Prisma.QueryRaw(`SELECT * FROM "Post" WHERE id = ? AND title = ?`, "123abc", "my post").Exec(ctx, &posts)
+err := client.Prisma.QueryRaw("SELECT * FROM `Post` WHERE id = ? AND title = ?", "123abc", "my post").Exec(ctx, &posts)
 ```
 
 ### Custom Query
@@ -63,7 +63,7 @@ var res []struct{
 	PostID   db.RawString `json:"post_id"`
 	Comments db.RawInt    `json:"comments"`
 }
-err := client.Prisma.QueryRaw(`SELECT post_id, count(*) as comments FROM "Comment" GROUP BY post_id`).Exec(ctx, &res)
+err := client.Prisma.QueryRaw("SELECT post_id, count(*) as comments FROM `Comment` GROUP BY post_id").Exec(ctx, &res)
 ```
 
 ### Operations
@@ -71,7 +71,7 @@ err := client.Prisma.QueryRaw(`SELECT post_id, count(*) as comments FROM "Commen
 Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `result.Count`, which contains the affected rows.
 
 ```go
-result, err := client.Prisma.ExecuteRaw(`UPDATE Post SET title = ? WHERE id = ?`, "my post", "123").Exec(ctx)
+result, err := client.Prisma.ExecuteRaw("UPDATE `Post` SET title = ? WHERE id = ?", "my post", "123").Exec(ctx)
 println(result.Count) // 1
 ```
 
