@@ -38,7 +38,13 @@ var Engines = []Engine{{
 }, {
 	"migration-engine",
 	"PRISMA_MIGRATION_ENGINE_BINARY",
-}}
+}, {
+ 	"introspection-engine",
+ 	"PRISMA_INTROSPECTION_ENGINE_BINARY",
+ }, {
+ 	"prisma-fmt",
+ 	"PRISMA_FMT_BINARY",
+ }}
 
 // init overrides URLs if env variables are specific for debugging purposes and to
 // be able to provide a fallback if the links above should go down
