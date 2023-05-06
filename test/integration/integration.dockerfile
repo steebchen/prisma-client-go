@@ -1,4 +1,4 @@
-FROM golang:1.20.1 as build
+FROM golang:1.20.4 as build
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN ls -Rlah /app/test/integration
 RUN go build -o /app/main .
 
 # start a new stage to test if the runtime fetching works
-FROM golang:1.20.1
+FROM golang:1.20.4
 
 WORKDIR /app
 
