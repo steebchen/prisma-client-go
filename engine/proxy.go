@@ -110,7 +110,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 
 	var response GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json gql resopnse unmarshal: %w", err)
 	}
 
 	if len(response.Errors) > 0 {
@@ -123,7 +123,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 	}
 
 	if err := json.Unmarshal(response.Data.Result, into); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json data result unmarshal: %w", err)
 	}
 
 	logger.Debug.Printf("[timing] request unmarshal took %s", time.Since(startParse))
@@ -143,7 +143,7 @@ func (e *DataProxyEngine) Batch(ctx context.Context, payload interface{}, into i
 	}
 
 	if err := json.Unmarshal(body, &into); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json body unmarshal: %w", err)
 	}
 
 	return nil

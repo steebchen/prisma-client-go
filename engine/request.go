@@ -1,7 +1,6 @@
 package engine
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -31,7 +30,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 
 	var response GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json gql response unmarshal: %w", err)
 	}
 
 	if len(response.Errors) > 0 {
@@ -43,10 +42,13 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		return fmt.Errorf("pql error: %s", first.RawMessage())
 	}
 
-	response.Data.Result = transformResponse(response.Data.Result)
+	response.Data.Result, err = transformResponse(response.Data.Result)
+	if err != nil {
+		return fmt.Errorf("transform response: %w", err)
+	}
 
 	if err := json.Unmarshal(response.Data.Result, v); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json data result unmarshal: %w", err)
 	}
 
 	logger.Debug.Printf("[timing] request unmarshaling took %s", time.Since(startParse))
@@ -61,19 +63,16 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 		return fmt.Errorf("request failed: %w", err)
 	}
 
-	body = transformResponse(body)
+	body, err = transformResponse(body)
+	if err != nil {
+		return fmt.Errorf("transform response: %w", err)
+	}
 
 	if err := json.Unmarshal(body, &v); err != nil {
-		return fmt.Errorf("json unmarshal: %w", err)
+		return fmt.Errorf("json body unmarshal: %w", err)
 	}
 
 	return nil
-}
-
-func transformResponse(data []byte) []byte {
-	// hack for raw queries
-	replace := []byte(`{"prisma__type":"null","prisma__value":null}`)
-	return bytes.ReplaceAll(data, replace, []byte("null"))
 }
 
 func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
