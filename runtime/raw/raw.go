@@ -40,14 +40,14 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 			panic(err)
 		}
 		switch p := param.(type) {
-		case time.Time, raw.DateTime, *raw.DateTime:
+		case time.Time, *time.Time, raw.DateTime, *raw.DateTime:
 			newParams += fmt.Sprintf(`{"prisma__type":"date","prisma__value":%s}`, string(data))
-		case decimal.Decimal, raw.Decimal, *raw.Decimal:
+		case decimal.Decimal, *decimal.Decimal, raw.Decimal, *raw.Decimal:
 			newParams += fmt.Sprintf(`{"prisma__type":"decimal","prisma__value":%q}`, string(data))
-		case json.RawMessage, raw.JSON, *raw.JSON:
+		case json.RawMessage, *json.RawMessage, raw.JSON, *raw.JSON:
 			encoded := base64.URLEncoding.EncodeToString(data)
 			newParams += fmt.Sprintf(`{"prisma__type":"json","prisma__value":%q}`, encoded)
-		case []byte, raw.Bytes, *raw.Bytes:
+		case []byte, *[]byte, raw.Bytes, *raw.Bytes:
 			encoded := base64.URLEncoding.EncodeToString(data)
 			newParams += fmt.Sprintf(`{"prisma__type":"bytes","prisma__value":%q}`, encoded)
 		default:
