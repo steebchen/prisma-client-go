@@ -124,4 +124,4 @@ db.Post.Or(
 
 ## Next steps
 
-In the next article, you can explore how to [fetch for multiple things](04-fetch.md) at once.
+In the next article, you can explore how to [fetch for multiple things](fetch.md) at once.

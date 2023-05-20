@@ -182,4 +182,4 @@ log.Printf("post: %+v", post)
 
 ## API reference
 
-To explore all query capabilities, check out the [API reference](reference).
+To explore all query capabilities, check out the [API reference](walkthrough).

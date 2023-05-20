@@ -51,4 +51,4 @@ posts, err := client.
 
 ## Next steps
 
-Check out a [detailed explanation on how to create records](07-create.md).
+Check out a [detailed explanation on how to create records](create.md).

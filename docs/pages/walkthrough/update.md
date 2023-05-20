@@ -67,4 +67,4 @@ updated, err := client.Comment.FindUnique(
 
 ## Next steps
 
-Learn how to [delete data](09-delete.md).
+Learn how to [delete data](delete.md).

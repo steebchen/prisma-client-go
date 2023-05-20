@@ -68,4 +68,4 @@ posts, err := client.Post.FindMany(
 
 ## Next steps
 
-We'll explore how you can query for data in the [next article](02-find.md).
+We'll explore how you can query for data in the [next article](find.md).

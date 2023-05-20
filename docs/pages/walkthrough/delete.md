@@ -36,4 +36,4 @@ deleted, err := client.Post.FindUnique(
 
 ## Next steps
 
-Learn how to [upsert documents](10-upsert.md).
+Learn how to [upsert documents](upsert.md).
