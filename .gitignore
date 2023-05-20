@@ -5,8 +5,12 @@ prisma-*
 query-engine-*
 prisma-client-go
 *.sqlite
-*.json
 *_gen.go
+
+*.json
+!docs/**/*.json
+
+docs/node_modules/
 
 # build folder for Prisma CLI binaries
 build/

@@ -2,6 +2,7 @@
 .github/
 .idea/
 build/
+docs/
 
 prisma-client-go
 schema.graphql
