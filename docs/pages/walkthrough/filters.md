@@ -121,7 +121,3 @@ db.Post.Or(
     db.Post.Content.Equals("456"),
 )
 ```
-
-## Next steps
-
-In the next article, you can explore how to [fetch for multiple things](fetch.md) at once.

@@ -3,7 +3,7 @@
 ## Docker
 
 To deploy with docker, build your dockerfile as usual, run `go generate ./...` (
-see [setting up go generate](deploy#set-up-go-generate)), and you're good to go!
+see [setting up go generate](best-practices#set-up-go-generate)), and you're good to go!
 
 We also recommend using [Go modules](https://blog.golang.org/using-go-modules), which is recommended when using Go >
 =1.13.

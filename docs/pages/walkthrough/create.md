@@ -51,7 +51,3 @@ created, err := client.Comment.CreateOne(
     db.Comment.ID.Set("post"),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-Learn how to [update data](update.md).

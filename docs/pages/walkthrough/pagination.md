@@ -60,7 +60,3 @@ selected, err := client.
 ```
 
 Also check out the [order by docs](order-by.md) to understand how you can combine cursor-based pagination with order by.
-
-## Next steps
-
-Learn how to [order queries](order-by.md).

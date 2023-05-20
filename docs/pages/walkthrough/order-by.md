@@ -48,7 +48,3 @@ posts, err := client.
         db.Post.CreatedAt.Order(db.SortOrderDesc),
     ).Exec(ctx)
 ```
-
-## Next steps
-
-Check out a [detailed explanation on how to create records](create.md).

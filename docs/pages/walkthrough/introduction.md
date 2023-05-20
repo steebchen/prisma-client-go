@@ -65,7 +65,3 @@ posts, err := client.Post.FindMany(
     db.Post.Desc.EqualsOptional(pointerVariable),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-We'll explore how you can query for data in the [next article](find.md).

@@ -33,7 +33,3 @@ deleted, err := client.Post.FindUnique(
     db.Post.ID.Equals("id"),
 ).Delete().Exec(ctx)
 ```
-
-## Next steps
-
-Learn how to [upsert documents](upsert.md).
