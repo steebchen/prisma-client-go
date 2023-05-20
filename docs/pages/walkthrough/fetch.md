@@ -44,7 +44,3 @@ for _, comment := range comments {
     log.Printf("comment: %+v", comment)
 }
 ```
-
-## Next steps
-
-Check out a [detailed explanation for pagination](pagination.md).

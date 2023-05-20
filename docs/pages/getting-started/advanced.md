@@ -25,46 +25,44 @@ We will also need to add a relation from to the post model in order to make a 1:
 model Post {
     // ...
 
+    // add this to your post model
     comments Comment[]
 }
 ```
 
-<details>
-    <summary>Expand to show full schema.prisma</summary>
+Your full schema should look like this:
 
-    ```prisma
-    datasource db {
-        // could be postgresql or mysql
-        provider = "sqlite"
-        url      = "file:dev.db"
-    }
+```prisma
+datasource db {
+    // could be postgresql or mysql
+    provider = "sqlite"
+    url      = "file:dev.db"
+}
 
-    generator db {
-        provider = "go run github.com/prisma/prisma-client-go"
-    }
+generator db {
+    provider = "go run github.com/prisma/prisma-client-go"
+}
 
-    model Post {
-        id        String    @id @default(cuid())
-        createdAt DateTime  @default(now())
-        updatedAt DateTime  @updatedAt
-        title     String
-        published Boolean
-        desc      String?
+model Post {
+    id        String    @id @default(cuid())
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    title     String
+    published Boolean
+    desc      String?
 
-        comments Comment[]
-    }
+    comments Comment[]
+}
 
-    model Comment {
-        id        String   @id @default(cuid())
-        createdAt DateTime @default(now())
-        content   String
+model Comment {
+    id        String   @id @default(cuid())
+    createdAt DateTime @default(now())
+    content   String
 
-        post   Post   @relation(fields: [postID], references: [id])
-        postID String
-    }
-    ```
-
-</details>
+    post   Post   @relation(fields: [postID], references: [id])
+    postID String
+}
+```
 
 Whenever you make changes to your model, migrate your database and re-generate your prisma code:
 

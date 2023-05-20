@@ -82,7 +82,3 @@ Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will 
 ```go
 count, err := client.Prisma.ExecuteRaw(`UPDATE "Post" SET title = $1 WHERE id = $2`, "my post", "123").Exec(ctx)
 ```
-
-## Next steps
-
-Ensure consistency with [transactions](transactions.md).
