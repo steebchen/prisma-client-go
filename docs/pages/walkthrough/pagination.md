@@ -59,8 +59,8 @@ selected, err := client.
     Exec(ctx)
 ```
 
-Also check out the [order by docs](06-order-by.md) to understand how you can combine cursor-based pagination with order by.
+Also check out the [order by docs](order-by.md) to understand how you can combine cursor-based pagination with order by.
 
 ## Next steps
 
-Learn how to [order queries](06-order-by.md).
+Learn how to [order queries](order-by.md).

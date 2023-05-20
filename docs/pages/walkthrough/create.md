@@ -54,4 +54,4 @@ created, err := client.Comment.CreateOne(
 
 ## Next steps
 
-Learn how to [update data](08-update.md).
+Learn how to [update data](update.md).

@@ -48,4 +48,4 @@ _, err := client.Post.FindUnique(
 
 ## Next steps
 
-Learn how to write high quality unit tests with [native mocks](17-mocks.md).
+Learn how to write high quality unit tests with [native mocks](mocks.md).

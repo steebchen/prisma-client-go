@@ -47,4 +47,4 @@ for _, comment := range comments {
 
 ## Next steps
 
-Check out a [detailed explanation for pagination](05-pagination.md).
+Check out a [detailed explanation for pagination](pagination.md).

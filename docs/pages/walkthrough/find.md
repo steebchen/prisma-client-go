@@ -83,7 +83,7 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-To explore more query filters, see [all possible query filters](03-filters.md).
+To explore more query filters, see [all possible query filters](filters.md).
 
 ### Querying for relations
 
@@ -99,8 +99,8 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-To explore querying for relations in detail, see [more relation query examples](11-relations.md).
+To explore querying for relations in detail, see [more relation query examples](relations.md).
 
 ## Next steps
 
-Read the next article [query filters](03-filters.md) to explore how to form more complex queries.
+Read the next article [query filters](filters.md) to explore how to form more complex queries.

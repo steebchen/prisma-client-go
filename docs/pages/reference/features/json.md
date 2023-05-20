@@ -92,4 +92,4 @@ For more information about all json filters and more example queries, check out 
 
 ## Next steps
 
-Check out how to [dynamically ignore fields](16-if-present-methods.md).
+Check out how to [dynamically ignore fields](if-present-methods.md).

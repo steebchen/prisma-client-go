@@ -38,4 +38,4 @@ post, err := client.Post.UpsertOne(
 
 ## Next steps
 
-Check out the details of [querying for relations](11-relations.md).
+Check out the details of [querying for relations](relations.md).
