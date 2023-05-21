@@ -10,8 +10,6 @@ prisma-client-go
 *.json
 !docs/**/*.json
 
-docs/node_modules/
-
 # build folder for Prisma CLI binaries
 build/
 
