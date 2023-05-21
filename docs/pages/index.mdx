@@ -1,27 +1,38 @@
-import { Callout } from 'nextra-theme-docs'
+import {
+  Callout,
+  Card,
+  Cards,
+} from 'nextra-theme-docs'
 
 # Prisma Go Client Docs
 ### Typesafe database access for Go
 
 **Welcome to the Prisma Go client’s docs!**
 
-You'll find everything you need here, including a search.
+You'll find everything you need here to get work with the Prisma Go client.
 If you can't find anything or have any questions, please [open an issue](https://github.com/prisma/prisma-client-go/issues/new/choose)!
 
-You can always use the search in the top right corner or press `CMD+K` / `CTRL+K` to look for anything.
+You can always use the search in the top right corner or press `CMD+K` / `CTRL+K` to look for anything specific.
 
 <Callout type="info" emoji="ℹ️">
-  <b>Dedicated help available</b> If you need help or consultation to set up the best Go database client, I offer
-  consulting to answer all your concerns and questions, and get you running in no time.
-  [Get in touch!](mailto:contact@luca-steeb.com?subject=Prisma%20Go%20Client%20Consulting)
+  <b>Sponsors & Consulting</b> I'm looking for [sponsors](https://github.com/sponsors/steebchen) to be able to work on the Go client full time. I also offer consulting to answer all your concerns and questions, help you set everything up and more. [Get in touch!](mailto:contact@luca-steeb.com?subject=Prisma%20Go%20Client%20Consulting)
 </Callout>
 
-### Table of contents
+### Getting started
 
-- [Quickstart](getting-started)
-- [Walkthrough](walkthrough)
-- [Deploy](deploy/deploy)
-- [Features](features/index)
+<Cards className="flex flex-wrap">
+  <Card href="./getting-started/quickstart" icon={''} title={'Quickstart'} arrow={true}/>
+  <Card href="./walkthrough/introduction" icon={''} title={'Walkthrough'} arrow={true}/>
+  <Card href="./reference/features" icon={''} title={'Features'} arrow={true}/>
+  <Card href="./reference/deploy" icon={''} title={'Deploy'} arrow={true}/>
+</Cards>
+
+### Help & Support
+
+<Cards className="flex flex-wrap">
+  <Card href="./community" icon={''} title={'Bug reports & feature requests'} arrow={true}/>
+  <Card href="./community" icon={''} title={'Community'} arrow={true}/>
+</Cards>
 
 ---
 
