@@ -49,7 +49,7 @@
     To get this up and running in your database, we use the Prisma migration
     tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate our database:
 
-     ```shell script
+    ```shell script
     # sync the database with your schema
     go run github.com/prisma/prisma-client-go migrate dev --name init
     ```
