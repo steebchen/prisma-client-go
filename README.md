@@ -8,26 +8,26 @@
         <span>&nbsp;&nbsp;</span>
         <a href="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml"><img src="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml/badge.svg" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="#contributing"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
+        <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
         <span>&nbsp;&nbsp;</span>
         <a href="./LICENSE"><img src="https://img.shields.io/github/license/prisma/prisma-client-go" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="https://slack.prisma.io/"><img src="https://img.shields.io/badge/chat-on%20slack-blue.svg" /></a>
+        <a href="https://slack.prisma.io/"><img src="https://img.shields.io/badge/asdf%20slack-blue.svg" /></a>
     </div>
     <div>
-        <a href="./docs/quickstart.md">Quickstart</a>
+        <a href="https://goprisma.org/docs/getting-started/quickstart">Quickstart</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://www.prisma.io/">Website</a>
+        <a href="https://www.prisma.io/">Prisma Core</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="./docs">Docs</a>
+        <a href="https://goprisma.org/docs">Docs</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="./docs/reference">API reference</a>
+        <a href="https://goprisma.org/docs/reference">API reference</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
         <a href="https://www.prisma.io/blog">Blog</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://slack.prisma.io/">Slack</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
         <a href="https://twitter.com/prisma">Twitter</a>
+        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+        <a href="https://goprisma.org/docs/community">Community</a>
     </div>
 </div>
 
@@ -41,9 +41,9 @@ It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides da
 
 ## Getting started
 
-To get started, [**read our quickstart tutorial**](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
+To get started, [**read our quickstart tutorial**](https://goprisma.org/docs/getting-started/quickstart) to add Prisma to your project in just a few minutes.
 
-You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference).
+You also might want to read [deployment tips](https://goprisma.org/docs/reference/deploy) and the [full API reference](https://goprisma.org/docs/reference).
 
 ## Status
 
@@ -51,7 +51,7 @@ The Go client is currently maintained by @steebchen and considered to be in alph
 
 ## Contributing
 
-Check out our [advanced contributing guide](./CONTRIBUTING.md).
+Check out our [advanced contributing guide](./CONTRIBUTING).
 
 ## Security
 
