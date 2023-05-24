@@ -89,7 +89,3 @@ actual, err := client.User.FindFirst(
 ```
 
 For more information about all json filters and more example queries, check out the [Prisma JSON filters documentation](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields).
-
-## Next steps
-
-Check out how to [dynamically ignore fields](if-present-methods.md).

@@ -35,7 +35,3 @@ post, err := client.Post.UpsertOne(
     db.Post.Views.Increment(1),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-Check out the details of [querying for relations](relations.md).

@@ -83,7 +83,3 @@ if err := client.Prisma.Transaction(b, a).Exec(ctx); err != nil {
     panic(err)
 }
 ```
-
-## Next steps
-
-Check out how to use [json fields](15-json.md).

@@ -61,7 +61,3 @@ users, err := client.User.FindMany(
     ),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-Explore working with [scalar lists](12-scalar-lists.md).

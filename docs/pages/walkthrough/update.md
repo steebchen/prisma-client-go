@@ -64,7 +64,3 @@ updated, err := client.Comment.FindUnique(
     db.Comment.Post.Unlink(),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-Learn how to [delete data](delete.md).
