@@ -54,7 +54,3 @@ post, err := client.Post.FindUnique(
 ### Notes
 
 NULL values in scalar lists [may need extra consideration](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-scalar-lists-arrays#filtering-scalar-lists).
-
-## Next steps
-
-If the Go client shouldn't support a query you need to do, read how you can use [raw SQL queries](13-raw.md).

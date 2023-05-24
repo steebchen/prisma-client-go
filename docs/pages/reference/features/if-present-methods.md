@@ -45,7 +45,3 @@ _, err := client.Post.FindUnique(
     db.Post.Content.SetIfPresent(&newContent),
 ).Exec(ctx)
 ```
-
-## Next steps
-
-Learn how to write high quality unit tests with [native mocks](mocks.md).
