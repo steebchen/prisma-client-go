@@ -29,8 +29,3 @@ h1 + h2, h2 + h3, h1 + h3 {
   /*noinspection CssUnresolvedCustomProperty*/
   color: hsl(var(--nextra-primary-hue) 100% 45%/var(--tw-text-opacity)) !important;
 }
-
-html.dark .nextra-sidebar-container li:not(.active) > a, html.dark .nextra-sidebar-container li:not(.active) > button {
-  /* improve sidebar link contrast on dark theme */
-  color: #a4a4a4 !important;
-}
