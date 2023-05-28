@@ -19,7 +19,7 @@ const PrismaVersion = "4.14.1"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engines/commits/master
-const EngineVersion = "272861e07ab64f234d3ffc4094e32bd61775599c"
+const EngineVersion = "e078aa75c40550d826bc35aeee4f45582fb4165e"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
