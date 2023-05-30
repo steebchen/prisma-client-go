@@ -53,7 +53,7 @@ posts, err := client.Post.FindMany(
 ).Exec(ctx)
 ```
 
-This schema is consistently used. You can usually just type `db.` and then see what models, fields and actions your editor auto completion will suggest. Depending on the type or the shape of a model or a field, there may be different actions available. If a field is optional, you will also get additional
+This schema is consistently used. You can usually just type `db.` and then see what models, fields and actions your editor auto-completion will suggest. Depending on the type or the shape of a model or a field, there may be different actions available. If a field is optional, you will also get additional
 methods such as IsNull() and *Optional variations to query for SQL NULLs:
 
 ```go

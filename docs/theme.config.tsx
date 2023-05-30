@@ -1,7 +1,7 @@
 import { DocsThemeConfig } from 'nextra-theme-docs'
 
 export default {
-  logo: <span>Prisma Client Go</span>,
+  logo: <span>Go Prisma</span>,
   project: {
     link: 'https://github.com/prisma/prisma-client-go',
   },

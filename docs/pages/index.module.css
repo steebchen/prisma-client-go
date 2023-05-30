@@ -1,0 +1,89 @@
+.container {
+  padding: 4rem 0;
+
+  /* centering shenanigans */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.jumbotron {
+  max-width: 500px;
+}
+
+.heading p {
+  font-size: 2.2rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.subheading {
+  margin-top: 2rem;
+}
+
+.subheading > p {
+  font-weight: 400;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+a.btnPrimary, a.btnSecondary {
+  margin-top: 1.5rem;
+  display: inline-block;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.2s ease;
+  -webkit-user-drag: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+a.btnPrimary, a.btnSecondary {
+  background: linear-gradient(to bottom, #238aff, #0077ff);
+  color: white;
+  text-shadow: 0 1px 1px #00387838;
+  box-shadow: 0 1px 2px #00295738;
+}
+
+a.btnPrimary span, a.btnSecondary span {
+  display: inline-block;
+  transition: all 0.2s ease;
+}
+
+a.btnPrimary:hover span, a.btnSecondary:hover span {
+  transform: translateX(3px);
+}
+
+a.btnPrimary:active span, a.btnSecondary:active span {
+  transform: translateX(5px);
+}
+
+a.btnPrimary:focus-visible span, a.btnSecondary:focus-visible span {
+  transform: translateX(3px);
+}
+
+a.btnPrimary:active, a.btnSecondary:active {
+  box-shadow: 0 1px 3px #00295738;
+  filter: brightness(0.95);
+}
+
+a.btnPrimary:hover {
+  box-shadow: 0 5px 30px -10px #0078ffab;
+  filter: brightness(1.05);
+}
+
+a.btnSecondary:hover {
+  box-shadow: 0 5px 30px -10px rgba(196, 196, 196, 0.67);
+  filter: brightness(1.05);
+}
+
+a.btnSecondary {
+  background: white;
+  color: black;
+}
