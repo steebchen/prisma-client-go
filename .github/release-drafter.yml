@@ -4,8 +4,16 @@ exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
   - 'ci'
+  - 'chore'
 exclude-contributors:
   - 'dependabot[bot]'
+autolabeler:
+  - label: 'ci'
+    branch:
+      - '/ci\/.+/'
+  - label: 'chore'
+    branch:
+      - '/chore\/.+/'
 template: |
   # v$NEXT_MINOR_VERSION
 
