@@ -10,6 +10,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.gotpl'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '**/*.work'
+
       - uses: actions/setup-go@v4
         with:
           go-version: '1.19'
@@ -23,10 +34,13 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
       - name: deps
+        if: steps.changes.outputs.go == 'true'
         run: go mod download
 
       - name: setup & generate
+        if: steps.changes.outputs.go == 'true'
         run: go generate -tags setup ./...
 
       - name: test
+        if: steps.changes.outputs.go == 'true'
         run: go test ./... -v
