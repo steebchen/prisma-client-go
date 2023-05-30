@@ -1,11 +1,14 @@
 {
-  "index": "Home",
-  "getting-started": "Getting Started",
-  "walkthrough": "Walkthrough",
-  "reference": "Reference",
-  "help": "Help",
-  "community": "Community",
-  "README": {
+  "index": {
+    "type": "page",
+    "display": "hidden",
+    "theme": {
+      "layout": "full"
+    }
+  },
+  "docs": {
+    "type": "page",
+    "title": "Documentation",
     "display": "hidden"
   }
 }

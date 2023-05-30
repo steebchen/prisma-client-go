@@ -3,16 +3,4 @@ const withNextra = require('nextra')({
   themeConfig: './theme.config.tsx',
 })
 
-module.exports = withNextra({
-  basePath: '/docs',
-  redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/docs',
-        basePath: false,
-        permanent: false,
-      },
-    ]
-  },
-})
+module.exports = withNextra({})
