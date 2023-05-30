@@ -1,6 +1,8 @@
 name-template: v$NEXT_MINOR_VERSION
 sort-direction: ascending
-
+exclude-labels:
+  - 'skip-changelog'
+  - 'dependencies'
 template: |
   # v$NEXT_MINOR_VERSION
 
