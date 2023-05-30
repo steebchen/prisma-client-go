@@ -26,6 +26,7 @@ jobs:
         run: go mod download
 
       - name: generate
+        if: steps.changes.outputs.go == 'true'
         run: |
           cd test/e2e/
           go generate -tags e2e ./...
@@ -33,6 +34,7 @@ jobs:
         #   DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}
 
       - name: test
+        if: steps.changes.outputs.go == 'true'
         run: |
           cd test/e2e/
           go test ./... -run '^TestE2E.*$' -tags e2e -v
