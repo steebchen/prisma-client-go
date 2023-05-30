@@ -3,6 +3,7 @@ sort-direction: ascending
 exclude-labels:
   - 'skip-changelog'
   - 'dependencies'
+  - 'ci'
 template: |
   # v$NEXT_MINOR_VERSION
 
