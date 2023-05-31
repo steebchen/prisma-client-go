@@ -5,7 +5,6 @@ on:
       - main
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go release-draft.yml"
-
 jobs:
   update-release-draft:
     runs-on: ubuntu-latest
