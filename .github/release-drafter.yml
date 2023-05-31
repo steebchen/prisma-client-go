@@ -1,19 +1,53 @@
 name-template: v$NEXT_MINOR_VERSION
 sort-direction: ascending
+categories:
+  - title: '🚀 Features'
+    collapse-after: 3
+    labels:
+      - 'dependencies'
+  - title: '🐛 Bugfixes'
+    collapse-after: 3
+    labels:
+      - 'dependencies'
+  - title: '🧰 Chore'
+    collapse-after: 3
+    labels:
+      - 'dependencies'
+  - title: '⬆️ Dependencies'
+    collapse-after: 3
+    labels:
+      - 'dependencies'
 exclude-labels:
   - 'skip-changelog'
-  - 'dependencies'
-  - 'ci'
-  - 'chore'
 exclude-contributors:
+  - 'dependabot'
   - 'dependabot[bot]'
 autolabeler:
-  - label: 'ci'
+  - label: 'kind/ci'
+    title:
+      - '/^ci.+/$'
     branch:
-      - '/ci\/.+/'
-  - label: 'chore'
+      - '/^ci\/.+/$'
+  - label: 'kind/feature'
+    title:
+      - '/^feat.+/$'
     branch:
-      - '/chore\/.+/'
+      - '/^feat\/.+/$'
+  - label: 'kind/fix'
+    title:
+      - '/^fix.+/$'
+    branch:
+      - '/^fix\/.+/$'
+  - label: 'kind/chore'
+    title:
+      - '/^chore.+/$'
+    branch:
+      - '/^chore\/.+/$'
+  - label: 'kind/refactor'
+    title:
+      - '/^refactor.+/$'
+    branch:
+      - '/^refactor\/.+/$'
 template: |
   # v$NEXT_MINOR_VERSION
 
@@ -30,3 +64,7 @@ template: |
   ## Contributors
 
   $CONTRIBUTORS
+  
+  ----
+  
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION
