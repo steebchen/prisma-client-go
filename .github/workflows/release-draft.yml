@@ -9,11 +9,16 @@ on:
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go release-draft.yml"
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 jobs:
   update-release-draft:
     runs-on: ubuntu-latest
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
     steps:
       - uses: release-drafter/release-drafter@v5
         with:
