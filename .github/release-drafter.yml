@@ -4,15 +4,15 @@ categories:
   - title: '🚀 Features'
     collapse-after: 3
     labels:
-      - 'dependencies'
+      - 'kind/feature'
   - title: '🐛 Bugfixes'
     collapse-after: 3
     labels:
-      - 'dependencies'
+      - 'kind/fix'
   - title: '🧰 Chore'
     collapse-after: 3
     labels:
-      - 'dependencies'
+      - 'kind/chore'
   - title: '⬆️ Dependencies'
     collapse-after: 3
     labels:
