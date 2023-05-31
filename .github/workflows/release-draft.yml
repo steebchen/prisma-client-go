@@ -8,6 +8,9 @@ env:
 jobs:
   update-release-draft:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
     steps:
       - uses: release-drafter/release-drafter@v5
         with:
