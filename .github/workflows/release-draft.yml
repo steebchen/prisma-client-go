@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    # Only following types are handled by the action, but one can default to all as well
+    types: [opened, reopened, synchronize]
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go release-draft.yml"
 permissions:
