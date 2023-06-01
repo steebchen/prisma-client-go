@@ -5,16 +5,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.3.0
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/docs/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.md', '**.mdx', '**.[jt]sx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.md', '**.mdx', '**.[jt]sx') }}
+            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-
       - uses: pnpm/action-setup@v2
         with:
           version: 8.6.0
-          run_install: false
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: pnpm
           cache-dependency-path: ./docs/pnpm-lock.yaml
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
         working-directory: ./docs
       - run: pnpm test
         working-directory: ./docs
