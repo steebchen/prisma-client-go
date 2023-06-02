@@ -92,7 +92,7 @@ func FetchEngine(toDir string, engineName string, binaryPlatformName string) err
 
 	binaryPlatformRemoteName := binaryPlatformName
 	if binaryPlatformRemoteName == "linux" {
-		binaryPlatformRemoteName = "linux-musl"
+		binaryPlatformRemoteName = "linux-static-x64"
 	}
 	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
 
