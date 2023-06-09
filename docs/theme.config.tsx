@@ -5,16 +5,14 @@ export default {
   project: {
     link: 'https://github.com/prisma/prisma-client-go',
   },
+  head: null,
   docsRepositoryBase: 'https://github.com/prisma/prisma-client-go/tree/main/docs',
   footer: {
     text: (
       <span>
-        All source code and content licensed under
+        All source code and content licensed under&nbsp;
         <a href="https://github.com/prisma/prisma-client-go/blob/main/LICENSE" target="_blank">
           Apache 2.0
-        </a>
-        <a href="https://goprisma.org" target="_blank">
-          Prisma Client Go
         </a>
       </span>
     ),
@@ -22,6 +20,14 @@ export default {
   useNextSeoProps() {
     return {
       titleTemplate: '%s – Prisma Client Go',
+      description: 'Prisma Client Go is an auto-generated and fully type-safe database client',
+      openGraph: {
+        type: 'website',
+        url: 'https://goprisma.org',
+        description: 'Prisma Client Go is an auto-generated and fully type-safe database client',
+        site_name: 'Go Prisma',
+        title: 'Prisma Client Go',
+      },
     }
   },
   sidebar: {
