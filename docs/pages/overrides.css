@@ -1,23 +1,23 @@
 /* Some overrides for the default docs template styling */
 /* Ideally we'd integrate these directly in the nextra docs starter */
 
-h1 {
+article h1 {
   font-weight: 800 !important;
 }
 
-h2 {
+article h2 {
   font-weight: 700 !important;
 }
 
-h3 {
+article h3 {
   font-weight: 600 !important;
 }
 
-h2, h3 {
+article h2, article h3 {
   margin: 2rem 0 0 !important;
 }
 
-h1 + h2, h2 + h3, h1 + h3 {
+article h1 + h2, article h2 + h3, article h1 + h3 {
   margin: 0.5rem 0 0 !important;
 }
 
