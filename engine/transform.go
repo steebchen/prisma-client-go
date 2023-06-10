@@ -4,9 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"time"
-
-	"github.com/prisma/prisma-client-go/logger"
 )
 
 // transformResponse for raw queries
@@ -15,17 +12,10 @@ import (
 // ->
 // ["asdf", null]
 func transformResponse(data []byte) ([]byte, error) {
-	start := time.Now()
-	defer func() {
-		logger.Debug.Printf("[timing] transform response took %s", time.Since(start))
-	}()
-
 	var m interface{}
 	if err := json.Unmarshal(data, &m); err != nil {
 		return nil, err
 	}
-
-	logger.Debug.Printf("query transform before: %s", string(data))
 
 	forEachValue(&m, func(k *string, i *int, v *interface{}) (interface{}, bool) {
 		if v == nil {
@@ -47,7 +37,6 @@ func transformResponse(data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("transform response marshal: %w", err)
 	}
-	logger.Debug.Printf("query transform after: %s", out)
 
 	return out, nil
 }
