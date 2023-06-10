@@ -27,7 +27,7 @@ func BinaryPlatformName() string {
 	distro := getLinuxDistro()
 
 	if distro == "alpine" {
-		return "linux-musl"
+		return "linux-static-x64"
 	}
 
 	ssl := getOpenSSL()

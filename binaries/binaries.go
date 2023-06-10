@@ -15,11 +15,11 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "4.7.1"
+const PrismaVersion = "4.15.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engines/commits/master
-const EngineVersion = "272861e07ab64f234d3ffc4094e32bd61775599c"
+const EngineVersion = "70a9adfd11f836696eca398396544fe07a8d8edb"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
 var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
@@ -38,12 +38,6 @@ var Engines = []Engine{{
 }, {
 	"migration-engine",
 	"PRISMA_MIGRATION_ENGINE_BINARY",
-}, {
-	"introspection-engine",
-	"PRISMA_INTROSPECTION_ENGINE_BINARY",
-}, {
-	"prisma-fmt",
-	"PRISMA_FMT_BINARY",
 }}
 
 // init overrides URLs if env variables are specific for debugging purposes and to
@@ -98,7 +92,7 @@ func FetchEngine(toDir string, engineName string, binaryPlatformName string) err
 
 	binaryPlatformRemoteName := binaryPlatformName
 	if binaryPlatformRemoteName == "linux" {
-		binaryPlatformRemoteName = "linux-musl"
+		binaryPlatformRemoteName = "linux-static-x64"
 	}
 	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
 
