@@ -1,0 +1,5 @@
+# ignore specific generated schema files
+schema.out.prisma
+
+# ignore local env file to run e2e tests
+e2e.env

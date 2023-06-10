@@ -65,7 +65,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","roleID":null,"role":null,"posts":[{"id":"a","title":"common","content":"a","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null}],"comments":null}`
+			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","authorID":"relations"},{"id":"b","title":"common","content":"b","authorID":"relations"}]}`
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
@@ -142,7 +142,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "find by same field fail",
+		name: "find by same field override",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -206,9 +206,9 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Category.Where(
-						Category.Weight.GT(3),
-						Category.Weight.LTE(3), // <- this needs to fail this part of the query, so no posts will be fetched
-						Category.Weight.LT(10),
+						Category.Weight.Gt(3),
+						Category.Weight.Lte(3), // <- this needs to fail this part of the query, so no posts will be fetched
+						Category.Weight.Lt(10),
 					),
 				),
 			).Exec(ctx)
@@ -295,10 +295,10 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Category.Where(
-						Category.Weight.GT(1),
-						Category.Weight.GTE(5),
-						Category.Weight.LTE(5),
-						Category.Weight.LT(10),
+						Category.Weight.Gt(1),
+						Category.Weight.Gte(5),
+						Category.Weight.Lte(5),
+						Category.Weight.Lt(10),
 					),
 				).With(
 					Post.Category.Fetch(),
@@ -678,6 +678,103 @@ func TestRelations(t *testing.T) {
 			}
 
 			assert.Equal(t, expectedEmpty, actual)
+		},
+	}, {
+		name: "unlink many",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "user",
+					email: "john@example.com",
+					username: "johndoe",
+					name: "John",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneCategory(data: {
+					id: "stuff",
+					name: "Stuff",
+					posts: {
+						create: [{
+							id: "a",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "b",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}, {
+							id: "c",
+							title: "common",
+							author: {
+								connect: {
+									id: "user",
+								},
+							},
+						}],
+					},
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			categoryID := "stuff"
+			actual, err := client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Update(
+				Category.Posts.Unlink(
+					Post.ID.Equals("a"),
+					Post.ID.Equals("c"),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expectedAfter := &CategoryModel{
+				InnerCategory: InnerCategory{
+					ID:   "stuff",
+					Name: "Stuff",
+				},
+				RelationsCategory: RelationsCategory{
+					Posts: []PostModel{{
+						InnerPost: InnerPost{
+							ID:         "b",
+							Title:      "common",
+							AuthorID:   "user",
+							CategoryID: &categoryID,
+						},
+					}},
+				},
+			}
+
+			assert.Equal(t, expectedAfter, actual)
+
+			actual, err = client.Category.FindUnique(
+				Category.ID.Equals(categoryID),
+			).With(
+				Category.Posts.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			assert.Equal(t, expectedAfter, actual)
 		},
 	}, {
 		name: "update and fetch",
@@ -1240,7 +1337,7 @@ func TestRelations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

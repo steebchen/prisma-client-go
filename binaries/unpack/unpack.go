@@ -2,7 +2,6 @@ package unpack
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"time"
@@ -15,29 +14,43 @@ import (
 // TODO check checksum after expanding file
 
 // noinspection GoUnusedExportedFunction
-func Unpack(data []byte, name string) {
+func Unpack(data []byte, name string, version string) {
 	start := time.Now()
 
-	file := fmt.Sprintf("prisma-query-engine-%s", name)
+	filename := fmt.Sprintf("prisma-query-engine-%s", name)
 
 	// TODO check if dev env/dev binary in ~/.prisma
 	// TODO check if engine in local dir OR env var
 
-	tempDir := binaries.GlobalUnpackDir()
+	tempDir := binaries.GlobalUnpackDir(version)
 
-	dir := platform.CheckForExtension(platform.Name(), path.Join(tempDir, file))
+	file := platform.CheckForExtension(platform.Name(), path.Join(tempDir, filename))
 
-	if err := os.MkdirAll(tempDir, os.ModePerm); err != nil {
+	if err := os.MkdirAll(tempDir, 0750); err != nil {
 		panic(fmt.Errorf("mkdirall failed: %w", err))
 	}
 
-	if _, err := os.Stat(dir); err == nil {
+	if _, err := os.Stat(file); err == nil {
 		logger.Debug.Printf("query engine exists, not unpacking. %s", time.Since(start))
 		return
 	}
 
-	if err := ioutil.WriteFile(dir, data, os.ModePerm); err != nil {
-		panic(fmt.Errorf("unpack write file: %w", err))
+	f, err := os.Create(file)
+	if err != nil {
+		panic(fmt.Errorf("generate open go file: %w", err))
 	}
-	logger.Debug.Printf("unpacked at %s in %s", dir, time.Since(start))
+
+	if _, err := fmt.Fprintf(f, "%s", string(data)); err != nil {
+		panic(err)
+	}
+
+	if err := f.Close(); err != nil {
+		panic(err)
+	}
+
+	if err := os.Chmod(file, os.ModePerm); err != nil {
+		panic(fmt.Errorf("could not chmod +x %s: %w", file, err))
+	}
+
+	logger.Debug.Printf("unpacked at %s in %s", file, time.Since(start))
 }

@@ -8,22 +8,23 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
     title     String
     content   String?
+    desc      String?
 
     comments Comment[]
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -61,7 +62,7 @@ posts, err := client.Post.FindMany(
     db.Post.Title.Contains("hi"),
     db.Post.Content.IsNull(),
     db.Post.Desc.Contains(variable),
-    db.Post.Desc.ContainsOptional(pointerVariable),
+    db.Post.Desc.EqualsOptional(pointerVariable),
 ).Exec(ctx)
 ```
 

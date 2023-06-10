@@ -1,26 +1,28 @@
 package logger
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 )
 
+const flag = log.Ldate | log.Lmicroseconds
+
 // TODO add log levels
 
-var v = os.Getenv("PHOTON_GO_LOG")
+var v = os.Getenv("PRISMA_CLIENT_GO_LOG")
 var Enabled = v != ""
 
 var Debug *log.Logger
 var Info *log.Logger
 
 func init() {
-	discard := log.New(ioutil.Discard, "", 0)
+	discard := log.New(io.Discard, "", 0)
 
 	Debug = discard
 	if Enabled {
-		Debug = log.New(os.Stdout, "debug: ", log.Flags())
+		Debug = log.New(os.Stdout, "[prisma-client-go] DEBUG: ", flag)
 	}
 
-	Info = log.New(os.Stdout, "info: ", log.Flags())
+	Info = log.New(os.Stdout, "[prisma-client-go] INFO: ", flag)
 }

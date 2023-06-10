@@ -1,6 +1,6 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
-{{ range $model := $.DMMF.Datamodel.Models }}
+{{ range $model := $.AST.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
 	{{ $nameUpper := $model.Name.GoCase }}
 	{{ $nsQuery := (print $name "Query") }}
@@ -12,32 +12,36 @@
 	// {{ $nsQuery }} exposes query functions for the {{ $name }} model
 	type {{ $nsQuery }} struct {
 		{{- range $field := $model.Fields }}
-			{{/* Filter non-relations only for now */}}
+			{{/* ReadFilter non-relations only for now */}}
+			{{ $name := $field.Name.GoCase }}
+			{{ if $field.Prisma }}
+				{{ $name = $field.Name.PrismaGoCase }}
+			{{ end }}
 			{{- if $field.Kind.IncludeInStruct -}}
-				// {{ $field.Name.GoCase }}
+				// {{ $name }}
 				//
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				{{- if $field.IsUnique }}
 					// @unique
 				{{- end }}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
+				{{ $name }} {{ $nsQuery }}{{ $field.Name.GoCase }}{{ $field.Type }}
 			{{ end }}
 
 			{{- if $field.Kind.IsRelation }}
-				{{ $field.Name.GoCase }} {{ $nsQuery }}{{ $field.Name.GoCase }}Relations
+				{{ $name }} {{ $nsQuery }}{{ $name }}Relations
 			{{ end }}
 		{{- end }}
 	}
 
 	{{ range $op := $.DMMF.Operators }}
-		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}WhereParam) {{ $name }}Param {
+		func ({{ $nsQuery }}) {{ $op.Name }}(params ...{{ $nameUpper }}WhereParam) {{ $name }}DefaultParam {
 			var fields []builder.Field
 
 			for _, q := range params {
 				fields = append(fields, q.field())
 			}
 
-			return {{ $name }}Param{
+			return {{ $name }}DefaultParam{
 				data: builder.Field{
 					Name:     "{{ $op.Action }}",
 					List:     true,
@@ -49,7 +53,7 @@
 	{{ end }}
 
 	{{/* composite keys for FindUnique */}}
-	{{ range $unique := $model.CompositeIndexes }}
+	{{ range $unique := $model.Indexes }}
 		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
@@ -63,7 +67,7 @@
 
 			return {{ $model.Name.GoLowerCase }}EqualsUniqueParam{
 				data: builder.Field{
-					Name:   "{{ $unique.ASTName }}",
+					Name:   "{{ $unique.InternalName }}",
 					Fields: builder.TransformEquals(fields),
 				},
 			}
@@ -93,25 +97,20 @@
 				// @{{ if $field.IsRequired }}required{{ else }}optional{{ end }}
 				func ({{ $nsQuery }}{{ $field.Name.GoCase }}Relations) {{ $method.Name }}(
 					params ...{{ $field.Type.GoCase }}WhereParam,
-				) {{ $name }}Param {
+				) {{ $name }}DefaultParam {
 					var fields []builder.Field
 
 					for _, q := range params {
 						fields = append(fields, q.field())
 					}
 
-					return {{ $name }}Param{
+					return {{ $name }}DefaultParam{
 						data: builder.Field{
 							Name:   "{{ $field.Name }}",
 							Fields: []builder.Field{
 								{
-									Name: "{{ $method.Action }}",
-									Fields: []builder.Field{builder.Field{
-										Name:     "AND",
-										List:     true,
-										WrapList: true,
-										Fields:   fields,
-									}},
+									Name:   "{{ $method.Action }}",
+									Fields: fields,
 								},
 							},
 						},
@@ -149,12 +148,7 @@
 					if len(where) > 0 {
 						v.query.Inputs = append(v.query.Inputs, builder.Input{
 							Name:   "where",
-							Fields: []builder.Field{builder.Field{
-								Name:     "AND",
-								List:     true,
-								WrapList: true,
-								Fields:   where,
-							}},
+							Fields: where,
 						})
 					}
 				{{ end }}
@@ -197,64 +191,90 @@
 				}
 			}
 
-			{{ if not $field.IsRequired }}
-				func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Unlink() {{ $setReturnStruct }} {
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name: "{{ $field.Name }}",
-							Fields: []builder.Field{
-								{
-									Name:  "disconnect",
-									Value: true,
+			{{ if or (not $field.IsRequired) (ne $field.RelationName "") }}
+				func (r {{ $nsQuery }}{{ $field.Name.GoCase }}Relations) Unlink(
+					{{ if $field.IsList }}params ...{{ $field.Type.GoCase }}WhereParam,{{ end }}
+				) {{ $setReturnStruct }} {
+					var v {{ $setReturnStruct }}
+					{{ if $field.IsList }}
+						var fields []builder.Field
+						for _, q := range params {
+							fields = append(fields, q.field())
+						}
+						v = {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name: "{{ $field.Name }}",
+								Fields: []builder.Field{
+									{
+										Name:     "disconnect",
+										List:     true,
+										WrapList: true,
+										Fields:   builder.TransformEquals(fields),
+									},
 								},
 							},
-						},
-					}
+						}
+					{{ else }}
+						v = {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name: "{{ $field.Name }}",
+								Fields: []builder.Field{
+									{
+										Name:  "disconnect",
+										Value: true,
+									},
+								},
+							},
+						}
+					{{ end }}
+					return v
 				}
 			{{ end }}
 		{{ end }}
 
 		{{ if $field.Kind.IncludeInStruct }}
-			// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-			func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-				{{ if $field.IsList }}
-					if value == nil {
-						value = []{{ $field.Type.Value }}{}
-					}
-				{{ end }}
-				{{/* if scalar list (only postgres) */}}
-				{{ if $field.IsList }}
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Fields: []builder.Field{
-								builder.Field{
-									Name:   "set",
-									Value:  value,
+			{{ if not $field.Prisma }}
+				// Set the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+				func (r {{ $struct }}) Set(value {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					{{ if $field.IsList }}
+						if value == nil {
+							value = []{{ $field.Type.Value }}{}
+						}
+					{{ end }}
+					{{/* if scalar list (only postgres) */}}
+					{{ if $field.IsList }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Fields: []builder.Field{
+									builder.Field{
+										Name:   "set",
+										Value:  value,
+									},
 								},
 							},
-						},
-					}
-				{{ else }}
-					return {{ $setReturnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Value:  value,
-						},
-					}
-				{{ end }}
-			}
-
-			// Set the optional value of {{ $field.Name.GoCase }} dynamically
-			func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-				if value == nil {
-					return {{ $setReturnStruct }}{}
+						}
+					{{ else }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Value:  value,
+							},
+						}
+					{{ end }}
 				}
 
-				return r.Set(*value)
-			}
+				// Set the optional value of {{ $field.Name.GoCase }} dynamically
+				func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+					if value == nil {
+						return {{ $setReturnStruct }}{}
+					}
 
-			{{ if and (not $field.IsRequired) (not $field.IsList) }}
+					return r.Set(*value)
+				}
+			{{ end }}
+
+			{{ if and (not $field.IsRequired) (not $field.IsList) (not $field.Prisma) }}
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
 				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
 					if value == nil {
@@ -272,33 +292,47 @@
 				}
 			{{ end }}
 
-			{{ if not $field.IsList }}
-				{{ range $type := $.DMMF.WriteTypes }}
-					{{ if eq $field.Type $type.Name }}
-						{{ range $method := $type.Methods }}
-							// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
-							func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $setReturnStruct }} {
-								return {{ $setReturnStruct }}{
-									data: builder.Field{
-										Name:   "{{ $field.Name }}",
-										Fields: []builder.Field{
-											builder.Field{
-												Name:   "{{ $method.Action }}",
-												Value:  value,
-											},
-										},
-									},
-								}
-							}
-
-							func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
-								if value == nil {
-									return {{ $setReturnStruct }}{}
-								}
-								return r.{{ $method.Name }}(*value)
+			{{ $writeType := $.AST.WriteFilter $field.Type.String $field.IsList }}
+			{{ if $writeType }}
+				{{ range $method := $writeType.Methods }}
+					{{ $type := $method.Type.Value }}
+					{{ if eq $type "" }}
+						{{ $type = $field.Type.Value}}
+					{{ end }}
+					// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
+					func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $setReturnStruct }} {
+						{{ if $method.IsList }}
+							var fields []builder.Field
+							for _, v := range value {
+								fields = append(fields, builder.Field{
+									Value: v,
+								})
 							}
 						{{ end }}
-					{{ end }}
+						return {{ $setReturnStruct }}{
+							data: builder.Field{
+								Name:   "{{ $field.Name }}",
+								Fields: []builder.Field{
+									builder.Field{
+										Name:   "{{ $method.Action }}",
+										{{ if $method.IsList }}
+											List: true,
+											Fields: fields,
+										{{ else }}
+											Value: value,
+										{{ end }}
+									},
+								},
+							},
+						}
+					}
+
+					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+						if value == nil {
+							return {{ $setReturnStruct }}{}
+						}
+						return r.{{ $method.Name }}({{ if not $method.IsList }}*{{ end }}value)
+					}
 				{{ end }}
 			{{ end }}
 		{{ end }}
@@ -307,10 +341,10 @@
 		{{ if or ($field.IsID) ($field.IsUnique) }}
 			{{ $returnStruct = (print $name "ParamUnique") }}
 		{{ else }}
-			{{ $returnStruct = (print $name "Param") }}
+			{{ $returnStruct = (print $name "DefaultParam") }}
 		{{ end }}
 
-		{{ if $field.Kind.IncludeInStruct }}
+		{{ if and $field.Kind.IncludeInStruct (not $field.Prisma) }}
 			{{/* Provide an `Equals` method for most types. */}}
 			{{/* Equals has a special return type for individual fields */}}
 			{{ $equalsReturnStruct := "" }}
@@ -345,31 +379,7 @@
 				return r.Equals({{ if not $field.IsList }}*{{ end }}value)
 			}
 
-			{{ if not $field.IsList }}
-				{{/* Provide an `In` method for most types. */}}
-				func (r {{ $struct }}) In(values []{{ $field.Type.Value }}) {{ $returnStruct }} {
-					var fields []builder.Field
-					for _, v := range values {
-						fields = append(fields, builder.Field{
-							Value: v,
-						})
-					}
-					return {{ $returnStruct }}{
-						data: builder.Field{
-							Name:   "{{ $field.Name }}",
-							Fields: []builder.Field{
-								{
-									Name:   "in",
-									List:   true,
-									Fields: fields,
-								},
-							},
-						},
-					}
-				}
-			{{ end }}
-
-			{{ if not $field.IsRequired }}
+			{{ if and (not $field.IsRequired) (not $field.Prisma) }}
 				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
 						data: builder.Field{
@@ -400,8 +410,8 @@
 				}
 			{{ end }}
 
-			func (r {{ $struct }}) Order(direction types.Direction) {{ $name }}Param {
-				return {{ $name }}Param{
+			func (r {{ $struct }}) Order(direction SortOrder) {{ $name }}DefaultParam {
+				return {{ $name }}DefaultParam{
 					data: builder.Field{
 						Name:  "{{ $field.Name }}",
 						Value: direction,
@@ -409,44 +419,63 @@
 				}
 			}
 
-			{{/* If it's a unique ID, allow using these fields as cursor queries */}}
-			{{ if or ($field.IsID) ($field.IsUnique) }}
-				func (r {{ $struct }}) Cursor(cursor {{ $field.Type.Value }}) {{ $name }}CursorParam {
-					return {{ $name }}CursorParam{
+			func (r {{ $struct }}) Cursor(cursor {{ $field.Type.Value }}) {{ $name }}CursorParam {
+				return {{ $name }}CursorParam{
+					data: builder.Field{
+						Name:  "{{ $field.Name }}",
+						Value: cursor,
+					},
+				}
+			}
+		{{ end }}
+
+		{{/* Provide field and type-specific methods. */}}
+		{{ $readType := $.AST.ReadFilter $field.Type.String $field.IsList }}
+		{{ if $readType }}
+			{{ range $method := $readType.Methods }}
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: Use {{ $method.Deprecated }} instead.
+				{{- end }}
+				{{ $type := $method.Type.Value }}
+				{{ if eq $type "" }}
+					{{ $type = $field.Type.Value}}
+				{{ end }}
+				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $returnStruct }} {
+					{{ if $method.IsList }}
+						var fields []builder.Field
+						for _, v := range value {
+							fields = append(fields, builder.Field{
+								Value: v,
+							})
+						}
+					{{ end }}
+					return {{ $returnStruct }}{
 						data: builder.Field{
-							Name:  "{{ $field.Name }}",
-							Value: cursor,
+							Name:   "{{ if $field.Prisma }}{{ $field.Name.PrismaInternalCase }}{{ else }}{{ $field.Name }}{{ end }}",
+							Fields: []builder.Field{
+								{
+									Name: "{{ $method.Action }}",
+									{{ if $method.IsList }}
+										List: true,
+										Fields: fields,
+									{{ else }}
+										Value: value,
+									{{ end }}
+								},
+							},
 						},
 					}
 				}
-			{{ end }}
-		{{ end }}
 
-		{{/* Provide type-specific methods. */}}
-		{{ range $type := $.DMMF.ReadTypes }}
-			{{ if eq $field.Type $type.Name }}
-				{{ range $method := $type.Methods }}
-					func (r {{ $struct }}) {{ $method.Name }}(value {{ $field.Type.Value }}) {{ $returnStruct }} {
-						return {{ $returnStruct }}{
-							data: builder.Field{
-								Name:   "{{ $field.Name }}",
-								Fields: []builder.Field{
-									{
-										Name: "{{ $method.Action }}",
-										Value: value,
-									},
-								},
-							},
-						}
+				{{ if ne $method.Deprecated "" }}
+					// deprecated: Use {{ $method.Deprecated }}IfPresent instead.
+				{{- end }}
+				func (r {{ $struct }}) {{ $method.Name }}IfPresent(value {{ if $method.IsList }}[]{{ else }}*{{ end }}{{ $type }}) {{ $returnStruct }} {
+					if value == nil {
+						return {{ $returnStruct }}{}
 					}
-
-					func (r {{ $struct }}) {{ $method.Name }}IfPresent(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
-						if value == nil {
-							return {{ $returnStruct }}{}
-						}
-						return r.{{ $method.Name }}(*value)
-					}
-				{{ end }}
+					return r.{{ $method.Name }}({{ if not $method.IsList }}*{{ end }}value)
+				}
 			{{ end }}
 		{{ end }}
 	{{ end }}

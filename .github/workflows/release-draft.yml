@@ -2,7 +2,7 @@ name: release-drafter
 on:
   push:
     branches:
-      - master
+      - main
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go release-draft.yml"
 

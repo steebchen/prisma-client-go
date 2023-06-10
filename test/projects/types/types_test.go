@@ -218,16 +218,16 @@ func TestTypes(t *testing.T) {
 			users, err := client.User.FindMany(
 				User.StrOpt.Contains("long"),
 				User.Bool.Equals(true),
-				User.Int.GTE(5),
-				User.Int.GT(3),
-				User.Int.LTE(5),
-				User.Int.LT(7),
-				User.Float.GTE(5.5),
-				User.Float.GT(2.7),
-				User.Float.LTE(5.5),
-				User.Float.LT(7.3),
-				User.Date.Before(time.Now()),
-				User.Date.After(before),
+				User.Int.Gte(5),
+				User.Int.Gt(3),
+				User.Int.Lte(5),
+				User.Int.Lt(7),
+				User.Float.Gte(5.5),
+				User.Float.Gt(2.7),
+				User.Float.Lte(5.5),
+				User.Float.Lt(7.3),
+				User.Date.Lt(time.Now()),
+				User.Date.Gt(before),
 				User.CreatedAt.Equals(date),
 				User.UpdatedAt.Equals(date),
 			).Exec(ctx)
@@ -252,7 +252,7 @@ func TestTypes(t *testing.T) {
 			assert.Equal(t, expected, users)
 		},
 	}, {
-		name: "failing query for the same field should lead to ErrNotFound",
+		name: "invalid query for the same field should lead to ErrNotFound",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -278,16 +278,16 @@ func TestTypes(t *testing.T) {
 			_, err := client.User.FindFirst(
 				User.StrOpt.Contains("long"),
 				User.Bool.Equals(true),
-				User.Int.GTE(5),
-				User.Int.GT(10), // <- this is the failing part – this ensures all fields are considered in the query
-				User.Int.LTE(5),
-				User.Int.LT(7),
-				User.Float.GTE(5.5),
-				User.Float.GT(10), // <- this is the failing part – this ensures all fields are considered in the query
-				User.Float.LTE(5.5),
-				User.Float.LT(7.3),
-				User.Date.Before(time.Now()),
-				User.Date.After(before),
+				User.Int.Gte(5),
+				User.Int.Gt(10), // <- this is the failing part – this ensures all fields are considered in the query
+				User.Int.Lte(5),
+				User.Int.Lt(7),
+				User.Float.Gte(5.5),
+				User.Float.Gt(10), // <- this is the failing part – this ensures all fields are considered in the query
+				User.Float.Lte(5.5),
+				User.Float.Lt(7.3),
+				User.Date.Lt(time.Now()),
+				User.Date.Gt(before),
 				User.CreatedAt.Equals(date),
 				User.UpdatedAt.Equals(date),
 			).Exec(ctx)
@@ -394,7 +394,7 @@ func TestTypes(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var s *string = nil
+			var s *string
 			actual, err := client.User.FindMany(
 				User.StrOpt.EqualsOptional(s),
 			).Exec(ctx)
@@ -539,6 +539,7 @@ func TestTypes(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.StrOpt.In([]string{"first", "third"}),
+				User.StrOpt.NotIn([]string{"asdf", "abc"}),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -576,7 +577,7 @@ func TestTypes(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

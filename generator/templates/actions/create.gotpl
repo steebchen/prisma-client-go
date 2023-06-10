@@ -43,7 +43,7 @@
 		return v
 	}
 
-	func (r {{ $result }}) With(params ...i{{ $model.Name.GoCase }}RelationWith) {{ $result }} {
+	func (r {{ $result }}) With(params ...{{ $model.Name.GoCase }}RelationWith) {{ $result }} {
 		for _, q := range params {
 			query := q.getQuery()
 			r.query.Outputs = append(r.query.Outputs, builder.Output{
@@ -74,8 +74,8 @@
 		return &v, nil
 	}
 
-	func (r {{ $result }}) Tx() {{ $name }}TxResult {
-		v := New{{ $name }}TxResult()
+	func (r {{ $result }}) Tx() {{ $name }}UniqueTxResult {
+		v := New{{ $name }}UniqueTxResult()
 		v.query = r.query
 		v.query.TxResult = make(chan []byte, 1)
 		return v

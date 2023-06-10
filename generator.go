@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path"
@@ -36,7 +35,7 @@ func reply(w io.Writer, data interface{}) error {
 func invokePrisma() error {
 	reader := bufio.NewReader(os.Stdin)
 
-	if logger.Enabled {
+	if logger.Enabled || writeDebugFile {
 		dir, _ := os.Getwd()
 		log.Printf("current working dir: %s", dir)
 	}
@@ -51,16 +50,16 @@ func invokePrisma() error {
 			return fmt.Errorf("could not read bytes from stdin: %w", err)
 		}
 
+		if writeDebugFile {
+			if err := os.WriteFile("dmmf.json", content, 0600); err != nil {
+				log.Print(err)
+			}
+		}
+
 		var input jsonrpc.Request
 
 		if err := json.Unmarshal(content, &input); err != nil {
 			return fmt.Errorf("could not open stdin %w", err)
-		}
-
-		if writeDebugFile {
-			if err := ioutil.WriteFile("dmmf.json", content, 0644); err != nil {
-				log.Print(err)
-			}
 		}
 
 		var response interface{}
@@ -80,8 +79,11 @@ func invokePrisma() error {
 			var params generator.Root
 
 			if err := json.Unmarshal(input.Params, &params); err != nil {
-				return fmt.Errorf("could not unmarshal params into generator.Root type %w", err)
+				dir, _ := os.Getwd()
+				return fmt.Errorf("could not unmarshal params into generator.Root type at %s: %w", dir, err)
 			}
+
+			generator.Transform(&params)
 
 			if err := generator.Run(&params); err != nil {
 				return fmt.Errorf("could not generate code. %w", err)

@@ -41,7 +41,7 @@ Your dockerfile could look like this. It uses Go modules, layered caching for fa
 lightweight images (usually a few megabytes).
 
 ```dockerfile
-FROM golang:1.13 as build
+FROM golang:1.16 as build
 
 WORKDIR /app
 

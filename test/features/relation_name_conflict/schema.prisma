@@ -21,7 +21,7 @@ model a {
 
 model b {
 	id  String  @id
-	aID String
+	aID String  @unique
 	a a @relation(fields: [aID], references: [id])
 }
 

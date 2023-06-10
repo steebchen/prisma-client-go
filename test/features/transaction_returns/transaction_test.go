@@ -75,6 +75,40 @@ func TestTransactionReturns(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
+		name: "transaction find many",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			createUser := client.User.CreateOne(
+				User.Email.Set("a"),
+				User.ID.Set("a"),
+			).Tx()
+
+			update := client.User.FindMany().Update(
+				User.Email.Set("new"),
+			).Tx()
+
+			if err := client.Prisma.Transaction(createUser, update).Exec(ctx); err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, &BatchResult{Count: 1}, update.Result())
+
+			// --
+
+			actual, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "a",
+					Email: "new",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
 		name: "transaction result caching",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			createUserA := client.User.CreateOne(
@@ -134,7 +168,7 @@ func TestTransactionReturns(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "fail",
+		name: "rollback tx",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -192,7 +226,7 @@ func TestTransactionReturns(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

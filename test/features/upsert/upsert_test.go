@@ -85,11 +85,51 @@ func TestUpsert(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
+	}, {
+		name: "transaction",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "upsert",
+					title: "title",
+					views: 0,
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			query := client.Post.UpsertOne(
+				Post.ID.Equals("upsert"),
+			).Create(
+				Post.Title.Set("title"),
+				Post.Views.Set(0),
+				Post.ID.Set("upsert"),
+			).Update(
+				Post.Title.Set("title"),
+				Post.Views.Increment(1),
+			).Tx()
+
+			if err := client.Prisma.Transaction(query).Exec(ctx); err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &PostModel{
+				InnerPost: InnerPost{
+					ID:    "upsert",
+					Title: "title",
+					Views: 1,
+				},
+			}
+
+			assert.Equal(t, expected, query.Result())
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

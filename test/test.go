@@ -3,7 +3,6 @@ package test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -12,6 +11,7 @@ import (
 	"github.com/prisma/prisma-client-go/cli"
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/test/cmd"
+	"github.com/prisma/prisma-client-go/test/setup/mongodb"
 	"github.com/prisma/prisma-client-go/test/setup/mysql"
 	"github.com/prisma/prisma-client-go/test/setup/postgresql"
 	"github.com/prisma/prisma-client-go/test/setup/sqlite"
@@ -20,8 +20,6 @@ import (
 type Database interface {
 	Name() string
 	ConnectionString(mockDBName string) string
-	Setup()
-	Teardown()
 	SetupDatabase(t *testing.T) string
 	TeardownDatabase(t *testing.T, mockDBName string)
 }
@@ -29,11 +27,13 @@ type Database interface {
 var MySQL = mysql.MySQL
 var PostgreSQL = postgresql.PostgreSQL
 var SQLite = sqlite.SQLite
+var MongoDB = mongodb.MongoDB
 
 var Databases = []Database{
-	mysql.MySQL,
-	postgresql.PostgreSQL,
-	sqlite.SQLite,
+	MySQL,
+	PostgreSQL,
+	SQLite,
+	MongoDB,
 }
 
 const schemaTemplate = "schema.temp.%s.prisma"
@@ -49,7 +49,7 @@ func replaceSchema(t *testing.T, db Database, e engine.Engine, schemaPath string
 	xe.ReplaceSchema(func(schema string) string {
 		return strings.ReplaceAll(schema, `env("__REPLACE__")`, fmt.Sprintf(`"%s"`, db.ConnectionString(mockDB)))
 	})
-	if err := ioutil.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
+	if err := os.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -131,7 +131,7 @@ func migrate(t *testing.T, schemaPath string) {
 	cleanup(t)
 
 	verbose := os.Getenv("PRISMA_CLIENT_GO_TEST_MIGRATE_LOGS") != ""
-	if err := cli.Run([]string{"db", "push", "--preview-feature", "--schema=./" + schemaPath}, verbose); err != nil {
+	if err := cli.Run([]string{"db", "push", "--schema=./" + schemaPath, "--skip-generate"}, verbose); err != nil {
 		t.Fatalf("could not run db push: %s", err)
 	}
 }

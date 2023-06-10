@@ -2,7 +2,6 @@ package postgresql
 
 import (
 	"fmt"
-	"log"
 	"testing"
 
 	"github.com/prisma/prisma-client-go/test/cmd"
@@ -10,7 +9,6 @@ import (
 )
 
 const containerName = "go-client-postgres"
-const image = "postgres:12.5-alpine"
 
 var PostgreSQL = &postgreSQL{}
 
@@ -39,21 +37,5 @@ func (*postgreSQL) TeardownDatabase(t *testing.T, mockDB string) {
 func exec(t *testing.T, query string) {
 	if err := cmd.Run("docker", "exec", "-t", containerName, "psql", "-U", "postgres", "-c", query); err != nil {
 		t.Fatal(err)
-	}
-}
-
-func (db *postgreSQL) Setup() {
-	if err := cmd.Run("docker", "run", "--name", containerName, "-p", "5433:5432", "-e", "POSTGRES_PASSWORD=pw", "-d", image); err != nil {
-		panic(err)
-	}
-}
-
-func (db *postgreSQL) Teardown() {
-	if err := cmd.Run("docker", "stop", containerName); err != nil {
-		log.Println(err)
-	}
-
-	if err := cmd.Run("docker", "rm", containerName, "--force"); err != nil {
-		log.Println(err)
 	}
 }

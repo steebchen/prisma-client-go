@@ -32,6 +32,7 @@ func Run(arguments []string, output bool) error {
 
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PRISMA_HIDE_UPDATE_MESSAGE=true")
+	cmd.Env = append(cmd.Env, "PRISMA_CLI_QUERY_ENGINE_TYPE=binary")
 
 	for _, engine := range binaries.Engines {
 		var value string

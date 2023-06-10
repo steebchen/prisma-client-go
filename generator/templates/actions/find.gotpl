@@ -12,14 +12,19 @@
 
 			{{ $relationName := $model.Name.GoCase }}
 
-			{{ $orderByParam := (print "i" $model.Name.GoCase "OrderByParam") }}
+			{{ $orderByParam := (print $model.Name.GoCase "OrderByParam") }}
 
 			{{ if ne $field.Name "" }}
 				{{ $result = (print $name "To" $field.Name.GoCase "Find" $v.Name) }}
 				{{ $updateResult = (print $name "To" $field.Name.GoCase "Update" $v.Name) }}
 				{{ $deleteResult = (print $name "To" $field.Name.GoCase "Delete" $v.Name) }}
 				{{ $relationName = $field.Type.GoCase }}
-				{{ $orderByParam = (print "i" $field.Type.GoCase "OrderByParam") }}
+				{{ $orderByParam = (print $field.Type.GoCase "OrderByParam") }}
+			{{ end }}
+
+			{{ $txResult := "Unique" }}
+			{{ if $v.List }}
+				{{ $txResult = "Many" }}
 			{{ end }}
 
 			type {{ $result }} struct {
@@ -74,12 +79,7 @@
 						if len(where) > 0 {
 							v.query.Inputs = append(v.query.Inputs, builder.Input{
 								Name:   "where",
-								Fields: []builder.Field{builder.Field{
-									Name:     "AND",
-									List:     true,
-									WrapList: true,
-									Fields:   where,
-								}},
+								Fields: where,
 							})
 						}
 					{{ else }}
@@ -94,7 +94,7 @@
 				}
 			{{ end }}
 
-			func (r {{ $result }}) With(params ...i{{ $relationName }}RelationWith) {{ $result }} {
+			func (r {{ $result }}) With(params ...{{ $relationName }}RelationWith) {{ $result }} {
 				for _, q := range params {
 					query := q.getQuery()
 					r.query.Outputs = append(r.query.Outputs, builder.Output{
@@ -112,17 +112,17 @@
 					var fields []builder.Field
 
 					for _, param := range params {
-						direction, _ := param.field().Value.(types.Direction)
-
 						fields = append(fields, builder.Field{
 							Name: param.field().Name,
-							Value: direction,
+							Value: param.field().Value,
+							Fields: param.field().Fields,
 						})
 					}
 
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "orderBy",
 						Fields: fields,
+						WrapList: true,
 					})
 
 					return r
@@ -144,7 +144,7 @@
 					return r
 				}
 
-				func (r {{ $result }}) Cursor(cursor i{{ $model.Name.GoCase }}CursorParam) {{ $result }} {
+				func (r {{ $result }}) Cursor(cursor {{ $model.Name.GoCase }}CursorParam) {{ $result }} {
 					r.query.Inputs = append(r.query.Inputs, builder.Input{
 						Name:  "cursor",
 						Fields: []builder.Field{cursor.field()},
@@ -196,7 +196,7 @@
 				func (r {{ $result }}) Update(params ...{{ $model.Name.GoCase }}SetParam) {{ $updateResult }} {
 					r.query.Operation = "mutation"
 					r.query.Method = "update{{ $v.InnerName }}"
-					r.query.Model = "{{ $model.Name.GoCase }}"
+					r.query.Model = "{{ $model.Name.String }}"
 					{{ if $v.List }}
 						r.query.Outputs = countOutput
 					{{ end }}
@@ -248,8 +248,8 @@
 					return &v, nil
 				}
 
-				func (r {{ $updateResult }}) Tx() {{ $name }}TxResult {
-					v := New{{ $name }}TxResult()
+				func (r {{ $updateResult }}) Tx() {{ $name }}{{ $txResult }}TxResult {
+					v := New{{ $name }}{{ $txResult }}TxResult()
 					v.query = r.query
 					v.query.TxResult = make(chan []byte, 1)
 					return v
@@ -286,8 +286,8 @@
 					return &v, nil
 				}
 
-				func (r {{ $result }}) Tx() {{ $name }}TxResult {
-					v := New{{ $name }}TxResult()
+				func (r {{ $deleteResult }}) Tx() {{ $name }}{{ $txResult }}TxResult {
+					v := New{{ $name }}{{ $txResult }}TxResult()
 					v.query = r.query
 					v.query.TxResult = make(chan []byte, 1)
 					return v

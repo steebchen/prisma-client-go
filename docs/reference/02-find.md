@@ -6,7 +6,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -17,11 +17,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -77,9 +77,9 @@ This returns an `ErrNotFound` error (exported by the generated client) if there 
 The query operations change based on the data types in your schema. For example, integers and floats will have greater than and less than operations, while strings have prefix and suffix operations.
 
 ```go
-post, err := client.Post.FindUnique(
-    // query for posts containing the title "hi"
-    db.Post.Title.Contains("what up"),
+posts, err := client.Post.FindMany(
+    // query for posts containing the title "What"
+    db.Post.Title.Contains("What"),
 ).Exec(ctx)
 ```
 
@@ -90,16 +90,16 @@ To explore more query filters, see [all possible query filters](03-filters.md).
 You can query for relations by using "Some" or "Every" to query for records where only some or all of the records match respectively. You can nest those queries as deep as you like.
 
 ```go
-// get posts which have at least one comment with a title "My Title" and that post's comments are all "What up?"
+// get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"
 posts, err := client.Post.FindMany(
-    Post.Title.Equals("what up"),
-    Post.Comments.Some(
-        Comment.Title.Equals("My Title"),
+    db.Post.Title.Equals("What up?"),
+    db.Post.Comments.Some(
+        db.Comment.Content.Equals("My Content"),
     ),
 ).Exec(ctx)
 ```
 
-To explore querying for relations in detail, see [more relation query examples](10-relations.md).
+To explore querying for relations in detail, see [more relation query examples](11-relations.md).
 
 ## Next steps
 

@@ -19,7 +19,7 @@
     go get github.com/prisma/prisma-client-go
     ```
 
-3) Prepare your database schema in a `prisma/schema.prisma` file. For example, a simple schema with a sqlite database and
+3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
     Prisma Client Go as a generator with two models would look like this:
 
     ```prisma
@@ -31,6 +31,9 @@
 
     generator db {
         provider = "go run github.com/prisma/prisma-client-go"
+        // set the output folder and package name
+        // output           = "./your-folder"
+        // package          = "yourpackagename"
     }
 
     model Post {
@@ -44,21 +47,16 @@
     ```
 
     To get this up and running in your database, we use the Prisma migration
-    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) (Note: this tool is experimental) to create and migrate our
-    database:
+    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate our database:
 
      ```shell script
     # sync the database with your schema
-    go run github.com/prisma/prisma-client-go db push --preview-feature
+    go run github.com/prisma/prisma-client-go migrate dev --name init
     ```
 
-4) Generate the Prisma Client Go client in your project
+    After the migration, the Prisma Client Go client is automatically generated in your project.
 
-    ```shell script
-    go run github.com/prisma/prisma-client-go generate
-    ```
-
-    If you make changes to your prisma schema, you need to run this command again.
+    If you just want to re-generate the client, run `go run github.com/prisma/prisma-client-go generate`.
 
 ## Usage
 

@@ -1,11 +1,25 @@
 {{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
 
+{{/* user model enums */}}
 {{ range $enum := $.DMMF.Datamodel.Enums -}}
 	type {{ $enum.Name.GoCase }} string
 
 	const (
 		{{ range $v := $enum.Values -}}
 			{{ $enum.Name.GoCase }}{{ $v.Name.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v.Name }}"
+		{{ end }}
+	)
+
+	type Raw{{ $enum.Name.GoCase }} {{ $enum.Name.GoCase }}
+{{ end }}
+
+{{/* internal prisma enums */}}
+{{ range $enum := $.DMMF.Schema.EnumTypes.Prisma -}}
+	type {{ $enum.Name.GoCase }} string
+
+	const (
+		{{ range $v := $enum.Values -}}
+			{{ $enum.Name.GoCase }}{{ $v.GoCase }} {{ $enum.Name.GoCase }} = "{{ $v }}"
 		{{ end }}
 	)
 {{ end }}

@@ -3,6 +3,7 @@ package builder
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -11,9 +12,10 @@ import (
 )
 
 type Input struct {
-	Name   string
-	Fields []Field
-	Value  interface{}
+	Name     string
+	Fields   []Field
+	Value    interface{}
+	WrapList bool
 }
 
 // Output can be a single Name or can have nested fields
@@ -122,7 +124,13 @@ func (q Query) buildInputs(inputs []Input) string {
 		if i.Value != nil {
 			builder.Write(Value(i.Value))
 		} else {
-			builder.WriteString(q.buildFields(false, false, i.Fields))
+			if i.WrapList {
+				builder.WriteString("[")
+			}
+			builder.WriteString(q.buildFields(i.WrapList, i.WrapList, i.Fields))
+			if i.WrapList {
+				builder.WriteString("]")
+			}
 		}
 
 		builder.WriteString(",")
@@ -162,7 +170,36 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		builder.WriteString("{")
 	}
 
-	for _, f := range fields {
+	var final []Field
+	// remember the order in which the unique fields where added to the map
+	var uniqueNames []string
+
+	// check for duplicate fields so that multiple queries on the same field will be shared
+	// this is necessary for json filters and more
+	uniques := make(map[string]*Field)
+	for i, f := range fields {
+		if _, ok := uniques[f.Name]; ok {
+			// check if field is a model operation
+			if f.Fields != nil && f.Name != "AND" && f.Name != "OR" && f.Name != "NOT" {
+				// field already exists, join sub-fields
+				uniques[f.Name].Fields = append(uniques[f.Name].Fields, f.Fields...)
+			} else {
+				// if it's a list or just contains a value, just add it, which may result in a duplicate
+				// this is necessary for some operations, e.g. linking multiple records
+				final = append(final, f)
+			}
+		} else {
+			uniques[f.Name] = &fields[i]
+			uniqueNames = append(uniqueNames, f.Name)
+		}
+	}
+
+	// use the list of unique names to add the unique fields in a deterministic order
+	for _, name := range uniqueNames {
+		final = append(final, *uniques[name])
+	}
+
+	for _, f := range final {
 		if wrapList {
 			builder.WriteString("{")
 		}
@@ -215,7 +252,7 @@ func (q Query) Exec(ctx context.Context, into interface{}) error {
 
 func (q Query) Do(ctx context.Context, payload interface{}, into interface{}) error {
 	if q.Engine == nil {
-		panic("client.Prisma.Connect() needs to be called before sending queries")
+		return fmt.Errorf("client.Prisma.Connect() needs to be called before sending queries")
 	}
 
 	logger.Debug.Printf("[timing] building %q", time.Since(q.Start))
