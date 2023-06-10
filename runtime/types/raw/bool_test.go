@@ -20,37 +20,37 @@ func TestBool_UnmarshalJSON(t *testing.T) {
 		name:     "true",
 		expected: true,
 		args: args{
-			b: []byte(`{"prisma__type":"bool","prisma__value":true}`),
+			b: []byte(`true`),
 		},
 	}, {
 		name:     "false",
 		expected: false,
 		args: args{
-			b: []byte(`{"prisma__type":"bool","prisma__value":false}`),
+			b: []byte(`false`),
 		},
 	}, {
 		name:     "int 1",
 		expected: true,
 		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":1}`),
+			b: []byte(`1`),
 		},
 	}, {
 		name:     "int 0",
 		expected: false,
 		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":0}`),
+			b: []byte(`0`),
 		},
 	}, {
 		name:    "error on wrong type",
 		wantErr: true,
 		args: args{
-			b: []byte(`{"prisma__type":"double","prisma__value":0}`),
+			b: []byte(`asdf`),
 		},
 	}, {
 		name:    "error on wrong data",
 		wantErr: true,
 		args: args{
-			b: []byte(`{"prisma__type":"int","prisma__value":"0"}`),
+			b: []byte(`3`),
 		},
 	}}
 	for _, tt := range tests {

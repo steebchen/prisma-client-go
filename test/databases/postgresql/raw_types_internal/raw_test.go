@@ -7,7 +7,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/prisma/prisma-client-go/runtime/types/raw"
 	"github.com/prisma/prisma-client-go/test"
 	"github.com/prisma/prisma-client-go/test/helpers/massert"
 )
@@ -15,25 +14,25 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-func TestRaw(t *testing.T) {
+func TestRawTypesInternal(t *testing.T) {
 	t.Parallel()
 
-	var strOpt raw.String = "strOpt"
-	var i raw.Int = 5
-	var f raw.Float = 5.5
-	var b raw.Boolean = false
-	d := raw.Decimal{Decimal: decimal.NewFromFloat(5.5)}
-	json := raw.JSON(`{"field":"value"}`)
-	jsonOpt := &json
-	bytes := raw.Bytes(`{"field":"value"}`)
-	bytesOpt := &bytes
+	var strOpt RawString = "strOpt"
+	var i RawInt = 5
+	var f RawFloat = 5.5
+	var b RawBoolean = false
+	var d = RawDecimal{Decimal: decimal.NewFromFloat(5.5)}
+	var jsn = RawJSON{RawMessage: []byte(`{"field":"value"}`)}
+	var jsonOpt = &jsn
+	var bytes RawBytes = []byte(`{"field":"value"}`)
+	var bytesOpt = &bytes
 
 	dateOrig, err := time.Parse(time.RFC3339, "2020-01-01T00:00:00Z")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	date := raw.DateTime{Time: dateOrig}
+	date := RawDateTime{Time: dateOrig}
 
 	tests := []struct {
 		name   string
@@ -96,12 +95,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUser
+			var actual []RawUserModel
 			if err := client.Prisma.QueryRaw(`select * from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUser{{
+			expected := []RawUserModel{{
 				ID:         "id1",
 				Email:      "email1",
 				Username:   "a",
@@ -117,7 +116,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
+				JSON:       jsn,
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
@@ -137,7 +136,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
+				JSON:       jsn,
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
@@ -202,12 +201,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUser
+			var actual []RawUserModel
 			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUser{{
+			expected := []RawUserModel{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -223,7 +222,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
+				JSON:       jsn,
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
@@ -288,12 +287,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUser
+			var actual []RawUserModel
 			if err := client.Prisma.QueryRaw(`select * from "User" where id = $1 and email = $2`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUser{{
+			expected := []RawUserModel{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -309,7 +308,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
+				JSON:       jsn,
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
@@ -375,7 +374,7 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count raw.BigInt `json:"count"`
+				Count BigInt `json:"count"`
 			}
 			if err := client.Prisma.QueryRaw(`select count(*) as count from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
@@ -387,7 +386,7 @@ func TestRaw(t *testing.T) {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, "a", "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, json, jsonOpt, bytes, bytesOpt).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, "a", "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, jsn, jsonOpt, bytes, bytesOpt).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -495,12 +494,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUser
+			var actual []RawUserModel
 			if err := client.Prisma.QueryRaw(`select * from "User" where "time" = $1`, date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUser{{
+			expected := []RawUserModel{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
@@ -516,7 +515,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:    &b,
 				Time:       date,
 				TimeOpt:    &date,
-				JSON:       json,
+				JSON:       jsn,
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
@@ -580,14 +579,14 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			j := raw.JSON(`{"field":"b"}`)
+			j := RawJSON{RawMessage: []byte(`{"field":"b"}`)}
 
-			var actual []RawUser
+			var actual []RawUserModel
 			if err := client.Prisma.QueryRaw(`select * from "User" where "json"->>'field' = 'b'`, j).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUser{{
+			expected := []RawUserModel{{
 				ID:         "id2",
 				Email:      "email2",
 				Username:   "b",
