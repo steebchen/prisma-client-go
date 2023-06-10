@@ -4,7 +4,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -15,11 +15,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -27,7 +27,7 @@ model Comment {
 ### Return the first 5 rows
 
 ```go
-created, err := client.
+selected, err := client.
     Post.
     FindMany().
     Take(5).
@@ -37,7 +37,7 @@ created, err := client.
 ### Return the first 5 rows and skip 2 rows
 
 ```go
-created, err := client.
+selected, err := client.
     Post.
     FindMany().
     Take(5).
@@ -50,12 +50,12 @@ created, err := client.
 Instead of using `Skip`, you can also provide a cursor:
 
 ```go
-created, err := client.
+selected, err := client.
     Post.
     FindMany().
     Take(5).
     Skip(2).
-    Cursor(Post.ID.Cursor("abc")).
+    Cursor(db.Post.ID.Cursor("abc")).
     Exec(ctx)
 ```
 
@@ -63,4 +63,4 @@ Also check out the [order by docs](06-order-by.md) to understand how you can com
 
 ## Next steps
 
-Learn how to [order queries](07-create.md).
+Learn how to [order queries](06-order-by.md).

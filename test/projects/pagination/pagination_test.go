@@ -55,6 +55,70 @@ func TestPagination(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.FindMany().OrderBy(
+				Post.Title.Order(SortOrderAsc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "a",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "order by ASC (deprecated)",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
 				Post.Title.Order(ASC),
 			).Exec(ctx)
 			if err != nil {
@@ -85,6 +149,135 @@ func TestPagination(t *testing.T) {
 		},
 	}, {
 		name: "order by DESC",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "c",
+					content: "c",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "b",
+					content: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
+				Post.Title.Order(SortOrderDesc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "c",
+					Content: "c",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "b",
+					Content: "b",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "a",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "order by many fields",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOnePost(data: {
+					id: "a",
+					title: "a",
+					content: "1",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "y",
+					content: "2",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "b",
+					title: "z",
+					content: "2",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.FindMany().OrderBy(
+				Post.Content.Order(SortOrderDesc),
+				Post.Title.Order(SortOrderDesc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []PostModel{{
+				InnerPost: InnerPost{
+					ID:      "b",
+					Title:   "z",
+					Content: "2",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "c",
+					Title:   "y",
+					Content: "2",
+				},
+			}, {
+				InnerPost: InnerPost{
+					ID:      "a",
+					Title:   "a",
+					Content: "1",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "order by DESC (deprecated)",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -344,82 +537,11 @@ func TestPagination(t *testing.T) {
 
 			assert.Equal(t, expected, actual)
 		},
-	}, {
-		name: "int cursor",
-		// language=GraphQL
-		before: []string{`
-			mutation {
-				result: createOnePost(data: {
-					id: "a",
-					title: "a",
-					content: "a",
-					intTest: 3,
-				}) {
-					id
-				}
-			}
-		`, `
-			mutation {
-				result: createOnePost(data: {
-					id: "c",
-					title: "c",
-					content: "c",
-					intTest: 1,
-				}) {
-					id
-				}
-			}
-		`, `
-			mutation {
-				result: createOnePost(data: {
-					id: "b",
-					title: "b",
-					content: "b",
-					intTest: 2,
-				}) {
-					id
-				}
-			}
-		`},
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			actual, err := client.
-				Post.
-				FindMany().
-				OrderBy(
-					Post.IntTest.Order(DESC),
-				).
-				Cursor(Post.IntTest.Cursor(2)).
-				Exec(ctx)
-
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			b := 2
-			c := 1
-			expected := []PostModel{{
-				InnerPost: InnerPost{
-					ID:      "b",
-					Title:   "b",
-					Content: "b",
-					IntTest: &b,
-				},
-			}, {
-				InnerPost: InnerPost{
-					ID:      "c",
-					Title:   "c",
-					Content: "c",
-					IntTest: &c,
-				},
-			}}
-
-			assert.Equal(t, expected, actual)
-		},
 	}}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

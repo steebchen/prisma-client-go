@@ -5,6 +5,8 @@ import (
 
 	"github.com/iancoleman/strcase"
 	"github.com/takuoki/gocase"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // String acts as a builtin string but provides useful casing methods.
@@ -30,8 +32,21 @@ func (s String) CamelCase() string {
 }
 
 // Tag returns the struct tag value of a field.
-func (s String) Tag() string {
+func (s String) Tag(isRequired bool) string {
+	if !isRequired {
+		return fmt.Sprintf("`json:\"%s,omitempty\"`", s)
+	}
 	return fmt.Sprintf("`json:\"%s\"`", s)
+}
+
+// PrismaGoCase transforms `relevance` into `Relevance_`
+func (s String) PrismaGoCase() string {
+	return cases.Title(language.Und, cases.NoLower).String(string(s)) + "_"
+}
+
+// PrismaInternalCase transforms `relevance` into `_relevance`
+func (s String) PrismaInternalCase() string {
+	return "_" + string(s)
 }
 
 // builtin Go types
@@ -58,14 +73,14 @@ func (t Type) String() string {
 func (t Type) Value() string {
 	str := string(t)
 	v, ok := builtin[str]
-	if !ok {
-		return gocase.To(strcase.ToCamel(str))
+	if ok {
+		return v
 	}
 
-	return v
+	return gocase.To(strcase.ToCamel(str))
 }
 
-// GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
+// GoCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (t Type) GoCase() string {
 	return gocase.To(strcase.ToCamel(string(t)))
 }

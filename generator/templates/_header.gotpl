@@ -8,10 +8,12 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"testing"
+	"os"
 
 	"github.com/prisma/prisma-client-go/engine"
 	"github.com/prisma/prisma-client-go/engine/mock"
 	"github.com/prisma/prisma-client-go/runtime/types"
+	rawmodels "github.com/prisma/prisma-client-go/runtime/types/raw"
 	"github.com/prisma/prisma-client-go/runtime/lifecycle"
 	"github.com/prisma/prisma-client-go/runtime/raw"
 	"github.com/prisma/prisma-client-go/runtime/builder"
@@ -24,8 +26,13 @@ import (
 	_ "github.com/joho/godotenv"
 )
 
+// ignore unused os import as it may not be needed depending on engine type
+var _ = os.DevNull
+
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
+
+const RFC3339Milli = types.RFC3339Milli
 
 type BatchResult = types.BatchResult
 
@@ -35,11 +42,22 @@ type Bytes    = types.Bytes
 type BigInt   = types.BigInt
 type Decimal  = types.Decimal
 
-type Direction = types.Direction
+type RawString   = rawmodels.String
+type RawInt      = rawmodels.Int
+type RawFloat    = rawmodels.Float
+type RawBoolean  = rawmodels.Boolean
+type RawDateTime = rawmodels.DateTime
+type RawJSON     = rawmodels.JSON
+type RawBytes    = rawmodels.Bytes
+type RawBigInt   = rawmodels.BigInt
+type RawDecimal  = rawmodels.Decimal
+
+// deprecated: use SortOrder
+type Direction = SortOrder
 
 const (
-	ASC  Direction = types.ASC
-	DESC Direction = types.DESC
+	// deprecated: use SortOrderAsc
+	ASC  Direction = "asc"
+	// deprecated: use SortOrderDesc
+	DESC Direction = "desc"
 )
-
-const RFC3339Milli = types.RFC3339Milli

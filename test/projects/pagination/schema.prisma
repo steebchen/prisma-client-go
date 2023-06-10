@@ -11,8 +11,7 @@ generator db {
 }
 
 model Post {
-  id      String @id @default(cuid())
+  id      String @id @default(cuid()) @map("_id")
   title   String @unique
   content String
-  intTest Int?   @unique
 }

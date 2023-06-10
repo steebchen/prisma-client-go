@@ -3,13 +3,11 @@ sort-direction: ascending
 
 template: |
   # v$NEXT_MINOR_VERSION
-  
+
   TODO: description
-  
-  🌟 **Help us spread the word about Prisma by starring the repo ☝️ or [tweeting](https://twitter.com/intent/tweet?text=Check%20out%20the%20latest%20Prisma%20Go%20Client%20release%20v$NEXT_MINOR_VERSION%20%F0%9F%9A%80%0D%0A%0D%0Ahttps://github.com/prisma/prisma-client-go/releases/tag/v$NEXT_MINOR_VERSION) about the release.**
-  
+
   ## Major changes
-  
+
   TODO: list major changes
 
   ## Changes
@@ -19,9 +17,3 @@ template: |
   ## Contributors
 
   $CONTRIBUTORS
-  
-  ## Interested in providing feedback for the Go client?
-
-  We would like to ask you a few questions and get your feedback about the Go client. We'll send merch along your away as a thank you.
-  If you're interested, email me at steeb@prisma.io or join our [public Slack](https://slack.prisma.io) and DM me.
-  

@@ -13,7 +13,7 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type RawUserModel struct {
+type CustomRawUserModel struct {
 	ID       string   `json:"id"`
 	Email    string   `json:"email"`
 	Username string   `json:"username"`
@@ -30,7 +30,7 @@ type RawUserModel struct {
 }
 
 func TestRaw(t *testing.T) {
-	// t.Parallel() // TODO re-enable when removing deprecated tests
+	t.Parallel()
 
 	strOpt := "strOpt"
 	i := 5
@@ -87,12 +87,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM User`).Exec(ctx, &actual); err != nil {
+			var actual []CustomRawUserModel
+			if err := client.Prisma.QueryRaw("select * from `User`").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUserModel{{
 				ID:       "id1",
 				Email:    "email1",
 				Username: "a",
@@ -165,12 +165,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM User WHERE id = ?`, "id2").Exec(ctx, &actual); err != nil {
+			var actual []CustomRawUserModel
+			if err := client.Prisma.QueryRaw("select * from `User` where id = ?", "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUserModel{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",
@@ -231,12 +231,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw(`SELECT * FROM User WHERE id = ? AND email = ?`, "id2", "email2").Exec(ctx, &actual); err != nil {
+			var actual []CustomRawUserModel
+			if err := client.Prisma.QueryRaw("select * from `User` where id = ? and email = ?", "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUserModel{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",
@@ -298,13 +298,13 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count int `json:"count"`
+				Count string `json:"count"`
 			}
-			if err := client.Prisma.QueryRaw(`SELECT COUNT(*) AS count FROM User`).Exec(ctx, &actual); err != nil {
+			if err := client.Prisma.QueryRaw("select count(*) as count from `User`").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, actual[0].Count)
+			assert.Equal(t, "2", actual[0].Count)
 		},
 	}, {
 		name:   "insert into",
@@ -314,7 +314,7 @@ func TestRaw(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			result, err := client.Prisma.ExecuteRaw("INSERT INTO `User` (`id`, `email`, `username`, `str`, `strOpt`, `date`, `dateOpt`, `int`, `intOpt`, `float`, `floatOpt`, `bool`, `boolOpt`) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)", "a", "a", "a", "a", "a", date, date, 1, 1, 2.0, 2.0, true, false).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw("insert into `User` (`id`, `email`, `username`, `str`, `strOpt`, `date`, `dateOpt`, `int`, `intOpt`, `float`, `floatOpt`, `bool`, `boolOpt`) values(?,?,?,?,?,?,?,?,?,?,?,?,?)", "a", "a", "a", "a", "a", date, date, 1, 1, 2.0, 2.0, true, false).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -346,14 +346,14 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "id1").Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw("update `User` set email = 'abc' where id = ?", "id1").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
 			assert.Equal(t, 1, result.Count)
 
-			result, err = client.Prisma.ExecuteRaw("UPDATE `User` SET email = 'abc' WHERE id = ?", "non-existing").Exec(ctx)
+			result, err = client.Prisma.ExecuteRaw("update `User` set email = 'abc' where id = ?", "non-existing").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -409,12 +409,12 @@ func TestRaw(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			var actual []RawUserModel
-			if err := client.Prisma.QueryRaw("SELECT * FROM `User` WHERE date = ?", date).Exec(ctx, &actual); err != nil {
+			var actual []CustomRawUserModel
+			if err := client.Prisma.QueryRaw("select * from `User` where date = ?", date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUserModel{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",

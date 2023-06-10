@@ -1,9 +1,5 @@
 name: test all
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: pull_request
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go test.yml"
 
@@ -12,13 +8,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
 
-      - uses: actions/setup-go@v2
+      - uses: dorny/paths-filter@v2
+        id: changes
         with:
-          go-version: '1.14'
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.gotpl'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '**/*.work'
 
-      - uses: actions/cache@v2
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.19'
+
+      - uses: actions/cache@v3
         with:
           path: |
             ~/go/pkg/mod
@@ -27,13 +34,13 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
       - name: deps
+        if: steps.changes.outputs.go == 'true'
         run: go mod download
 
-      - name: generate
-        run: go generate ./...
-
-      - name: setup
-        run: go run ./test/setup/init setup
+      - name: setup & generate
+        if: steps.changes.outputs.go == 'true'
+        run: go generate -tags setup ./...
 
       - name: test
+        if: steps.changes.outputs.go == 'true'
         run: go test ./... -v

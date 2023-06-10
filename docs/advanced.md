@@ -10,11 +10,11 @@ So let's introduce a new comment model:
 
 ```prisma
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -44,22 +44,22 @@ model Post {
     }
 
     model Post {
-        id        String   @default(cuid()) @id
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        published Boolean
+        id        String    @id @default(cuid())
+        createdAt DateTime  @default(now())
+        updatedAt DateTime  @updatedAt
         title     String
-        content   String?
+        published Boolean
+        desc      String?
 
         comments Comment[]
     }
 
     model Comment {
-        id        String   @default(cuid()) @id
+        id        String   @id @default(cuid())
         createdAt DateTime @default(now())
         content   String
 
-        post   Post @relation(fields: [postID], references: [id])
+        post   Post   @relation(fields: [postID], references: [id])
         postID String
     }
     ```
@@ -69,11 +69,7 @@ model Post {
 Whenever you make changes to your model, migrate your database and re-generate your prisma code:
 
 ```shell script
-# apply migrations
-go run github.com/prisma/prisma-client-go migrate save --experimental --name "add comment model"
-go run github.com/prisma/prisma-client-go migrate up --experimental
-# generate
-go run github.com/prisma/prisma-client-go generate
+go run github.com/prisma/prisma-client-go migrate dev --name add_comment_model
 ```
 
 In order to create comments, we first need to create a post, and then reference that post when creating a comment.
@@ -159,7 +155,7 @@ orderedComments, err := client.Comment.FindMany(
         db.Post.ID.Equals("123"),
     ),
 ).Take(2).OrderBy(
-    db.Comment.CreatedAt.Order(db.DESC),
+    db.Comment.CreatedAt.Order(db.SortOrderDesc),
 ).Exec(ctx)
 if err != nil {
     return err
@@ -174,10 +170,10 @@ few of their comments in just a few lines and fully type-safe:
 ```go
 // return a post by its id including 5 of its comments
 post, err := client.Post.FindUnique(
-    Post.ID.Equals("123"),
+    db.Post.ID.Equals("123"),
 ).With(
     // also fetch 3 this post's comments
-    Post.Comments.Fetch().Take(3),
+    db.Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 
 // will log post and its comments

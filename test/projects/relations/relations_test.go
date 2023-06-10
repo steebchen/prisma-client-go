@@ -65,7 +65,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","roleID":null,"role":null,"posts":[{"id":"a","title":"common","content":"a","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null},{"id":"b","title":"common","content":"b","authorID":"relations","categoryID":null,"author":null,"Category":null,"comments":null}],"comments":null}`
+			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","authorID":"relations"},{"id":"b","title":"common","content":"b","authorID":"relations"}]}`
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
@@ -142,7 +142,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "find by same field fail",
+		name: "find by same field override",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -1337,7 +1337,7 @@ func TestRelations(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			test.RunSerial(t, []test.Database{test.SQLite, test.MySQL, test.PostgreSQL}, func(t *testing.T, db test.Database, ctx context.Context) {
+			test.RunSerial(t, test.Databases, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 				mockDBName := test.Start(t, db, client.Engine, tt.before)
 				defer test.End(t, db, client.Engine, mockDBName)

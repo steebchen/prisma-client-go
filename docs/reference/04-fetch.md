@@ -6,7 +6,7 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
@@ -17,11 +17,11 @@ model Post {
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -30,21 +30,21 @@ model Comment {
 
 ```go
 // find a post
-post, err := client.Post.FindUnique(
-    Post.Title.Equals("hi"),
+post, err := client.Post.FindFirst(
+    db.Post.Title.Equals("hi"),
 ).With(
     // also fetch 3 of its comments
-    Post.Comments.Fetch().Take(3),
+    db.Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 check(err)
 log.Printf("post's title: %s", post.Title)
 
 comments := post.Comments()
 for _, comment := range comments {
-    log.Printf("comment: %s", comment)
+    log.Printf("comment: %+v", comment)
 }
 ```
 
 ## Next steps
 
-Check out a [detailed explanation for creating rows](07-create.md).
+Check out a [detailed explanation for pagination](05-pagination.md).

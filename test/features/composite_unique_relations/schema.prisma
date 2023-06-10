@@ -11,12 +11,12 @@ generator db {
 }
 
 model User {
-  id           String        @id @default(cuid())
+  id           String        @id @default(cuid()) @map("_id")
   participants Participant[]
 }
 
 model Participant {
-  id      String  @id @default(cuid())
+  id      String  @id @default(cuid()) @map("_id")
   unused1 String? @unique
   unused2 String? @unique
   user    User    @relation(fields: [userId], references: [id])
@@ -29,6 +29,6 @@ model Participant {
 }
 
 model Event {
-  id           String        @id
+  id           String        @id @default(cuid()) @map("_id")
   participants Participant[]
 }

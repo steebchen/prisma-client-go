@@ -4,22 +4,23 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     published Boolean
     title     String
     content   String?
+    views     Int      @default(0)
 
     comments Comment[]
 }
 
 model Comment {
-    id        String   @default(cuid()) @id
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     content   String
 
-    post   Post @relation(fields: [postID], references: [id])
+    post   Post   @relation(fields: [postID], references: [id])
     postID String
 }
 ```
@@ -33,7 +34,7 @@ by type. All of these queries are fully type-safe and independent of the underly
 ### String filters
 
 ```go
-// query for posts where the title ist "my post"
+// query for posts where the title is "my post"
 db.Post.Title.Equals("my post"),
 // query for titles containing the string "post"
 db.Post.Title.Contains("post"),
@@ -53,9 +54,9 @@ db.Post.Views.Lte(50),
 // query for all posts which have less than 50 views
 db.Post.Views.Lt(50),
 // query for all posts which have more than or exactly 50 views
-db.Post.Views.Gt(50),
-// query for all posts which have more than 50 views
 db.Post.Views.Gte(50),
+// query for all posts which have more than 50 views
+db.Post.Views.Gt(50),
 ```
 
 ### Time filters
@@ -63,13 +64,13 @@ db.Post.Views.Gte(50),
 ```go
 // query for all posts which equal an exact date
 db.Post.CreatedAt.Equals(yesterday),
-// query for all posts which were created in the last 6 hours
+// query for all posts which were created in the last 6 hours(createdAt > 6 hours ago)
 db.Post.CreatedAt.Gt(time.Now().Add(-6 * time.Hour)),
-// query for all posts which were created in the last 6 hours including right now
-db.Post.CreatedAt.Lte(time.Now().Add(-6 * time.Hour)),
+// query for all posts which were created in the last 6 hours(createdAt >= 6 hours ago)
+db.Post.CreatedAt.Gte(time.Now().Add(-6 * time.Hour)),
 // query for all posts which were created until yesterday
 db.Post.CreatedAt.Lt(time.Now().Truncate(24 * time.Hour)),
-// query for all posts which were created until yesterday including right now
+// query for all posts which were created until yesterday including today's 00:00:00
 db.Post.CreatedAt.Lte(time.Now().Truncate(24 * time.Hour)),
 ```
 
@@ -110,14 +111,14 @@ db.Post.Not(
 
 ### Or
 
-If you want to negate a query, you can use `Or`.
+You can use `Or`.
 
-The following query queries for all posts where either their title equals "123" OR their description equals "456":
+The following query queries for all posts where either their title equals "123" OR their content equals "456":
 
 ```go
 db.Post.Or(
     db.Post.Title.Equals("123"),
-    db.Post.Desc.Equals("456"),
+    db.Post.Content.Equals("456"),
 )
 ```
 

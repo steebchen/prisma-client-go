@@ -8,11 +8,10 @@ generator db {
   output            = "."
   disableGoBinaries = true
   package           = "db"
-  previewFeatures = ["nativeTypes"]
 }
 
 model User {
-  id String @id @default(cuid())
-  a  String @db.VarChar(5)
+  id String  @id @default(cuid()) @map("_id")
+  a  String  @db.VarChar(5)
   b  String? @db.VarChar(50)
 }

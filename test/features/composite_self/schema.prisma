@@ -11,28 +11,10 @@ generator db {
 }
 
 model Event {
-  id            String          @id @default(cuid())
-  EventInstance EventInstance[]
-}
-
-model Document {
-  id            String          @id @default(cuid())
-  EventInstance EventInstance[]
-}
-
-model EventInstance {
-  id                      String         @id @default(cuid())
-  createdAt               DateTime       @default(now())
-  updatedAt               DateTime       @updatedAt
-  event                   Event          @relation(fields: [eventId], references: [id])
-  eventId                 String
-  start                   DateTime
-  end                     DateTime
-  summary                 Document       @relation(fields: [summaryId], references: [id])
-  summaryId               String
-  previous                EventInstance? @relation("NextPreviousEventInstance", fields: [previousEventInstanceId], references: [id])
-  previousEventInstanceId String?
-  next                    EventInstance? @relation("NextPreviousEventInstance")
-
-  @@unique([eventId, id], name: "EventEventInstance_key")
+  id              String   @id @default(cuid()) @map("_id")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  previous        Event?   @relation("NextPreviousEvent", fields: [previousEventId], references: [id])
+  previousEventId String?  @unique
+  next            Event?   @relation("NextPreviousEvent")
 }

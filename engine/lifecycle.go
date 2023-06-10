@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/joho/godotenv"
 	"os"
 	"os/exec"
 	"path"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 
 	"github.com/prisma/prisma-client-go/binaries"
 	"github.com/prisma/prisma-client-go/binaries/platform"
@@ -19,9 +20,9 @@ import (
 func (e *QueryEngine) Connect() error {
 	logger.Debug.Printf("ensure query engine binary...")
 
-	_ = godotenv.Load(".env")
-	_ = godotenv.Load("db/.env")
-	_ = godotenv.Load("prisma/.env")
+	_ = godotenv.Load("e2e.env")
+	_ = godotenv.Load("db/e2e.env")
+	_ = godotenv.Load("prisma/e2e.env")
 
 	startEngine := time.Now()
 
@@ -41,6 +42,7 @@ func (e *QueryEngine) Connect() error {
 }
 
 func (e *QueryEngine) Disconnect() error {
+	e.disconnected = true
 	logger.Debug.Printf("disconnecting...")
 
 	if platform.Name() == "windows" {
@@ -67,7 +69,7 @@ func (e *QueryEngine) Disconnect() error {
 func (e *QueryEngine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
-	binariesPath := binaries.GlobalUnpackDir()
+	binariesPath := binaries.GlobalUnpackDir(binaries.EngineVersion)
 	// check for darwin/windows/linux first
 	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
 	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
@@ -93,33 +95,33 @@ func (e *QueryEngine) ensure() (string, error) {
 	if prismaQueryEngineBinary != "" {
 		logger.Debug.Printf("PRISMA_QUERY_ENGINE_BINARY is defined, using %s", prismaQueryEngineBinary)
 
-		if _, err := os.Stat(prismaQueryEngineBinary); err == nil {
+		if _, err := os.Stat(prismaQueryEngineBinary); err != nil {
 			return "", fmt.Errorf("PRISMA_QUERY_ENGINE_BINARY was provided, but no query engine was found at %s", prismaQueryEngineBinary)
 		}
 
 		file = prismaQueryEngineBinary
 		forceVersion = false
-	}
+	} else {
+		if info, err := os.Stat(localExactPath); err == nil {
+			file = localExactPath
+			logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
+		} else if info, err = os.Stat(localPath); err == nil {
+			file = localPath
+			logger.Debug.Printf("query engine found in working directory: %s %+v", file, info)
+		}
 
-	if _, err := os.Stat(localExactPath); err == nil {
-		logger.Debug.Printf("exact query engine found in working directory")
-		file = localExactPath
-	} else if _, err := os.Stat(localPath); err == nil {
-		logger.Debug.Printf("query engine found in working directory")
-		file = localPath
-	}
-
-	if _, err := os.Stat(globalExactPath); err == nil {
-		logger.Debug.Printf("query engine found in global path")
-		file = globalExactPath
-	} else if _, err := os.Stat(globalPath); err == nil {
-		logger.Debug.Printf("exact query engine found in global path")
-		file = globalPath
+		if info, err := os.Stat(globalExactPath); err == nil {
+			file = globalExactPath
+			logger.Debug.Printf("query engine found in global path: %s %+v", file, info)
+		} else if info, err = os.Stat(globalPath); err == nil {
+			file = globalPath
+			logger.Debug.Printf("exact query engine found in global path: %s %+v", file, info)
+		}
 	}
 
 	if file == "" {
 		// TODO log instructions on how to fix this problem
-		return "", fmt.Errorf("no binary found ")
+		return "", fmt.Errorf("no binary found")
 	}
 
 	startVersion := time.Now()
@@ -165,6 +167,7 @@ func (e *QueryEngine) spawn(file string) error {
 		"PRISMA_DML="+e.Schema,
 		"RUST_LOG=error",
 		"RUST_LOG_FORMAT=json",
+		"PRISMA_CLIENT_ENGINE_TYPE=binary",
 	)
 
 	// TODO fine tune this using log levels

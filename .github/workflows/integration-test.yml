@@ -1,9 +1,5 @@
 name: integration test all
-on:
-  push:
-    branches:
-      - master
-  pull_request:
+on: pull_request
 env:
   PRISMA_TELEMETRY_INFORMATION: "prisma-client-go integration-test.yml"
 
@@ -17,7 +13,16 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache
+          restore-keys: ${{ runner.os }}-go-
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
       - name: integration
+        if: steps.changes.outputs.go == 'true'
         run: docker build . -f test/integration/integration.dockerfile -t integration && docker run integration

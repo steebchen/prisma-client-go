@@ -4,7 +4,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -16,14 +15,14 @@ import (
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "2.30.0"
+const PrismaVersion = "4.15.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
-// The versions can be found under https://github.com/prisma/prisma-engine/commits/master.
-const EngineVersion = "60b19f4a1de4fe95741da371b4c44a92f4d1adcb"
+// The versions can be found under https://github.com/prisma/prisma-engines/commits/master
+const EngineVersion = "70a9adfd11f836696eca398396544fe07a8d8edb"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
-var PrismaURL = "https://prisma-photongo.s3-eu-west-1.amazonaws.com/%s-%s-%s.gz"
+var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://binaries.prisma.sh/all_commits/%s/%s/%s.gz"
@@ -39,12 +38,6 @@ var Engines = []Engine{{
 }, {
 	"migration-engine",
 	"PRISMA_MIGRATION_ENGINE_BINARY",
-}, {
-	"introspection-engine",
-	"PRISMA_INTROSPECTION_ENGINE_BINARY",
-}, {
-	"prisma-fmt",
-	"PRISMA_FMT_BINARY",
 }}
 
 // init overrides URLs if env variables are specific for debugging purposes and to
@@ -61,22 +54,22 @@ func init() {
 // PrismaCLIName returns the local file path of where the CLI lives
 func PrismaCLIName() string {
 	variation := platform.Name()
-	return fmt.Sprintf("prisma-cli-%s", variation)
+	return fmt.Sprintf("prisma-cli-%s-x64", variation)
 }
 
 var baseDirName = path.Join("prisma", "binaries")
 
 // GlobalTempDir returns the path of where the engines live
 // internally, this is the global temp dir
-func GlobalTempDir() string {
+func GlobalTempDir(version string) string {
 	temp := os.TempDir()
 	logger.Debug.Printf("temp dir: %s", temp)
 
-	return path.Join(temp, baseDirName, "engines", EngineVersion)
+	return path.Join(temp, baseDirName, "engines", version)
 }
 
-func GlobalUnpackDir() string {
-	return path.Join(GlobalTempDir(), "unpacked")
+func GlobalUnpackDir(version string) string {
+	return path.Join(GlobalTempDir(version), "unpacked", "v2")
 }
 
 // GlobalCacheDir returns the path of where the CLI lives
@@ -99,7 +92,7 @@ func FetchEngine(toDir string, engineName string, binaryPlatformName string) err
 
 	binaryPlatformRemoteName := binaryPlatformName
 	if binaryPlatformRemoteName == "linux" {
-		binaryPlatformRemoteName = "linux-musl"
+		binaryPlatformRemoteName = "linux-static-x64"
 	}
 	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
 
@@ -149,7 +142,7 @@ func DownloadCLI(toDir string) error {
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
 	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
 
-	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, to, url)
+	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
 		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
@@ -193,7 +186,7 @@ func DownloadEngine(name string, toDir string) (file string, err error) {
 		return "", fmt.Errorf("could not download %s to %s: %w", url, to, err)
 	}
 
-	logger.Debug.Printf("download() took %s", time.Since(startDownload))
+	logger.Debug.Printf("%s engine download took %s", name, time.Since(startDownload))
 
 	logger.Debug.Printf("%s done", name)
 
@@ -216,7 +209,7 @@ func download(url string, to string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		out, _ := ioutil.ReadAll(resp.Body)
+		out, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("received code %d from %s: %+v", resp.StatusCode, url, string(out))
 	}
 
@@ -251,12 +244,12 @@ func download(url string, to string) error {
 }
 
 func copyFile(from string, to string) error {
-	input, err := ioutil.ReadFile(from)
+	input, err := os.ReadFile(from)
 	if err != nil {
 		return fmt.Errorf("readfile: %w", err)
 	}
 
-	if err := ioutil.WriteFile(to, input, os.ModePerm); err != nil {
+	if err := os.WriteFile(to, input, os.ModePerm); err != nil {
 		return fmt.Errorf("writefile: %w", err)
 	}
 

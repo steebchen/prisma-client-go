@@ -33,10 +33,3 @@ func (*sqLite) TeardownDatabase(t *testing.T, name string) {
 		t.Fatal(err)
 	}
 }
-
-func (*sqLite) Setup() {
-	// sqlite does not need any dependency; prisma can handle creating new db files
-}
-
-func (*sqLite) Teardown() {
-}

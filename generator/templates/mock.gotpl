@@ -34,12 +34,12 @@ type Mock struct {
 		mock *Mock
 	}
 
-	type i{{ $model.Name.GoCase }}MockExpectParam interface {
+	type {{ $model.Name.GoCase }}MockExpectParam interface {
 		ExtractQuery() builder.Query
 		{{ $model.Name.GoLowerCase }}Model()
 	}
 
-	func (m *{{ $ns }}) Expect(query i{{ $model.Name.GoCase }}MockExpectParam) *{{ $ns }}Exec {
+	func (m *{{ $ns }}) Expect(query {{ $model.Name.GoCase }}MockExpectParam) *{{ $ns }}Exec {
 		return &{{ $ns }}Exec{
 			mock:  m.mock,
 			query: query.ExtractQuery(),
@@ -52,6 +52,13 @@ type Mock struct {
 	}
 
 	func (m *{{ $ns }}Exec) Returns(v {{ $model.Name.GoCase }}Model) {
+		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
+			Query: m.query,
+			Want:  &v,
+		})
+	}
+
+	func (m *{{ $ns }}Exec) ReturnsMany(v []{{ $model.Name.GoCase }}Model) {
 		*m.mock.Expectations = append(*m.mock.Expectations, mock.Expectation{
 			Query: m.query,
 			Want:  &v,

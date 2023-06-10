@@ -4,8 +4,9 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
+
+	"github.com/prisma/prisma-client-go/binaries"
 )
 
 // TODO go fmt files after creation
@@ -59,9 +60,9 @@ import (
 )
 
 func init() {
-	unpack.Unpack(data, "%s")
+	unpack.Unpack(data, "%s", "%s")
 }
-`, name, constraints, pkg, name)
+`, name, constraints, pkg, name, binaries.EngineVersion)
 	return err
 }
 
@@ -89,7 +90,7 @@ func uncompressedMemcopy(w io.Writer, r io.Reader) error {
 		return err
 	}
 
-	b, err := ioutil.ReadAll(r)
+	b, err := io.ReadAll(r)
 	if err != nil {
 		return err
 	}

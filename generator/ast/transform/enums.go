@@ -1,13 +1,17 @@
 package transform
 
+import (
+	"github.com/prisma/prisma-client-go/generator/types"
+)
+
 type Enum struct {
-	Name   string   `json:"name"`
-	Values []string `json:"values"`
+	Name   types.String   `json:"name"`
+	Values []types.String `json:"values"`
 }
 
 func (r *AST) enums() []Enum {
 	var enums []Enum
-	for _, enum := range r.dmmf.Schema.EnumTypes.Enums {
+	for _, enum := range r.dmmf.Schema.EnumTypes.Model {
 		enums = append(enums, Enum{
 			Name:   enum.Name,
 			Values: enum.Values,

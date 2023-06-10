@@ -2,7 +2,6 @@ package binaries
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"testing"
@@ -12,7 +11,7 @@ import (
 )
 
 func tmpDir(t *testing.T) string {
-	dir, err := ioutil.TempDir("/tmp", "prisma-client-go-test-fetchEngine-")
+	dir, err := os.MkdirTemp("/tmp", "prisma-client-go-test-fetchEngine-")
 	if err != nil {
 		t.Fatal(err)
 	}
