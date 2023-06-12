@@ -33,4 +33,4 @@ jobs:
 
       - name: integration
         if: steps.changes.outputs.go == 'true'
-        run: docker build . --platform linux/amd64 -f test/integration/integration.dockerfile -t integration && docker run --platform linux/amd64 integration
+        run: docker build . -f test/integration/integration.dockerfile -t integration && docker run integration
