@@ -12,6 +12,17 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.gotpl'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '**/*.work'
+
       - uses: actions/cache@v3
         with:
           path: |
