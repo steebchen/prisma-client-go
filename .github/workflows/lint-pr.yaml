@@ -5,9 +5,6 @@ on:
       - opened
       - edited
       - synchronize
-env:
-  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go lint-pr.yaml"
-
 jobs:
   enforce-semantic-title:
     runs-on: ubuntu-latest

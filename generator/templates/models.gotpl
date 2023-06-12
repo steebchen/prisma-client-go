@@ -20,8 +20,8 @@
 		{{ end }}
 	}
 
-	// Raw{{ $model.Name.GoCase }} is a struct for {{ $model.Name }} when used in raw queries
-	type Raw{{ $model.Name.GoCase }} struct {
+	// Raw{{ $model.Name.GoCase }}Model is a struct for {{ $model.Name }} when used in raw queries
+	type Raw{{ $model.Name.GoCase }}Model struct {
 		{{ range $field := $model.Fields }}
 			{{- if not $field.Kind.IsRelation -}}
 				{{- if $field.IsRequired }}

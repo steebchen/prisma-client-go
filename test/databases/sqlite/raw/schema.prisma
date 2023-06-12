@@ -11,8 +11,8 @@ generator db {
 }
 
 model User {
-  id       String   @id @default(cuid())
-  email    String   @unique
+  id       String    @id @default(cuid())
+  email    String    @unique
   username String
   str      String
   strOpt   String?

@@ -1,8 +1,5 @@
 name: lint all
 on: pull_request
-env:
-  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go lint.yml"
-
 jobs:
   lint:
     name: lint
@@ -14,6 +11,17 @@ jobs:
         with:
           go-version: '1.19'
 
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.gotpl'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '**/*.work'
+
       - uses: actions/cache@v3
         with:
           path: |
@@ -23,13 +31,17 @@ jobs:
           restore-keys: ${{ runner.os }}-go-
 
       - name: download
+        if: steps.changes.outputs.go == 'true'
         run: go mod download
 
       - name: generate
+        if: steps.changes.outputs.go == 'true'
         run: go generate ./...
 
       - name: install golangci-lint
+        if: steps.changes.outputs.go == 'true'
         run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.50.0
 
       - name: run linter
+        if: steps.changes.outputs.go == 'true'
         run: ./bin/golangci-lint run ./... --timeout "5m0s" --enable "gofmt,revive,exportloopref,gocritic"

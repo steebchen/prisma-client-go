@@ -1,14 +1,22 @@
 name: e2e test all
 on: pull_request
-env:
-  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go e2e-test.yml"
-
 jobs:
   e2e:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            go:
+              - '**/*.go'
+              - '**/*.gotpl'
+              - '**/*.mod'
+              - '**/*.sum'
+              - '**/*.work'
 
       - uses: actions/setup-go@v4
         with:
@@ -26,6 +34,7 @@ jobs:
         run: go mod download
 
       - name: generate
+        if: steps.changes.outputs.go == 'true'
         run: |
           cd test/e2e/
           go generate -tags e2e ./...
@@ -33,6 +42,7 @@ jobs:
         #   DATA_PROXY_DATABASE_URL: ${{ secrets.DATA_PROXY_DATABASE_URL }}
 
       - name: test
+        if: steps.changes.outputs.go == 'true'
         run: |
           cd test/e2e/
           go test ./... -run '^TestE2E.*$' -tags e2e -v

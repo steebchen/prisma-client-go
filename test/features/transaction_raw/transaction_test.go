@@ -39,14 +39,16 @@ func TestTransactionRaw(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			var v []RawUser
+			var v []UserModel
 			if err := e.Into(&v); err != nil {
 				t.Fatal(err)
 			}
 
-			massert.Equal(t, []RawUser{{
-				ID:    "123",
-				Email: "john@example.com",
+			massert.Equal(t, []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "123",
+					Email: "john@example.com",
+				},
 			}}, v)
 		},
 	}, {
@@ -80,9 +82,11 @@ func TestTransactionRaw(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			expected := []RawUser{{
-				ID:    "123",
-				Email: "new-email",
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:    "123",
+					Email: "new-email",
+				},
 			}}
 
 			massert.Equal(t, expected, actual)
