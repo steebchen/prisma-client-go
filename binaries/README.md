@@ -6,19 +6,29 @@ Prisma Engine binaries are fully managed, maintained and automatically updated b
 
 Prisma CLI binaries are not officially managed and were just by the maintainers of the Go client. This is why there is a some documentation here and a script on how to build, upload and bump the Prisma CLI binaries.
 
+**NOTE: This is just for documentation purposes. The Prisma CLI is [automatically published](https://github.com/steebchen/prisma-client-go/blob/main/.github/workflows/publish-cli.yml).**
+
+--------
+
 ## How to build Prisma CLI binaries
+
+Prisma CLI binaries are automatically published to S3 by a GitHub action. You can follow the instructions below to build these binaries yourself.
 
 ### Prerequisites
 
-Install [zeit/pkg](https://github.com/zeit/pkg):
-
-```shell script
-npm i -g pkg
-```
+Requires NodeJS.
 
 Install the [AWS CLI](https://aws.amazon.com/cli/) and authenticate.
 
 ### Build the binary and upload to S3
+
+#### Publish the latest Prisma version
+
+```shell script
+sh publish-latest.sh
+```
+
+#### Publish a specific Prisma version
 
 ```shell script
 sh publish.sh <version>

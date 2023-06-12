@@ -1,0 +1,28 @@
+name: cli
+on:
+  schedule:
+    # run once per hour
+    - cron: '0 * * * *'
+jobs:
+  publish:
+    name: Publish Prisma CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Install dependencies
+        run: |
+          apt update && apt install -y curl jq unzip less
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          ./aws/install
+      - name: Publish the latest CLI
+        run: |
+          aws sts get-caller-identity
+          sh publish-latest.sh
+        working-directory: ./binaries
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PRISMA_CLI_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}
