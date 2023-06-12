@@ -5,7 +5,11 @@ export default {
   project: {
     link: 'https://github.com/prisma/prisma-client-go',
   },
-  head: null,
+  head: (
+    <>
+      <link rel="icon" href="/icon.png" sizes="any"/>
+    </>
+  ),
   docsRepositoryBase: 'https://github.com/prisma/prisma-client-go/tree/main/docs',
   footer: {
     text: (
