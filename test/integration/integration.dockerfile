@@ -13,8 +13,6 @@ RUN go mod download -x
 
 RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
 
-RUN ls -Rlah /app/test/integration
-
 # build the integration binary with all dependencies
 RUN go build -o /app/main .
 
