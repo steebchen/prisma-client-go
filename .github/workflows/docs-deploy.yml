@@ -4,15 +4,27 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
   push:
-    tags:
-      - '*'
     branches:
       - hotfix
+    release:
+      types:
+        - published
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          # fetch all history in order for Nextra to generate last modified dates
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: pnpm
+          cache-dependency-path: ./docs/pnpm-lock.yaml
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
       - name: Pull Vercel Environment Information
