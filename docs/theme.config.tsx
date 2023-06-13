@@ -3,19 +3,19 @@ import { DocsThemeConfig } from 'nextra-theme-docs'
 export default {
   logo: <span>Go Prisma</span>,
   project: {
-    link: 'https://github.com/prisma/prisma-client-go',
+    link: 'https://github.com/steebchen/prisma-client-go',
   },
   head: (
     <>
       <link rel="icon" href="/icon.png" sizes="any"/>
     </>
   ),
-  docsRepositoryBase: 'https://github.com/prisma/prisma-client-go/tree/main/docs',
+  docsRepositoryBase: 'https://github.com/steebchen/prisma-client-go/tree/main/docs',
   footer: {
     text: (
       <span>
         All source code and content licensed under&nbsp;
-        <a href="https://github.com/prisma/prisma-client-go/blob/main/LICENSE" target="_blank">
+        <a href="https://github.com/steebchen/prisma-client-go/blob/main/LICENSE" target="_blank">
           Apache 2.0
         </a>
       </span>

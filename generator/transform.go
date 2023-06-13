@@ -3,8 +3,9 @@ package generator
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/prisma/prisma-client-go/generator/ast/transform"
 	"os"
+
+	"github.com/steebchen/prisma-client-go/generator/ast/transform"
 )
 
 // Transform builds the AST from the flat DMMF so it can be used properly in templates

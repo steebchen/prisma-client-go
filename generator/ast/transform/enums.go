@@ -1,7 +1,7 @@
 package transform
 
 import (
-	"github.com/prisma/prisma-client-go/generator/types"
+	"github.com/steebchen/prisma-client-go/generator/types"
 )
 
 type Enum struct {

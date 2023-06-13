@@ -25,12 +25,12 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # prefetch the binaries, so that they will be cached and not downloaded on each change
-RUN go run github.com/prisma/prisma-client-go prefetch
+RUN go run github.com/steebchen/prisma-client-go prefetch
 
 COPY . ./
 
 # generate the Prisma Client Go client
-RUN go run github.com/prisma/prisma-client-go generate
+RUN go run github.com/steebchen/prisma-client-go generate
 # or, if you use go generate to run the generator, use the following line instead
 # RUN go generate ./...
 
@@ -57,11 +57,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # prefetch the binaries, so that they will be cached and not downloaded on each change
-RUN go run github.com/prisma/prisma-client-go prefetch
+RUN go run github.com/steebchen/prisma-client-go prefetch
 
 COPY ./ ./
 # generate the Prisma Client Go client
-RUN go run github.com/prisma/prisma-client-go generate
+RUN go run github.com/steebchen/prisma-client-go generate
 # or, if you use go generate to run the generator, use the following line instead
 # RUN go generate ./...
 

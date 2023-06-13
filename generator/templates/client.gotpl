@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
 const schema = `{{ .Datamodel }}`
 const schemaConnectionURL = "{{ (index .Datasources 0).URL.Value }}"
