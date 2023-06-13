@@ -12,9 +12,9 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
+	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 func (e *QueryEngine) Connect() error {
@@ -132,7 +132,7 @@ func (e *QueryEngine) ensure() (string, error) {
 	logger.Debug.Printf("version check took %s", time.Since(startVersion))
 
 	if v := strings.TrimSpace(strings.Replace(string(out), "query-engine", "", 1)); binaries.EngineVersion != v {
-		note := "Did you forget to run `go run github.com/prisma/prisma-client-go generate`?"
+		note := "Did you forget to run `go run github.com/steebchen/prisma-client-go generate`?"
 		msg := fmt.Errorf("expected query engine version `%s` but got `%s`\n%s", binaries.EngineVersion, v, note)
 		if forceVersion {
 			return "", msg

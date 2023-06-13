@@ -11,7 +11,7 @@ WORKDIR /app/test/integration
 
 RUN go mod download -x
 
-RUN go run github.com/prisma/prisma-client-go db push --schema schemax.prisma
+RUN go run github.com/steebchen/prisma-client-go db push --schema schemax.prisma
 
 # build the integration binary with all dependencies
 RUN go build -o /app/main .

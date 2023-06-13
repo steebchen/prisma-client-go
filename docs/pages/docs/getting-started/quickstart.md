@@ -16,7 +16,7 @@
     Install the Go module in your project:
 
     ```shell script
-    go get github.com/prisma/prisma-client-go
+    go get github.com/steebchen/prisma-client-go
     ```
 
 3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
@@ -30,7 +30,7 @@
     }
 
     generator db {
-        provider = "go run github.com/prisma/prisma-client-go"
+        provider = "go run github.com/steebchen/prisma-client-go"
         // set the output folder and package name
         // output           = "./your-folder"
         // package          = "yourpackagename"
@@ -51,12 +51,12 @@
 
     ```shell script
     # sync the database with your schema
-    go run github.com/prisma/prisma-client-go migrate dev --name init
+    go run github.com/steebchen/prisma-client-go migrate dev --name init
     ```
 
     After the migration, the Prisma Client Go client is automatically generated in your project.
 
-    If you just want to re-generate the client, run `go run github.com/prisma/prisma-client-go generate`.
+    If you just want to re-generate the client, run `go run github.com/steebchen/prisma-client-go generate`.
 
 ## Usage
 

@@ -4,13 +4,13 @@
     <h2>Prisma Client Go</h2>
     <p><h3 align="center">Typesafe database access for Go</h3></p>
     <div>
-        <a href="https://github.com/prisma/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/prisma/prisma-client-go" /></a>
+        <a href="https://github.com/steebchen/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/steebchen/prisma-client-go" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml"><img src="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml/badge.svg" /></a>
+        <a href="https://github.com/steebchen/prisma-client-go/actions/workflows/test.yml"><img src="https://github.com/steebchen/prisma-client-go/actions/workflows/test.yml/badge.svg" /></a>
         <span>&nbsp;&nbsp;</span>
         <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="./LICENSE"><img src="https://img.shields.io/github/license/prisma/prisma-client-go" /></a>
+        <a href="./LICENSE"><img src="https://img.shields.io/github/license/steebchen/prisma-client-go" /></a>
         <span>&nbsp;&nbsp;</span>
         <a href="https://slack.prisma.io/"><img src="https://img.shields.io/badge/asdf%20slack-blue.svg" /></a>
     </div>

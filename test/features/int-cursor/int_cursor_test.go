@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test"
-	"github.com/prisma/prisma-client-go/test/setup/mysql"
-	"github.com/prisma/prisma-client-go/test/setup/postgresql"
-	"github.com/prisma/prisma-client-go/test/setup/sqlite"
+	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/setup/mysql"
+	"github.com/steebchen/prisma-client-go/test/setup/postgresql"
+	"github.com/steebchen/prisma-client-go/test/setup/sqlite"
 )
 
 type cx = context.Context

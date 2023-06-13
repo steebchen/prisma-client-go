@@ -12,10 +12,10 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/bindata"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
+	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/binaries/bindata"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 const DefaultPackageName = "db"
@@ -57,7 +57,7 @@ func generateClient(input *Root) error {
 	var buf bytes.Buffer
 
 	ctx := build.Default
-	pkg, err := ctx.Import("github.com/prisma/prisma-client-go", ".", build.FindOnly)
+	pkg, err := ctx.Import("github.com/steebchen/prisma-client-go", ".", build.FindOnly)
 	if err != nil {
 		return fmt.Errorf("could not get main template asset: %w", err)
 	}

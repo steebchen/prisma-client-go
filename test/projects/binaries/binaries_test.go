@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
 )
 
 func TestBinaries(t *testing.T) {
