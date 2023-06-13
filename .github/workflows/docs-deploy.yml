@@ -4,11 +4,10 @@ env:
   VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 on:
   push:
+    tags:
+      - 'v*'
     branches:
       - hotfix
-    release:
-      types:
-        - published
 jobs:
   deploy:
     runs-on: ubuntu-latest
