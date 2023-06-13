@@ -5,6 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3.3.0
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            docs:
+              - '.github/workflows/**/*.yml'
+              - 'docs/**'
+
       - uses: actions/cache@v3
         with:
           path: ${{ github.workspace }}/docs/.next/cache
@@ -13,15 +22,20 @@ jobs:
             ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.md', '**.mdx', '**.[jt]sx') }}
             ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
             ${{ runner.os }}-nextjs-
+
       - uses: pnpm/action-setup@v2
         with:
           version: 8.6.0
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
           cache: pnpm
           cache-dependency-path: ./docs/pnpm-lock.yaml
+
       - run: pnpm install --frozen-lockfile
         working-directory: ./docs
+
       - run: pnpm test
+        if: steps.changes.outputs.docs == 'true'
         working-directory: ./docs
