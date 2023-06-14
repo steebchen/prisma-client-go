@@ -2,7 +2,9 @@
 
 set -eux
 
+CI=${CI:-false}
 S3_BUCKET="prisma-photongo"
+pkg_version=5.8.1
 
 v="$1"
 
@@ -15,7 +17,7 @@ echo "Building Prisma CLI $v"
 mkdir -p build
 cd build
 yarn init --yes
-yarn add "pkg" "prisma@$v" "@prisma/client@$v"
+yarn add "pkg@$pkg_version" "prisma@$v" "@prisma/client@$v"
 yarn prisma version
 
 mkdir -p node_modules/prisma/node_modules/@prisma/engines
@@ -29,6 +31,14 @@ version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " 
 if [ "$version" != "$v" ]; then
   echo "Version mismatch: $version != $v"
   exit 1
+fi
+
+# test
+if [[ $CI == 'true' ]]; then
+  echo 'Testing binary'
+  ./prisma-linux-x64 --version
+else
+  echo 'Skipping tests'
 fi
 
 mkdir -p out/

@@ -12,8 +12,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18.x
-      - name: Install dependencies
-        run: apt update && apt install -y curl jq unzip less
       - name: Publish the latest CLI
         run: |
           aws sts get-caller-identity
