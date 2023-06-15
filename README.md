@@ -19,7 +19,7 @@
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
         <a href="https://goprisma.org/docs">Docs</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs/walkthrough">Syntax Walkthrough</a>
+        <a href="https://goprisma.org/docs/walkthrough">Walkthrough</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
         <a href="https://www.prisma.io/blog">Prisma Blog</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
