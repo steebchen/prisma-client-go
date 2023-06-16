@@ -45,13 +45,14 @@ func Name() string {
 }
 
 func Arch() string {
-	// should be x86 or arm64
-	if runtime.GOARCH == "amd64" {
+	switch runtime.GOARCH {
+	case "amd64":
 		return "x64"
-	} else if runtime.GOARCH == "arm64" {
+	case "arm64":
 		return "arm64"
-	} else {
-		panic(fmt.Errorf("unsupported arch: %s", runtime.GOARCH))
+	default:
+		log.Printf("warning: unsupported architecture %s, falling back to x64", runtime.GOARCH)
+		return "x64"
 	}
 }
 
