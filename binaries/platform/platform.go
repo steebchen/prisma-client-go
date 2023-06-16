@@ -3,6 +3,7 @@ package platform
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"regexp"
 	"runtime"

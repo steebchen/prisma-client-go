@@ -18,7 +18,7 @@ import (
 const PrismaVersion = "4.15.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
-// The versions can be found under https://github.com/prisma/prisma-engines/commits/master
+// The versions can be found under https://github.com/prisma/prisma-engines/commits/main
 const EngineVersion = "70a9adfd11f836696eca398396544fe07a8d8edb"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
