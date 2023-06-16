@@ -20,15 +20,22 @@ func BinaryPlatformName() string {
 	}
 
 	platform := Name()
+	arch := Arch()
 
+	// other supported platforms are darwin and windows
 	if platform != "linux" {
+		// special case for darwin arm64
+		if platform == "darwin" && arch == "arm64" {
+			return "darwin-arm64"
+		}
+		// otherwise, return `darwin` or `windows`
 		return platform
 	}
 
 	distro := getLinuxDistro()
 
 	if distro == "alpine" {
-		return "linux-static-x64"
+		return fmt.Sprintf("linux-static-%s", arch)
 	}
 
 	ssl := getOpenSSL()
