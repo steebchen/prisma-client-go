@@ -44,6 +44,17 @@ func Name() string {
 	return runtime.GOOS
 }
 
+func Arch() string {
+	// should be x86 or arm64
+	if runtime.GOARCH == "amd64" {
+		return "x64"
+	} else if runtime.GOARCH == "arm64" {
+		return "arm64"
+	} else {
+		panic(fmt.Errorf("unsupported arch: %s", runtime.GOARCH))
+	}
+}
+
 // CheckForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
 func CheckForExtension(platform, path string) string {
 	if platform == "windows" {
