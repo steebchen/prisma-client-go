@@ -49,7 +49,7 @@ The Go client is currently maintained by @steebchen and considered to be in alph
 
 ## Contributing
 
-Check out the [advanced contributing guide](./CONTRIBUTING).
+Check out the [advanced contributing guide](./CONTRIBUTING.md).
 
 ## Security
 
