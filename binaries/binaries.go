@@ -141,7 +141,7 @@ func FetchNative(toDir string) error {
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
-	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
+	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name(), platform.Arch()))
 
 	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 
