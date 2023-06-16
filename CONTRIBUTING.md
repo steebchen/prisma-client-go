@@ -1,5 +1,9 @@
 # Contributing
 
+## PRs Welcome
+
+We welcome contributions to this project. For small things, feel free to directly create a PR. For major changes, please open an issue first to discuss the changes.
+
 ## Writing Commit Messages
 
 We use [conventional commits](https://www.conventionalcommits.org) (also known as semantic commits) to ensure consistent and descriptive commit messages.
