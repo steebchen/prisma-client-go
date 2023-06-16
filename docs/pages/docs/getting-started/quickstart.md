@@ -2,61 +2,60 @@
 
 ## Setup
 
-1) Initialise a new Go project
+### Initialise a new Go project
 
-    If you don't have a Go project yet, initialise one using Go modules:
+If you don't have a Go project yet, initialise one using Go modules:
 
-    ```shell script
-    mkdir demo && cd demo
-    go mod init demo
-    ```
+```shell script
+mkdir demo && cd demo
+go mod init demo
+```
 
-2) Get Prisma Client Go
+### Get Prisma Client Go
 
-    Install the Go module in your project:
+Install the Go module in your project:
 
-    ```shell script
-    go get github.com/steebchen/prisma-client-go
-    ```
+```shell script
+go get github.com/steebchen/prisma-client-go
+```
 
-3) Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and
-    Prisma Client Go as a generator with two models would look like this:
+### Prepare your Prisma database schema
 
-    ```prisma
-    datasource db {
-        // could be postgresql or mysql
-        provider = "sqlite"
-        url      = "file:dev.db"
-    }
+Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
 
-    generator db {
-        provider = "go run github.com/steebchen/prisma-client-go"
-        // set the output folder and package name
-        // output           = "./your-folder"
-        // package          = "yourpackagename"
-    }
+```prisma
+datasource db {
+  // could be postgresql or mysql
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
 
-    model Post {
-        id        String   @default(cuid()) @id
-        createdAt DateTime @default(now())
-        updatedAt DateTime @updatedAt
-        title     String
-        published Boolean
-        desc      String?
-    }
-    ```
+generator db {
+  provider = "go run github.com/steebchen/prisma-client-go"
+}
 
-    To get this up and running in your database, we use the Prisma migration
-    tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate our database:
+model Post {
+  id        String   @default(cuid()) @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  published Boolean
+  desc      String?
+}
+```
 
-    ```shell script
-    # sync the database with your schema
-    go run github.com/steebchen/prisma-client-go migrate dev --name init
-    ```
+Next, run `db push` to synchronize your schema with your database. It will also create the database if it doesn't exist.
 
-    After the migration, the Prisma Client Go client is automatically generated in your project.
+```shell script
+# sync the database with your schema
+go run github.com/steebchen/prisma-client-go db push
+# The Prisma Client Go client is automatically generated in your project.
+# You can re-run this command any time to sync your schema with the database.
+```
 
-    If you just want to re-generate the client, run `go run github.com/steebchen/prisma-client-go generate`.
+If you just want to re-generate the client, run `go run github.com/steebchen/prisma-client-go generate`.
+
+To create a migration for your production database, use the Prisma migration tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate your database.
 
 ## Usage
 
@@ -66,69 +65,69 @@ Create a file `main.go`:
 package main
 
 import (
-    "context"
-    "encoding/json"
-    "fmt"
+  "context"
+  "encoding/json"
+  "fmt"
 
-    "demo/db"
+  "demo/db"
 )
 
 func main() {
-    if err := run(); err != nil {
-        panic(err)
-    }
+  if err := run(); err != nil {
+    panic(err)
+  }
 }
 
 func run() error {
-    client := db.NewClient()
-    if err := client.Prisma.Connect(); err != nil {
-        return err
+  client := db.NewClient()
+  if err := client.Prisma.Connect(); err != nil {
+    return err
+  }
+
+  defer func() {
+    if err := client.Prisma.Disconnect(); err != nil {
+      panic(err)
     }
+  }()
 
-    defer func() {
-        if err := client.Prisma.Disconnect(); err != nil {
-            panic(err)
-        }
-    }()
+  ctx := context.Background()
 
-    ctx := context.Background()
+  // create a post
+  createdPost, err := client.Post.CreateOne(
+    db.Post.Title.Set("Hi from Prisma!"),
+    db.Post.Published.Set(true),
+    db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
+  ).Exec(ctx)
+  if err != nil {
+    return err
+  }
 
-    // create a post
-    createdPost, err := client.Post.CreateOne(
-        db.Post.Title.Set("Hi from Prisma!"),
-        db.Post.Published.Set(true),
-        db.Post.Desc.Set("Prisma is a database toolkit and makes databases easy."),
-    ).Exec(ctx)
-    if err != nil {
-        return err
-    }
+  result, _ := json.MarshalIndent(createdPost, "", "  ")
+  fmt.Printf("created post: %s\n", result)
 
-    result, _ := json.MarshalIndent(createdPost, "", "  ")
-    fmt.Printf("created post: %s\n", result)
+  // find a single post
+  post, err := client.Post.FindUnique(
+    db.Post.ID.Equals(createdPost.ID),
+  ).Exec(ctx)
+  if err != nil {
+    return err
+  }
 
-    // find a single post
-    post, err := client.Post.FindUnique(
-        db.Post.ID.Equals(createdPost.ID),
-    ).Exec(ctx)
-    if err != nil {
-        return err
-    }
+  result, _ = json.MarshalIndent(post, "", "  ")
+  fmt.Printf("post: %s\n", result)
 
-    result, _ = json.MarshalIndent(post, "", "  ")
-    fmt.Printf("post: %s\n", result)
+  // for optional/nullable values, you need to check the function and create two return values
+  // `desc` is a string, and `ok` is a bool whether the record is null or not. If it's null,
+  // `ok` is false, and `desc` will default to Go's default values; in this case an empty string (""). Otherwise,
+  // `ok` is true and `desc` will be "my description".
+  desc, ok := post.Desc()
+  if !ok {
+    return fmt.Errorf("post's description is null")
+  }
 
-    // for optional/nullable values, you need to check the function and create two return values
-    // `desc` is a string, and `ok` is a bool whether the record is null or not. If it's null,
-    // `ok` is false, and `desc` will default to Go's default values; in this case an empty string (""). Otherwise,
-    // `ok` is true and `desc` will be "my description".
-    desc, ok := post.Desc()
-    if !ok {
-        return fmt.Errorf("post's description is null")
-    }
+  fmt.Printf("The posts's description is: %s\n", desc)
 
-    fmt.Printf("The posts's description is: %s\n", desc)
-
-    return nil
+  return nil
 }
 ```
 
@@ -161,5 +160,7 @@ The posts's title is: Prisma is a database toolkit and makes databases easy.
 
 ### Next steps
 
-We just scratched the surface of what you can do. Read our [advanced tutorial](advanced.md) to learn about more
+Read more about [using the Go CLI](cli.md) for Prisma CLI commands such as `generate`, `migrate`, `db`, and `introspect`.
+
+We just scratched the surface of what you can do. Read the [advanced tutorial](advanced.md) to learn about more
 complex queries and how you can query for relations.
