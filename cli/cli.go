@@ -28,7 +28,7 @@ func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
 	cmd := exec.Command(path.Join(dir, prisma), arguments...) //nolint:gosec
-	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameDynamic())
+	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameStatic())
 
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PRISMA_HIDE_UPDATE_MESSAGE=true")
