@@ -194,14 +194,13 @@ func generateBinaries(input *Root) error {
 
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
-		pt := name
+		pt := runtime.GOOS
 		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
 			pt = "linux"
 		}
 
 		if name == "native" {
 			name = platform.BinaryPlatformName()
-			pt = runtime.GOOS
 		}
 
 		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
