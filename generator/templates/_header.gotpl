@@ -24,6 +24,7 @@ import (
 	_ "github.com/iancoleman/strcase"
 	_ "github.com/takuoki/gocase"
 	_ "github.com/joho/godotenv"
+	_ "golang.org/x/text/cases"
 )
 
 // ignore unused os import as it may not be needed depending on engine type
