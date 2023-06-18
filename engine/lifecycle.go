@@ -14,6 +14,7 @@ import (
 
 	"github.com/steebchen/prisma-client-go/binaries"
 	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/binaries/unpack"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
@@ -101,6 +102,9 @@ func (e *QueryEngine) ensure() (string, error) {
 
 		file = prismaQueryEngineBinary
 		forceVersion = false
+	} else if qe := os.Getenv(unpack.FileEnv); qe != "" {
+		logger.Debug.Printf("using PRISMA_INTERNAL_QUERY_ENGINE_DIR %s", qe)
+		file = qe
 	} else {
 		if info, err := os.Stat(localExactPath); err == nil {
 			file = localExactPath

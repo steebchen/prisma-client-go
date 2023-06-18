@@ -25,6 +25,16 @@ func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = DefaultPackageName
 	}
+
+	if binaryTargets := os.Getenv("PRISMA_CLI_BINARY_TARGETS"); binaryTargets != "" {
+		s := strings.Split(binaryTargets, ",")
+		var targets []BinaryTarget
+		for _, t := range s {
+			targets = append(targets, BinaryTarget{Value: t})
+		}
+		input.Generator.BinaryTargets = targets
+		logger.Debug.Printf("overriding binary targets: %+v", targets)
+	}
 }
 
 // Run invokes the generator, which builds the templates and writes to the specified output file.
@@ -144,13 +154,24 @@ func generateBinaries(input *Root) error {
 	}
 
 	var targets []string
+	var isNonLinux bool
+
+	logger.Debug.Printf("defined binary targets: %v", input.Generator.BinaryTargets)
 
 	for _, target := range input.Generator.BinaryTargets {
 		targets = append(targets, target.Value)
+		if target.Value == "darwin" || target.Value == "windows" {
+			isNonLinux = true
+		}
 	}
 
-	targets = add(targets, "native")
-	targets = add(targets, "linux")
+	// add native by default if native binary is darwin or linux
+	// this prevents conflicts when building on linux
+	if isNonLinux || len(targets) == 0 {
+		targets = add(targets, "native")
+	}
+
+	logger.Debug.Printf("final binary targets: %v", targets)
 
 	// TODO refactor
 	for _, name := range targets {
@@ -174,7 +195,7 @@ func generateBinaries(input *Root) error {
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
 		pt := name
-		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
+		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
 			pt = "linux"
 		}
 
@@ -189,7 +210,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 		to := path.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
-		if err := bindata.WriteFile(strings.ReplaceAll(name, "-", "_"), pkg, pt, enginePath, to); err != nil {
+		if err := bindata.WriteFile(name, pkg, pt, enginePath, to); err != nil {
 			return fmt.Errorf("generate write go file: %w", err)
 		}
 

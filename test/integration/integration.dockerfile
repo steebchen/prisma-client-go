@@ -24,7 +24,7 @@ WORKDIR /app
 COPY --from=build /app/main /app/main
 COPY --from=build /app/test/integration/dev.db /app/dev.db
 
-ENV PRISMA_CLIENT_GO_LOG=info
+ENV PRISMA_CLIENT_GO_LOG=debug
 ENV DEBUG=*
 
 CMD ["/app/main"]
