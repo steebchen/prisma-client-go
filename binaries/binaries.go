@@ -18,11 +18,11 @@ import (
 const PrismaVersion = "4.15.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
-// The versions can be found under https://github.com/prisma/prisma-engines/commits/master
+// The versions can be found under https://github.com/prisma/prisma-engines/commits/main
 const EngineVersion = "70a9adfd11f836696eca398396544fe07a8d8edb"
 
 // PrismaURL points to an S3 bucket URL where the CLI binaries are stored.
-var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-x64.gz"
+var PrismaURL = "https://packaged-cli.prisma.sh/%s-%s-%s-%s.gz"
 
 // EngineURL points to an S3 bucket URL where the Prisma engines are stored.
 var EngineURL = "https://binaries.prisma.sh/all_commits/%s/%s/%s.gz"
@@ -54,7 +54,8 @@ func init() {
 // PrismaCLIName returns the local file path of where the CLI lives
 func PrismaCLIName() string {
 	variation := platform.Name()
-	return fmt.Sprintf("prisma-cli-%s-x64", variation)
+	arch := platform.Arch()
+	return fmt.Sprintf("prisma-cli-%s-%s", variation, arch)
 }
 
 var baseDirName = path.Join("prisma", "binaries")
@@ -140,7 +141,7 @@ func FetchNative(toDir string) error {
 func DownloadCLI(toDir string) error {
 	cli := PrismaCLIName()
 	to := platform.CheckForExtension(platform.Name(), path.Join(toDir, cli))
-	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name()))
+	url := platform.CheckForExtension(platform.Name(), fmt.Sprintf(PrismaURL, "prisma-cli", PrismaVersion, platform.Name(), platform.Arch()))
 
 	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 

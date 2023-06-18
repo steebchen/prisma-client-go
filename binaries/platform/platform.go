@@ -3,6 +3,7 @@ package platform
 
 import (
 	"fmt"
+	"log"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -19,15 +20,22 @@ func BinaryPlatformName() string {
 	}
 
 	platform := Name()
+	arch := Arch()
 
+	// other supported platforms are darwin and windows
 	if platform != "linux" {
+		// special case for darwin arm64
+		if platform == "darwin" && arch == "arm64" {
+			return "darwin-arm64"
+		}
+		// otherwise, return `darwin` or `windows`
 		return platform
 	}
 
 	distro := getLinuxDistro()
 
 	if distro == "alpine" {
-		return "linux-static-x64"
+		return fmt.Sprintf("linux-static-%s", arch)
 	}
 
 	ssl := getOpenSSL()
@@ -42,6 +50,18 @@ func BinaryPlatformName() string {
 // Name returns the platform name
 func Name() string {
 	return runtime.GOOS
+}
+
+func Arch() string {
+	switch runtime.GOARCH {
+	case "amd64":
+		return "x64"
+	case "arm64":
+		return "arm64"
+	default:
+		log.Printf("warning: unsupported architecture %s, falling back to x64", runtime.GOARCH)
+		return "x64"
+	}
 }
 
 // CheckForExtension adds a .exe extension on windows (e.g. .gz -> .exe.gz)
