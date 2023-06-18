@@ -165,7 +165,7 @@ func GetEnginePath(dir, engine, binaryName string) string {
 }
 
 func DownloadEngine(name string, toDir string) (file string, err error) {
-	binaryName := platform.BinaryPlatformName()
+	binaryName := platform.BinaryPlatformNameDynamic()
 
 	logger.Debug.Printf("checking %s...", name)
 

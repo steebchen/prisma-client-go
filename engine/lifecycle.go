@@ -72,8 +72,8 @@ func (e *QueryEngine) ensure() (string, error) {
 
 	binariesPath := binaries.GlobalUnpackDir(binaries.EngineVersion)
 	// check for darwin/windows/linux first
-	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
-	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
+	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameStatic())
+	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameDynamic())
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
@@ -103,7 +103,7 @@ func (e *QueryEngine) ensure() (string, error) {
 		file = prismaQueryEngineBinary
 		forceVersion = false
 	} else if qe := os.Getenv(unpack.FileEnv); qe != "" {
-		logger.Debug.Printf("using PRISMA_INTERNAL_QUERY_ENGINE_DIR %s", qe)
+		logger.Debug.Printf("using unpacked file env %s %s", unpack.FileEnv, qe)
 		file = qe
 	} else {
 		if info, err := os.Stat(localExactPath); err == nil {
