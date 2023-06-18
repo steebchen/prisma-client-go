@@ -88,7 +88,7 @@ func GlobalCacheDir() string {
 func FetchEngine(dir string, engineName string, binaryName string) error {
 	logger.Debug.Printf("checking %s...", engineName)
 
-	to := GlobalCacheDir()
+	to := GetEnginePath(dir, engineName, binaryName)
 
 	binaryPlatformRemoteName := binaryName
 	if binaryPlatformRemoteName == "linux" {
