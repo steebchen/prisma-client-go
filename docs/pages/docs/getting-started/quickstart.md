@@ -131,7 +131,13 @@ func run() error {
 }
 ```
 
-and run it:
+make sure your go.mod is up to date:
+
+```
+go mod tidy
+```
+
+and then run it:
 
 ```shell script
 go run .
