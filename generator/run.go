@@ -176,7 +176,7 @@ func generateBinaries(input *Root) error {
 	// TODO refactor
 	for _, name := range targets {
 		if name == "native" {
-			name = platform.BinaryPlatformNameDynamic()
+			name = platform.BinaryPlatformNameStatic()
 		}
 
 		// first, ensure they are actually downloaded
