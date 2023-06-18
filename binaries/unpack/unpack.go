@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/steebchen/prisma-client-go/binaries"
@@ -16,6 +17,8 @@ import (
 // noinspection GoUnusedExportedFunction
 func Unpack(data []byte, name string, version string) {
 	start := time.Now()
+
+	name = strings.ReplaceAll(name, "_", "-")
 
 	filename := fmt.Sprintf("prisma-query-engine-%s", name)
 
@@ -31,7 +34,7 @@ func Unpack(data []byte, name string, version string) {
 	}
 
 	if _, err := os.Stat(file); err == nil {
-		logger.Debug.Printf("query engine exists, not unpacking. %s", time.Since(start))
+		logger.Debug.Printf("query engine exists, not unpacking. %s. at %s", time.Since(start), file)
 		return
 	}
 

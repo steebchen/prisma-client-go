@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -172,16 +173,17 @@ func generateBinaries(input *Root) error {
 
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
-		if name == "native" {
-			name = platform.BinaryPlatformName()
-		}
-
-		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
-
 		pt := name
 		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
 			pt = "linux"
 		}
+
+		if name == "native" {
+			name = platform.BinaryPlatformName()
+			pt = runtime.GOOS
+		}
+
+		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
 
 		filename := fmt.Sprintf("query-engine-%s_gen.go", name)
 		to := path.Join(outputDir, filename)
