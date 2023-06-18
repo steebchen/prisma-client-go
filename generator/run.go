@@ -177,6 +177,7 @@ func generateBinaries(input *Root) error {
 	for _, name := range targets {
 		if name == "native" {
 			name = platform.BinaryPlatformNameStatic()
+			logger.Debug.Printf("swapping 'native' binary target with '%s'", name)
 		}
 
 		// first, ensure they are actually downloaded
@@ -200,7 +201,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 		}
 
 		if name == "native" {
-			name = platform.BinaryPlatformNameDynamic()
+			name = platform.BinaryPlatformNameStatic()
 		}
 
 		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
