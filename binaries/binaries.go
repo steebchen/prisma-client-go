@@ -95,16 +95,17 @@ func FetchEngine(toDir string, engineName string, binaryPlatformName string) err
 	if binaryPlatformRemoteName == "linux" {
 		binaryPlatformRemoteName = "linux-static-x64"
 	}
-	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
-
-	logger.Debug.Printf("download url %s", url)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
-		logger.Debug.Printf("%s is cached", to)
+		logger.Debug.Printf("%s is cached at %s", engineName, to)
 		return nil
 	}
 
+	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
+
 	logger.Debug.Printf("%s is missing, downloading...", engineName)
+
+	logger.Debug.Printf("downloading %s from %s to %s", engineName, url, to)
 
 	if err := download(url, to); err != nil {
 		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
