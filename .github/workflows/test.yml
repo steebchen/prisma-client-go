@@ -42,3 +42,5 @@ jobs:
       - name: test
         if: steps.changes.outputs.go == 'true'
         run: go test ./... -v
+        env:
+          PRISMA_CLIENT_GO_LOG: debug
