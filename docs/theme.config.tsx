@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { DocsThemeConfig } from 'nextra-theme-docs'
 
 export default {
@@ -13,12 +14,25 @@ export default {
   docsRepositoryBase: 'https://github.com/steebchen/prisma-client-go/tree/main/docs',
   footer: {
     text: (
-      <span>
-        All source code and content licensed under&nbsp;
-        <a href="https://github.com/steebchen/prisma-client-go/blob/main/LICENSE" target="_blank">
-          Apache 2.0
-        </a>
-      </span>
+      <>
+        <div style={{ width: '100%' }}>
+          All source code and content licensed under&nbsp;
+          <a href="https://github.com/steebchen/prisma-client-go/blob/main/LICENSE" target="_blank">
+            Apache 2.0
+          </a>
+        </div>
+
+        <div>
+          <a href="https://vercel.com/?utm_source=prisma-client-go&utm_campaign=oss" target="_blank">
+            <Image
+              alt="Powered by Vercel"
+              src="https://images.ctfassets.net/e5382hct74si/78Olo8EZRdUlcDUFQvnzG7/fa4cdb6dc04c40fceac194134788a0e2/1618983297-powered-by-vercel.svg"
+              width="212"
+              height="44"
+            />
+          </a>
+        </div>
+      </>
     ),
   },
   useNextSeoProps() {
