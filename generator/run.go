@@ -180,6 +180,8 @@ func generateBinaries(input *Root) error {
 			logger.Debug.Printf("swapping 'native' binary target with '%s'", name)
 		}
 
+		name = TransformBinaryTarget(name)
+
 		// first, ensure they are actually downloaded
 		if err := binaries.FetchEngine(binaries.GlobalCacheDir(), "query-engine", name); err != nil {
 			return fmt.Errorf("failed fetching binaries: %w", err)
@@ -204,6 +206,8 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 			name = platform.BinaryPlatformNameStatic()
 		}
 
+		name = TransformBinaryTarget(name)
+
 		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
 
 		filename := fmt.Sprintf("query-engine-%s_gen.go", name)
@@ -227,4 +231,13 @@ func add(list []string, item string) []string {
 		list = append(list, item)
 	}
 	return list
+}
+
+func TransformBinaryTarget(name string) string {
+	// TODO this is a temp fix as the exact alpine libraries are not working
+	if name == "linux" || strings.Contains(name, "musl") {
+		name = "linux-static-x64"
+		logger.Debug.Printf("overriding binary name with '%s' due to linux or musl", name)
+	}
+	return name
 }

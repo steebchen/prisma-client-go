@@ -34,10 +34,6 @@ func BinaryPlatformNameDynamic() string {
 
 	distro := getLinuxDistro()
 
-	if distro == "alpine" {
-		return fmt.Sprintf("linux-static-%s", arch)
-	}
-
 	ssl := getOpenSSL()
 
 	name := fmt.Sprintf("%s-openssl-%s", distro, ssl)
