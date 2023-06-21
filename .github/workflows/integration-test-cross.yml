@@ -1,7 +1,7 @@
 name: integration test all
 on: pull_request
 jobs:
-  integration:
+  integration-alpine:
     strategy:
       fail-fast: false
       matrix:
@@ -43,6 +43,6 @@ jobs:
           restore-keys: ${{ runner.os }}-go-
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
-      - name: integration
+      - name: test
         if: steps.changes.outputs.go == 'true'
-        run: docker build . -f test/integration/integration.dockerfile -t integration && docker run integration
+        run: docker build . --build-arg IMAGE="golang:1-alpine" -f test/integration/integration.dockerfile -t integration && docker run integration
