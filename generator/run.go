@@ -236,7 +236,7 @@ func add(list []string, item string) []string {
 func TransformBinaryTarget(name string) string {
 	// TODO this is a temp fix as the exact alpine libraries are not working
 	if name == "linux" || strings.Contains(name, "musl") {
-		name = "linux-static-x64"
+		name = "linux-static-" + platform.Arch()
 		logger.Debug.Printf("overriding binary name with '%s' due to linux or musl", name)
 	}
 	return name
