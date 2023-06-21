@@ -45,4 +45,4 @@ jobs:
 
       - name: test
         if: steps.changes.outputs.go == 'true'
-        run: docker build . --build-arg IMAGE="golang:1-alpine" -f test/integration/integration.dockerfile -t integration && docker run integration
+        run: docker build . --build-arg IMAGE="golang:1" -f test/integration/integration.dockerfile -t integration && docker run integration
