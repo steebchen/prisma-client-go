@@ -86,21 +86,16 @@ func GlobalCacheDir() string {
 }
 
 func FetchEngine(dir string, engineName string, binaryName string) error {
-	logger.Debug.Printf("checking %s...", engineName)
+	logger.Debug.Printf("checking %s %s...", engineName, binaryName)
 
 	to := GetEnginePath(dir, engineName, binaryName)
-
-	binaryPlatformRemoteName := binaryName
-	if binaryPlatformRemoteName == "linux" {
-		binaryPlatformRemoteName = "linux-static-x64"
-	}
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
 		logger.Debug.Printf("%s is cached at %s", engineName, to)
 		return nil
 	}
 
-	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
+	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, engineName))
 
 	logger.Debug.Printf("%s is missing, downloading...", engineName)
 
