@@ -90,9 +90,9 @@ func (e *QueryEngine) ensure() (string, error) {
 	cacheStatic := path.Join(cachePath, binaries.EngineVersion, name+binaryName)
 	cacheExact := path.Join(cachePath, binaries.EngineVersion, name+exactBinaryName)
 
-	logger.Debug.Printf("expecting local query engine `%s` or `%s`", localStatic, localExact)
-	logger.Debug.Printf("expecting global query engine `%s` or `%s`", globalUnpackStatic, globalUnpackExact)
-	logger.Debug.Printf("expecting cached query engine `%s` or `%s`", cacheStatic, cacheExact)
+	logger.Debug.Printf("checking for local query engine `%s` or `%s`", localStatic, localExact)
+	logger.Debug.Printf("checking for global query engine `%s` or `%s`", globalUnpackStatic, globalUnpackExact)
+	logger.Debug.Printf("checking for cached query engine `%s` or `%s`", cacheStatic, cacheExact)
 
 	// TODO write tests for all cases
 
@@ -107,27 +107,31 @@ func (e *QueryEngine) ensure() (string, error) {
 
 		file = prismaQueryEngineBinary
 		forceVersion = false
-	} else if qe := os.Getenv(unpack.FileEnv); qe != "" {
-		logger.Debug.Printf("using unpacked file env %s %s", unpack.FileEnv, qe)
-		file = qe
 	} else {
+		if qe := os.Getenv(unpack.FileEnv); qe != "" {
+			logger.Debug.Printf("using unpacked file env %s %s", unpack.FileEnv, qe)
+
+			if info, err := os.Stat(qe); err == nil {
+				file = qe
+				logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
+			} else {
+				return "", fmt.Errorf("prisma query engine was expected at %s via FileEnv but was not found", qe)
+			}
+		}
+
 		if info, err := os.Stat(localExact); err == nil {
 			file = localExact
 			logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
 		} else if info, err = os.Stat(localStatic); err == nil {
 			file = localStatic
 			logger.Debug.Printf("query engine found in working directory: %s %+v", file, info)
-		}
-
-		if info, err := os.Stat(cacheExact); err == nil {
+		} else if info, err = os.Stat(cacheExact); err == nil {
 			file = cacheExact
 			logger.Debug.Printf("query engine found in cache path: %s %+v", file, info)
 		} else if info, err = os.Stat(cacheStatic); err == nil {
 			file = cacheStatic
 			logger.Debug.Printf("exact query engine found in cache path: %s %+v", file, info)
-		}
-
-		if info, err := os.Stat(globalUnpackExact); err == nil {
+		} else if info, err = os.Stat(globalUnpackExact); err == nil {
 			file = globalUnpackExact
 			logger.Debug.Printf("query engine found in global path: %s %+v", file, info)
 		} else if info, err = os.Stat(globalUnpackStatic); err == nil {

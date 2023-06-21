@@ -14,7 +14,7 @@ import (
 
 // TODO check checksum after expanding file
 
-const FileEnv = "PRISMA_INTERNAL_QUERY_ENGINE_DIR"
+const FileEnv = "PRISMA_INTERNAL_QUERY_ENGINE_PATH"
 
 // noinspection GoUnusedExportedFunction
 func Unpack(data []byte, name string, version string) {
