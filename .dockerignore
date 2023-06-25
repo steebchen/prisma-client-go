@@ -15,3 +15,6 @@ schema.graphql
 **/*_gen.go
 **/prisma-*
 **/query-engine-*
+
+Dockerfile
+*.dockerfile

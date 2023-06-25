@@ -14,6 +14,7 @@ import (
 
 	"github.com/steebchen/prisma-client-go/binaries"
 	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/binaries/unpack"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
@@ -69,10 +70,12 @@ func (e *QueryEngine) Disconnect() error {
 func (e *QueryEngine) ensure() (string, error) {
 	ensureEngine := time.Now()
 
-	binariesPath := binaries.GlobalUnpackDir(binaries.EngineVersion)
+	unpackPath := binaries.GlobalUnpackDir(binaries.EngineVersion)
+	cachePath := binaries.GlobalCacheDir()
+
 	// check for darwin/windows/linux first
-	binaryName := platform.CheckForExtension(platform.Name(), platform.Name())
-	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
+	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameStatic())
+	exactBinaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameDynamic())
 
 	var file string
 	// forceVersion saves whether a version check should be done, which should be disabled
@@ -80,13 +83,16 @@ func (e *QueryEngine) ensure() (string, error) {
 	forceVersion := true
 
 	name := "prisma-query-engine-"
-	localPath := path.Join("./", name+binaryName)
-	localExactPath := path.Join("./", name+exactBinaryName)
-	globalPath := path.Join(binariesPath, name+binaryName)
-	globalExactPath := path.Join(binariesPath, name+exactBinaryName)
+	localStatic := path.Join("./", name+binaryName)
+	localExact := path.Join("./", name+exactBinaryName)
+	globalUnpackStatic := path.Join(unpackPath, name+binaryName)
+	globalUnpackExact := path.Join(unpackPath, name+exactBinaryName)
+	cacheStatic := path.Join(cachePath, binaries.EngineVersion, name+binaryName)
+	cacheExact := path.Join(cachePath, binaries.EngineVersion, name+exactBinaryName)
 
-	logger.Debug.Printf("expecting local query engine `%s` or `%s`", localPath, localExactPath)
-	logger.Debug.Printf("expecting global query engine `%s` or `%s`", globalPath, globalExactPath)
+	logger.Debug.Printf("checking for local query engine `%s` or `%s`", localStatic, localExact)
+	logger.Debug.Printf("checking for global query engine `%s` or `%s`", globalUnpackStatic, globalUnpackExact)
+	logger.Debug.Printf("checking for cached query engine `%s` or `%s`", cacheStatic, cacheExact)
 
 	// TODO write tests for all cases
 
@@ -102,19 +108,34 @@ func (e *QueryEngine) ensure() (string, error) {
 		file = prismaQueryEngineBinary
 		forceVersion = false
 	} else {
-		if info, err := os.Stat(localExactPath); err == nil {
-			file = localExactPath
-			logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
-		} else if info, err = os.Stat(localPath); err == nil {
-			file = localPath
-			logger.Debug.Printf("query engine found in working directory: %s %+v", file, info)
+		if qe := os.Getenv(unpack.FileEnv); qe != "" {
+			logger.Debug.Printf("using unpacked file env %s %s", unpack.FileEnv, qe)
+
+			if info, err := os.Stat(qe); err == nil {
+				file = qe
+				logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
+			} else {
+				return "", fmt.Errorf("prisma query engine was expected at %s via FileEnv but was not found", qe)
+			}
 		}
 
-		if info, err := os.Stat(globalExactPath); err == nil {
-			file = globalExactPath
+		if info, err := os.Stat(localExact); err == nil {
+			file = localExact
+			logger.Debug.Printf("exact query engine found in working directory: %s %+v", file, info)
+		} else if info, err = os.Stat(localStatic); err == nil {
+			file = localStatic
+			logger.Debug.Printf("query engine found in working directory: %s %+v", file, info)
+		} else if info, err = os.Stat(cacheExact); err == nil {
+			file = cacheExact
+			logger.Debug.Printf("query engine found in cache path: %s %+v", file, info)
+		} else if info, err = os.Stat(cacheStatic); err == nil {
+			file = cacheStatic
+			logger.Debug.Printf("exact query engine found in cache path: %s %+v", file, info)
+		} else if info, err = os.Stat(globalUnpackExact); err == nil {
+			file = globalUnpackExact
 			logger.Debug.Printf("query engine found in global path: %s %+v", file, info)
-		} else if info, err = os.Stat(globalPath); err == nil {
-			file = globalPath
+		} else if info, err = os.Stat(globalUnpackStatic); err == nil {
+			file = globalUnpackStatic
 			logger.Debug.Printf("exact query engine found in global path: %s %+v", file, info)
 		}
 	}

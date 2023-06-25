@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
@@ -23,6 +24,16 @@ const DefaultPackageName = "db"
 func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = DefaultPackageName
+	}
+
+	if binaryTargets := os.Getenv("PRISMA_CLI_BINARY_TARGETS"); binaryTargets != "" {
+		s := strings.Split(binaryTargets, ",")
+		var targets []BinaryTarget
+		for _, t := range s {
+			targets = append(targets, BinaryTarget{Value: t})
+		}
+		input.Generator.BinaryTargets = targets
+		logger.Debug.Printf("overriding binary targets: %+v", targets)
 	}
 }
 
@@ -143,19 +154,33 @@ func generateBinaries(input *Root) error {
 	}
 
 	var targets []string
+	var isNonLinux bool
+
+	logger.Debug.Printf("defined binary targets: %v", input.Generator.BinaryTargets)
 
 	for _, target := range input.Generator.BinaryTargets {
 		targets = append(targets, target.Value)
+		if target.Value == "darwin" || target.Value == "windows" {
+			isNonLinux = true
+		}
 	}
 
-	targets = add(targets, "native")
-	targets = add(targets, "linux")
+	// add native by default if native binary is darwin or linux
+	// this prevents conflicts when building on linux
+	if isNonLinux || len(targets) == 0 {
+		targets = add(targets, "native")
+	}
+
+	logger.Debug.Printf("final binary targets: %v", targets)
 
 	// TODO refactor
 	for _, name := range targets {
 		if name == "native" {
-			name = platform.BinaryPlatformName()
+			name = platform.BinaryPlatformNameStatic()
+			logger.Debug.Printf("swapping 'native' binary target with '%s'", name)
 		}
+
+		name = TransformBinaryTarget(name)
 
 		// first, ensure they are actually downloaded
 		if err := binaries.FetchEngine(binaries.GlobalCacheDir(), "query-engine", name); err != nil {
@@ -172,22 +197,24 @@ func generateBinaries(input *Root) error {
 
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
-		if name == "native" {
-			name = platform.BinaryPlatformName()
-		}
-
-		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
-
-		pt := name
-		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
+		pt := runtime.GOOS
+		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
 			pt = "linux"
 		}
+
+		if name == "native" {
+			name = platform.BinaryPlatformNameStatic()
+		}
+
+		name = TransformBinaryTarget(name)
+
+		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
 
 		filename := fmt.Sprintf("query-engine-%s_gen.go", name)
 		to := path.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
-		if err := bindata.WriteFile(strings.ReplaceAll(name, "-", "_"), pkg, pt, enginePath, to); err != nil {
+		if err := bindata.WriteFile(name, pkg, pt, enginePath, to); err != nil {
 			return fmt.Errorf("generate write go file: %w", err)
 		}
 
@@ -204,4 +231,13 @@ func add(list []string, item string) []string {
 		list = append(list, item)
 	}
 	return list
+}
+
+func TransformBinaryTarget(name string) string {
+	// TODO this is a temp fix as the exact alpine libraries are not working
+	if name == "linux" || strings.Contains(name, "musl") {
+		name = "linux-static-" + platform.Arch()
+		logger.Debug.Printf("overriding binary name with '%s' due to linux or musl", name)
+	}
+	return name
 }

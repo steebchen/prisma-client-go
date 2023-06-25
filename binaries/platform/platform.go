@@ -12,9 +12,9 @@ import (
 
 var binaryNameWithSSLCache string
 
-// BinaryPlatformName returns the name of the prisma binary which should be used,
-// for example "darwin" or "linux-openssl-1.1.x"
-func BinaryPlatformName() string {
+// BinaryPlatformNameDynamic returns the name of the prisma binary which should be used,
+// for example "darwin" or "linux-openssl-1.1.x". This can include dynamically linked binaries.
+func BinaryPlatformNameDynamic() string {
 	if binaryNameWithSSLCache != "" {
 		return binaryNameWithSSLCache
 	}
@@ -34,10 +34,6 @@ func BinaryPlatformName() string {
 
 	distro := getLinuxDistro()
 
-	if distro == "alpine" {
-		return fmt.Sprintf("linux-static-%s", arch)
-	}
-
 	ssl := getOpenSSL()
 
 	name := fmt.Sprintf("%s-openssl-%s", distro, ssl)
@@ -45,6 +41,25 @@ func BinaryPlatformName() string {
 	binaryNameWithSSLCache = name
 
 	return name
+}
+
+// BinaryPlatformNameStatic returns the name of the prisma binary which should be used,
+// for example "darwin" or "linux-static-x64". This only includes statically linked binaries.
+func BinaryPlatformNameStatic() string {
+	platform := Name()
+	arch := Arch()
+
+	// other supported platforms are darwin and windows
+	if platform != "linux" {
+		// special case for darwin arm64
+		if platform == "darwin" && arch == "arm64" {
+			return "darwin-arm64"
+		}
+		// otherwise, return `darwin` or `windows`
+		return platform
+	}
+
+	return fmt.Sprintf("linux-static-%s", arch)
 }
 
 // Name returns the platform name

@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"time"
 
 	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"github.com/steebchen/prisma-client-go/logger"
@@ -86,25 +85,21 @@ func GlobalCacheDir() string {
 	return path.Join(cache, baseDirName, "cli", PrismaVersion)
 }
 
-func FetchEngine(toDir string, engineName string, binaryPlatformName string) error {
-	logger.Debug.Printf("checking %s...", engineName)
+func FetchEngine(dir string, engineName string, binaryName string) error {
+	logger.Debug.Printf("checking %s %s...", engineName, binaryName)
 
-	to := platform.CheckForExtension(binaryPlatformName, path.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engineName, binaryPlatformName)))
-
-	binaryPlatformRemoteName := binaryPlatformName
-	if binaryPlatformRemoteName == "linux" {
-		binaryPlatformRemoteName = "linux-static-x64"
-	}
-	url := platform.CheckForExtension(binaryPlatformName, fmt.Sprintf(EngineURL, EngineVersion, binaryPlatformRemoteName, engineName))
-
-	logger.Debug.Printf("download url %s", url)
+	to := GetEnginePath(dir, engineName, binaryName)
 
 	if _, err := os.Stat(to); !os.IsNotExist(err) {
-		logger.Debug.Printf("%s is cached", to)
+		logger.Debug.Printf("%s is cached at %s", engineName, to)
 		return nil
 	}
 
+	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, engineName))
+
 	logger.Debug.Printf("%s is missing, downloading...", engineName)
+
+	logger.Debug.Printf("downloading %s from %s to %s", engineName, url, to)
 
 	if err := download(url, to); err != nil {
 		return fmt.Errorf("could not download %s to %s: %w", url, to, err)
@@ -130,7 +125,7 @@ func FetchNative(toDir string) error {
 	}
 
 	for _, e := range Engines {
-		if _, err := DownloadEngine(e.Name, toDir); err != nil {
+		if err := FetchEngine(toDir, e.Name, platform.BinaryPlatformNameStatic()); err != nil {
 			return fmt.Errorf("could not download engines: %w", err)
 		}
 	}
@@ -160,38 +155,8 @@ func DownloadCLI(toDir string) error {
 	return nil
 }
 
-func GetEnginePath(dir, engine, binaryName string) string {
-	return platform.CheckForExtension(binaryName, path.Join(dir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engine, binaryName)))
-}
-
-func DownloadEngine(name string, toDir string) (file string, err error) {
-	binaryName := platform.BinaryPlatformName()
-
-	logger.Debug.Printf("checking %s...", name)
-
-	to := platform.CheckForExtension(binaryName, path.Join(toDir, EngineVersion, fmt.Sprintf("prisma-%s-%s", name, binaryName)))
-
-	url := platform.CheckForExtension(binaryName, fmt.Sprintf(EngineURL, EngineVersion, binaryName, name))
-
-	logger.Debug.Printf("download url %s", url)
-
-	if _, err := os.Stat(to); !os.IsNotExist(err) {
-		logger.Debug.Printf("%s is cached", to)
-		return to, nil
-	}
-
-	logger.Debug.Printf("%s is missing, downloading...", name)
-
-	startDownload := time.Now()
-	if err := download(url, to); err != nil {
-		return "", fmt.Errorf("could not download %s to %s: %w", url, to, err)
-	}
-
-	logger.Debug.Printf("%s engine download took %s", name, time.Since(startDownload))
-
-	logger.Debug.Printf("%s done", name)
-
-	return to, nil
+func GetEnginePath(dir, engineName, binaryName string) string {
+	return platform.CheckForExtension(binaryName, path.Join(dir, EngineVersion, fmt.Sprintf("prisma-%s-%s", engineName, binaryName)))
 }
 
 func download(url string, to string) error {
