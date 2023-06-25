@@ -1,5 +1,7 @@
 name: e2e test all
-on: pull_request
+on:
+  pull_request:
+  push:
 jobs:
   e2e:
     runs-on: ubuntu-latest
