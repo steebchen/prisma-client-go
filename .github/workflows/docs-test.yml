@@ -14,24 +14,28 @@ jobs:
               - '.github/workflows/**/*.yml'
               - 'docs/**'
 
-      - uses: actions/cache@v3
-        with:
-          path: ${{ github.workspace }}/docs/.next/cache
-          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.md', '**.mdx', '**.[jt]sx') }}
-          restore-keys: |
-            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**.[jt]s', '**.md', '**.mdx', '**.[jt]sx') }}
-            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
-            ${{ runner.os }}-nextjs-
+      - name: Collect versions
+        run: |
+          echo "nodejs_version=$(cat docs/.tool-versions | grep 'nodejs' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
+          echo "pnpm_version=$(cat docs/.tool-versions | grep 'pnpm' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
 
       - uses: pnpm/action-setup@v2
         with:
-          version: 8.6.0
+          version: ${{ env.pnpm_version }}
 
       - uses: actions/setup-node@v3
         with:
-          node-version: 18.x
+          node-version: ${{ env.nodejs_version }}
           cache: pnpm
           cache-dependency-path: ./docs/pnpm-lock.yaml
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/docs/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.md', '**/*.mdx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-
 
       - run: pnpm install --frozen-lockfile
         working-directory: ./docs
