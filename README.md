@@ -1,5 +1,3 @@
-
-
 <div align="center">
     <h1>Prisma Client Go</h1>
     <h2>Typesafe database access for Go</h2>
@@ -10,7 +8,7 @@
         <span>&nbsp;&nbsp;</span>
         <a href="./LICENSE"><img src="https://img.shields.io/github/license/steebchen/prisma-client-go?style=for-the-badge" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs/community"><img src="https://img.shields.io/static/v1?style=for-the-badge&label=community&message=join here&color=blue" /></a>
+        <a href="https://goprisma.org/docs/community"><img src="https://img.shields.io/static/v1?style=for-the-badge&label=community&message=join discord&color=blue" /></a>
     </div>
     <div>
         <a href="https://goprisma.org/docs/getting-started/quickstart">Quickstart</a>
@@ -33,19 +31,27 @@
 
 ## Description
 
-Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most database-specific tools.
+Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces
+boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most
+database-specific tools.
 
-It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access, declarative data modeling, schema migrations and visual data management.
+It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access,
+declarative data modeling, schema migrations and visual data management.
 
 ## Getting started
 
-To get started, [**read the quickstart tutorial**](https://goprisma.org/docs/getting-started/quickstart) to add Prisma to your project in just a few minutes.
+To get started, [**read the quickstart tutorial**](https://goprisma.org/docs/getting-started/quickstart) to add Prisma
+to your project in just a few minutes.
 
-You also might want to read [deployment tips](https://goprisma.org/docs/reference/deploy) and the [full API reference](https://goprisma.org/docs/reference).
+You also might want to read [deployment tips](https://goprisma.org/docs/reference/deploy) and
+the [full API reference](https://goprisma.org/docs/reference).
 
 ## Status
 
-The Go client is currently maintained by @steebchen and considered to be in alpha. I am actively looking for [sponsors](https://github.com/sponsors/steebchen) who can support the continuous maintenance and development of new features to finally make working with databases in Go fun. If you [sponsor](https://github.com/sponsors/steebchen) me, I will prioritize your issues and feature requests and will help you set up and answer any questions you have.
+The Go client is currently maintained by @steebchen and considered to be in alpha. I am actively looking
+for [sponsors](https://github.com/sponsors/steebchen) who can support the continuous maintenance and development of new
+features to finally make working with databases in Go fun. If you [sponsor](https://github.com/sponsors/steebchen) me, I
+will prioritize your issues and feature requests and will help you set up and answer any questions you have.
 
 ## Contributing
 
@@ -53,4 +59,5 @@ Check out the [advanced contributing guide](./CONTRIBUTING.md).
 
 ## Security
 
-If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%20Security%20Report%20Go&cc=contact@luca-steeb.com)
+If you have a security issue to report, please contact us
+at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%20Security%20Report%20Go&cc=contact@luca-steeb.com)
