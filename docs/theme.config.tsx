@@ -5,6 +5,9 @@ export default {
   project: {
     link: 'https://github.com/steebchen/prisma-client-go',
   },
+  chat: {
+    link: 'https://discord.gg/er3ZbmYHDk',
+  },
   head: (
     <>
       <link rel="icon" href="/icon.png" sizes="any"/>
