@@ -151,11 +151,18 @@ func getOpenSSL() string {
 
 // parseOpenSSLVersion returns the OpenSSL version, ignoring the patch version; e.g. 1.1.x
 func parseOpenSSLVersion(str string) string {
+	// parse minor and major version for OpenSSL 1.x
 	r := regexp.MustCompile(`^OpenSSL\s(\d+\.\d+)\.\d+`)
 	matches := r.FindStringSubmatch(str)
-	if len(matches) > 0 {
+	if len(matches) > 1 && strings.HasPrefix(matches[1], "1.") {
 		return matches[1] + ".x"
 	}
-	// default to 1.1.x
-	return "1.1.x"
+	// parse major version for others
+	r = regexp.MustCompile(`^OpenSSL\s(\d+)\.\d+\.\d+`)
+	matches = r.FindStringSubmatch(str)
+	if len(matches) > 0 {
+		return matches[1] + ".0.x"
+	}
+	// default to 3.0.x
+	return "3.0.x"
 }
