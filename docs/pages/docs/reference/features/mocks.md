@@ -43,8 +43,8 @@ func TestGetPostTitle_returns(t *testing.T) {
     // and makes sure that all of them succeeded
     defer ensure(t)
 
-    expected := &PostModel{
-        InnerPost: InnerPost{
+    expected := &db.PostModel{
+        InnerPost: db.InnerPost{
             ID:   "123",
             Title: "foo",
         },
@@ -58,7 +58,7 @@ func TestGetPostTitle_returns(t *testing.T) {
         client.Post.FindUnique(
             db.Post.ID.Equals("123"),
         ),
-    ).Returns(expected) // sets the object which should be returned in the function call
+    ).Returns(*expected) // sets the object which should be returned in the function call
 
     // mocking set up is done; let's define the actual test now
     title, err := GetPostTitle(context.Background(), client, "123")
