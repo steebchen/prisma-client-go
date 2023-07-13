@@ -1,16 +1,9 @@
 {
-  "name": "docs",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "test": "npm run build",
     "build": "npx next build && next-sitemap"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@types/gtag.js": "^0.0.12",
     "@vercel/analytics": "^1.0.1",

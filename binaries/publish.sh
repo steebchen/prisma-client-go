@@ -50,6 +50,7 @@ mv prisma-macos-arm64 "out/prisma-cli-$version-darwin-arm64"
 mv prisma-linuxstatic-arm64 "out/prisma-cli-$version-linux-arm64"
 mv prisma-win-arm64.exe "out/prisma-cli-$version-windows-arm64.exe"
 
+rm -r out/
 cd out/
 
 gzip -f "prisma-cli-$version-darwin-x64"

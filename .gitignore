@@ -22,6 +22,9 @@ schema.temp.*.prisma
 schema.graphql
 .graphqlconfig
 
+# ignore go work sum, as we specifically do not want sum files for the integration test mod files
+go.work.sum
+
 # JetBrains
 .idea/**/csv-plugin.xml
 .idea/**/workspace.xml

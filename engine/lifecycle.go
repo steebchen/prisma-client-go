@@ -189,6 +189,7 @@ func (e *QueryEngine) spawn(file string) error {
 		"RUST_LOG=error",
 		"RUST_LOG_FORMAT=json",
 		"PRISMA_CLIENT_ENGINE_TYPE=binary",
+		"PRISMA_ENGINE_PROTOCOL=graphql",
 	)
 
 	// TODO fine tune this using log levels
