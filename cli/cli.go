@@ -2,12 +2,12 @@ package cli
 
 import (
 	"fmt"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"os"
 	"os/exec"
 	"path"
 
 	"github.com/steebchen/prisma-client-go/binaries"
-	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
