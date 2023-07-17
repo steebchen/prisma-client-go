@@ -3,12 +3,11 @@ package generator
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
-	"go/build"
 	"go/format"
 	"os"
 	"path"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"text/template"
@@ -64,38 +63,21 @@ func Run(input *Root) error {
 	return nil
 }
 
+//go:embed templates/*.gotpl templates/actions/*.gotpl
+var templateFS embed.FS
+
 func generateClient(input *Root) error {
 	var buf bytes.Buffer
 
-	ctx := build.Default
-	pkg, err := ctx.Import("github.com/steebchen/prisma-client-go", ".", build.FindOnly)
+	tpl, err := template.ParseFS(templateFS, "templates/*.gotpl", "templates/actions/*.gotpl")
 	if err != nil {
-		return fmt.Errorf("could not get main template asset: %w", err)
-	}
-
-	var templates []*template.Template
-
-	templateDir := pkg.Dir + "/generator/templates"
-	err = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
-		if strings.Contains(path, ".gotpl") {
-			tpl, err := template.ParseFiles(path)
-			if err != nil {
-				return err
-			}
-			templates = append(templates, tpl.Templates()...)
-		}
-
-		return err
-	})
-
-	if err != nil {
-		return fmt.Errorf("could not walk dir %s: %w", templateDir, err)
+		return fmt.Errorf("could not parse template fs: %w", err)
 	}
 
 	// Run header template first
-	header, err := template.ParseFiles(templateDir + "/_header.gotpl")
+	header, err := template.ParseFS(templateFS, "templates/_header.gotpl")
 	if err != nil {
-		return fmt.Errorf("could not find header template %s: %w", templateDir, err)
+		return fmt.Errorf("could not find header template: %w", err)
 	}
 
 	if err := header.Execute(&buf, input); err != nil {
@@ -103,7 +85,7 @@ func generateClient(input *Root) error {
 	}
 
 	// Then process all remaining templates
-	for _, tpl := range templates {
+	for _, tpl := range tpl.Templates() {
 		if strings.Contains(tpl.Name(), "_") {
 			continue
 		}
