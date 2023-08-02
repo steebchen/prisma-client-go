@@ -50,7 +50,6 @@ mv prisma-macos-arm64 "out/prisma-cli-$version-darwin-arm64"
 mv prisma-linuxstatic-arm64 "out/prisma-cli-$version-linux-arm64"
 mv prisma-win-arm64.exe "out/prisma-cli-$version-windows-arm64.exe"
 
-rm -r out/
 cd out/
 
 gzip -f "prisma-cli-$version-darwin-x64"
@@ -66,5 +65,8 @@ aws s3 cp . "s3://$S3_BUCKET" --recursive --acl public-read
 # make sure all files were successfully uploaded before marking the version as processed
 touch "$processed_name"
 aws s3 cp "$processed_name" "s3://$S3_BUCKET" --acl public-read
+
+cd ..
+rm -r out/
 
 echo "Successfully published Prisma CLI $version"
