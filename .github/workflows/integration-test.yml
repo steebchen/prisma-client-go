@@ -29,6 +29,11 @@ jobs:
         if: runner.os == 'macos' && steps.changes.outputs.go == 'true'
         run: |
           brew install docker
+          # Start workaround for https://github.com/actions/runner-images/issues/8104
+          brew remove --ignore-dependencies qemu
+          curl -o ./qemu.rb https://raw.githubusercontent.com/Homebrew/homebrew-core/dc0669eca9479e9eeb495397ba3a7480aaa45c2e/Formula/qemu.rb
+          brew install ./qemu.rb
+          # End workaround
           colima start
 
           # For testcontainers to find the Colima socket
