@@ -14,6 +14,21 @@ type Model struct {
 	OldModel dmmf.Model `json:"-"`
 }
 
+func (m Model) CompoundKeys() []Index {
+	var items []Index
+	items = append(items, m.Indexes...)
+
+	if m.OldModel.PrimaryKey.Name != "" {
+		items = append(items, Index{
+			Name:         m.OldModel.PrimaryKey.Name,
+			InternalName: m.OldModel.PrimaryKey.Name.String(),
+			Fields:       m.OldModel.PrimaryKey.Fields,
+		})
+	}
+
+	return items
+}
+
 type Field struct {
 	// TODO re-declare all fields here instead of embedding dmmf.Field
 
