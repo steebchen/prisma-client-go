@@ -53,6 +53,7 @@ jobs:
         run: docker build . --build-arg IMAGE="golang:1" -f test/integration/integration.dockerfile -t integration && docker run integration
 
   integration-alpine:
+    name: "integration (alpine)"
     runs-on: ubuntu-latest
 
     steps:
