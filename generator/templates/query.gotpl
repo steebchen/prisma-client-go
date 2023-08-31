@@ -81,7 +81,7 @@
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
-		{{ if $field.RequiredOnCreate }}
+    {{ if $field.RequiredOnCreate $model.OldModel.PrimaryKey }}
 			{{ $setReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "SetParam") }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParam") }}
