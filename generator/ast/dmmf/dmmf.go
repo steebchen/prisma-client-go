@@ -237,6 +237,15 @@ type PrimaryKey struct {
 	Fields []types.String `json:"fields"`
 }
 
+func (k PrimaryKey) IsFieldInPrimary(field types.String) bool {
+	for _, f := range k.Fields {
+		if f == field {
+			return true
+		}
+	}
+	return false
+}
+
 func (m Model) Actions() []string {
 	return []string{"Set", "Equals"}
 }
@@ -277,7 +286,11 @@ type Field struct {
 	HasDefaultValue bool `json:"hasDefaultValue"`
 }
 
-func (f Field) RequiredOnCreate() bool {
+func (f Field) RequiredOnCreate(key PrimaryKey) bool {
+	if key.IsFieldInPrimary(f.Name) {
+		return true
+	}
+
 	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList {
 		return false
 	}

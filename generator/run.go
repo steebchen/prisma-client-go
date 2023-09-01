@@ -97,7 +97,7 @@ func generateClient(input *Root) error {
 		}
 
 		if _, err := format.Source(buf.Bytes()); err != nil {
-			return fmt.Errorf("could not format source %s from file %s: %w", buf.String(), tpl.Name(), err)
+			return fmt.Errorf("could not format source %s from file %s %s: %w", buf.String(), tpl.Name(), input.SchemaPath, err)
 		}
 	}
 
