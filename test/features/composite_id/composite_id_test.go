@@ -11,6 +11,10 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
+func str(v string) *string {
+	return &v
+}
+
 func TestCompositeID(t *testing.T) {
 	t.Parallel()
 
@@ -75,6 +79,88 @@ func TestCompositeID(t *testing.T) {
 					Name:         "test",
 				},
 			}
+			assert.Equal(t, expected, org)
+		},
+	}, {
+		name: "link",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.Repository.CreateOne(
+				Repository.PlatformID.Set("test"),
+				Repository.PlatformKind.Set("test"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.Organization.CreateOne(
+				Organization.PlatformID.Set("a"),
+				Organization.PlatformKind.Set("kind"),
+				Organization.Name.Set("a"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.Organization.CreateOne(
+				Organization.PlatformID.Set("b"),
+				Organization.PlatformKind.Set("kind"),
+				Organization.Name.Set("b"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.Repository.FindUnique(
+				Repository.RepositoryID(
+					Repository.PlatformKind.Equals("test"),
+					Repository.PlatformID.Equals("test"),
+				),
+			).Update(
+				Repository.Org.Link(
+					Organization.OrganizationID(
+						Organization.PlatformKind.Equals("kind"),
+						Organization.PlatformID.Equals("b"),
+					),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			org, err := client.Organization.FindMany().With(
+				Organization.Repositories.Fetch(),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []OrganizationModel{{
+				InnerOrganization: InnerOrganization{
+					PlatformID:   "a",
+					PlatformKind: "kind",
+					Name:         "a",
+				},
+				RelationsOrganization: RelationsOrganization{
+					Repositories: []RepositoryModel{},
+				},
+			}, {
+				InnerOrganization: InnerOrganization{
+					PlatformID:   "b",
+					PlatformKind: "kind",
+					Name:         "b",
+				},
+				RelationsOrganization: RelationsOrganization{
+					Repositories: []RepositoryModel{
+						{
+							InnerRepository: InnerRepository{
+								PlatformID:   "test",
+								PlatformKind: "kind",
+								OrgID:        str("b"),
+							},
+						},
+					},
+				},
+			}}
 			assert.Equal(t, expected, org)
 		},
 	}}
