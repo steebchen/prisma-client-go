@@ -10,7 +10,7 @@ generator db {
   package           = "db"
 }
 
-model RepositoryOrganization {
+model Organization {
   platformId   String
   platformKind String
 
@@ -18,16 +18,16 @@ model RepositoryOrganization {
 
   repositories Repository[]
 
-  @@id(name: "repositoryOrganizationId", [platformKind, platformId])
-  @@map("repository_organizations")
+  @@id(name: "organizationId", [platformKind, platformId])
+  @@map("organizations")
 }
 
 model Repository {
   platformId   String
   platformKind String
 
-  orgId String?                 @map("org_id")
-  org   RepositoryOrganization? @relation(fields: [platformKind, orgId], references: [platformKind, platformId])
+  orgId String?       @map("org_id")
+  org   Organization? @relation(fields: [platformKind, orgId], references: [platformKind, platformId])
 
   @@id(name: "repositoryId", [platformKind, platformId])
   @@map("repositories")

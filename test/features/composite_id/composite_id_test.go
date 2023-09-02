@@ -29,10 +29,10 @@ func TestCompositeID(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			_, err = client.RepositoryOrganization.CreateOne(
-				RepositoryOrganization.PlatformID.Set("test"),
-				RepositoryOrganization.PlatformKind.Set("test"),
-				RepositoryOrganization.Name.Set("test"),
+			_, err = client.Organization.CreateOne(
+				Organization.PlatformID.Set("test"),
+				Organization.PlatformKind.Set("test"),
+				Organization.Name.Set("test"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -49,27 +49,27 @@ func TestCompositeID(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			_, err = client.RepositoryOrganization.CreateOne(
-				RepositoryOrganization.PlatformID.Set("test"),
-				RepositoryOrganization.PlatformKind.Set("test"),
-				RepositoryOrganization.Name.Set("test"),
+			_, err = client.Organization.CreateOne(
+				Organization.PlatformID.Set("test"),
+				Organization.PlatformKind.Set("test"),
+				Organization.Name.Set("test"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			org, err := client.RepositoryOrganization.FindUnique(
-				RepositoryOrganization.RepositoryOrganizationID(
-					RepositoryOrganization.PlatformKind.Equals("test"),
-					RepositoryOrganization.PlatformID.Equals("test"),
+			org, err := client.Organization.FindUnique(
+				Organization.OrganizationID(
+					Organization.PlatformKind.Equals("test"),
+					Organization.PlatformID.Equals("test"),
 				),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := &RepositoryOrganizationModel{
-				InnerRepositoryOrganization: InnerRepositoryOrganization{
+			expected := &OrganizationModel{
+				InnerOrganization: InnerOrganization{
 					PlatformID:   "test",
 					PlatformKind: "test",
 					Name:         "test",
