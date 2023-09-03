@@ -40,7 +40,8 @@ created, err := client.Post.CreateOne(
 
 ### Create a record with a relation
 
-Use the `Link` method to connect new records with existing ones. For example, the following query creates a new comment and sets the postID attribute of the comment.
+Use the `Link` method to connect new records with existing ones. For example, the following query creates a new comment
+and sets the postID attribute of the comment.
 
 ```go
 created, err := client.Comment.CreateOne(

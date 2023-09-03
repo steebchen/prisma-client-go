@@ -18,7 +18,8 @@ model Post {
 
 ### Upsert a record
 
-Use UpsertOne to query for a document, define what to write when creating the document, and what to update if the document already exists.
+Use UpsertOne to query for a document, define what to write when creating the document, and what to update if the
+document already exists.
 
 ```go
 post, err := client.Post.UpsertOne(

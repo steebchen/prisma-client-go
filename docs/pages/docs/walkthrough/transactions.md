@@ -1,6 +1,7 @@
 # Transactions
 
-A database transaction refers to a sequence of read/write operations that are guaranteed to either succeed or fail as a whole.
+A database transaction refers to a sequence of read/write operations that are guaranteed to either succeed or fail as a
+whole.
 
 The examples use the following prisma schema:
 
@@ -28,7 +29,8 @@ model Comment {
 
 ## Successful scenario
 
-A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provide the Prisma calls to `client.Prisma.Transaction`:
+A simple transaction could look as follows. Just omit the `Exec(ctx)`, and provide the Prisma calls
+to `client.Prisma.Transaction`:
 
 ```go
 // create two posts at once and run in a transaction
