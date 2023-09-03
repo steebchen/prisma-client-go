@@ -5,23 +5,23 @@ datasource db {
 
 generator db {
   provider          = "go run github.com/steebchen/prisma-client-go"
-	output            = "."
+  output            = "."
   disableGoBinaries = true
   package           = "raw"
 }
 
 model User {
-	id       String    @id @default(cuid())
-	email    String    @unique
-	username String
-	str      String
-	strOpt   String?
-	date     DateTime
-	dateOpt  DateTime?
-	int      Int
-	intOpt   Int?
-	float    Float
-	floatOpt Float?
-	bool     Boolean
+  id       String    @id @default(cuid())
+  email    String    @unique
+  username String
+  str      String
+  strOpt   String?
+  date     DateTime
+  dateOpt  DateTime?
+  int      Int
+  intOpt   Int?
+  float    Float
+  floatOpt Float?
+  bool     Boolean
   boolOpt  Boolean?
 }

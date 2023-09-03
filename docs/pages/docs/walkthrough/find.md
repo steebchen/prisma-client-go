@@ -55,7 +55,8 @@ if errors.Is(err, db.ErrNotFound) {
 
 ### Find a single record
 
-FindFirst finds the first record found. It has the same query capabilities as FindMany, but acts as a convenience method to return just the first record found.
+FindFirst finds the first record found. It has the same query capabilities as FindMany, but acts as a convenience method
+to return just the first record found.
 
 ```go
 post, err := client.Post.FindFirst(
@@ -74,7 +75,8 @@ This returns an `ErrNotFound` error (exported by the generated client) if there 
 
 ### Query API
 
-The query operations change based on the data types in your schema. For example, integers and floats will have greater than and less than operations, while strings have prefix and suffix operations.
+The query operations change based on the data types in your schema. For example, integers and floats will have greater
+than and less than operations, while strings have prefix and suffix operations.
 
 ```go
 posts, err := client.Post.FindMany(
@@ -87,7 +89,8 @@ To explore more query filters, see [all possible query filters](filters.md).
 
 ### Querying for relations
 
-You can query for relations by using "Some" or "Every" to query for records where only some or all of the records match respectively. You can nest those queries as deep as you like.
+You can query for relations by using "Some" or "Every" to query for records where only some or all of the records match
+respectively. You can nest those queries as deep as you like.
 
 ```go
 // get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"

@@ -1,9 +1,14 @@
 # Raw API
 
-You can use the raw API when there's something you can't do with the current go client features. The query will be redirected to the underlying database, so everything supported by the database should work. Please note that you need to use the syntax specific to the database you're using.
+You can use the raw API when there's something you can't do with the current go client features. The query will be
+redirected to the underlying database, so everything supported by the database should work. Please note that you need to
+use the syntax specific to the database you're using.
 
-NOTE: When defining your return type structure, you have to use the native database type. For example, MySQL uses `int` for `bool`.
-You can also use Prisma-specific raw data types, such as `RawInt`, `RawString`, so that it works without having to think about what is used internally. If you are querying for a specific model, you can also use `Raw<Model>Model`, e.g. `RawPostModel` instead of `PostModel`.
+NOTE: When defining your return type structure, you have to use the native database type. For example, MySQL uses `int`
+for `bool`.
+You can also use Prisma-specific raw data types, such as `RawInt`, `RawString`, so that it works without having to think
+about what is used internally. If you are querying for a specific model, you can also use `Raw<Model>Model`,
+e.g. `RawPostModel` instead of `PostModel`.
 
 The examples use the following prisma schema:
 
@@ -56,15 +61,16 @@ err := client.Prisma.QueryRaw("SELECT * FROM `Post` WHERE id = ? AND title = ?",
 ```go
 // note the usage of db.RawString, db.RawInt, etc.
 var res []struct{
-	PostID   db.RawString `json:"post_id"`
-	Comments db.RawInt    `json:"comments"`
+PostID   db.RawString `json:"post_id"`
+Comments db.RawInt    `json:"comments"`
 }
 err := client.Prisma.QueryRaw("SELECT post_id, count(*) as comments FROM `Comment` GROUP BY post_id").Exec(ctx, &res)
 ```
 
 #### Operations
 
-Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `Result{Count: int}`, which contains the affected rows.
+Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `Result{Count: int}`,
+which contains the affected rows.
 
 ```go
 result, err := client.Prisma.ExecuteRaw("UPDATE `Post` SET title = ? WHERE id = ?", "my post", "123").Exec(ctx)
@@ -95,8 +101,8 @@ err := client.Prisma.QueryRaw(`SELECT * FROM "Post" WHERE id = $1 AND title = $2
 
 ```go
 var res []struct{
-	ID        db.RawString  `json:"id"`
-	Published db.RawBoolean `json:"published"`
+ID        db.RawString  `json:"id"`
+Published db.RawBoolean `json:"published"`
 }
 err := client.Prisma.QueryRaw(`SELECT id, published FROM "Post"`).Exec(ctx, &res)
 ```
@@ -108,15 +114,16 @@ To ensure compatibility with database and go types, you can use raw types.
 ```go
 // note the usage of db.RawString, db.RawInt, etc.
 var res []struct{
-	ID        db.RawString  `json:"post_id"`
-	Published db.RawBoolean `json:"published"`
+ID        db.RawString  `json:"post_id"`
+Published db.RawBoolean `json:"published"`
 }
 err := client.Prisma.QueryRaw(`SELECT post_id, count(*) as comments FROM "Comment" GROUP BY post_id`).Exec(ctx, &res)
 ```
 
 #### Operations
 
-Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `Result{Count: int}`, which contains the affected rows.
+Use `ExecuteRaw` for operations such as `INSERT`, `UPDATE` or `DELETE`. It will always return a `Result{Count: int}`,
+which contains the affected rows.
 
 ```go
 result, err := client.Prisma.ExecuteRaw(`UPDATE "Post" SET title = $1 WHERE id = $2`, "my post", "123").Exec(ctx)

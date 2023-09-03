@@ -2,11 +2,13 @@
 
 ## PRs Welcome
 
-We welcome contributions to this project. For small things, feel free to directly create a PR. For major changes, please open an issue first to discuss the changes.
+We welcome contributions to this project. For small things, feel free to directly create a PR. For major changes, please
+open an issue first to discuss the changes.
 
 ## Writing Commit Messages
 
-We use [conventional commits](https://www.conventionalcommits.org) (also known as semantic commits) to ensure consistent and descriptive commit messages.
+We use [conventional commits](https://www.conventionalcommits.org) (also known as semantic commits) to ensure consistent
+and descriptive commit messages.
 
 ## Tests
 
@@ -36,9 +38,12 @@ You can also run individual code generation tests via your editor, however keep 
 
 ### E2E tests
 
-End-to-end tests require third party credentials and may also be flaky from time to time. This is why they are not run locally by default and optional in CI.
+End-to-end tests require third party credentials and may also be flaky from time to time. This is why they are not run
+locally by default and optional in CI.
 
-To run them locally, you need to set up all required credentials (check the [env vars used for CI](https://github.com/steebchen/prisma-client-go/blob/a8a05c34aadd035303ea4651fcf6187cc4d039a0/.github/workflows/e2e-test.yml#L43), and then run:
+To run them locally, you need to set up all required credentials (check
+the [env vars used for CI](https://github.com/steebchen/prisma-client-go/blob/a8a05c34aadd035303ea4651fcf6187cc4d039a0/.github/workflows/e2e-test.yml#L43),
+and then run:
 
 ```sh
 cd test/e2e/

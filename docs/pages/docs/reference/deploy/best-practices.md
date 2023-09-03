@@ -2,7 +2,8 @@
 
 ## Best practices
 
-Prisma Client Go needs to generate code to work. This means that you need to run the generator before you can use it. We recommend to use Go's built-in [`go generate`](https://blog.golang.org/generate) to run the generator.
+Prisma Client Go needs to generate code to work. This means that you need to run the generator before you can use it. We
+recommend to use Go's built-in [`go generate`](https://blog.golang.org/generate) to run the generator.
 
 ### Set up go generate
 

@@ -21,7 +21,8 @@ go get github.com/steebchen/prisma-client-go
 
 ### Prepare your Prisma database schema
 
-Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma Client Go as a generator with two models would look like this:
+Prepare your database schema in a `schema.prisma` file. For example, a simple schema with a sqlite database and Prisma
+Client Go as a generator with two models would look like this:
 
 ```prisma
 datasource db {
@@ -55,7 +56,8 @@ go run github.com/steebchen/prisma-client-go db push
 
 If you just want to re-generate the client, run `go run github.com/steebchen/prisma-client-go generate`.
 
-To create a migration for your production database, use the Prisma migration tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate your database.
+To create a migration for your production database, use the Prisma migration
+tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) to create and migrate your database.
 
 ## Usage
 
@@ -166,7 +168,8 @@ The posts's title is: Prisma is a database toolkit and makes databases easy.
 
 ### Next steps
 
-Read more about [using the Go CLI](cli.md) for Prisma CLI commands such as `generate`, `migrate`, `db`, and `introspect`.
+Read more about [using the Go CLI](cli.md) for Prisma CLI commands such as `generate`, `migrate`, `db`,
+and `introspect`.
 
 We just scratched the surface of what you can do. Read the [advanced tutorial](advanced.md) to learn about more
 complex queries and how you can query for relations.

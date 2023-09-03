@@ -14,7 +14,6 @@ Your dockerfile could look like this. It uses Go modules and layered caching for
 
 If you want to optimize your docker images even further, learn how to use a [multi-stage build](#optimized-dockerfile).
 
-
 ```dockerfile
 FROM golang:1.20 as build
 

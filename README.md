@@ -1,30 +1,30 @@
 <div align="center">
-    <h1>Prisma Client Go</h1>
-    <h2>Typesafe database access for Go</h2>
-    <div>
-        <a href="https://github.com/steebchen/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/steebchen/prisma-client-go?style=for-the-badge" /></a>
-        <span>&nbsp;&nbsp;</span>
-        <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" /></a>
-        <span>&nbsp;&nbsp;</span>
-        <a href="./LICENSE"><img src="https://img.shields.io/github/license/steebchen/prisma-client-go?style=for-the-badge" /></a>
-        <span>&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs/community"><img src="https://img.shields.io/static/v1?style=for-the-badge&label=community&message=join discord&color=blue" /></a>
-    </div>
-    <div>
-        <a href="https://goprisma.org/docs/getting-started/quickstart">Quickstart</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://www.prisma.io/">Prisma Core</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs">Docs</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs/walkthrough">Walkthrough</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://www.prisma.io/blog">Prisma Blog</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://twitter.com/prisma">Prisma Twitter</a>
-        <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://goprisma.org/docs/community">Go Community</a>
-    </div>
+  <h1>Prisma Client Go</h1>
+  <h2>Typesafe database access for Go</h2>
+  <div>
+    <a href="https://github.com/steebchen/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/steebchen/prisma-client-go?style=for-the-badge" /></a>
+    <span>&nbsp;&nbsp;</span>
+    <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" /></a>
+    <span>&nbsp;&nbsp;</span>
+    <a href="./LICENSE"><img src="https://img.shields.io/github/license/steebchen/prisma-client-go?style=for-the-badge" /></a>
+    <span>&nbsp;&nbsp;</span>
+    <a href="https://goprisma.org/docs/community"><img src="https://img.shields.io/static/v1?style=for-the-badge&label=community&message=join discord&color=blue" /></a>
+  </div>
+  <div>
+    <a href="https://goprisma.org/docs/getting-started/quickstart">Quickstart</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://www.prisma.io/">Prisma Core</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://goprisma.org/docs">Docs</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://goprisma.org/docs/walkthrough">Walkthrough</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://www.prisma.io/blog">Prisma Blog</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://twitter.com/prisma">Prisma Twitter</a>
+    <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+    <a href="https://goprisma.org/docs/community">Go Community</a>
+  </div>
 </div>
 
 <hr>

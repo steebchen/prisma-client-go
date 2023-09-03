@@ -1,6 +1,8 @@
 # Fetching additional data
 
-You can query for an entity and specify what to return in addition. For example, if you want to show a post's information with some of its comments, you would usually do 2 separate queries, but using the With/Fetch syntax you can do it in a single query.
+You can query for an entity and specify what to return in addition. For example, if you want to show a post's
+information with some of its comments, you would usually do 2 separate queries, but using the With/Fetch syntax you can
+do it in a single query.
 
 The examples use the following prisma schema:
 
