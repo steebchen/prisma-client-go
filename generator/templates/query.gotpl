@@ -53,7 +53,7 @@
 	{{ end }}
 
 	{{/* composite keys for FindUnique */}}
-	{{ range $unique := $model.Indexes }}
+  {{ range $unique := $model.CompoundKeys }}
 		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
@@ -81,7 +81,7 @@
 		type {{ $struct }} struct {}
 
 		{{ $setReturnStruct := "" }}
-		{{ if $field.RequiredOnCreate }}
+    {{ if $field.RequiredOnCreate $model.OldModel.PrimaryKey }}
 			{{ $setReturnStruct = (print $name "WithPrisma" $field.Name.GoCase "SetParam") }}
 		{{ else }}
 			{{ $setReturnStruct = (print $name "SetParam") }}
