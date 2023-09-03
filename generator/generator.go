@@ -2,6 +2,7 @@ package generator
 
 import (
 	"os"
+	"strings"
 
 	"github.com/steebchen/prisma-client-go/generator/ast/dmmf"
 	"github.com/steebchen/prisma-client-go/generator/ast/transform"
@@ -20,6 +21,10 @@ type Root struct {
 	// BinaryPaths (optional)
 	BinaryPaths BinaryPaths    `json:"binaryPaths"`
 	AST         *transform.AST `json:"ast"`
+}
+
+func (r *Root) EscapedDatamodel() string {
+	return strings.ReplaceAll(r.Datamodel, "`", "'")
 }
 
 func (r *Root) GetEngineType() string {
