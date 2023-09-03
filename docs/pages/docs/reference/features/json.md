@@ -13,9 +13,11 @@ model Log {
 
 ## How JSON works in the Go client
 
-JSON works by using Go's `json.RawMessage` data structure. It's a `[]byte` behind the scenes, which means you can use the API you already know to work with unstructured json data in the Go client.
+JSON works by using Go's `json.RawMessage` data structure. It's a `[]byte` behind the scenes, which means you can use
+the API you already know to work with unstructured json data in the Go client.
 
-You can work with []bytes directly, but usually you marshal this data from an existing struct or unmarshal the data to a given struct variable.
+You can work with []bytes directly, but usually you marshal this data from an existing struct or unmarshal the data to a
+given struct variable.
 
 ## Write JSON data
 
@@ -71,7 +73,8 @@ log.Printf("log info: %+v", info)
 
 ## Query JSON
 
-You can filter JSON fields by using a combination of `Path` and a JSON query. Note that the syntax differs between databases.
+You can filter JSON fields by using a combination of `Path` and a JSON query. Note that the syntax differs between
+databases.
 
 ```go
 actual, err := client.User.FindFirst(
@@ -88,4 +91,5 @@ actual, err := client.User.FindFirst(
 ).Exec(ctx)
 ```
 
-For more information about all json filters and more example queries, check out the [Prisma JSON filters documentation](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields).
+For more information about all json filters and more example queries, check out
+the [Prisma JSON filters documentation](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields).

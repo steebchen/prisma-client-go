@@ -77,7 +77,8 @@ db.Post.CreatedAt.Lte(time.Now().Truncate(24 * time.Hour)),
 ### Optional type filters
 
 Optional fields are hard to represent in Go, since SQL has NULLs but Go does not have nullable types.
-Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set NULLs by using a pointer, you can use the `XOptional` method variants.
+Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set
+NULLs by using a pointer, you can use the `XOptional` method variants.
 
 ```go
 // set an optional field with a specific string

@@ -22,7 +22,8 @@ The params are exported the following shape:
 <Model><Action>Param
 ```
 
-For the model user above, there are two main exported interfaces, one for querying for data and one for writing data respectively:
+For the model user above, there are two main exported interfaces, one for querying for data and one for writing data
+respectively:
 
 ```
 UserWhereParam
@@ -31,7 +32,8 @@ UserSetParam
 
 ## Example
 
-With the schema above and the CreateUser function users of type customers should have their IP address saved, but not for new users of type employee.
+With the schema above and the CreateUser function users of type customers should have their IP address saved, but not
+for new users of type employee.
 
 ```go
 func CreateUser(w http.ResponseWriter, r *http.Request) {

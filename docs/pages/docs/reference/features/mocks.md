@@ -1,8 +1,13 @@
 # Mocks for testing
 
-When writing tests for functions which invoke methods used by the Go client, you usually need to run a real database in order to make these tests work. While this is acceptable for integration tests, it may be harder to test code because you need to reset and migrate the database, seed data, and then tear off everything. Plus, it results in incredibly slow test runs.
+When writing tests for functions which invoke methods used by the Go client, you usually need to run a real database in
+order to make these tests work. While this is acceptable for integration tests, it may be harder to test code because
+you need to reset and migrate the database, seed data, and then tear off everything. Plus, it results in incredibly slow
+test runs.
 
-Prisma provides native mocks in order to inject anything you want in your unit tests. This way, you can define for what query what result is returned, and then test your function with that information. They will also be fast, because there's no real database needed, and you just define yourself what a function should return.
+Prisma provides native mocks in order to inject anything you want in your unit tests. This way, you can define for what
+query what result is returned, and then test your function with that information. They will also be fast, because
+there's no real database needed, and you just define yourself what a function should return.
 
 The examples use the following prisma schema:
 
@@ -17,7 +22,8 @@ model Post {
 
 The function `GetPostTitle` acts as your resolver; for example, it could be a function which is called in an API route.
 
-To write a unit test, you would create a new Prisma mock client, define your expectations, and then run your actual test.
+To write a unit test, you would create a new Prisma mock client, define your expectations, and then run your actual
+test.
 Expectations consist of the exact query or queries you expect, and the result what should be returned.
 
 ```go

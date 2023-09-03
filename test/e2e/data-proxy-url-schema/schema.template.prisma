@@ -8,7 +8,7 @@ datasource db {
 
 generator db {
   provider         = "go run github.com/steebchen/prisma-client-go"
-	engineType       = "dataproxy"
+  engineType       = "dataproxy"
   output           = "."
   disableGitignore = true
   package          = "db"

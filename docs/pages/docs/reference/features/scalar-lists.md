@@ -53,4 +53,5 @@ post, err := client.Post.FindUnique(
 
 ### Notes
 
-NULL values in scalar lists [may need extra consideration](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-scalar-lists-arrays#filtering-scalar-lists).
+NULL values in scalar
+lists [may need extra consideration](https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-scalar-lists-arrays#filtering-scalar-lists).
