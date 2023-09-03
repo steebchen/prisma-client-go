@@ -1,8 +1,5 @@
 name: test all
 on: pull_request
-env:
-  PRISMA_TELEMETRY_INFORMATION: "prisma-client-go test.yml"
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,6 +12,7 @@ jobs:
         with:
           filters: |
             go:
+              - '.github/workflows/**/*.yml'
               - '**/*.go'
               - '**/*.gotpl'
               - '**/*.mod'
@@ -43,4 +41,4 @@ jobs:
 
       - name: test
         if: steps.changes.outputs.go == 'true'
-        run: go test ./... -v
+        run: go test ./... -v -failfast

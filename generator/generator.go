@@ -3,9 +3,9 @@ package generator
 import (
 	"os"
 
-	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
-	"github.com/prisma/prisma-client-go/generator/ast/transform"
-	"github.com/prisma/prisma-client-go/generator/types"
+	"github.com/steebchen/prisma-client-go/generator/ast/dmmf"
+	"github.com/steebchen/prisma-client-go/generator/ast/transform"
+	"github.com/steebchen/prisma-client-go/generator/types"
 )
 
 // Root describes the generator output root.
@@ -94,6 +94,4 @@ type BinaryPaths struct {
 	MigrationEngine map[string]string `json:"migrationEngine"` // key target, value path
 	// QueryEngine (optional)
 	QueryEngine map[string]string `json:"queryEngine"`
-	// IntrospectionEngine (optional)
-	IntrospectionEngine map[string]string `json:"introspectionEngine"`
 }

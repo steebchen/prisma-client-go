@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
 {{/* user model enums */}}
 {{ range $enum := $.DMMF.Datamodel.Enums -}}

@@ -1,8 +1,8 @@
 package transform
 
 import (
-	"github.com/prisma/prisma-client-go/generator/ast/dmmf"
-	"github.com/prisma/prisma-client-go/generator/types"
+	"github.com/steebchen/prisma-client-go/generator/ast/dmmf"
+	"github.com/steebchen/prisma-client-go/generator/types"
 )
 
 type Model struct {
@@ -12,6 +12,21 @@ type Model struct {
 
 	// TODO remove this and apply all required data directly to model
 	OldModel dmmf.Model `json:"-"`
+}
+
+func (m Model) CompoundKeys() []Index {
+	var items []Index
+	items = append(items, m.Indexes...)
+
+	if m.OldModel.PrimaryKey.Name != "" {
+		items = append(items, Index{
+			Name:         m.OldModel.PrimaryKey.Name,
+			InternalName: m.OldModel.PrimaryKey.Name.String(),
+			Fields:       m.OldModel.PrimaryKey.Fields,
+		})
+	}
+
+	return items
 }
 
 type Field struct {

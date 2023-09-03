@@ -64,9 +64,25 @@ func Test_parseOpenSSLVersion(t *testing.T) {
 		input: "OpenSSL 1.0.2g  1 Mar 2016",
 		want:  "1.0.x",
 	}, {
-		name:  "default to 1.1",
+		name:  "default to 3.0.x",
 		input: "",
-		want:  "1.1.x",
+		want:  "3.0.x",
+	}, {
+		name:  "use 3.0.x for 3.x always",
+		input: "OpenSSL 3.1.0",
+		want:  "3.0.x",
+	}, {
+		name:  "use 3.0.x for 3.x always",
+		input: "OpenSSL 3.1.1",
+		want:  "3.0.x",
+	}, {
+		name:  "use 3.0.x for 3.x always",
+		input: "OpenSSL 3.0.0",
+		want:  "3.0.x",
+	}, {
+		name:  "use 3.0.x for 3.x always",
+		input: "OpenSSL 3.5.3",
+		want:  "3.0.x",
 	}}
 	for _, tt := range tests {
 		tt := tt

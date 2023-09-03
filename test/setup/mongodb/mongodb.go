@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/prisma/prisma-client-go/test/setup"
+	"github.com/steebchen/prisma-client-go/test/setup"
 )
 
 var MongoDB = &mongoDB{}

@@ -1,0 +1,45 @@
+name: docs
+on: pull_request
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3.3.0
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            docs:
+              - '.github/workflows/**/*.yml'
+              - 'docs/**'
+
+      - name: Collect versions
+        run: |
+          echo "nodejs_version=$(cat docs/.tool-versions | grep 'nodejs' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
+          echo "pnpm_version=$(cat docs/.tool-versions | grep 'pnpm' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.pnpm_version }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.nodejs_version }}
+          cache: pnpm
+          cache-dependency-path: ./docs/pnpm-lock.yaml
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ github.workspace }}/docs/.next/cache
+          key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.md', '**/*.mdx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-
+            ${{ runner.os }}-nextjs-
+
+      - run: pnpm install --frozen-lockfile
+        working-directory: ./docs
+
+      - run: pnpm test
+        if: steps.changes.outputs.docs == 'true'
+        working-directory: ./docs

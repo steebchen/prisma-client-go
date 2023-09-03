@@ -1,72 +1,63 @@
-
-
 <div align="center">
-    <h2>Prisma Client Go</h2>
-    <p><h3 align="center">Typesafe database access for Go</h3></p>
+    <h1>Prisma Client Go</h1>
+    <h2>Typesafe database access for Go</h2>
     <div>
-        <a href="https://github.com/prisma/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/prisma/prisma-client-go" /></a>
+        <a href="https://github.com/steebchen/prisma-client-go/releases"><img src="https://img.shields.io/github/v/release/steebchen/prisma-client-go?style=for-the-badge" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml"><img src="https://github.com/prisma/prisma-client-go/actions/workflows/test.yml/badge.svg" /></a>
+        <a href="./CONTRIBUTING.md"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="#contributing"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" /></a>
+        <a href="./LICENSE"><img src="https://img.shields.io/github/license/steebchen/prisma-client-go?style=for-the-badge" /></a>
         <span>&nbsp;&nbsp;</span>
-        <a href="./LICENSE"><img src="https://img.shields.io/github/license/prisma/prisma-client-go" /></a>
-        <span>&nbsp;&nbsp;</span>
-        <a href="https://slack.prisma.io/"><img src="https://img.shields.io/badge/chat-on%20slack-blue.svg" /></a>
+        <a href="https://goprisma.org/docs/community"><img src="https://img.shields.io/static/v1?style=for-the-badge&label=community&message=join discord&color=blue" /></a>
     </div>
     <div>
-        <a href="./docs/quickstart.md">Quickstart</a>
+        <a href="https://goprisma.org/docs/getting-started/quickstart">Quickstart</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://www.prisma.io/">Website</a>
+        <a href="https://www.prisma.io/">Prisma Core</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="./docs">Docs</a>
+        <a href="https://goprisma.org/docs">Docs</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="./docs/reference">API reference</a>
+        <a href="https://goprisma.org/docs/walkthrough">Walkthrough</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://www.prisma.io/blog">Blog</a>
+        <a href="https://www.prisma.io/blog">Prisma Blog</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://slack.prisma.io/">Slack</a>
+        <a href="https://twitter.com/prisma">Prisma Twitter</a>
         <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-        <a href="https://twitter.com/prisma">Twitter</a>
+        <a href="https://goprisma.org/docs/community">Go Community</a>
     </div>
 </div>
 
 <hr>
 
-## Deprecation note
-
-**Prisma Client Go is no longer officially maintained**. Read [this issue](https://github.com/prisma/prisma-client-go/issues/707) to learn more.
-
 ## Description
 
-Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most database-specific tools.
+Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces
+boilerplate**. You can use it as an alternative to traditional ORMs such as gorm, xorm, sqlboiler and most
+database-specific tools.
 
-It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access, declarative data modeling, schema migrations and visual data management.
-
-_NOTE_: Prisma Client Go is currently offered under our [early access program](https://www.prisma.io/docs/about/releases#product-maturity-levels). There will be documented breaking changes with new [releases](https://github.com/prisma/prisma-client-go/releases).
+It is part of the [Prisma](https://www.prisma.io/) ecosystem. Prisma provides database tools for data access,
+declarative data modeling, schema migrations and visual data management.
 
 ## Getting started
 
-To get started, [**read our quickstart tutorial**](./docs/quickstart.md) to add Prisma to your project in just a few minutes.
+To get started, [**read the quickstart tutorial**](https://goprisma.org/docs/getting-started/quickstart) to add Prisma
+to your project in just a few minutes.
 
-You also might want to read [deployment tips](./docs/deploy.md) and the [full API reference](./docs/reference).
+You also might want to read [deployment tips](https://goprisma.org/docs/reference/deploy) and
+the [full API reference](https://goprisma.org/docs/reference).
 
-## Notes
+## Status
 
-The go client works slightly different than the normal Prisma tooling. When you're using the go client, whenever you see Prisma CLI commands such as `prisma ...`, you should always write `go run github.com/prisma/prisma-client-go ...` instead.
-
-If you just work with the Go client and don't have (or want) the NodeJS Prisma CLI installed, you can set up an alias so that you can write `prisma` commands as usual, but it'll invoke the real locally bundled Prisma CLI. To do that, edit your `~/.bashrc` or `~/.zshrc` and add:
-
-```
-alias prisma="go run github.com/prisma/prisma-client-go"
-```
-
-Now `prisma generate` and any other command will work, and it'll just run 1`go run github.com/prisma/prisma-client-go generate` under the hood.
+The Go client is currently maintained by @steebchen and considered to be in alpha. I am actively looking
+for [sponsors](https://github.com/sponsors/steebchen) who can support the continuous maintenance and development of new
+features to finally make working with databases in Go fun. If you [sponsor](https://github.com/sponsors/steebchen) me, I
+will prioritize your issues and feature requests and will help you set up and answer any questions you have.
 
 ## Contributing
 
-Check out our [advanced contributing guide](./CONTRIBUTING.md).
+Check out the [advanced contributing guide](./CONTRIBUTING.md).
 
 ## Security
 
-If you have a security issue to report, please contact us at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%202%20Security%20Report%20Go)
+If you have a security issue to report, please contact us
+at [security@prisma.io](mailto:security@prisma.io?subject=[GitHub]%20Prisma%20Security%20Report%20Go&cc=contact@luca-steeb.com)

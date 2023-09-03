@@ -2,13 +2,13 @@ package cli
 
 import (
 	"fmt"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"os"
 	"os/exec"
 	"path"
 
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
+	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // Run the prisma CLI with given arguments
@@ -28,7 +28,7 @@ func Run(arguments []string, output bool) error {
 	logger.Debug.Printf("running %s %+v", path.Join(dir, prisma), arguments)
 
 	cmd := exec.Command(path.Join(dir, prisma), arguments...) //nolint:gosec
-	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformName())
+	binaryName := platform.CheckForExtension(platform.Name(), platform.BinaryPlatformNameStatic())
 
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "PRISMA_HIDE_UPDATE_MESSAGE=true")

@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	// {{ $model.Name.GoCase }}Model represents the {{ $model.Name.String }} model and is a wrapper for accessing fields and methods
@@ -20,8 +20,8 @@
 		{{ end }}
 	}
 
-	// Raw{{ $model.Name.GoCase }} is a struct for {{ $model.Name }} when used in raw queries
-	type Raw{{ $model.Name.GoCase }} struct {
+	// Raw{{ $model.Name.GoCase }}Model is a struct for {{ $model.Name }} when used in raw queries
+	type Raw{{ $model.Name.GoCase }}Model struct {
 		{{ range $field := $model.Fields }}
 			{{- if not $field.Kind.IsRelation -}}
 				{{- if $field.IsRequired }}

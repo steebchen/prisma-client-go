@@ -7,36 +7,35 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/runtime/types/raw"
-	"github.com/prisma/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test"
 )
 
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type RawUserModel struct {
-	ID       raw.String   `json:"id"`
-	Email    raw.String   `json:"email"`
-	Username raw.String   `json:"username"`
-	Name     *raw.String  `json:"name"`
-	Stuff    *raw.String  `json:"stuff"`
-	Str      raw.String   `json:"str"`
-	StrOpt   *raw.String  `json:"strOpt"`
-	Int      raw.Int      `json:"int"`
-	IntOpt   *raw.Int     `json:"intOpt"`
-	Float    raw.Float    `json:"float"`
-	FloatOpt *raw.Float   `json:"floatOpt"`
-	Bool     raw.Boolean  `json:"bool"`
-	BoolOpt  *raw.Boolean `json:"boolOpt"`
+type CustomRawUser struct {
+	ID       string   `json:"id"`
+	Email    string   `json:"email"`
+	Username string   `json:"username"`
+	Name     *string  `json:"name"`
+	Stuff    *string  `json:"stuff"`
+	Str      string   `json:"str"`
+	StrOpt   *string  `json:"strOpt"`
+	Int      int      `json:"int"`
+	IntOpt   *int     `json:"intOpt"`
+	Float    float64  `json:"float"`
+	FloatOpt *float64 `json:"floatOpt"`
+	Bool     bool     `json:"bool"`
+	BoolOpt  *bool    `json:"boolOpt"`
 }
 
 func TestRaw(t *testing.T) {
 	t.Parallel()
 
-	var strOpt raw.String = "strOpt"
-	var i raw.Int = 5
-	var f raw.Float = 5.5
-	var b raw.Boolean = false
+	strOpt := "strOpt"
+	i := 5
+	f := 5.5
+	b := false
 
 	tests := []struct {
 		name   string
@@ -87,12 +86,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []CustomRawUser
 			if err := client.Prisma.QueryRaw(`select * from "User"`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUser{{
 				ID:       "id1",
 				Email:    "email1",
 				Username: "a",
@@ -165,12 +164,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []CustomRawUser
 			if err := client.Prisma.QueryRaw(`select * from user where id = ?`, "id2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUser{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",
@@ -231,12 +230,12 @@ func TestRaw(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			var actual []RawUserModel
+			var actual []CustomRawUser
 			if err := client.Prisma.QueryRaw(`select * from user where id = ? and email = ?`, "id2", "email2").Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUser{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",
@@ -298,15 +297,13 @@ func TestRaw(t *testing.T) {
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			var actual []struct {
-				Count struct {
-					Value string `json:"prisma__value"`
-				} `json:"count"`
+				Count string `json:"count"`
 			}
 			if err := client.Prisma.QueryRaw(`select count(*) as count from user`).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, "2", actual[0].Count.Value)
+			assert.Equal(t, "2", actual[0].Count)
 		},
 	}, {
 		name:   "insert into",
@@ -410,12 +407,12 @@ func TestRaw(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			var actual []RawUserModel
+			var actual []CustomRawUser
 			if err := client.Prisma.QueryRaw(`select * from "User" where date = $1`, date).Exec(ctx, &actual); err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			expected := []RawUserModel{{
+			expected := []CustomRawUser{{
 				ID:       "id2",
 				Email:    "email2",
 				Username: "b",
