@@ -1,4 +1,4 @@
-module github.com/prisma/prisma-client-go
+module github.com/steebchen/prisma-client-go
 
 go 1.16
 
@@ -8,5 +8,5 @@ require (
 	github.com/shopspring/decimal v1.3.1
 	github.com/stretchr/testify v1.8.4
 	github.com/takuoki/gocase v1.0.0
-	golang.org/x/text v0.9.0
+	golang.org/x/text v0.12.0
 )

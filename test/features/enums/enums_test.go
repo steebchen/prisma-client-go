@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/prisma/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test"
 )
 
 func TestEnums(t *testing.T) {

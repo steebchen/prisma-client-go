@@ -3,19 +3,19 @@ package generator
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
-	"go/build"
 	"go/format"
 	"os"
 	"path"
-	"path/filepath"
+	"runtime"
 	"strings"
 	"text/template"
 
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/bindata"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
+	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/binaries/bindata"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 const DefaultPackageName = "db"
@@ -23,6 +23,16 @@ const DefaultPackageName = "db"
 func addDefaults(input *Root) {
 	if input.Generator.Config.Package == "" {
 		input.Generator.Config.Package = DefaultPackageName
+	}
+
+	if binaryTargets := os.Getenv("PRISMA_CLI_BINARY_TARGETS"); binaryTargets != "" {
+		s := strings.Split(binaryTargets, ",")
+		var targets []BinaryTarget
+		for _, t := range s {
+			targets = append(targets, BinaryTarget{Value: t})
+		}
+		input.Generator.BinaryTargets = targets
+		logger.Debug.Printf("overriding binary targets: %+v", targets)
 	}
 }
 
@@ -53,38 +63,21 @@ func Run(input *Root) error {
 	return nil
 }
 
+//go:embed templates/*.gotpl templates/actions/*.gotpl
+var templateFS embed.FS
+
 func generateClient(input *Root) error {
 	var buf bytes.Buffer
 
-	ctx := build.Default
-	pkg, err := ctx.Import("github.com/prisma/prisma-client-go", ".", build.FindOnly)
+	tpl, err := template.ParseFS(templateFS, "templates/*.gotpl", "templates/actions/*.gotpl")
 	if err != nil {
-		return fmt.Errorf("could not get main template asset: %w", err)
-	}
-
-	var templates []*template.Template
-
-	templateDir := pkg.Dir + "/generator/templates"
-	err = filepath.Walk(templateDir, func(path string, info os.FileInfo, err error) error {
-		if strings.Contains(path, ".gotpl") {
-			tpl, err := template.ParseFiles(path)
-			if err != nil {
-				return err
-			}
-			templates = append(templates, tpl.Templates()...)
-		}
-
-		return err
-	})
-
-	if err != nil {
-		return fmt.Errorf("could not walk dir %s: %w", templateDir, err)
+		return fmt.Errorf("could not parse template fs: %w", err)
 	}
 
 	// Run header template first
-	header, err := template.ParseFiles(templateDir + "/_header.gotpl")
+	header, err := template.ParseFS(templateFS, "templates/_header.gotpl")
 	if err != nil {
-		return fmt.Errorf("could not find header template %s: %w", templateDir, err)
+		return fmt.Errorf("could not find header template: %w", err)
 	}
 
 	if err := header.Execute(&buf, input); err != nil {
@@ -92,7 +85,7 @@ func generateClient(input *Root) error {
 	}
 
 	// Then process all remaining templates
-	for _, tpl := range templates {
+	for _, tpl := range tpl.Templates() {
 		if strings.Contains(tpl.Name(), "_") {
 			continue
 		}
@@ -104,7 +97,7 @@ func generateClient(input *Root) error {
 		}
 
 		if _, err := format.Source(buf.Bytes()); err != nil {
-			return fmt.Errorf("could not format source %s from file %s: %w", buf.String(), tpl.Name(), err)
+			return fmt.Errorf("could not format source %s from file %s %s: %w", buf.String(), tpl.Name(), input.SchemaPath, err)
 		}
 	}
 
@@ -143,19 +136,33 @@ func generateBinaries(input *Root) error {
 	}
 
 	var targets []string
+	var isNonLinux bool
+
+	logger.Debug.Printf("defined binary targets: %v", input.Generator.BinaryTargets)
 
 	for _, target := range input.Generator.BinaryTargets {
 		targets = append(targets, target.Value)
+		if target.Value == "darwin" || target.Value == "windows" {
+			isNonLinux = true
+		}
 	}
 
-	targets = add(targets, "native")
-	targets = add(targets, "linux")
+	// add native by default if native binary is darwin or linux
+	// this prevents conflicts when building on linux
+	if isNonLinux || len(targets) == 0 {
+		targets = add(targets, "native")
+	}
+
+	logger.Debug.Printf("final binary targets: %v", targets)
 
 	// TODO refactor
 	for _, name := range targets {
 		if name == "native" {
-			name = platform.BinaryPlatformName()
+			name = platform.BinaryPlatformNameStatic()
+			logger.Debug.Printf("swapping 'native' binary target with '%s'", name)
 		}
+
+		name = TransformBinaryTarget(name)
 
 		// first, ensure they are actually downloaded
 		if err := binaries.FetchEngine(binaries.GlobalCacheDir(), "query-engine", name); err != nil {
@@ -172,22 +179,24 @@ func generateBinaries(input *Root) error {
 
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
-		if name == "native" {
-			name = platform.BinaryPlatformName()
-		}
-
-		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
-
-		pt := name
-		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") {
+		pt := runtime.GOOS
+		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
 			pt = "linux"
 		}
+
+		if name == "native" {
+			name = platform.BinaryPlatformNameStatic()
+		}
+
+		name = TransformBinaryTarget(name)
+
+		enginePath := binaries.GetEnginePath(binaries.GlobalCacheDir(), "query-engine", name)
 
 		filename := fmt.Sprintf("query-engine-%s_gen.go", name)
 		to := path.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
-		if err := bindata.WriteFile(strings.ReplaceAll(name, "-", "_"), pkg, pt, enginePath, to); err != nil {
+		if err := bindata.WriteFile(name, pkg, pt, enginePath, to); err != nil {
 			return fmt.Errorf("generate write go file: %w", err)
 		}
 
@@ -204,4 +213,13 @@ func add(list []string, item string) []string {
 		list = append(list, item)
 	}
 	return list
+}
+
+func TransformBinaryTarget(name string) string {
+	// TODO this is a temp fix as the exact alpine libraries are not working
+	if name == "linux" || strings.Contains(name, "musl") {
+		name = "linux-static-" + platform.Arch()
+		logger.Debug.Printf("overriding binary name with '%s' due to linux or musl", name)
+	}
+	return name
 }

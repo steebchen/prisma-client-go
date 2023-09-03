@@ -5,8 +5,10 @@ prisma-*
 query-engine-*
 prisma-client-go
 *.sqlite
-*.json
 *_gen.go
+
+*.json
+!docs/**/*.json
 
 # build folder for Prisma CLI binaries
 build/
@@ -20,23 +22,8 @@ schema.temp.*.prisma
 schema.graphql
 .graphqlconfig
 
+# ignore go work sum, as we specifically do not want sum files for the integration test mod files
+go.work.sum
+
 # JetBrains
-.idea/**/csv-plugin.xml
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/**/usage.statistics.xml
-.idea/**/dictionaries
-.idea/**/shelf
-.idea/**/contentModel.xml
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
-.idea/**/dbnavigator.xml
-.idea/**/gradle.xml
-.idea/**/libraries
-*.iws
-out/
-.idea/httpRequests
+.idea/

@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/prisma/prisma-client-go/generator.Root*/ -}}
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ $name := $model.Name.GoLowerCase }}
@@ -9,7 +9,7 @@
 	// Creates a single {{ $name }}.
 	func (r {{ $ns }}) CreateOne(
 		{{ range $field := $model.Fields -}}
-			{{- if $field.RequiredOnCreate -}}
+			{{- if $field.RequiredOnCreate $model.PrimaryKey -}}
 				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}SetParam,
 			{{ end }}
 		{{- end }}
@@ -27,7 +27,7 @@
 		var fields []builder.Field
 
 		{{ range $field := $model.Fields -}}
-			{{- if $field.RequiredOnCreate -}}
+			{{- if $field.RequiredOnCreate $model.PrimaryKey -}}
 				fields = append(fields, _{{ $field.Name.GoLowerCase }}.field())
 			{{ end }}
 		{{- end }}

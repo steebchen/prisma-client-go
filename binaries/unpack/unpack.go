@@ -4,18 +4,23 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 	"time"
 
-	"github.com/prisma/prisma-client-go/binaries"
-	"github.com/prisma/prisma-client-go/binaries/platform"
-	"github.com/prisma/prisma-client-go/logger"
+	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // TODO check checksum after expanding file
 
+const FileEnv = "PRISMA_INTERNAL_QUERY_ENGINE_PATH"
+
 // noinspection GoUnusedExportedFunction
 func Unpack(data []byte, name string, version string) {
 	start := time.Now()
+
+	name = strings.ReplaceAll(name, "_", "-")
 
 	filename := fmt.Sprintf("prisma-query-engine-%s", name)
 
@@ -31,7 +36,7 @@ func Unpack(data []byte, name string, version string) {
 	}
 
 	if _, err := os.Stat(file); err == nil {
-		logger.Debug.Printf("query engine exists, not unpacking. %s", time.Since(start))
+		logger.Debug.Printf("query engine exists, not unpacking. %s. at %s", time.Since(start), file)
 		return
 	}
 
@@ -53,4 +58,8 @@ func Unpack(data []byte, name string, version string) {
 	}
 
 	logger.Debug.Printf("unpacked at %s in %s", file, time.Since(start))
+
+	if err := os.Setenv(FileEnv, file); err != nil {
+		panic(err)
+	}
 }

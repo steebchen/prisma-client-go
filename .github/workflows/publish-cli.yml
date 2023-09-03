@@ -1,0 +1,22 @@
+name: cli
+on:
+  workflow_dispatch:
+jobs:
+  publish:
+    name: Publish Prisma CLI
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - name: Publish the latest CLI
+        run: |
+          aws configure list
+          aws sts get-caller-identity
+          sh publish-latest.sh
+        working-directory: ./binaries
+        env:
+          AWS_DEFAULT_REGION: eu-west-1
+          AWS_ACCESS_KEY_ID: ${{ secrets.PRISMA_CLI_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}

@@ -1,0 +1,45 @@
+name: docs
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+on:
+  push:
+    tags:
+      - 'v*'
+    branches:
+      - hotfix
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          # fetch all history in order for Nextra to generate last modified dates
+          fetch-depth: 0
+
+      - name: Collect versions
+        run: |
+          echo "nodejs_version=$(cat docs/.tool-versions | grep 'nodejs' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
+          echo "pnpm_version=$(cat docs/.tool-versions | grep 'pnpm' | cut -d ' ' -f 2)" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.pnpm_version }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.nodejs_version }}
+          cache: pnpm
+          cache-dependency-path: ./docs/pnpm-lock.yaml
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}

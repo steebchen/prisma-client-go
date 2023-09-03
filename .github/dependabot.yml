@@ -4,7 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    # https://github.com/prisma/prisma-client-go/pull/641#issuecomment-952631905
+    # https://github.com/steebchen/prisma-client-go/pull/641#issuecomment-952631905
     ignore:
       - dependency-name: "github.com/iancoleman/strcase"
       - dependency-name: "github.com/takuoki/gocase"
@@ -16,5 +16,10 @@ updates:
 
   - package-ecosystem: "github-actions"
     directory: "/"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "npm"
+    directory: "/docs"
     schedule:
       interval: "daily"
