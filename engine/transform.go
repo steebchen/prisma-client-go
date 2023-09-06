@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // transformResponse for raw queries
@@ -38,6 +39,8 @@ func transformResponse(data []byte) ([]byte, error) {
 		return nil, fmt.Errorf("transform response marshal: %w", err)
 	}
 
+	logger.Debug.Printf("transformed response: %s", out)
+
 	return out, nil
 }
 
@@ -56,6 +59,18 @@ func handleObject(o map[string]interface{}) (interface{}, bool) {
 			}
 			dst = dst[:n]
 			return dst, false
+		}
+		if t == "array" {
+			value, ok := o["prisma__value"].([]interface{})
+			if !ok {
+				panic("expected array")
+			}
+			var items []interface{}
+			for _, item := range value {
+				item, _ := handleObject(item.(map[string]interface{}))
+				items = append(items, item)
+			}
+			return items, false
 		}
 		return o["prisma__value"], false
 	}
