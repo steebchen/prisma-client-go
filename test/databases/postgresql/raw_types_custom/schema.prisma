@@ -38,4 +38,5 @@ model User {
   bytes        Bytes
   bytesOpt     Bytes?
   bytesEmpty   Bytes?
+  items        String[]
 }
