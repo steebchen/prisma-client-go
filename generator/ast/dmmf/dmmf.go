@@ -291,7 +291,7 @@ func (f Field) RequiredOnCreate(key PrimaryKey) bool {
 		return true
 	}
 
-	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList {
+	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList || f.Kind.IsRelation() {
 		return false
 	}
 
