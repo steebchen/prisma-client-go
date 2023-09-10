@@ -32,3 +32,19 @@ model Repository {
   @@id(name: "repositoryId", [platformKind, platformId])
   @@map("repositories")
 }
+
+model Company {
+  id     String   @id
+  name   String
+  image  String?
+  access Access[]
+}
+
+model Access {
+  company_relation Company @relation(fields: [company_id], references: [id])
+  company_id       String
+
+  email String
+
+  @@id([company_id, email])
+}

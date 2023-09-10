@@ -163,6 +163,25 @@ func TestCompositeID(t *testing.T) {
 			}}
 			assert.Equal(t, expected, org)
 		},
+	}, {
+		name: "create with specific model layout",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.Company.CreateOne(
+				Company.ID.Set("123"),
+				Company.Name.Set("name"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.Access.CreateOne(
+				Access.CompanyID.Set("123"),
+				Access.Email.Set("email"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
