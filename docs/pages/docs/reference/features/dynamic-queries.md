@@ -6,10 +6,10 @@ The examples use the following prisma schema:
 
 ```prisma
 model User {
-    id       String   @default(cuid()) @id
-    kind     String   // can be of type employee or customer
-    email    String
-    referrer String?
+  id       String   @default(cuid()) @id
+  kind     String   // can be of type employee or customer
+  email    String
+  referrer String?
 }
 
 ```
@@ -37,22 +37,22 @@ for new users of type employee.
 
 ```go
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-    var params []db.UserSetParam
-    email := r.PostFormValue("email")
-    kind := r.PostFormValue("kind")
-    if kind == "customer" {
-        // Set the referer for users of type customer only
-        params = append(params, db.User.Referrer.Set("Referer"))
-    }
-    _, err := client.User.CreateOne(
-        db.User.Kind.Set(kind),
-        db.User.Email.Set(email),
-        params...,
-    ).Exec(r.Context())
-    if err != nil {
-        panic(err)
-    }
-    // write results to response
-    // ...
+  var params []db.UserSetParam
+  email := r.PostFormValue("email")
+  kind := r.PostFormValue("kind")
+  if kind == "customer" {
+    // Set the referer for users of type customer only
+    params = append(params, db.User.Referrer.Set("Referer"))
+  }
+  _, err := client.User.CreateOne(
+    db.User.Kind.Set(kind),
+    db.User.Email.Set(email),
+    params...,
+  ).Exec(r.Context())
+  if err != nil {
+    panic(err)
+  }
+  // write results to response
+  // ...
 }
 ```

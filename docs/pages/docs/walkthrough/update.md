@@ -4,23 +4,23 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post?   @relation(fields: [postID], references: [id])
-    postID String?
+  post   Post?   @relation(fields: [postID], references: [id])
+  postID String?
 }
 ```
 
@@ -30,10 +30,10 @@ To update a record, just query for a field using FindUnique or FindMany, and the
 
 ```go
 updated, err := client.Post.FindMany(
-    db.Post.Title.Equals("what up"),
+  db.Post.Title.Equals("what up"),
 ).Update(
-    db.Post.Content.Set("new content"),
-    db.Post.Title.Set("new title"),
+  db.Post.Content.Set("new content"),
+  db.Post.Title.Set("new title"),
 ).Exec(ctx)
 ```
 
@@ -45,11 +45,11 @@ You can set relations in the same way as when creating records.
 
 ```go
 updated, err := client.Comment.FindUnique(
-    db.Comment.ID.Equals("id"),
+  db.Comment.ID.Equals("id"),
 ).Update(
-    db.Comment.Post.Link(
-        db.Post.ID.Equals(postID),
-    ),
+  db.Comment.Post.Link(
+    db.Post.ID.Equals(postID),
+  ),
 ).Exec(ctx)
 ```
 
@@ -59,8 +59,8 @@ For optional relations, you can also unlink the relation, so the foreign key val
 
 ```go
 updated, err := client.Comment.FindUnique(
-    db.Comment.ID.Equals("id"),
+  db.Comment.ID.Equals("id"),
 ).Update(
-    db.Comment.Post.Unlink(),
+  db.Comment.Post.Unlink(),
 ).Exec(ctx)
 ```

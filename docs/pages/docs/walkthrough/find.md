@@ -6,23 +6,23 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -32,7 +32,7 @@ model Comment {
 
 ```go
 posts, err := client.Post.FindMany(
-    db.Post.Title.Equals("hi"),
+  db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 ```
 
@@ -44,12 +44,12 @@ FindUnique finds a record which is guaranteed to be unique, like @id fields or f
 
 ```go
 post, err := client.Post.FindUnique(
-    db.Post.ID.Equals("123"),
+  db.Post.ID.Equals("123"),
 ).Exec(ctx)
 if errors.Is(err, db.ErrNotFound) {
-    log.Printf("no record with id 123")
+  log.Printf("no record with id 123")
 } else if err != nil {
-    log.Printf("error occurred: %s", err)
+  log.Printf("error occurred: %s", err)
 }
 ```
 
@@ -60,12 +60,12 @@ to return just the first record found.
 
 ```go
 post, err := client.Post.FindFirst(
-    db.Post.Title.Equals("hi"),
+  db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 if errors.Is(err, db.ErrNotFound) {
-    log.Printf("no record with title 'hi' found")
+  log.Printf("no record with title 'hi' found")
 } else if err != nil {
-    log.Printf("error occurred: %s", err)
+  log.Printf("error occurred: %s", err)
 }
 
 log.Printf("post: %+v", post)
@@ -80,8 +80,8 @@ than and less than operations, while strings have prefix and suffix operations.
 
 ```go
 posts, err := client.Post.FindMany(
-    // query for posts containing the title "What"
-    db.Post.Title.Contains("What"),
+  // query for posts containing the title "What"
+  db.Post.Title.Contains("What"),
 ).Exec(ctx)
 ```
 
@@ -95,10 +95,10 @@ respectively. You can nest those queries as deep as you like.
 ```go
 // get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"
 posts, err := client.Post.FindMany(
-    db.Post.Title.Equals("What up?"),
-    db.Post.Comments.Some(
-        db.Comment.Content.Equals("My Content"),
-    ),
+  db.Post.Title.Equals("What up?"),
+  db.Post.Comments.Some(
+    db.Comment.Content.Equals("My Content"),
+  ),
 ).Exec(ctx)
 ```
 

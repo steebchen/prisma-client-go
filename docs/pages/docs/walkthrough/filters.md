@@ -4,24 +4,24 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
-    views     Int      @default(0)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  views     Int      @default(0)
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -106,7 +106,7 @@ The following query queries for all posts where their title doesn't equal "123":
 
 ```go
 db.Post.Not(
-    db.Post.Title.Equals("123"),
+  db.Post.Title.Equals("123"),
 )
 ```
 
@@ -118,7 +118,7 @@ The following query queries for all posts where either their title equals "123" 
 
 ```go
 db.Post.Or(
-    db.Post.Title.Equals("123"),
-    db.Post.Content.Equals("456"),
+  db.Post.Title.Equals("123"),
+  db.Post.Content.Equals("456"),
 )
 ```

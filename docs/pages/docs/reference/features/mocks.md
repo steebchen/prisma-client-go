@@ -13,8 +13,8 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id    String   @default(cuid()) @id
-    title String
+  id    String   @default(cuid()) @id
+  title String
 }
 ```
 
@@ -29,52 +29,52 @@ Expectations consist of the exact query or queries you expect, and the result wh
 ```go
 // main.go
 func GetPostTitle(ctx context.Context, client *PrismaClient, postID string) (string, error) {
-    post, err := client.Post.FindUnique(
-        db.Post.ID.Equals(postID),
-    ).Exec(ctx)
-    if err != nil {
-        return "", fmt.Errorf("error fetching post: %w", err)
-    }
+  post, err := client.Post.FindUnique(
+    db.Post.ID.Equals(postID),
+  ).Exec(ctx)
+  if err != nil {
+    return "", fmt.Errorf("error fetching post: %w", err)
+  }
 
-    return post.Title, nil
+  return post.Title, nil
 }
 
 // main_test.go
 func TestGetPostTitle_returns(t *testing.T) {
-    // create a new mock
-    // this returns a mock prisma `client` and a `mock` object to set expectations
-    client, mock, ensure := NewMock()
-    // defer calling ensure, which makes sure all of the expectations were met and actually called
-    // calling this makes sure that an error is returned if there was no query happening for a given expectation
-    // and makes sure that all of them succeeded
-    defer ensure(t)
+  // create a new mock
+  // this returns a mock prisma `client` and a `mock` object to set expectations
+  client, mock, ensure := NewMock()
+  // defer calling ensure, which makes sure all of the expectations were met and actually called
+  // calling this makes sure that an error is returned if there was no query happening for a given expectation
+  // and makes sure that all of them succeeded
+  defer ensure(t)
 
-    expected := db.PostModel{
-        InnerPost: db.InnerPost{
-            ID:   "123",
-            Title: "foo",
-        },
-    }
+  expected := db.PostModel{
+    InnerPost: db.InnerPost{
+      ID:   "123",
+      Title: "foo",
+    },
+  }
 
-    // start the expectation
-    mock.Post.Expect(
-        // define your exact query as in your tested function
-        // call it with the exact arguments which you expect the function to be called with
-        // you can copy and paste this from your tested function, and just put specific values into the arguments
-        client.Post.FindUnique(
-            db.Post.ID.Equals("123"),
-        ),
-    ).Returns(expected) // sets the object which should be returned in the function call
+  // start the expectation
+  mock.Post.Expect(
+    // define your exact query as in your tested function
+    // call it with the exact arguments which you expect the function to be called with
+    // you can copy and paste this from your tested function, and just put specific values into the arguments
+    client.Post.FindUnique(
+      db.Post.ID.Equals("123"),
+    ),
+  ).Returns(expected) // sets the object which should be returned in the function call
 
-    // mocking set up is done; let's define the actual test now
-    title, err := GetPostTitle(context.Background(), client, "123")
-    if err != nil {
-        t.Fatal(err)
-    }
+  // mocking set up is done; let's define the actual test now
+  title, err := GetPostTitle(context.Background(), client, "123")
+  if err != nil {
+    t.Fatal(err)
+  }
 
-    if title != "foo" {
-        t.Fatalf("title expected to be foo but is %s", title)
-    }
+  if title != "foo" {
+    t.Fatalf("title expected to be foo but is %s", title)
+  }
 }
 ```
 
@@ -85,18 +85,18 @@ You can also mock the client to return an error for a given query by using the `
 ```go
 // main_test.go
 func TestGetPostTitle_error(t *testing.T) {
-    client, mock, ensure := NewMock()
-    defer ensure(t)
+  client, mock, ensure := NewMock()
+  defer ensure(t)
 
-    mock.Post.Expect(
-        client.Post.FindUnique(
-            db.Post.ID.Equals("123"),
-        ),
-    ).Errors(db.ErrNotFound)
+  mock.Post.Expect(
+    client.Post.FindUnique(
+      db.Post.ID.Equals("123"),
+    ),
+  ).Errors(db.ErrNotFound)
 
-    _, err := GetPostTitle(context.Background(), client, "123")
-    if !errors.Is(err, ErrNotFound) {
-        t.Fatalf("error expected to return ErrNotFound but is %s", err)
-    }
+  _, err := GetPostTitle(context.Background(), client, "123")
+  if !errors.Is(err, ErrNotFound) {
+    t.Fatalf("error expected to return ErrNotFound but is %s", err)
+  }
 }
 ```
