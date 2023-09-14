@@ -4,10 +4,10 @@ The examples use the following prisma schema:
 
 ```prisma
 model Log {
-    id      String   @id @default(cuid())
-    date    DateTime @default(now())
-    message String
-    meta    Json
+  id      String   @id @default(cuid())
+  date    DateTime @default(now())
+  message String
+  meta    Json
 }
 ```
 
@@ -23,24 +23,24 @@ given struct variable.
 
 ```go
 type LogInfo struct {
-    Service string `json:"service"`
+  Service string `json:"service"`
 }
 
 logInfo := &LogInfo{
-    Service: "deployment/api",
+  Service: "deployment/api",
 }
 infoBytes, err := json.Marshal(logInfo)
 if err != nil {
-    panic(err)
+  panic(err)
 }
 
 _, err = client.Log.CreateOne(
-    db.Log.Message.Set("/api/graphql: status code 400"),
-    db.Log.Info.Set(infoBytes),
-    db.Log.ID.Set("123"),
+  db.Log.Message.Set("/api/graphql: status code 400"),
+  db.Log.Info.Set(infoBytes),
+  db.Log.ID.Set("123"),
 ).Exec(ctx)
 if err != nil {
-    panic(err)
+  panic(err)
 }
 ```
 
@@ -48,10 +48,10 @@ if err != nil {
 
 ```go
 log, err := client.Log.FindUnique(
-    db.Log.ID.Equals("123"),
+  db.Log.ID.Equals("123"),
 ).Exec(ctx)
 if err != nil {
-    panic(err)
+  panic(err)
 }
 
 // log.Info is of type json.RawMessage, so this will contain binary data such as [123 34 97 116 116 ...]
@@ -61,12 +61,12 @@ log.Printf("log info: %s", log.Info)
 // to unmarshal this information into a specific struct, we make use of Go's usual handling of json data:
 
 type LogInfo struct {
-    Service string `json:"service"`
+  Service string `json:"service"`
 }
 
 var info LogInfo
 if err := json.Unmarshal(log.Info, &info); err != nil {
-    panic(err)
+  panic(err)
 }
 log.Printf("log info: %+v", info)
 ```
@@ -78,16 +78,16 @@ databases.
 
 ```go
 actual, err := client.User.FindFirst(
-    User.Meta.Path([]string{"service"}),
-    User.Meta.StringContains("api"),
+  User.Meta.Path([]string{"service"}),
+  User.Meta.StringContains("api"),
 ).Exec(ctx)
 ```
 
 ```go
 actual, err := client.User.FindFirst(
-    User.Meta.Path([]string{"service"}),
-    // Note that Equals accepts JSON, so strings need to be surrounded with quotes
-    User.Meta.Equals(JSON(`"deployment/api"`)),
+  User.Meta.Path([]string{"service"}),
+  // Note that Equals accepts JSON, so strings need to be surrounded with quotes
+  User.Meta.Equals(JSON(`"deployment/api"`)),
 ).Exec(ctx)
 ```
 

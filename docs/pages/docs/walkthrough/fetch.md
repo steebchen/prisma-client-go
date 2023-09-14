@@ -8,23 +8,23 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -33,16 +33,16 @@ model Comment {
 ```go
 // find a post
 post, err := client.Post.FindFirst(
-    db.Post.Title.Equals("hi"),
+  db.Post.Title.Equals("hi"),
 ).With(
-    // also fetch 3 of its comments
-    db.Post.Comments.Fetch().Take(3),
+  // also fetch 3 of its comments
+  db.Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 check(err)
 log.Printf("post's title: %s", post.Title)
 
 comments := post.Comments()
 for _, comment := range comments {
-    log.Printf("comment: %+v", comment)
+  log.Printf("comment: %+v", comment)
 }
 ```

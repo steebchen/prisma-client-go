@@ -6,13 +6,13 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
-    views     Int      @default(0)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  views     Int      @default(0)
 }
 ```
 
@@ -23,16 +23,16 @@ document already exists.
 
 ```go
 post, err := client.Post.UpsertOne(
-    // query
-    db.Post.ID.Equals("upsert"),
+  // query
+  db.Post.ID.Equals("upsert"),
 ).Create(
-    // set these fields if document doesn't exist already
-    db.Post.Published.Set(true),
-    db.Post.Title.Set("title"),
-    db.Post.ID.Set("upsert"),
+  // set these fields if document doesn't exist already
+  db.Post.Published.Set(true),
+  db.Post.Title.Set("title"),
+  db.Post.ID.Set("upsert"),
 ).Update(
-    // update these fields if document already exists
-    db.Post.Title.Set("new-title"),
-    db.Post.Views.Increment(1),
+  // update these fields if document already exists
+  db.Post.Title.Set("new-title"),
+  db.Post.Views.Increment(1),
 ).Exec(ctx)
 ```
