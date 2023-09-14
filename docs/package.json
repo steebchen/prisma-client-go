@@ -14,8 +14,8 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "20.5.7",
-    "next-sitemap": "^4.2.2",
+    "@types/node": "20.6.0",
+    "next-sitemap": "^4.2.3",
     "typescript": "5.2.2"
   }
 }

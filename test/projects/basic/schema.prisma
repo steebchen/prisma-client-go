@@ -10,10 +10,13 @@ generator db {
   package           = "basic"
 }
 
+/// User
 model User {
+  /// id
   id       String  @id @default(cuid()) @map("_id")
   email    String  @unique
   username String
   name     String?
+  // stuff with `backtick`
   stuff    String?
 }

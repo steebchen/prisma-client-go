@@ -15,36 +15,6 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type RawUserModel1 struct {
-	ID           RawString    `json:"id"`
-	Email        RawString    `json:"email"`
-	Username     RawString    `json:"username"`
-	Str          RawString    `json:"str"`
-	StrOpt       *RawString   `json:"strOpt,omitempty"`
-	StrEmpty     *RawString   `json:"strEmpty,omitempty"`
-	Time         RawDateTime  `json:"time"`
-	TimeOpt      *RawDateTime `json:"timeOpt,omitempty"`
-	TimeEmpty    *RawDateTime `json:"timeEmpty,omitempty"`
-	Int          RawInt       `json:"int"`
-	IntOpt       *RawInt      `json:"intOpt,omitempty"`
-	IntEmpty     *RawInt      `json:"intEmpty,omitempty"`
-	Float        RawFloat     `json:"float"`
-	FloatOpt     *RawFloat    `json:"floatOpt,omitempty"`
-	FloatEmpty   *RawFloat    `json:"floatEmpty,omitempty"`
-	Bool         RawBoolean   `json:"bool"`
-	BoolOpt      *RawBoolean  `json:"boolOpt,omitempty"`
-	BoolEmpty    *RawBoolean  `json:"boolEmpty,omitempty"`
-	Decimal      RawDecimal   `json:"decimal"`
-	DecimalOpt   *RawDecimal  `json:"decimalOpt,omitempty"`
-	DecimalEmpty *RawDecimal  `json:"decimalEmpty,omitempty"`
-	JSON         RawJSON      `json:"json"`
-	JSONOpt      *RawJSON     `json:"jsonOpt,omitempty"`
-	JSONEmpty    *RawJSON     `json:"jsonEmpty,omitempty"`
-	Bytes        RawBytes     `json:"bytes"`
-	BytesOpt     *RawBytes    `json:"bytesOpt,omitempty"`
-	BytesEmpty   *RawBytes    `json:"bytesEmpty,omitempty"`
-}
-
 type CustomRawUserModel struct {
 	ID           string           `json:"id"`
 	Email        string           `json:"email"`
@@ -73,6 +43,7 @@ type CustomRawUserModel struct {
 	Bytes        []byte           `json:"bytes"`
 	BytesOpt     *[]byte          `json:"bytesOpt,omitempty"`
 	BytesEmpty   *[]byte          `json:"bytesEmpty,omitempty"`
+	Items        []string         `json:"items"`
 }
 
 func TestRawTypesCustom(t *testing.T) {
@@ -122,6 +93,7 @@ func TestRawTypesCustom(t *testing.T) {
 					jsonOpt: "{\"field\":\"value\"}",
 					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
 					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
+					items: ["a", "b"],
 				}) {
 					id
 				}
@@ -148,6 +120,7 @@ func TestRawTypesCustom(t *testing.T) {
 					jsonOpt: "{\"field\":\"value\"}",
 					bytes: "eyJmaWVsZCI6InZhbHVlIn0=",
 					bytesOpt: "eyJmaWVsZCI6InZhbHVlIn0=",
+					items: ["a", "b"],
 				}) {
 					id
 				}
@@ -179,6 +152,7 @@ func TestRawTypesCustom(t *testing.T) {
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
+				Items:      []string{"a", "b"},
 			}, {
 				ID:         "id2",
 				Email:      "email2",
@@ -199,6 +173,7 @@ func TestRawTypesCustom(t *testing.T) {
 				JSONOpt:    jsonOpt,
 				Bytes:      bytes,
 				BytesOpt:   bytesOpt,
+				Items:      []string{"a", "b"},
 			}}
 
 			massert.Equal(t, expected, actual)

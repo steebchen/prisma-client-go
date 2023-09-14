@@ -4,24 +4,24 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
-    views     Int      @default(0)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  views     Int      @default(0)
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -77,7 +77,8 @@ db.Post.CreatedAt.Lte(time.Now().Truncate(24 * time.Hour)),
 ### Optional type filters
 
 Optional fields are hard to represent in Go, since SQL has NULLs but Go does not have nullable types.
-Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set NULLs by using a pointer, you can use the `XOptional` method variants.
+Usually, the community defaults to using pointers, but providing that everywhere can be inconvenient. In order to set
+NULLs by using a pointer, you can use the `XOptional` method variants.
 
 ```go
 // set an optional field with a specific string
@@ -105,7 +106,7 @@ The following query queries for all posts where their title doesn't equal "123":
 
 ```go
 db.Post.Not(
-    db.Post.Title.Equals("123"),
+  db.Post.Title.Equals("123"),
 )
 ```
 
@@ -117,7 +118,7 @@ The following query queries for all posts where either their title equals "123" 
 
 ```go
 db.Post.Or(
-    db.Post.Title.Equals("123"),
-    db.Post.Content.Equals("456"),
+  db.Post.Title.Equals("123"),
+  db.Post.Content.Equals("456"),
 )
 ```

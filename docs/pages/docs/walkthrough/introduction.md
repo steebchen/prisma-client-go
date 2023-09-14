@@ -8,24 +8,24 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
-    desc      String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  desc      String?
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -44,24 +44,26 @@ form of `<model>.<field>.<method>`:
 
 ```go
 posts, err := client.Post.FindMany(
-    // package.
-    // model.
-    //      field.
-    //            method.
-    //                  (value)
-    db.Post.Title.Equals("hi"),
+  // package.
+  // model.
+  //      field.
+  //            method.
+  //                  (value)
+  db.Post.Title.Equals("hi"),
 ).Exec(ctx)
 ```
 
-This schema is consistently used. You can usually just type `db.` and then see what models, fields and actions your editor auto-completion will suggest. Depending on the type or the shape of a model or a field, there may be different actions available. If a field is optional, you will also get additional
+This schema is consistently used. You can usually just type `db.` and then see what models, fields and actions your
+editor auto-completion will suggest. Depending on the type or the shape of a model or a field, there may be different
+actions available. If a field is optional, you will also get additional
 methods such as IsNull() and *Optional variations to query for SQL NULLs:
 
 ```go
 posts, err := client.Post.FindMany(
-    db.Post.Title.Equals("hi"),
-    db.Post.Title.Contains("hi"),
-    db.Post.Content.IsNull(),
-    db.Post.Desc.Contains(variable),
-    db.Post.Desc.EqualsOptional(pointerVariable),
+  db.Post.Title.Equals("hi"),
+  db.Post.Title.Contains("hi"),
+  db.Post.Content.IsNull(),
+  db.Post.Desc.Contains(variable),
+  db.Post.Desc.EqualsOptional(pointerVariable),
 ).Exec(ctx)
 ```

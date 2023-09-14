@@ -32,3 +32,43 @@ model Repository {
   @@id(name: "repositoryId", [platformKind, platformId])
   @@map("repositories")
 }
+
+model Company {
+  id     String   @id
+  name   String
+  image  String?
+  access Access[]
+}
+
+model Access {
+  company_relation Company @relation(fields: [company_id], references: [id])
+  company_id       String
+
+  email String
+
+  @@id([company_id, email])
+}
+
+model Team {
+  path     String     @id
+  name     String
+  image    String?
+  document Document[]
+}
+
+model Document {
+  team_relation Team   @relation(fields: [team_path], references: [path])
+  team_path     String
+
+  parent    Document?  @relation("subfolder", fields: [parent_id], references: [id], onDelete: Cascade)
+  child     Document[] @relation("subfolder")
+  parent_id String?
+
+  id String @id @default(cuid())
+
+  name String
+  type String
+
+  @@unique([team_path, parent_id, name])
+  @@unique([id, team_path])
+}

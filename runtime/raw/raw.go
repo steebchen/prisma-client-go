@@ -35,24 +35,7 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 		if i > 0 {
 			newParams += ","
 		}
-		data, err := json.Marshal(param)
-		if err != nil {
-			panic(err)
-		}
-		switch p := param.(type) {
-		case time.Time, *time.Time, raw.DateTime, *raw.DateTime:
-			newParams += fmt.Sprintf(`{"prisma__type":"date","prisma__value":%s}`, string(data))
-		case decimal.Decimal, *decimal.Decimal, raw.Decimal, *raw.Decimal:
-			newParams += fmt.Sprintf(`{"prisma__type":"decimal","prisma__value":%q}`, string(data))
-		case json.RawMessage, *json.RawMessage, raw.JSON, *raw.JSON:
-			encoded := base64.URLEncoding.EncodeToString(data)
-			newParams += fmt.Sprintf(`{"prisma__type":"json","prisma__value":%q}`, encoded)
-		case []byte, *[]byte, raw.Bytes, *raw.Bytes:
-			encoded := base64.URLEncoding.EncodeToString(data)
-			newParams += fmt.Sprintf(`{"prisma__type":"bytes","prisma__value":%q}`, encoded)
-		default:
-			newParams += string(builder.Value(p))
-		}
+		newParams += convertType(param)
 	}
 	newParams += "]"
 
@@ -64,4 +47,26 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 	})
 
 	return q
+}
+
+func convertType(input interface{}) string {
+	data, err := json.Marshal(input)
+	if err != nil {
+		panic(err)
+	}
+
+	switch p := input.(type) {
+	case time.Time, *time.Time, raw.DateTime, *raw.DateTime:
+		return fmt.Sprintf(`{"prisma__type":"date","prisma__value":%s}`, string(data))
+	case decimal.Decimal, *decimal.Decimal, raw.Decimal, *raw.Decimal:
+		return fmt.Sprintf(`{"prisma__type":"decimal","prisma__value":%q}`, string(data))
+	case json.RawMessage, *json.RawMessage, raw.JSON, *raw.JSON:
+		encoded := base64.URLEncoding.EncodeToString(data)
+		return fmt.Sprintf(`{"prisma__type":"json","prisma__value":%q}`, encoded)
+	case []byte, *[]byte, raw.Bytes, *raw.Bytes:
+		encoded := base64.URLEncoding.EncodeToString(data)
+		return fmt.Sprintf(`{"prisma__type":"bytes","prisma__value":%q}`, encoded)
+	default:
+		return string(builder.Value(p))
+	}
 }

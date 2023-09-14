@@ -5,7 +5,7 @@ datasource db {
 
 generator db {
   provider          = "go run github.com/steebchen/prisma-client-go"
-	output            = "."
+  output            = "."
   disableGoBinaries = true
   package           = "relations"
 }
@@ -16,8 +16,8 @@ model User {
   username String
   name     String?
 
-	// TODO separate this into an extra test
-	// related issue: https://github.com/steebchen/prisma-client-go/issues/126
+  // TODO separate this into an extra test
+  // related issue: https://github.com/steebchen/prisma-client-go/issues/126
   role   Role?   @relation(fields: [roleID], references: [id])
   roleID String?
 
@@ -35,8 +35,8 @@ model Post {
 
   // 1) optional relation
   // 2) uppercase model
-	// TODO create separate tests for these two cases
-	// related issue: https://github.com/steebchen/prisma-client-go/issues/127
+  // TODO create separate tests for these two cases
+  // related issue: https://github.com/steebchen/prisma-client-go/issues/127
   Category   Category? @relation(fields: [categoryID], references: [id])
   categoryID String?
 

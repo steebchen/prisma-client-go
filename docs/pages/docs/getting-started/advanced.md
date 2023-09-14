@@ -10,12 +10,12 @@ So let's introduce a new comment model:
 
 ```prisma
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -23,10 +23,10 @@ We will also need to add a relation from to the post model in order to make a 1:
 
 ```prisma
 model Post {
-    // ...
+  // ...
 
-    // add this to your post model
-    comments Comment[]
+  // add this to your post model
+  comments Comment[]
 }
 ```
 
@@ -34,33 +34,33 @@ Your full schema should look like this:
 
 ```prisma
 datasource db {
-    // could be postgresql or mysql
-    provider = "sqlite"
-    url      = "file:dev.db"
+  // could be postgresql or mysql
+  provider = "sqlite"
+  url      = "file:dev.db"
 }
 
 generator db {
-    provider = "go run github.com/steebchen/prisma-client-go"
+  provider = "go run github.com/steebchen/prisma-client-go"
 }
 
 model Post {
-    id        String    @id @default(cuid())
-    createdAt DateTime  @default(now())
-    updatedAt DateTime  @updatedAt
-    title     String
-    published Boolean
-    desc      String?
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  title     String
+  published Boolean
+  desc      String?
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
@@ -74,27 +74,27 @@ In order to create comments, we first need to create a post, and then reference 
 
 ```go
 post, err := client.Post.CreateOne(
-    db.Post.Title.Set("My new post"),
-    db.Post.Published.Set(true),
-    db.Post.Desc.Set("Hi there."),
-    db.Post.ID.Set("123"),
+  db.Post.Title.Set("My new post"),
+  db.Post.Published.Set(true),
+  db.Post.Desc.Set("Hi there."),
+  db.Post.ID.Set("123"),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 log.Printf("post: %+v", post)
 
 // then create a comment
 comments, err := client.Comment.CreateOne(
-    db.Comment.Content.Set("my description"),
-    // link the post we created before
-    db.Comment.Post.Link(
-        db.Post.ID.Equals(post.ID),
-    ),
+  db.Comment.Content.Set("my description"),
+  // link the post we created before
+  db.Comment.Post.Link(
+    db.Post.ID.Equals(post.ID),
+  ),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 log.Printf("post: %+v", comments)
@@ -105,58 +105,58 @@ Now that a post and a comment are created, you can query for them as follows:
 ```go
 // return all published posts
 posts, err := client.Post.FindMany(
-    db.Post.Published.Equals(true),
+  db.Post.Published.Equals(true),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 log.Printf("published posts: %+v", posts)
 
 // insert a few new comments
 _, err = client.Comment.CreateOne(
-    db.Comment.Content.Set("first comment"),
-    // link the post we created before
-    db.Comment.Post.Link(
-        db.Post.ID.Equals("123"),
-    ),
+  db.Comment.Content.Set("first comment"),
+  // link the post we created before
+  db.Comment.Post.Link(
+    db.Post.ID.Equals("123"),
+  ),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 _, err = client.Comment.CreateOne(
-    db.Comment.Content.Set("second comment"),
-    // link the post we created before
-    db.Comment.Post.Link(
-        db.Post.ID.Equals("123"),
-    ),
+  db.Comment.Content.Set("second comment"),
+  // link the post we created before
+  db.Comment.Post.Link(
+    db.Post.ID.Equals("123"),
+  ),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 // return all comments from a post with a given id
 comments, err := client.Comment.FindMany(
-    db.Comment.Post.Where(
-        db.Post.ID.Equals("123"),
-    ),
+  db.Comment.Post.Where(
+    db.Post.ID.Equals("123"),
+  ),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 log.Printf("comments of post with id 123: %+v", comments)
 
 // return the first two comments from a post with which contains a given title, and sort by descending date
 orderedComments, err := client.Comment.FindMany(
-    db.Comment.Post.Where(
-        db.Post.ID.Equals("123"),
-    ),
+  db.Comment.Post.Where(
+    db.Post.ID.Equals("123"),
+  ),
 ).Take(2).OrderBy(
-    db.Comment.CreatedAt.Order(db.SortOrderDesc),
+  db.Comment.CreatedAt.Order(db.SortOrderDesc),
 ).Exec(ctx)
 if err != nil {
-    return err
+  return err
 }
 
 log.Printf("ordered comments: %+v", orderedComments)
@@ -168,10 +168,10 @@ few of their comments in just a few lines and fully type-safe:
 ```go
 // return a post by its id including 5 of its comments
 post, err := client.Post.FindUnique(
-    db.Post.ID.Equals("123"),
+  db.Post.ID.Equals("123"),
 ).With(
-    // also fetch 3 this post's comments
-    db.Post.Comments.Fetch().Take(3),
+  // also fetch 3 this post's comments
+  db.Post.Comments.Fetch().Take(3),
 ).Exec(ctx)
 
 // will log post and its comments
