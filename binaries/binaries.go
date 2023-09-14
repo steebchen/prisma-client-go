@@ -3,14 +3,14 @@ package binaries
 import (
 	"compress/gzip"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-
-	"github.com/steebchen/prisma-client-go/binaries/platform"
-	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
@@ -62,6 +62,10 @@ var baseDirName = path.Join("prisma", "binaries")
 // GlobalTempDir returns the path of where the engines live
 // internally, this is the global temp dir
 func GlobalTempDir(version string) string {
+	if dir := os.Getenv("PRISMA_GLOBAL_TEMP_DIR"); dir != "" {
+		logger.Debug.Printf("using PRISMA_GLOBAL_TEMP_DIR: %s", dir)
+		return dir
+	}
 	temp := os.TempDir()
 	logger.Debug.Printf("temp dir: %s", temp)
 
@@ -69,15 +73,25 @@ func GlobalTempDir(version string) string {
 }
 
 func GlobalUnpackDir(version string) string {
+	if dir := os.Getenv("PRISMA_UNPACK_DIR"); dir != "" {
+		logger.Debug.Printf("using PRISMA_UNPACK_DIR: %s", dir)
+		return dir
+	}
 	return path.Join(GlobalTempDir(version), "unpacked", "v2")
 }
 
 // GlobalCacheDir returns the path of where the CLI lives
 // internally, this is the global temp dir
 func GlobalCacheDir() string {
+	if dir := os.Getenv("PRISMA_GLOBAL_CACHE_DIR"); dir != "" {
+		logger.Debug.Printf("using PRISMA_GLOBAL_CACHE_DIR: %s", dir)
+		return dir
+	}
+
 	cache, err := os.UserCacheDir()
 	if err != nil {
-		panic(fmt.Errorf("could not read user cache dir: %w", err))
+		cache = GlobalTempDir(PrismaVersion)
+		log.Printf("warning: could not detect user cache dir (falling back to %s): %s", cache, err)
 	}
 
 	logger.Debug.Printf("global cache dir: %s", cache)
