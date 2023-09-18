@@ -301,26 +301,13 @@
 					{{ end }}
 					// {{ $method.Name }} the {{ if $field.IsRequired }}required{{ else }}optional{{ end }} value of {{ $field.Name.GoCase }}
 					func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $setReturnStruct }} {
-						{{ if $method.IsList }}
-							var fields []builder.Field
-							for _, v := range value {
-								fields = append(fields, builder.Field{
-									Value: v,
-								})
-							}
-						{{ end }}
 						return {{ $setReturnStruct }}{
 							data: builder.Field{
 								Name:   "{{ $field.Name }}",
 								Fields: []builder.Field{
 									builder.Field{
-										Name:   "{{ $method.Action }}",
-										{{ if $method.IsList }}
-											List: true,
-											Fields: fields,
-										{{ else }}
-											Value: value,
-										{{ end }}
+										Name:  "{{ $method.Action }}",
+										Value: value,
 									},
 								},
 							},
@@ -441,26 +428,13 @@
 					{{ $type = $field.Type.Value}}
 				{{ end }}
 				func (r {{ $struct }}) {{ $method.Name }}(value {{ if $method.IsList }}[]{{ end }}{{ $type }}) {{ $returnStruct }} {
-					{{ if $method.IsList }}
-						var fields []builder.Field
-						for _, v := range value {
-							fields = append(fields, builder.Field{
-								Value: v,
-							})
-						}
-					{{ end }}
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:   "{{ if $field.Prisma }}{{ $field.Name.PrismaInternalCase }}{{ else }}{{ $field.Name }}{{ end }}",
 							Fields: []builder.Field{
 								{
-									Name: "{{ $method.Action }}",
-									{{ if $method.IsList }}
-										List: true,
-										Fields: fields,
-									{{ else }}
-										Value: value,
-									{{ end }}
+									Name:  "{{ $method.Action }}",
+									Value: value,
 								},
 							},
 						},
