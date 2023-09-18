@@ -24,6 +24,15 @@ func TestJSON(t *testing.T) {
 	}{{
 		name: "json filter",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.JSON.Set([]byte(`{"test":"x"}`)),
+				User.JSONOpt.Set([]byte(`"hi"`)),
+				User.ID.Set("456"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
 			x := struct {
 				Attr string `json:"attr"`
 			}{
@@ -67,6 +76,15 @@ func TestJSON(t *testing.T) {
 	}, {
 		name: "json filter nested",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.JSON.Set([]byte(`{"test":"x"}`)),
+				User.JSONOpt.Set([]byte(`"hi"`)),
+				User.ID.Set("456"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
 			x := struct {
 				Obj struct {
 					NestedAttr string `json:"nested_attr"`
