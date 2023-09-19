@@ -39,6 +39,8 @@ func (e *QueryEngine) Connect() error {
 	logger.Debug.Printf("connecting took %s", time.Since(startEngine))
 	logger.Debug.Printf("connected.")
 
+	e.connected = true
+
 	return nil
 }
 
@@ -215,7 +217,7 @@ func (e *QueryEngine) spawn(file string) error {
 	var connectErr error
 	var gqlErrors []GQLError
 	for i := 0; i < 100; i++ {
-		body, err := e.Request(ctx, "GET", "/status", map[string]interface{}{})
+		body, err := e.Request(ctx, "GET", "/status", map[string]interface{}{}, false)
 		if err != nil {
 			connectErr = err
 			logger.Debug.Printf("could not connect; retrying...")
