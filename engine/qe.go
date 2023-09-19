@@ -30,6 +30,10 @@ type QueryEngine struct {
 	// were specified and thus expects binaries in the local path
 	hasBinaryTargets bool
 
+	// connected indicates whether the user has called Connect()
+	connected bool
+
+	// disconnected indicates whether the user has called Disconnect()
 	disconnected bool
 }
 

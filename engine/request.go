@@ -18,7 +18,7 @@ var internalDeleteNotFoundMessage = "Error occurred during query execution: Inte
 func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}) error {
 	startReq := time.Now()
 
-	body, err := e.Request(ctx, "POST", "/", payload)
+	body, err := e.Request(ctx, "POST", "/", payload, true)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
@@ -58,7 +58,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 
 // Batch sends a batch request to the query engine; used for transactions
 func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
-	body, err := e.Request(ctx, "POST", "/", payload)
+	body, err := e.Request(ctx, "POST", "/", payload, true)
 	if err != nil {
 		return fmt.Errorf("request failed: %w", err)
 	}
@@ -75,10 +75,15 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 	return nil
 }
 
-func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}) ([]byte, error) {
+func (e *QueryEngine) Request(ctx context.Context, method string, path string, payload interface{}, requiresConnection bool) ([]byte, error) {
+	if !e.connected && requiresConnection {
+		logger.Info.Printf("A query was executed before Connect() was called. Make sure to call .Prisma.Connect() before sending any queries.")
+		return nil, fmt.Errorf("client is not connected yet")
+	}
+
 	if e.disconnected {
-		logger.Info.Printf("A query was executed after Disconnect() was called. Make sure to not send any queries after disconnecting the client.")
-		return nil, fmt.Errorf("client is disconnected")
+		logger.Info.Printf("A query was executed after Disconnect() was called. Make sure to not send any queries after calling .Prisma.Disconnect() the client.")
+		return nil, fmt.Errorf("client is already disconnected")
 	}
 
 	requestBody, err := json.Marshal(payload)
