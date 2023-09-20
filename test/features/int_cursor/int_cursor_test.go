@@ -64,7 +64,7 @@ func TestPagination(t *testing.T) {
 				Post.
 				FindMany().
 				OrderBy(
-					Post.IntTest.Order(DESC),
+					Post.IntTest.Order(SortOrderDesc),
 				).
 				Cursor(Post.IntTest.Cursor(2)).
 				Exec(ctx)
