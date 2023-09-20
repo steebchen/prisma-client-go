@@ -42,6 +42,14 @@ func TestLinkMany(t *testing.T) {
 							id: "b",
 							title: "common",
 							content: "b",
+						}, {
+							id: "c",
+							title: "common",
+							content: "c",
+						}, {
+							id: "d",
+							title: "common",
+							content: "d",
 						}],
 					},
 				}) {
@@ -138,6 +146,16 @@ func TestLinkMany(t *testing.T) {
 					id
 				}
 			}
+		`, `
+			mutation {
+				result: createOnePost(data: {
+					id: "c",
+					title: "common",
+					content: "c",
+				}) {
+					id
+				}
+			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			created, err := client.User.FindUnique(
@@ -146,6 +164,7 @@ func TestLinkMany(t *testing.T) {
 				User.Posts.Link(
 					Post.ID.Equals("a"),
 					Post.ID.Equals("b"),
+					Post.ID.Equals("c"),
 				),
 			).Exec(ctx)
 			if err != nil {
