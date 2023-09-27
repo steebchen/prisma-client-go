@@ -317,6 +317,9 @@ func (f Field) RelationMethods() []RelationMethod {
 		}, {
 			Name:   "Every",
 			Action: "every",
+		}, {
+			Name:   "None",
+			Action: "none",
 		}}
 	}
 

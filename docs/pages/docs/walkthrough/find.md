@@ -89,8 +89,10 @@ To explore more query filters, see [all possible query filters](filters.md).
 
 ### Querying for relations
 
-You can query for relations by using "Some" or "Every" to query for records where only some or all of the records match
+You can query for relations by using "Some", "Every" or "None" to query for records where only some, all or none of the records match
 respectively. You can nest those queries as deep as you like.
+
+Please [see the caveats](https://github.com/prisma/prisma/issues/18193) for the "Every" filter.
 
 ```go
 // get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"
