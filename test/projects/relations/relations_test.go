@@ -69,7 +69,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, string(actual))
 		},
 	}, {
-		name: "find by single relation",
+		name: "find by single relation with every and none",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -118,7 +118,7 @@ func TestRelations(t *testing.T) {
 				Post.Author.Where(
 					User.Email.Equals("john@example.com"),
 				),
-			).OrderBy(Post.ID.Order(ASC)).Exec(ctx)
+			).OrderBy(Post.ID.Order(SortOrderAsc)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -384,6 +384,9 @@ func TestRelations(t *testing.T) {
 					Post.Title.Equals("common"),
 					Post.Comments.Every(
 						Comment.Content.Contains("comment"),
+					),
+					Post.Comments.None(
+						Comment.Content.Contains("asdf"),
 					),
 				),
 			).Exec(ctx)
