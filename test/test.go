@@ -38,7 +38,9 @@ var Databases = []Database{
 
 const schemaTemplate = "schema.temp.%s.prisma"
 
-func replaceSchema(t *testing.T, db Database, e engine.Engine, schemaPath string, mockDB string) {
+func Migrate(t *testing.T, db Database, e engine.Engine, mockDB string) {
+	schemaPath := fmt.Sprintf(schemaTemplate, db.Name())
+
 	xe := e.(*engine.QueryEngine)
 	xe.ReplaceSchema(func(schema string) string {
 		for _, fromDB := range Databases {
@@ -52,15 +54,13 @@ func replaceSchema(t *testing.T, db Database, e engine.Engine, schemaPath string
 	if err := os.WriteFile(schemaPath, []byte(xe.Schema), 0644); err != nil {
 		t.Fatal(err)
 	}
+
+	runDBPush(t, schemaPath)
 }
 
 func Start(t *testing.T, db Database, e engine.Engine, queries []string) string {
 	mockDB := db.SetupDatabase(t)
-
-	schemaPath := fmt.Sprintf(schemaTemplate, db.Name())
-	replaceSchema(t, db, e, schemaPath, mockDB)
-
-	migrate(t, schemaPath)
+	Migrate(t, db, e, mockDB)
 
 	if err := e.Connect(); err != nil {
 		t.Fatalf("could not connect: %s", err)
@@ -91,14 +91,14 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 }
 
 func End(t *testing.T, db Database, e engine.Engine, mockDBName string) {
-	defer teardown(t, db, mockDBName)
+	defer Teardown(t, db, mockDBName)
 
 	if err := e.Disconnect(); err != nil {
 		t.Fatalf("could not disconnect: %s", err)
 	}
 }
 
-func teardown(t *testing.T, db Database, mockDBName string) {
+func Teardown(t *testing.T, db Database, mockDBName string) {
 	if err := cmd.Run("rm", "-rf", fmt.Sprintf(schemaTemplate, db.Name())); err != nil {
 		t.Fatal(err)
 	}
@@ -127,7 +127,7 @@ func run(t *testing.T, dbs []Database, invoke func(t *testing.T, db Database, ct
 	}
 }
 
-func migrate(t *testing.T, schemaPath string) {
+func runDBPush(t *testing.T, schemaPath string) {
 	cleanup(t)
 
 	verbose := os.Getenv("PRISMA_CLIENT_GO_TEST_MIGRATE_LOGS") != ""

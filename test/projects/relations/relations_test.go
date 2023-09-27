@@ -906,9 +906,9 @@ func TestRelations(t *testing.T) {
 							title: "common",
 							content: "c",
 						}, {
-							id: "d",
+							id: "x",
 							title: "unrelated",
-							content: "d",
+							content: "x",
 						}],
 					},
 				}) {
@@ -958,7 +958,7 @@ func TestRelations(t *testing.T) {
 			assert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "with and sub query orderby",
+		name: "with and sub query order by",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -999,9 +999,9 @@ func TestRelations(t *testing.T) {
 							title: "common",
 							content: "c",
 						}, {
-							id: "d",
+							id: "x",
 							title: "unrelated",
-							content: "d",
+							content: "x",
 						}],
 					},
 				}) {
@@ -1015,7 +1015,7 @@ func TestRelations(t *testing.T) {
 			).With(
 				User.Posts.Fetch(
 					Post.Title.Equals("common"),
-				).OrderBy(Post.ID.Order(DESC)).Take(3),
+				).OrderBy(Post.ID.Order(SortOrderDesc)).Take(2),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -1041,13 +1041,6 @@ func TestRelations(t *testing.T) {
 							ID:       "b",
 							Title:    "common",
 							Content:  str("b"),
-							AuthorID: "relations",
-						},
-					}, {
-						InnerPost: InnerPost{
-							ID:       "a",
-							Title:    "common",
-							Content:  str("a"),
 							AuthorID: "relations",
 						},
 					}},

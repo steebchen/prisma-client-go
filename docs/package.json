@@ -5,17 +5,17 @@
     "build": "npx next build && next-sitemap"
   },
   "dependencies": {
-    "@types/gtag.js": "^0.0.13",
+    "@types/gtag.js": "^0.0.14",
     "@vercel/analytics": "^1.0.2",
-    "next": "^13.4.19",
+    "next": "^13.5.2",
     "nextra": "^2.6.2",
     "nextra-theme-docs": "^2.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "20.5.7",
-    "next-sitemap": "^4.2.2",
+    "@types/node": "20.7.0",
+    "next-sitemap": "^4.2.3",
     "typescript": "5.2.2"
   }
 }

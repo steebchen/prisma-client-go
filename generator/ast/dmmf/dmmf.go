@@ -287,12 +287,12 @@ type Field struct {
 }
 
 func (f Field) RequiredOnCreate(key PrimaryKey) bool {
-	if key.IsFieldInPrimary(f.Name) {
-		return true
-	}
-
 	if !f.IsRequired || f.IsUpdatedAt || f.HasDefaultValue || f.IsReadOnly || f.IsList {
 		return false
+	}
+
+	if key.IsFieldInPrimary(f.Name) {
+		return true
 	}
 
 	if f.RelationName != "" && f.IsList {

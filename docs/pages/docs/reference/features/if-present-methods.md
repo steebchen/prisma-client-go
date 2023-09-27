@@ -9,9 +9,9 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id      String  @id @default(cuid())
-    title   String
-    content String?
+  id      String  @id @default(cuid())
+  title   String
+  content String?
 }
 ```
 
@@ -25,10 +25,10 @@ ignored.
 title := "hi"
 var content *string
 _, err := client.Post.FindMany(
-    // query for this one
-    db.Post.Title.EqualsIfPresent(&title),
-    // ignore this one, since `content` nil
-    db.Post.Content.EqualsIfPresent(content),
+  // query for this one
+  db.Post.Title.EqualsIfPresent(&title),
+  // ignore this one, since `content` nil
+  db.Post.Content.EqualsIfPresent(content),
 ).Exec(ctx)
 ```
 
@@ -41,11 +41,11 @@ present, the field value will be updated.
 var newTitle *string
 newContent := "hi"
 _, err := client.Post.FindUnique(
-    db.Post.ID.Equals("123"),
+  db.Post.ID.Equals("123"),
 ).Update(
-    // don't set because `newTitle` is nil
-    db.Post.Title.SetIfPresent(newTitle),
-    // set value
-    db.Post.Content.SetIfPresent(&newContent),
+  // don't set because `newTitle` is nil
+  db.Post.Title.SetIfPresent(newTitle),
+  // set value
+  db.Post.Content.SetIfPresent(&newContent),
 ).Exec(ctx)
 ```

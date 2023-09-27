@@ -4,15 +4,15 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
 
-    // add an index to be able to order by created_at
-    @@index([createdAt])
+  // add an index to be able to order by created_at
+  @@index([createdAt])
 }
 ```
 
@@ -22,7 +22,7 @@ The following example would equal to the default behaviour of ordering by ID in 
 
 ```go
 posts, err := client.Post.FindMany().OrderBy(
-    db.Post.ID.Order(db.SortOrderAsc),
+  db.Post.ID.Order(db.SortOrderAsc),
 ).Exec(ctx)
 ```
 
@@ -32,7 +32,7 @@ You can order by any field ein either direction, but it's recommended to use an 
 
 ```go
 posts, err := client.Post.FindMany().OrderBy(
-    db.Post.CreatedAt.Order(db.SortOrderDesc),
+  db.Post.CreatedAt.Order(db.SortOrderDesc),
 ).Exec(ctx)
 ```
 
@@ -40,11 +40,11 @@ posts, err := client.Post.FindMany().OrderBy(
 
 ```go
 posts, err := client.
-    Post.
-    FindMany().
-    Take(5).
-    Cursor(db.Post.ID.Cursor("abc")).
-    OrderBy(
-        db.Post.CreatedAt.Order(db.SortOrderDesc),
-    ).Exec(ctx)
+  Post.
+  FindMany().
+  Take(5).
+  Cursor(db.Post.ID.Cursor("abc")).
+  OrderBy(
+    db.Post.CreatedAt.Order(db.SortOrderDesc),
+  ).Exec(ctx)
 ```

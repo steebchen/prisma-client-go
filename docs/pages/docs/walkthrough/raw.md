@@ -14,24 +14,24 @@ The examples use the following prisma schema:
 
 ```prisma
 model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    published Boolean
-    title     String
-    content   String?
-    views     Int      @default(0)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  published Boolean
+  title     String
+  content   String?
+  views     Int      @default(0)
 
-    comments Comment[]
+  comments Comment[]
 }
 
 model Comment {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    content   String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String
 
-    post   Post   @relation(fields: [postID], references: [id])
-    postID String
+  post   Post   @relation(fields: [postID], references: [id])
+  postID String
 }
 ```
 
