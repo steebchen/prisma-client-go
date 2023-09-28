@@ -36,7 +36,9 @@ model Comment {
 
 ### Find by nested relation
 
-In a query, you can query for relations by using "Some" or "Every":
+In a query, you can query for relations by using "Some", "Every" or "None".
+
+Please [see the caveats](https://github.com/prisma/prisma/issues/18193) for the "Every" filter.
 
 ```go
 // get posts which have at least one comment with a content "My Content" and that post's titles are all "What up?"
@@ -57,6 +59,9 @@ users, err := client.User.FindMany(
     db.Post.Title.Equals("What up?"),
     db.Post.Comments.Some(
       db.Comment.Content.Equals("My Content"),
+    ),
+    db.Post.Comments.None(
+      db.Comment.Content.Equals("missing"),
     ),
   ),
 ).Exec(ctx)
