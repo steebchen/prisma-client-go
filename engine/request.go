@@ -91,11 +91,6 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 		return nil, fmt.Errorf("payload marshal: %w", err)
 	}
 
-	// TODO use specific log level
-	if logger.Enabled {
-		logger.Debug.Printf("prisma engine payload: `%s`", requestBody)
-	}
-
 	return request(ctx, e.http, method, e.url+path, requestBody, func(req *http.Request) {
 		req.Header.Set("content-type", "application/json")
 	})

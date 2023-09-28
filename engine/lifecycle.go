@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -215,7 +216,6 @@ func (e *QueryEngine) spawn(file string) error {
 
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
-	var gqlErrors []GQLError
 	for i := 0; i < 100; i++ {
 		body, err := e.Request(ctx, "GET", "/status", map[string]interface{}{}, false)
 		if err != nil {
@@ -225,33 +225,32 @@ func (e *QueryEngine) spawn(file string) error {
 			continue
 		}
 
-		var response GQLResponse
+		var response struct {
+			Status string `json:"status"`
+		}
 
-		if err := json.Unmarshal(body, &response); err != nil {
+		// the response is a JSON in a string, so unquote it
+		unquoted, _ := strconv.Unquote(string(body))
+		if err := json.Unmarshal([]byte(unquoted), &response); err != nil {
 			connectErr = err
-			logger.Debug.Printf("could not unmarshal response; retrying...")
+			logger.Debug.Printf("could not unmarshal response %s; retrying...", body)
 			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
-		if response.Errors != nil {
-			gqlErrors = response.Errors
-			logger.Debug.Printf("could not connect due to gql errors; retrying...")
+		if response.Status != "ok" {
+			connectErr = fmt.Errorf("unexpected status: " + response.Status)
+			logger.Debug.Printf("could not connect due to unexpected status %s  ; retrying...", response.Status)
 			time.Sleep(50 * time.Millisecond)
 			continue
 		}
 
 		connectErr = nil
-		gqlErrors = nil
 		break
 	}
 
 	if connectErr != nil {
 		return fmt.Errorf("readiness query error: %w", connectErr)
-	}
-
-	if gqlErrors != nil {
-		return fmt.Errorf("readiness gql errors: %+v", gqlErrors)
 	}
 
 	return nil
