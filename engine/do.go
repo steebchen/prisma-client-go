@@ -56,6 +56,8 @@ func request(ctx context.Context, client *http.Client, method string, url string
 	}
 
 	if logger.Enabled {
+		logger.Debug.Printf("prisma engine response: `%s`", responseBody)
+
 		if elapsedRaw := rawResponse.Header["X-Elapsed"]; len(elapsedRaw) > 0 {
 			elapsed, _ := strconv.Atoi(elapsedRaw[0])
 			duration := time.Duration(elapsed) * time.Microsecond
