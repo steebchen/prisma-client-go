@@ -23,7 +23,7 @@ yarn prisma version
 mkdir -p node_modules/prisma/node_modules/@prisma/engines
 cp -R node_modules/@prisma/engines/* node_modules/prisma/node_modules/@prisma/engines
 
-npx pkg -t node16-linuxstatic-x64,node16-darwin-x64,node16-win-x64,node16-linuxstatic-arm64,node16-darwin-arm64,node16-win-arm64 node_modules/prisma
+npx pkg -t node18-linuxstatic-x64,node18-darwin-x64,node18-win-x64,node18-linuxstatic-arm64,node18-darwin-arm64,node18-win-arm64 node_modules/prisma
 
 version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " -f 2)
 
