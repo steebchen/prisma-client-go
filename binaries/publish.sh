@@ -8,6 +8,8 @@ pkg_version=5.8.1
 
 v="$1"
 
+node -v
+
 # do nothing if the version already exists
 processed_name="prisma-cli-$v-processed.txt"
 aws s3 ls "s3://$S3_BUCKET/$processed_name" && echo "Version $v already exists. Skipping." && exit 0
