@@ -23,7 +23,7 @@ yarn prisma version
 mkdir -p node_modules/prisma/node_modules/@prisma/engines
 cp -R node_modules/@prisma/engines/* node_modules/prisma/node_modules/@prisma/engines
 
-npx pkg -t node18-linuxstatic-x64,node18-darwin-x64,node18-win-x64,node18-linuxstatic-arm64,node18-darwin-arm64,node18-win-arm64 node_modules/prisma
+npx pkg -t node18-linuxstatic-x64,node18-darwin-x64,node18-win-x64,node18-darwin-arm64,node18-win-arm64 node_modules/prisma
 
 version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " -f 2)
 
@@ -47,7 +47,7 @@ mv prisma-macos-x64 "out/prisma-cli-$version-darwin-x64"
 mv prisma-linuxstatic-x64 "out/prisma-cli-$version-linux-x64"
 mv prisma-win-x64.exe "out/prisma-cli-$version-windows-x64.exe"
 mv prisma-macos-arm64 "out/prisma-cli-$version-darwin-arm64"
-mv prisma-linuxstatic-arm64 "out/prisma-cli-$version-linux-arm64"
+#mv prisma-linuxstatic-arm64 "out/prisma-cli-$version-linux-arm64"
 mv prisma-win-arm64.exe "out/prisma-cli-$version-windows-arm64.exe"
 
 cd out/
@@ -56,7 +56,7 @@ gzip -f "prisma-cli-$version-darwin-x64"
 gzip -f "prisma-cli-$version-linux-x64"
 gzip -f "prisma-cli-$version-windows-x64.exe"
 gzip -f "prisma-cli-$version-darwin-arm64"
-gzip -f "prisma-cli-$version-linux-arm64"
+#gzip -f "prisma-cli-$version-linux-arm64"
 gzip -f "prisma-cli-$version-windows-arm64.exe"
 
 echo "Uploading Prisma CLI $version"
