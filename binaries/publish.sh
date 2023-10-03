@@ -8,6 +8,17 @@ pkg_version=5.8.1
 
 v="$1"
 
+uname -a
+node -v
+
+if [[ $CI == 'true' ]]; then
+  curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+  sudo installer -pkg AWSCLIV2.pkg -target /
+  aws --version
+  aws configure list
+  aws sts get-caller-identity
+fi
+
 # do nothing if the version already exists
 processed_name="prisma-cli-$v-processed.txt"
 aws s3 ls "s3://$S3_BUCKET/$processed_name" && echo "Version $v already exists. Skipping." && exit 0
@@ -23,7 +34,7 @@ yarn prisma version
 mkdir -p node_modules/prisma/node_modules/@prisma/engines
 cp -R node_modules/@prisma/engines/* node_modules/prisma/node_modules/@prisma/engines
 
-npx pkg -t node16-linuxstatic-x64,node16-darwin-x64,node16-win-x64,node16-linuxstatic-arm64,node16-darwin-arm64,node16-win-arm64 node_modules/prisma
+npx pkg -t node18-linuxstatic-x64,node18-darwin-x64,node18-win-x64,node18-linuxstatic-arm64,node18-darwin-arm64,node18-win-arm64 node_modules/prisma
 
 version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " -f 2)
 
@@ -33,10 +44,12 @@ if [ "$version" != "$v" ]; then
   exit 1
 fi
 
+ls -la
+
 # test
 if [[ $CI == 'true' ]]; then
   echo 'Testing binary'
-  ./prisma-linuxstatic-x64 --version
+  ./prisma-macos-arm64 --version
 else
   echo 'Skipping tests'
 fi
