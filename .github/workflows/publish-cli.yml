@@ -4,9 +4,6 @@ on:
   schedule:
     # run once per hour
     - cron: '0 * * * *'
-  push:
-    branches:
-      - ci/publish-cli
 jobs:
   publish:
     name: Publish Prisma CLI
