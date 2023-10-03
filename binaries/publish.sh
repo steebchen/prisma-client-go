@@ -43,6 +43,8 @@ if [ "$version" != "$v" ]; then
   exit 1
 fi
 
+ls -la
+
 # test
 if [[ $CI == 'true' ]]; then
   echo 'Testing binary'
