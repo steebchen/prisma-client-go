@@ -46,7 +46,12 @@ fi
 # test
 if [[ $CI == 'true' ]]; then
   echo 'Testing binary'
-  ./prisma-linuxstatic-x64 --version
+  #./prisma-macos-x64 --version
+  #./prisma-linuxstatic-x64 --version
+  #./prisma-win-x64.exe --version
+  ./prisma-macos-arm64 --version
+  #./prisma-linuxstatic-arm64 --version
+  #./prisma-win-arm64.exe --version
 else
   echo 'Skipping tests'
 fi
