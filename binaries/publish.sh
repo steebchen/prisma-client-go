@@ -11,6 +11,13 @@ v="$1"
 uname -a
 node -v
 
+curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+sudo installer -pkg AWSCLIV2.pkg -target /
+aws --version
+
+aws configure list
+aws sts get-caller-identity
+
 # do nothing if the version already exists
 processed_name="prisma-cli-$v-processed.txt"
 aws s3 ls "s3://$S3_BUCKET/$processed_name" && echo "Version $v already exists. Skipping." && exit 0

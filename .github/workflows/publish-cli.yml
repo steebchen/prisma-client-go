@@ -18,8 +18,6 @@ jobs:
           node-version: 18.x
       - name: Publish the latest CLI
         run: |
-          aws configure list
-          aws sts get-caller-identity
           sh publish-latest.sh
         working-directory: ./binaries
         env:
