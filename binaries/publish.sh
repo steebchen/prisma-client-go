@@ -8,6 +8,7 @@ pkg_version=5.8.1
 
 v="$1"
 
+uname -a
 node -v
 
 # do nothing if the version already exists
