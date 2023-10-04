@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   schedule:
     # run once per hour
-    - cron: '0 * * * *'
+    - cron: '0 0 * * *'
 jobs:
   publish:
     name: Publish Prisma CLI
@@ -14,8 +14,7 @@ jobs:
         with:
           node-version: 18.x
       - name: Publish the latest CLI
-        run: |
-          sh publish-latest.sh
+        run: sh publish-latest.sh
         working-directory: ./binaries
         env:
           AWS_DEFAULT_REGION: eu-west-1
