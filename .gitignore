@@ -7,8 +7,7 @@ prisma-client-go
 *.sqlite
 *_gen.go
 
-*.json
-!docs/**/*.json
+test/**/*.json
 
 # build folder for Prisma CLI binaries
 build/
