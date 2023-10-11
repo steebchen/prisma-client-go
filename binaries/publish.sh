@@ -36,7 +36,10 @@ cp -R node_modules/@prisma/engines/* node_modules/prisma/node_modules/@prisma/en
 
 npx pkg -t node18-linuxstatic-x64,node18-darwin-x64,node18-win-x64,node18-linuxstatic-arm64,node18-darwin-arm64,node18-win-arm64 node_modules/prisma
 
+export PRISMA_HIDE_UPDATE_MESSAGE=true
+
 version=$(npx prisma version | grep '^\(prisma \)' | cut -d : -f 2 | cut -d " " -f 2)
+hash=$(npx prisma version | grep '^\(Default Engines Hash\)' | cut -d : -f 2 | cut -d " " -f 2)
 
 # abort if the installed version does not equal the release version
 if [ "$version" != "$v" ]; then
@@ -82,4 +85,15 @@ aws s3 cp "$processed_name" "s3://$S3_BUCKET" --acl public-read
 cd ..
 rm -r out/
 
+cd ..
+
 echo "Successfully published Prisma CLI $version"
+
+if [[ $CI == 'true' ]]; then
+  echo "Committing changes"
+
+  sed -i '' -e "s/const EngineVersion = \".*\"/const EngineVersion = \"$hash\"/g" binaries.go
+  sed -i '' -e "s/const PrismaVersion = \".*\"/const PrismaVersion = \"$version\"/g" binaries.go
+
+  # changes are picked up by GitHub actions
+fi
