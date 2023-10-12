@@ -26,3 +26,5 @@ go.work.sum
 
 # JetBrains
 .idea/
+
+*.pkg
