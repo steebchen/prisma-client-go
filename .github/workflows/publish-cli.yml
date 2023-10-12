@@ -37,4 +37,4 @@ jobs:
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
         env:
           PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
