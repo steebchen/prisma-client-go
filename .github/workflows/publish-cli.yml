@@ -26,5 +26,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
+          title: 'chore(prisma): upgrade Prisma CLI'
+          body: 'This PR upgrades the Prisma CLI to the latest version.'
           commit-message: 'chore(prisma): upgrade Prisma CLI'
           token: ${{ secrets.GITHUB_TOKEN }}
