@@ -24,9 +24,16 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.PRISMA_CLI_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}
       - name: Create Pull Request
+        id: pr
         uses: peter-evans/create-pull-request@v5
         with:
           title: 'chore(prisma): upgrade Prisma CLI'
           body: 'This PR upgrades the Prisma CLI to the latest version.'
           commit-message: 'chore(prisma): upgrade Prisma CLI'
           token: ${{ secrets.GH_TOKEN }}
+      - name: Enable auto-squash
+        if: ${{ steps.pr.outputs.pull-request-number }}
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
