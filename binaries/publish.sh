@@ -90,6 +90,9 @@ cd ..
 echo "Successfully published Prisma CLI $version"
 
 if [[ $CI == 'true' ]]; then
+  echo "PRISMA_VERSION=$version" >> $GITHUB_OUTPUT
+  echo "PRISMA_HASH=$hash" >> $GITHUB_OUTPUT
+
   echo "Committing changes"
 
   sed -i '' -e "s/const EngineVersion = \".*\"/const EngineVersion = \"$hash\"/g" binaries.go

@@ -18,6 +18,7 @@ jobs:
           node-version: 18.x
       - name: Publish the latest CLI
         run: sh publish-latest.sh
+        id: publish
         working-directory: ./binaries
         env:
           AWS_DEFAULT_REGION: eu-west-1
@@ -27,9 +28,9 @@ jobs:
         id: pr
         uses: peter-evans/create-pull-request@v5
         with:
-          title: 'chore(prisma): upgrade Prisma CLI'
-          body: 'This PR upgrades the Prisma CLI to the latest version.'
-          commit-message: 'chore(prisma): upgrade Prisma CLI'
+          title: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
+          body: 'Upgrade prisma to `v${{ steps.publish.outputs.PRISMA_VERSION }}` with engine hash `${{ steps.publish.outputs.PRISMA_HASH }}`.'
+          commit-message: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
           token: ${{ secrets.GH_TOKEN }}
       - name: Enable auto-squash
         if: ${{ steps.pr.outputs.pull-request-number }}
