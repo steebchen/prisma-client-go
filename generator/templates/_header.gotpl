@@ -18,6 +18,7 @@ import (
 	"github.com/steebchen/prisma-client-go/runtime/raw"
 	"github.com/steebchen/prisma-client-go/runtime/builder"
 	"github.com/steebchen/prisma-client-go/runtime/transaction"
+	"github.com/steebchen/prisma-client-go/runtime/extension"
 
 	// no-op import for go modules
 	_ "github.com/shopspring/decimal"

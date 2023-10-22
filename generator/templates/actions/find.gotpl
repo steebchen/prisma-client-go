@@ -46,7 +46,7 @@
 			{{ if eq $field.Name "" }}
 				{{/* only allow equals & unique params for FindUnique */}}
 				func (r {{ $ns }}) Find{{ $v.Name }}(
-					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}WhereParam{{ else }}{{ $model.Name.GoCase }}EqualsUniqueWhereParam{{ end }},
+					params {{ if $v.List }}...{{ end }}{{ if $v.List }}{{ $model.Name.GoCase }}WhereParam{{ else }}{{ $model.Name.GoCase }}UniqueWhereParam{{ end }},
 				) {{ $result }} {
 					var v {{ $result }}
 					v.query = builder.NewQuery()

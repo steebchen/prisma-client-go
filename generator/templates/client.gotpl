@@ -66,6 +66,9 @@ func newClient() *PrismaClient {
 	c.Prisma = &PrismaActions{
 		Raw: &raw.Raw{Engine: c},
 		TX:  &transaction.TX{Engine: c},
+		Extension: &extension.Extension[PrismaClient]{
+			Client: c,
+		},
 	}
 	return c
 }
@@ -74,6 +77,7 @@ type PrismaActions struct {
 	*lifecycle.Lifecycle
 	*raw.Raw
 	*transaction.TX
+	*extension.Extension[PrismaClient]
 }
 
 // PrismaClient is the instance of the Prisma Client Go client.

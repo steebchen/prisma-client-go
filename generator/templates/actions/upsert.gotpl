@@ -24,7 +24,7 @@
 	func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
 
 	func (r {{ $ns }}) UpsertOne(
-		params {{ $model.Name.GoCase }}EqualsUniqueWhereParam,
+		params {{ $model.Name.GoCase }}UniqueWhereParam,
 	) {{ $result }} {
 		var v {{ $result }}
 		v.query = builder.NewQuery()

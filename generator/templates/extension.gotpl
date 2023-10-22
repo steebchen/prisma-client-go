@@ -1,0 +1,62 @@
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
+
+// TODO only generate if extension feature flag is turned on
+
+type Run = extension.Run
+type Operation = extension.Operation
+type Result = extension.Result
+type Args = extension.Args
+
+// ---
+
+type Ext struct {
+	*Actions
+}
+
+var ext = Ext{
+	Actions: &Actions{},
+}
+
+type Model string
+
+const (
+	{{ range $model := $.AST.Models }}
+		{{ $model.Name.GoCase }}ModelName Model = "{{ $model.Name }}"
+	{{ end }}
+)
+
+type Actions struct {
+}
+
+func (*Actions) OnAll(func(ctx context.Context, model Model, operation Operation, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+func (*Actions) OnQuery(func(ctx context.Context, model Model, operation Operation, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+func (*Actions) OnMutation(func(ctx context.Context, model Model, operation Operation, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+func (*Actions) OnOperation([]Operation, func(ctx context.Context, model Model, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+func (*Actions) OnModel([]Model, func(ctx context.Context, operation Operation, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+func (*Actions) On([]Operation, []Model, func(ctx context.Context, model Model, operation Operation, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+	return extension.Action{}
+}
+
+{{/* TODO this needs a lot more work as all the params have to be adapted to the respective method */}}
+{{ range $model := $.AST.Models }}
+	{{ range $operation := $.Operations }}
+		// func (*Actions) On{{ $model.Name.GoCase }}{{ $operation }}(func(ctx context.Context, query {{ $model.Name.GoCase }}{{ $operation.Param }}, args extension.Args, run extension.Run) (*extension.Result, error)) extension.Action {
+		// 	return extension.Action{}
+		// }
+	{{ end }}
+{{ end }}

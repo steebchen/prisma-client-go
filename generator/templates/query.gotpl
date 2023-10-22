@@ -58,7 +58,7 @@
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
 			{{ end -}}
-		) {{ $model.Name.GoCase }}EqualsUniqueWhereParam {
+		) {{ $model.Name.GoCase }}UniqueWhereParam {
 			var fields []builder.Field
 
 			{{ range $f := $unique.Fields }}

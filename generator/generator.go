@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"github.com/steebchen/prisma-client-go/runtime/extension"
 	"os"
 	"strings"
 
@@ -8,6 +9,8 @@ import (
 	"github.com/steebchen/prisma-client-go/generator/ast/transform"
 	"github.com/steebchen/prisma-client-go/generator/types"
 )
+
+var Operations = extension.Operations
 
 // Root describes the generator output root.
 type Root struct {
@@ -21,6 +24,9 @@ type Root struct {
 	// BinaryPaths (optional)
 	BinaryPaths BinaryPaths    `json:"binaryPaths"`
 	AST         *transform.AST `json:"ast"`
+
+	// manually added props
+	Operations []extension.Operation
 }
 
 func (r *Root) EscapedDatamodel() string {

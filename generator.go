@@ -76,16 +76,16 @@ func invokePrisma() error {
 		case "generate":
 			response = nil // success
 
-			var params generator.Root
+			var payload generator.Root
 
-			if err := json.Unmarshal(input.Params, &params); err != nil {
+			if err := json.Unmarshal(input.Params, &payload); err != nil {
 				dir, _ := os.Getwd()
 				return fmt.Errorf("could not unmarshal params into generator.Root type at %s: %w", dir, err)
 			}
 
-			generator.Transform(&params)
+			generator.Transform(&payload)
 
-			if err := generator.Run(&params); err != nil {
+			if err := generator.Run(&payload); err != nil {
 				return fmt.Errorf("could not generate code. %w", err)
 			}
 		default:

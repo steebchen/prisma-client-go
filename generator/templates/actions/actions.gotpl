@@ -142,13 +142,17 @@ var countOutput = []builder.Output{
 		return p.query
 	}
 
-	type {{ $model.Name.GoCase }}EqualsUniqueWhereParam interface {
+	type {{ $model.Name.GoCase }}UniqueWhereParam interface {
 		field() builder.Field
 		getQuery() builder.Query
 		equals()
 		unique()
 		{{ $model.Name.GoLowerCase }}Model()
 	}
+
+	{{/* for backwards-compatibility */}}
+	// deprecated: use {{ $model.Name.GoCase }}UniqueWhereParam instead
+	type {{ $model.Name.GoCase }}EqualsUniqueWhereParam = {{ $model.Name.GoCase }}UniqueWhereParam
 
 	type {{ $name }}EqualsUniqueParam struct {
 		data builder.Field
