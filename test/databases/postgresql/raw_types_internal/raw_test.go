@@ -14,10 +14,13 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
+//goland:noinspection SqlNoDataSourceInspection,SqlResolve
 func TestRawTypesInternal(t *testing.T) {
 	t.Parallel()
 
+	var role RawRole = "user"
 	var strOpt RawString = "strOpt"
+	var uuid RawString = "04f3df19-a4b7-4f11-a4ef-b7be96e6caa0"
 	var i RawInt = 5
 	var f RawFloat = 5.5
 	var b RawBoolean = false
@@ -45,6 +48,9 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
+					uuid: "04f3df19-a4b7-4f11-a4ef-b7be96e6caa0",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -71,6 +77,9 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
+					uuid: "04f3df19-a4b7-4f11-a4ef-b7be96e6caa0",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -102,6 +111,9 @@ func TestRawTypesInternal(t *testing.T) {
 
 			expected := []RawUserModel{{
 				ID:         "id1",
+				Role:       role,
+				RoleOpt:    &role,
+				UUID:       &uuid,
 				Email:      "email1",
 				Username:   "a",
 				Str:        "str",
@@ -122,6 +134,9 @@ func TestRawTypesInternal(t *testing.T) {
 				BytesOpt:   bytesOpt,
 			}, {
 				ID:         "id2",
+				Role:       role,
+				RoleOpt:    &role,
+				UUID:       &uuid,
 				Email:      "email2",
 				Username:   "b",
 				Str:        "str",
@@ -151,6 +166,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -177,6 +194,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -208,6 +227,8 @@ func TestRawTypesInternal(t *testing.T) {
 
 			expected := []RawUserModel{{
 				ID:         "id2",
+				Role:       role,
+				RoleOpt:    &role,
 				Email:      "email2",
 				Username:   "b",
 				Str:        "str",
@@ -237,6 +258,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -263,6 +286,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -294,6 +319,8 @@ func TestRawTypesInternal(t *testing.T) {
 
 			expected := []RawUserModel{{
 				ID:         "id2",
+				Role:       role,
+				RoleOpt:    &role,
 				Email:      "email2",
 				Username:   "b",
 				Str:        "str",
@@ -323,6 +350,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -349,6 +378,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -386,7 +417,7 @@ func TestRawTypesInternal(t *testing.T) {
 		name:   "insert into",
 		before: []string{},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`, "a", "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, jsn, jsonOpt, bytes, bytesOpt).Exec(ctx)
+			result, err := client.Prisma.ExecuteRaw(`insert into "User" ("id", "role", "roleOpt", "email", "username", "str", "strOpt", "time", "timeOpt", "int", "intOpt", "float", "floatOpt", "decimal", "decimalOpt", "bool", "boolOpt", "json", "jsonOpt", "bytes", "bytesOpt") values ($1,$2::"Role",$3::"Role",$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)`, "a", role, role, "a", "a", "a", "a", date, &date, 1, 1, 2.0, 2.0, 2.0, 2.0, true, false, jsn, jsonOpt, bytes, bytesOpt).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -399,6 +430,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -444,6 +477,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -470,6 +505,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -501,6 +538,8 @@ func TestRawTypesInternal(t *testing.T) {
 
 			expected := []RawUserModel{{
 				ID:         "id2",
+				Role:       role,
+				RoleOpt:    &role,
 				Email:      "email2",
 				Username:   "b",
 				Str:        "str",
@@ -529,6 +568,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id1",
+					role: "user",
+					roleOpt: "user",
 					email: "email1",
 					username: "a",
 					str: "str",
@@ -555,6 +596,8 @@ func TestRawTypesInternal(t *testing.T) {
 			mutation {
 				result: createOneUser(data: {
 					id: "id2",
+					role: "user",
+					roleOpt: "user",
 					email: "email2",
 					username: "b",
 					str: "str",
@@ -588,6 +631,8 @@ func TestRawTypesInternal(t *testing.T) {
 
 			expected := []RawUserModel{{
 				ID:         "id2",
+				Role:       role,
+				RoleOpt:    &role,
 				Email:      "email2",
 				Username:   "b",
 				Str:        "str",
