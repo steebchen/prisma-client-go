@@ -105,6 +105,7 @@ func (r *Root) GetSanitizedDatasourceURL() string {
 	if ds.ActiveProvider != ProviderSQLite {
 		return url
 	}
+
 	url = strings.ReplaceAll(url, "file:", "")
 	url = strings.ReplaceAll(url, "sqlite:", "")
 
@@ -121,7 +122,7 @@ func (r *Root) GetSanitizedDatasourceURL() string {
 	schemaPath := strings.Replace(r.SchemaPath, "/private", "", 1)
 
 	// replace /schema.prisma as we need just the directory
-	schemaPath = strings.Replace(schemaPath, "/schema.prisma", "", 1)
+	schemaPath = strings.Replace(schemaPath, "schema.prisma", "", 1)
 
 	// use the schema path to locate the sqlite file (as the path is relative to the schema)
 	url = path.Join(schemaPath, url)
