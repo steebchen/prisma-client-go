@@ -193,7 +193,7 @@ func (e *QueryEngine) GetEncodedDatasources() (string, error) {
 			if url == "" {
 				log.Printf("WARNING: env var %s which was defined in the Prisma schema is not set", env)
 				continue
-				//return "", fmt.Errorf("env var %s which was defined in the Prisma schema is not set", env)
+				// return "", fmt.Errorf("env var %s which was defined in the Prisma schema is not set", env)
 			}
 			overrides = append(overrides, DatasourceOverride{
 				Name: datasources[i].Name.String(),
@@ -206,8 +206,6 @@ func (e *QueryEngine) GetEncodedDatasources() (string, error) {
 			})
 		}
 	}
-
-	log.Printf("overrides: %+v", overrides)
 
 	if len(overrides) == 0 {
 		return "", nil
@@ -233,7 +231,7 @@ func (e *QueryEngine) spawn(file string) error {
 
 	logger.Debug.Printf("running query-engine on port %s", port)
 
-	e.httpUrl = "http://localhost:" + port
+	e.httpURL = "http://localhost:" + port
 
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
 

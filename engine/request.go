@@ -91,7 +91,7 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 		return nil, fmt.Errorf("payload marshal: %w", err)
 	}
 
-	return request(ctx, e.http, method, e.httpUrl+path, requestBody, func(req *http.Request) {
+	return request(ctx, e.http, method, e.httpURL+path, requestBody, func(req *http.Request) {
 		req.Header.Set("content-type", "application/json")
 	})
 }

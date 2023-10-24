@@ -1,8 +1,9 @@
-package raw
+package db
 
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
@@ -23,7 +24,7 @@ func TestSqliteChecks(t *testing.T) {
 		before: []string{`
 			mutation {
 				result: createOneUser(data: {
-					id: "123",
+					id: "checks-path-1",
 					email: "asdf",
 				}) {
 					id
@@ -31,12 +32,14 @@ func TestSqliteChecks(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			assert.Equal(t, "file:dev.db", schemaConnectionURL)
+			assert.Equal(t, "file:dev.db", schemaDatasourceURL)
 
 			users, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
 			}
+
+			log.Printf("users: %v", users)
 
 			assert.Equal(t, 1, len(users))
 		},
@@ -44,12 +47,14 @@ func TestSqliteChecks(t *testing.T) {
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
+			log.Printf("start")
 			client := NewClient()
 
 			mockDB := test.Start(t, test.SQLite, client.Engine, tt.before)
 			defer test.End(t, test.SQLite, client.Engine, mockDB)
 
 			tt.run(t, client, context.Background())
+			log.Printf("end")
 		})
 	}
 }

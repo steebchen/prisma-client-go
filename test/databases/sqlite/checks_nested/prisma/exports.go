@@ -1,3 +1,3 @@
-package checks_nested_db
+package db
 
-const SchemaConnectionURL = schemaConnectionURL
+const SchemaDatasourceURL = schemaDatasourceURL

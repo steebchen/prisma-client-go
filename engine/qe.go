@@ -31,8 +31,8 @@ type QueryEngine struct {
 	// datasourceURL holds the sanitized datasourceURL which is overridden in the datasource above
 	datasourceURL string
 
-	// httpUrl holds the query-engine httpUrl
-	httpUrl string
+	// httpURL holds the query-engine httpURL
+	httpURL string
 
 	// hasBinaryTargets can be toggled by generated code from Schema.prisma whether binaryTargets
 	// were specified and thus expects binaries in the local path

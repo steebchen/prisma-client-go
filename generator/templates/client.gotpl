@@ -3,7 +3,7 @@
 const datasources = `{{ .GetDatasourcesJSON }}`
 
 const schema = `{{ .EscapedDatamodel }}`
-const schemaConnectionURL = "{{ .GetSanitizedDatasourceURL }}"
+const schemaDatasourceURL = "{{ .GetSanitizedDatasourceURL }}"
 const schemaEnvVarName = "{{ (index .Datasources 0).URL.FromEnvVar }}"
 
 {{ $hasBinaryTargets := false }}
@@ -33,7 +33,7 @@ func NewClient() *PrismaClient {
 	c := newClient()
 
 	// use the schema connection url if set
-	url := schemaConnectionURL
+	url := schemaDatasourceURL
 	if url == "" {
 		// if not, use the schema env var name
 		url = os.Getenv(schemaEnvVarName)
