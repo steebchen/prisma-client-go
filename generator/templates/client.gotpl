@@ -29,17 +29,25 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func NewClient() *PrismaClient {
+func NewClient(options ...func(config *Config)) *PrismaClient {
+	var config Config
+	for _, option := range options {
+		option(&config)
+	}
+
 	c := newClient()
 
 	// use the schema connection url if set
-	url := schemaDatasourceURL
+	url := config.datasourceURL
 	if url == "" {
-		// if not, use the schema env var name
-		url = os.Getenv(schemaEnvVarName)
+		url = schemaDatasourceURL
 		if url == "" {
-			//panic("no connection string found")
-			println("WARNING: env var which was defined in the Prisma schema is not set" + schemaEnvVarName)
+			// if not, use the schema env var name
+			url = os.Getenv(schemaEnvVarName)
+			if url == "" {
+				//panic("no connection string found")
+				println("WARNING: env var which was defined in the Prisma schema is not set" + schemaEnvVarName)
+			}
 		}
 	}
 
@@ -52,6 +60,16 @@ func NewClient() *PrismaClient {
 	c.Prisma.Lifecycle = &lifecycle.Lifecycle{Engine: c.Engine}
 
 	return c
+}
+
+type Config struct {
+	datasourceURL string
+}
+
+func WithDatasourceURL(url string) func(*Config) {
+	return func(config *Config) {
+		config.datasourceURL = url
+	}
 }
 
 func newMockClient(expectations *[]mock.Expectation) *PrismaClient {

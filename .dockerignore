@@ -10,7 +10,6 @@ schema.graphql
 
 **migrations**/
 **/*.db
-**/*.sqlite
 **/*.json
 **/*_gen.go
 **/prisma-*
