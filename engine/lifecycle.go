@@ -2,8 +2,11 @@ package engine
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/generator"
+	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -171,6 +174,57 @@ func (e *QueryEngine) ensure() (string, error) {
 	return file, nil
 }
 
+type DatasourceOverride struct {
+	Name string `json:"name"`
+	URL  string `json:"url"`
+}
+
+func (e *QueryEngine) GetEncodedDatasources() (string, error) {
+	var overrides []DatasourceOverride
+
+	var datasources []generator.Datasource
+	if err := json.Unmarshal([]byte(e.datasources), &datasources); err != nil {
+		return "", fmt.Errorf("unmarshal datasources: %w", err)
+	}
+
+	for i := range datasources {
+		if env := datasources[i].URL.FromEnvVar; env != "" {
+			url := os.Getenv(env)
+			if url == "" {
+				log.Printf("WARNING: env var %s which was defined in the Prisma schema is not set", env)
+				continue
+				//return "", fmt.Errorf("env var %s which was defined in the Prisma schema is not set", env)
+			}
+			overrides = append(overrides, DatasourceOverride{
+				Name: datasources[i].Name.String(),
+				URL:  url,
+			})
+		} else {
+			overrides = append(overrides, DatasourceOverride{
+				Name: datasources[i].Name.String(),
+				URL:  e.datasourceURL,
+			})
+		}
+	}
+
+	log.Printf("overrides: %+v", overrides)
+
+	if len(overrides) == 0 {
+		return "", nil
+	}
+
+	raw, err := json.Marshal(overrides)
+	if err != nil {
+		return "", fmt.Errorf("marshal datasources: %w", err)
+	}
+
+	logger.Debug.Printf("datasources: %s", string(raw))
+
+	datasourcesBase64 := base64.URLEncoding.EncodeToString(raw)
+
+	return datasourcesBase64, nil
+}
+
 func (e *QueryEngine) spawn(file string) error {
 	port, err := getPort()
 	if err != nil {
@@ -179,7 +233,7 @@ func (e *QueryEngine) spawn(file string) error {
 
 	logger.Debug.Printf("running query-engine on port %s", port)
 
-	e.url = "http://localhost:" + port
+	e.httpUrl = "http://localhost:" + port
 
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
 
@@ -194,6 +248,18 @@ func (e *QueryEngine) spawn(file string) error {
 		"PRISMA_CLIENT_ENGINE_TYPE=binary",
 		"PRISMA_ENGINE_PROTOCOL=graphql",
 	)
+
+	encDS, err := e.GetEncodedDatasources()
+	if err != nil {
+		return fmt.Errorf("get encoded datasources: %w", err)
+	}
+
+	if encDS != "" {
+		e.cmd.Env = append(
+			e.cmd.Env,
+			"OVERWRITE_DATASOURCES="+encDS,
+		)
+	}
 
 	// TODO fine tune this using log levels
 	if logger.Enabled {

@@ -1,6 +1,7 @@
 package generator
 
 import (
+	"encoding/json"
 	"github.com/steebchen/prisma-client-go/logger"
 	"os"
 	"path"
@@ -27,6 +28,16 @@ type Root struct {
 
 func (r *Root) EscapedDatamodel() string {
 	return strings.ReplaceAll(r.Datamodel, "`", "'")
+}
+
+func (r *Root) GetDatasourcesJSON() string {
+	ds := r.Datasources[0]
+
+	data, err := json.Marshal([]Datasource{ds})
+	if err != nil {
+		panic(err)
+	}
+	return string(data)
 }
 
 func (r *Root) GetEngineType() string {
@@ -110,7 +121,7 @@ func (r *Root) GetSanitizedDatasourceURL() string {
 	url = strings.ReplaceAll(url, "sqlite:", "")
 
 	if path.IsAbs(url) {
-		return "sqlite:" + url
+		return "file:" + url
 	}
 
 	wd, err := os.Getwd()
@@ -133,7 +144,7 @@ func (r *Root) GetSanitizedDatasourceURL() string {
 	url = strings.Trim(url, "/")
 
 	// prefix with sqlite: to make it a valid connection string again
-	url = "sqlite:" + url
+	url = "file:" + url
 
 	logger.Debug.Printf("sanitizing relative sqlite path %s\n", url)
 

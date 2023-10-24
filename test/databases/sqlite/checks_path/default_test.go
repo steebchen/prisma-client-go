@@ -20,8 +20,25 @@ func TestSqliteChecks(t *testing.T) {
 		run    Func
 	}{{
 		name: "check for connection URL",
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "123",
+					email: "asdf",
+				}) {
+					id
+				}
+			}
+		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			assert.Equal(t, "sqlite:dev.db", schemaConnectionURL)
+			assert.Equal(t, "file:dev.db", schemaConnectionURL)
+
+			users, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, 1, len(users))
 		},
 	}}
 	for _, tt := range tests {

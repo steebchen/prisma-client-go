@@ -21,8 +21,25 @@ func TestSqliteChecksNested(t *testing.T) {
 		run    Func
 	}{{
 		name: "check for connection URL",
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "456",
+					email: "test123@example.com",
+				}) {
+					id
+				}
+			}
+		`},
 		run: func(t *testing.T, client *checks_nested_db.PrismaClient, ctx cx) {
-			assert.Equal(t, "sqlite:prisma/dev.db", checks_nested_db.SchemaConnectionURL)
+			assert.Equal(t, "file:dev.db", checks_nested_db.SchemaConnectionURL)
+
+			users, err := client.User.FindMany().Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			assert.Equal(t, 1, len(users))
 		},
 	}}
 	for _, tt := range tests {

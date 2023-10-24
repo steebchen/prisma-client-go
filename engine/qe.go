@@ -5,26 +5,34 @@ import (
 	"os/exec"
 )
 
-func NewQueryEngine(schema string, hasBinaryTargets bool) *QueryEngine {
+func NewQueryEngine(schema string, hasBinaryTargets bool, datasources string, datasourceURL string) *QueryEngine {
 	return &QueryEngine{
 		Schema:           schema,
 		hasBinaryTargets: hasBinaryTargets,
+		datasources:      datasources,
+		datasourceURL:    datasourceURL,
 		http:             &http.Client{},
 	}
 }
 
 type QueryEngine struct {
+	// Schema contains the prisma Schema
+	Schema string
+
 	// cmd holds the prisma binary process
 	cmd *exec.Cmd
 
 	// http is the internal http client
 	http *http.Client
 
-	// url holds the query-engine url
-	url string
+	// datasources holds the raw datasources
+	datasources string
 
-	// Schema contains the prisma Schema
-	Schema string
+	// datasourceURL holds the sanitized datasourceURL which is overridden in the datasource above
+	datasourceURL string
+
+	// httpUrl holds the query-engine httpUrl
+	httpUrl string
 
 	// hasBinaryTargets can be toggled by generated code from Schema.prisma whether binaryTargets
 	// were specified and thus expects binaries in the local path
