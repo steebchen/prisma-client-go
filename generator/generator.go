@@ -129,8 +129,17 @@ func (r *Root) GetSanitizedDatasourceURL() string {
 		panic(err)
 	}
 
+	schemaPathParts := strings.Split(r.SchemaPath, "/")
+
+	for i := len(schemaPathParts) - 1; i >= 0; i-- {
+		if strings.HasSuffix(schemaPathParts[i], ".prisma") {
+			schemaPathParts = schemaPathParts[:i]
+			break
+		}
+	}
+
 	// trim /private as it is some kind of symlink on macOS
-	schemaPath := strings.Replace(r.SchemaPath, "/private", "", 1)
+	schemaPath := strings.Replace(path.Join(schemaPathParts...), "/private", "", 1)
 
 	// replace /schema.prisma as we need just the directory
 	schemaPath = strings.Replace(schemaPath, "schema.prisma", "", 1)
