@@ -1,7 +1,7 @@
 {{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
 const schema = `{{ .EscapedDatamodel }}`
-const schemaConnectionURL = "{{ (index .Datasources 0).URL.Value }}"
+const schemaConnectionURL = "{{ .GetSanitizedDatasourceURL }}"
 const schemaEnvVarName = "{{ (index .Datasources 0).URL.FromEnvVar }}"
 
 {{ $hasBinaryTargets := false }}

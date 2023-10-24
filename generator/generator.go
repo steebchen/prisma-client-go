@@ -1,7 +1,9 @@
 package generator
 
 import (
+	"github.com/steebchen/prisma-client-go/logger"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/steebchen/prisma-client-go/generator/ast/dmmf"
@@ -67,23 +69,26 @@ type Value struct {
 	Value      string `json:"value"`
 }
 
-// ConnectorType describes the Database of this generator.
-type ConnectorType string
+// Provider describes the Database of this datasource.
+type Provider string
 
-// ConnectorType values
+// Provider values
+//
+//goland:noinspection GoUnusedConst
 const (
-	ConnectorTypeMySQL      ConnectorType = "mysql"
-	ConnectorTypeMongo      ConnectorType = "mongo"
-	ConnectorTypeSQLite     ConnectorType = "sqlite"
-	ConnectorTypePostgreSQL ConnectorType = "postgresql"
+	ProviderMySQL      Provider = "mysql"
+	ProviderMongo      Provider = "mongo"
+	ProviderSQLite     Provider = "sqlite"
+	ProviderPostgreSQL Provider = "postgresql"
 )
 
 // Datasource describes a Prisma data source of any database type.
 type Datasource struct {
-	Name          types.String  `json:"name"`
-	ConnectorType ConnectorType `json:"connectorType"`
-	URL           EnvValue      `json:"url"`
-	Config        interface{}   `json:"config"`
+	Name           types.String `json:"name"`
+	Provider       Provider     `json:"provider"`
+	ActiveProvider Provider     `json:"activeProvider"`
+	URL            EnvValue     `json:"url"`
+	Config         interface{}  `json:"config"`
 }
 
 // EnvValue contains a string value and optionally information if, and if yes from where, an env var is used for this value.
@@ -91,6 +96,47 @@ type EnvValue struct {
 	// FromEnvVar (optional)
 	FromEnvVar string `json:"fromEnvVar"`
 	Value      string `json:"value"`
+}
+
+func (r *Root) GetSanitizedDatasourceURL() string {
+	ds := r.Datasources[0]
+
+	url := ds.URL.Value
+	if ds.ActiveProvider != ProviderSQLite {
+		return url
+	}
+	url = strings.ReplaceAll(url, "file:", "")
+	url = strings.ReplaceAll(url, "sqlite:", "")
+
+	if path.IsAbs(url) {
+		return "sqlite:" + url
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+
+	// trim /private as it is some kind of symlink on macOS
+	schemaPath := strings.Replace(r.SchemaPath, "/private", "", 1)
+
+	// replace /schema.prisma as we need just the directory
+	schemaPath = strings.Replace(schemaPath, "/schema.prisma", "", 1)
+
+	// use the schema path to locate the sqlite file (as the path is relative to the schema)
+	url = path.Join(schemaPath, url)
+
+	// replace absolute URL to relative
+	url = strings.Replace(url, wd, "", 1)
+
+	url = strings.Trim(url, "/")
+
+	// prefix with sqlite: to make it a valid connection string again
+	url = "sqlite:" + url
+
+	logger.Debug.Printf("sanitizing relative sqlite path %s\n", url)
+
+	return url
 }
 
 // BinaryPaths holds the information of the paths to the Prisma binaries.
