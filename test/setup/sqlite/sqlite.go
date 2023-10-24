@@ -23,7 +23,7 @@ func (*sqLite) ConnectionString(mockDBName string) string {
 	return fmt.Sprintf(dbNameSchema, mockDBName)
 }
 
-func (*sqLite) SetupDatabase(t *testing.T) string {
+func (*sqLite) SetupDatabase(*testing.T) string {
 	mockDB := setup.RandomString()
 	return mockDB
 }

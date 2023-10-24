@@ -8,7 +8,7 @@ import (
 	"github.com/steebchen/prisma-client-go/engine"
 )
 
-func (e *Engine) Do(ctx context.Context, payload interface{}, v interface{}) error {
+func (e *Engine) Do(_ context.Context, payload interface{}, v interface{}) error {
 	e.expMu.Lock()
 	defer e.expMu.Unlock()
 
@@ -45,7 +45,7 @@ func (e *Engine) Do(ctx context.Context, payload interface{}, v interface{}) err
 	return retErr
 }
 
-func (e *Engine) Batch(ctx context.Context, payload interface{}, v interface{}) error {
+func (e *Engine) Batch(context.Context, interface{}, interface{}) error {
 	// TODO
 	panic("TODO")
 }

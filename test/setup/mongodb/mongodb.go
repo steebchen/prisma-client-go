@@ -19,8 +19,8 @@ func (*mongoDB) ConnectionString(mockDBName string) string {
 	return fmt.Sprintf("mongodb://prisma:pw@localhost:27016/%s?authSource=admin&retryWrites=true", mockDBName)
 }
 
-func (*mongoDB) SetupDatabase(t *testing.T) string {
+func (*mongoDB) SetupDatabase(*testing.T) string {
 	return setup.RandomString()
 }
 
-func (*mongoDB) TeardownDatabase(t *testing.T, mockDB string) {}
+func (*mongoDB) TeardownDatabase(*testing.T, string) {}
