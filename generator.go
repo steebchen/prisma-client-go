@@ -15,7 +15,9 @@ import (
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
-var writeDebugFile = os.Getenv("PRISMA_CLIENT_GO_WRITE_DMMF_FILE") != ""
+const DmmfWriteKey = "PRISMA_CLIENT_GO_WRITE_DMMF_FILE"
+
+var writeDebugFile = os.Getenv(DmmfWriteKey) != ""
 
 func reply(w io.Writer, data interface{}) error {
 	b, err := json.Marshal(data)
@@ -52,7 +54,7 @@ func invokePrisma() error {
 
 		if writeDebugFile {
 			if err := os.WriteFile("dmmf.json", content, 0600); err != nil {
-				log.Print(err)
+				return fmt.Errorf("could not write dmmf.json: %w", err)
 			}
 		}
 

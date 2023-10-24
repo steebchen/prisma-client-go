@@ -1,7 +1,9 @@
 {{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
 
+const datasources = `{{ .GetDatasourcesJSON }}`
+
 const schema = `{{ .EscapedDatamodel }}`
-const schemaConnectionURL = "{{ (index .Datasources 0).URL.Value }}"
+const schemaDatasourceURL = "{{ .GetSanitizedDatasourceURL }}"
 const schemaEnvVarName = "{{ (index .Datasources 0).URL.FromEnvVar }}"
 
 {{ $hasBinaryTargets := false }}
@@ -29,20 +31,24 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //   }()
 func NewClient() *PrismaClient {
 	c := newClient()
-	{{ if eq $.GetEngineType "dataproxy" }}
-		// use the schema connection url if set
-		url := schemaConnectionURL
+
+	// use the schema connection url if set
+	url := schemaDatasourceURL
+	if url == "" {
+		// if not, use the schema env var name
+		url = os.Getenv(schemaEnvVarName)
 		if url == "" {
-			// if not, use the schema env var name
-			url = os.Getenv(schemaEnvVarName)
-			if url == "" {
-				panic("no connection string found")
-			}
+			//panic("no connection string found")
+			println("WARNING: env var which was defined in the Prisma schema is not set" + schemaEnvVarName)
 		}
+	}
+
+	{{ if eq $.GetEngineType "dataproxy" }}
 		c.Engine = engine.NewDataProxyEngine(schema, url)
 	{{ else }}
-		c.Engine = engine.NewQueryEngine(schema, hasBinaryTargets)
+		c.Engine = engine.NewQueryEngine(schema, hasBinaryTargets, datasources, url)
 	{{ end }}
+
 	c.Prisma.Lifecycle = &lifecycle.Lifecycle{Engine: c.Engine}
 
 	return c
