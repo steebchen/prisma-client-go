@@ -1,10 +1,57 @@
 # Quickstart
 
-## Setup
+The fastest way to get started is to [clone the quickstart repository](#use-the-quickstart-repository).
+Alternatively, you can go through the [manual below to create a new project from scratch](#manual-setup).
 
-### Initialise a new Go project
+## Use the quickstart repository
 
-If you don't have a Go project yet, initialise one using Go modules:
+Clone the quickstart repository:
+
+```shell
+git clone git@github.com:steebchen/prisma-go-demo.git && cd prisma-go-demo
+```
+
+Create the pre-defined SQLite database and generate the Go client:
+
+```shell
+go run github.com/steebchen/prisma-client-go db push
+```
+
+Finally, run the simple main program at `main.go`:
+
+```shell
+go run .
+# created post: {
+#   "id": "ckfnrp7ec0000oh9kygil9s94",
+#   "createdAt": "2020-09-29T09:37:44.628Z",
+#   "updatedAt": "2020-09-29T09:37:44.628Z",
+#   "title": "Hi from Prisma!",
+#   "published": true,
+#   "desc": "Prisma is a database toolkit and makes databases easy."
+# }
+# post: {
+#   "id": "ckfnrp7ec0000oh9kygil9s94",
+#   "createdAt": "2020-09-29T09:37:44.628Z",
+#   "updatedAt": "2020-09-29T09:37:44.628Z",
+#   "title": "Hi from Prisma!",
+#   "published": true,
+#   "desc": "Prisma is a database toolkit and makes databases easy."
+# }
+# The posts's title is: Prisma is a database toolkit and makes databases easy.
+```
+
+### Next steps
+
+We just scratched the surface of what you can do. Read the [advanced tutorial](advanced.md) to learn about more
+complex queries and how you can query for relations.
+
+You can also read the full docs at [GoPrisma](https://goprisma.org/docs).
+
+## Manual setup
+
+### Initialize a new Go project
+
+If you don't have a Go project yet, initialize one using Go modules:
 
 ```shell script
 mkdir demo && cd demo
@@ -61,7 +108,7 @@ tool [`migrate`](https://www.prisma.io/docs/concepts/components/prisma-migrate) 
 
 ## Usage
 
-Create a file `main.go`:
+Create a file `main.go` (and adapt the import to the db folder if needed):
 
 ```go
 package main
@@ -71,6 +118,7 @@ import (
   "encoding/json"
   "fmt"
 
+  // adapt "demo" to your module name if it differs
   "demo/db"
 )
 
@@ -133,7 +181,7 @@ func run() error {
 }
 ```
 
-make sure your go.mod is up to date:
+make sure your go.mod is up-to-date:
 
 ```
 go mod tidy
