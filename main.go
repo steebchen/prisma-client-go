@@ -15,9 +15,18 @@ func main() {
 		args := os.Args[1:]
 		logger.Debug.Printf("invoking command %+v", args)
 
-		if args[0] == "prefetch" {
+		switch args[0] {
+		case "prefetch":
 			// just run prisma -v to trigger the download
 			if err := cli.Run([]string{"-v"}, true); err != nil {
+				panic(err)
+			}
+			os.Exit(0)
+			return
+		case "init":
+			// override default init flags
+			args = append(args, "--generator-provider", "go run github.com/steebchen/prisma-client-go")
+			if err := cli.Run(args, true); err != nil {
 				panic(err)
 			}
 			os.Exit(0)
