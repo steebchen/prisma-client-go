@@ -41,11 +41,13 @@ jobs:
 
       - name: install golangci-lint
         if: steps.changes.outputs.go == 'true'
-        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.50.0
+        run: curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.55.0
 
       - name: run linter
         if: steps.changes.outputs.go == 'true'
-        run: ./bin/golangci-lint run ./... --timeout "5m0s" --enable "gofmt,revive,exportloopref,gocritic"
+        run: |
+          ./bin/golangci-lint --version
+          ./bin/golangci-lint run ./... --config .golangci.yml
 
   editorconfig:
     runs-on: ubuntu-latest

@@ -3,7 +3,7 @@ package raw
 import (
 	"context"
 	"github.com/steebchen/prisma-client-go/test"
-	db "github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
+	"github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )

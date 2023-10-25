@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	"log"
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
@@ -39,22 +38,18 @@ func TestSqliteChecks(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			log.Printf("users: %v", users)
-
 			assert.Equal(t, 1, len(users))
 		},
 	}}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			log.Printf("start")
 			client := NewClient()
 
 			mockDB := test.Start(t, test.SQLite, client.Engine, tt.before)
 			defer test.End(t, test.SQLite, client.Engine, mockDB)
 
 			tt.run(t, client, context.Background())
-			log.Printf("end")
 		})
 	}
 }

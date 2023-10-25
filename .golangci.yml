@@ -1,0 +1,8 @@
+run:
+  timeout: 5m
+linters:
+  enable:
+    - gofmt
+    - revive
+    - exportloopref
+    - gocritic
