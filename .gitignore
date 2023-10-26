@@ -4,7 +4,6 @@
 prisma-*
 query-engine-*
 prisma-client-go
-*.sqlite
 *_gen.go
 
 test/**/*.json
