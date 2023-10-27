@@ -1,1 +1,9 @@
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
+
 var ErrNotFound = types.ErrNotFound
+
+type ErrUniqueConstraint = types.ErrUniqueConstraint[PrismaFields]
+
+func IsUniqueConstraint(err error) (*types.ErrUniqueConstraint[PrismaFields], bool) {
+	return types.CheckUniqueConstraint[PrismaFields](err)
+}
