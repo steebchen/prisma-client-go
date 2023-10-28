@@ -39,7 +39,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Field: User.Email.Field(),
 			//	}, violation)
-			assert.Equal(t, User.Email.Field(), violation.Field)
+			assert.Equal(t, User.Email.Field(), violation.Fields[0])
 
 			assert.Equal(t, true, ok)
 		},

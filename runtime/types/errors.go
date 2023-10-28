@@ -2,7 +2,7 @@ package types
 
 import (
 	"errors"
-	"regexp"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 )
 
 // ErrNotFound gets returned when a database record does not exist
@@ -13,16 +13,13 @@ type F interface {
 }
 
 type ErrUniqueConstraint[T F] struct {
-	// Field only shows on Postgres
-	Field T
+	// Message is the error message
+	Message string
+	// Fields only shows on Postgres
+	Fields []T
 	// Key only shows on MySQL
 	Key string
 }
-
-const fieldKey = "field"
-
-var prismaMySQLUniqueConstraint = regexp.MustCompile("Unique constraint failed on the constraint: `(?P<" + fieldKey + ">.+)`")
-var prismaPostgresUniqueConstraint = regexp.MustCompile("Unique constraint failed on the fields: \\(`(?P<" + fieldKey + ">.+)`\\)")
 
 // CheckUniqueConstraint returns on a unique constraint error or violation with error info
 // Use as follows:
@@ -36,26 +33,35 @@ var prismaPostgresUniqueConstraint = regexp.MustCompile("Unique constraint faile
 //
 // Ideally this will be replaced with Prisma-generated errors in the future
 func CheckUniqueConstraint[T F](err error) (*ErrUniqueConstraint[T], bool) {
-	if match, ok := findMatch(err, prismaMySQLUniqueConstraint); ok {
+	var ufr *protocol.UserFacingError
+	if ok := errors.As(err, &ufr); !ok {
+		return nil, false
+	}
+
+	if ufr.ErrorCode != "P2002" {
+		return nil, false
+	}
+
+	// postgres
+	if items, ok := ufr.Meta.Target.([]interface{}); ok {
+		var fields []T
+		for _, f := range items {
+			field, ok := f.(string)
+			if ok {
+				fields = append(fields, T(field))
+			}
+		}
 		return &ErrUniqueConstraint[T]{
-			Key: match,
+			Fields: fields,
 		}, true
 	}
-	if match, ok := findMatch(err, prismaPostgresUniqueConstraint); ok {
+
+	// mysql
+	if item, ok := ufr.Meta.Target.(string); ok {
 		return &ErrUniqueConstraint[T]{
-			Field: T(match),
+			Key: item,
 		}, true
 	}
+
 	return nil, false
-}
-
-func findMatch(err error, regex *regexp.Regexp) (string, bool) {
-	result := regex.FindStringSubmatch(err.Error())
-	if result == nil {
-		return "", false
-	}
-
-	index := regex.SubexpIndex(fieldKey)
-	field := result[index]
-	return field, true
 }

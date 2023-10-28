@@ -3,6 +3,7 @@ package test
 import (
 	"context"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"log"
 	"os"
 	"strings"
@@ -68,8 +69,8 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 	}
 
 	for _, q := range queries {
-		var response engine.GQLResponse
-		payload := engine.GQLRequest{
+		var response protocol.GQLResponse
+		payload := protocol.GQLRequest{
 			Query:     q,
 			Variables: map[string]interface{}{},
 		}

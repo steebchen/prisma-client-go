@@ -1,4 +1,4 @@
-package engine
+package protocol
 
 import (
 	"encoding/json"
@@ -33,11 +33,30 @@ type GQLBatchRequest struct {
 	Transaction bool         `json:"transaction"`
 }
 
-// GQLError is a GraphQL Error
+type UserFacingError struct {
+	IsPanic   bool   `json:"is_panic"`
+	Message   string `json:"message"`
+	Meta      Meta   `json:"meta"`
+	ErrorCode string `json:"error_code"`
+}
+
+func (e *UserFacingError) Error() string {
+	return e.Message
+}
+
+type Meta struct {
+	Target interface{} `json:"target"` // can be of type []string or string
+}
+
+// GQLError is a GraphQL Message
 type GQLError struct {
-	Message    string                 `json:"error"` // note: the query-engine uses 'error' instead of 'message'
-	Path       []string               `json:"path"`
-	Extensions map[string]interface{} `json:"query"`
+	Message         string           `json:"error"`
+	UserFacingError *UserFacingError `json:"user_facing_error"`
+	Path            []string         `json:"path"`
+}
+
+func (e *GQLError) Error() string {
+	return e.Message
 }
 
 func (e *GQLError) RawMessage() string {

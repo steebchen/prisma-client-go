@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"net/http"
 	"net/url"
 	"path"
@@ -108,7 +109,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 
 	startParse := time.Now()
 
-	var response GQLResponse
+	var response protocol.GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
 		return fmt.Errorf("json gql resopnse unmarshal: %w", err)
 	}

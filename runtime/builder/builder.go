@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"strings"
 	"time"
 
@@ -243,7 +244,7 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 }
 
 func (q Query) Exec(ctx context.Context, into interface{}) error {
-	payload := engine.GQLRequest{
+	payload := protocol.GQLRequest{
 		Query:     q.Build(),
 		Variables: map[string]interface{}{},
 	}
