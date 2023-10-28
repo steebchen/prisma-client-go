@@ -66,6 +66,29 @@ func TestUniqueConstraintViolation(t *testing.T) {
 
 			assert.Equal(t, true, ok)
 		},
+	}, {
+		name: "sqlite unique constraint violation",
+		dbs:  []test.Database{test.SQLite},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.Email.Set("john@example.com"),
+				User.Username.Set("username"),
+			).Exec(ctx)
+			assert.Equal(t, nil, err)
+
+			_, err = client.User.CreateOne(
+				User.Email.Set("john@example.com"),
+				User.Username.Set("username"),
+			).Exec(ctx)
+
+			violation, ok := IsUniqueConstraint(err)
+			//	assert.Equal(t, &ErrUniqueConstraint{
+			//		Field: User.Email.Field(),
+			//	}, violation)
+			assert.Equal(t, User.Email.Field(), violation.Fields[0])
+
+			assert.Equal(t, true, ok)
+		},
 	}}
 	for _, tt := range tests {
 		tt := tt
