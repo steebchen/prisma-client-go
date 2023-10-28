@@ -22,15 +22,6 @@ type ErrUniqueConstraint[T F] struct {
 }
 
 // CheckUniqueConstraint returns on a unique constraint error or violation with error info
-// Use as follows:
-//
-//	user, err := db.User.CreateOne(...).Exec(cxt)
-//	if err != nil {
-//		if info, err := db.UniqueConstraintError(); err != nil {
-//			log.Printf("unique constraint on the field: %s", info.Field)
-//		}
-//	}
-//
 // Ideally this will be replaced with Prisma-generated errors in the future
 func CheckUniqueConstraint[T F](err error) (*ErrUniqueConstraint[T], bool) {
 	var ufr *protocol.UserFacingError
