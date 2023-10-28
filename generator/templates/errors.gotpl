@@ -2,8 +2,8 @@
 
 var ErrNotFound = types.ErrNotFound
 
-type ErrUniqueConstraint = types.ErrUniqueConstraint[PrismaFields]
+type ErrUniqueConstraint = types.ErrUniqueConstraint[prismaFields]
 
-func IsUniqueConstraint(err error) (*types.ErrUniqueConstraint[PrismaFields], bool) {
-	return types.CheckUniqueConstraint[PrismaFields](err)
+func IsUniqueConstraint(err error) (*types.ErrUniqueConstraint[prismaFields], bool) {
+	return types.CheckUniqueConstraint[prismaFields](err)
 }

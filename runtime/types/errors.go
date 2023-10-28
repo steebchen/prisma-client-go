@@ -2,24 +2,27 @@ package types
 
 import (
 	"errors"
-	"strings"
+	"regexp"
 )
 
 // ErrNotFound gets returned when a database record does not exist
 var ErrNotFound = errors.New("ErrNotFound")
-
-type A string
-type B string
 
 type F interface {
 	~string
 }
 
 type ErrUniqueConstraint[T F] struct {
+	// Field only shows on Postgres
 	Field T
+	// Key only shows on MySQL
+	Key string
 }
 
-const prismaUniqueConstraint = "Unique constraint failed on the fields: (`%s`)"
+const fieldKey = "field"
+
+var prismaMySQLUniqueConstraint = regexp.MustCompile("Unique constraint failed on the constraint: `(?P<" + fieldKey + ">.+)`")
+var prismaPostgresUniqueConstraint = regexp.MustCompile("Unique constraint failed on the fields: \\(`(?P<" + fieldKey + ">.+)`\\)")
 
 // CheckUniqueConstraint returns on a unique constraint error or violation with error info
 // Use as follows:
@@ -33,27 +36,26 @@ const prismaUniqueConstraint = "Unique constraint failed on the fields: (`%s`)"
 //
 // Ideally this will be replaced with Prisma-generated errors in the future
 func CheckUniqueConstraint[T F](err error) (*ErrUniqueConstraint[T], bool) {
-	// TODO use regex
-	if !strings.Contains(err.Error(), prismaUniqueConstraint) {
-		return nil, false
+	if match, ok := findMatch(err, prismaMySQLUniqueConstraint); ok {
+		return &ErrUniqueConstraint[T]{
+			Key: match,
+		}, true
 	}
-	return &ErrUniqueConstraint[T]{
-		Field: "asdf",
-	}, true
+	if match, ok := findMatch(err, prismaPostgresUniqueConstraint); ok {
+		return &ErrUniqueConstraint[T]{
+			Field: T(match),
+		}, true
+	}
+	return nil, false
 }
 
-// ----------
-// THIS IS GENERATED CODE
-// ----------
+func findMatch(err error, regex *regexp.Regexp) (string, bool) {
+	result := regex.FindStringSubmatch(err.Error())
+	if result == nil {
+		return "", false
+	}
 
-type Fields string
-
-// TODO check what JS client uses for fields exports
-
-const UserModelNameField Fields = "user.name"
-
-type RealErrUniqueConstraint = ErrUniqueConstraint[Fields]
-
-func CheckUniqueConstraintError(err error) (*ErrUniqueConstraint[Fields], bool) {
-	return CheckUniqueConstraint[Fields](err)
+	index := regex.SubexpIndex(fieldKey)
+	field := result[index]
+	return field, true
 }
