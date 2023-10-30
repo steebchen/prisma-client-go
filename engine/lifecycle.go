@@ -235,7 +235,10 @@ func (e *QueryEngine) spawn(file string) error {
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
 
 	e.cmd.Stdout = os.Stdout
-	e.cmd.Stderr = os.Stderr
+
+	if err := checkStderr(e.cmd); err != nil {
+		return fmt.Errorf("setup stream: %w", err)
+	}
 
 	e.cmd.Env = append(
 		os.Environ(),
