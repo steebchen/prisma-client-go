@@ -156,7 +156,8 @@ func DownloadCLI(toDir string) error {
 	logger.Debug.Printf("ensuring CLI %s from %s to %s", cli, url, to)
 
 	if _, err := os.Stat(to); os.IsNotExist(err) {
-		logger.Info.Printf("prisma cli doesn't exist, fetching... (this might take a few minutes)")
+		filename := path.Base(to)
+		logger.Info.Printf("prisma cli binary %s doesn't exist, fetching... (this might take a few minutes)", filename)
 
 		if err := download(url, to); err != nil {
 			return fmt.Errorf("could not download %s to %s: %w", url, to, err)

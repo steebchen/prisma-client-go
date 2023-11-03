@@ -22,6 +22,13 @@ import (
 )
 
 func (e *QueryEngine) Connect() error {
+	success := false
+	go func() {
+		if !success {
+			e.closed <- struct{}{}
+		}
+	}()
+
 	logger.Debug.Printf("ensure query engine binary...")
 
 	_ = godotenv.Load(".env")
@@ -40,9 +47,15 @@ func (e *QueryEngine) Connect() error {
 	}
 
 	logger.Debug.Printf("connecting took %s", time.Since(startEngine))
-	logger.Debug.Printf("connected.")
+
+	if e.lastEngineError != "" {
+		return fmt.Errorf("query engine errored: %w", fmt.Errorf(e.lastEngineError))
+	}
 
 	e.connected = true
+	success = true
+
+	logger.Debug.Printf("connected.")
 
 	return nil
 }
@@ -67,6 +80,8 @@ func (e *QueryEngine) Disconnect() error {
 			return fmt.Errorf("wait for process: %w", err)
 		}
 	}
+
+	e.closed <- struct{}{}
 
 	logger.Debug.Printf("disconnected.")
 	return nil
@@ -236,7 +251,10 @@ func (e *QueryEngine) spawn(file string) error {
 
 	e.cmd.Stdout = os.Stdout
 
-	if err := checkStderr(e.cmd); err != nil {
+	e.onEngineError = make(chan string)
+	e.closed = make(chan interface{})
+
+	if err := e.streamStderr(e.cmd, e.onEngineError); err != nil {
 		return fmt.Errorf("setup stream: %w", err)
 	}
 

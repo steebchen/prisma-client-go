@@ -13,11 +13,23 @@ type Messsage struct {
 	Message string `json:"message"`
 }
 
-func checkStderr(cmd *exec.Cmd) error {
+func (e *QueryEngine) streamStderr(cmd *exec.Cmd, onError chan<- string) error {
 	stderr, err := cmd.StderrPipe()
 	if err != nil {
 		return fmt.Errorf("get stderr pipe: %w", err)
 	}
+
+	go func() {
+	outer:
+		for {
+			select {
+			case v := <-e.onEngineError:
+				e.lastEngineError = v
+			case <-e.closed:
+				break outer
+			}
+		}
+	}()
 
 	go func() {
 		scanner := bufio.NewScanner(stderr)
@@ -25,16 +37,16 @@ func checkStderr(cmd *exec.Cmd) error {
 		buf := make([]byte, maxCapacity)
 		scanner.Buffer(buf, maxCapacity)
 
-		// optionally, resize scanner's capacity for lines over 64K, see next example
 		for scanner.Scan() {
 			contents := scanner.Bytes()
-
 			var message Messsage
 			if err := json.Unmarshal(contents, &message); err != nil {
 				log.Printf("failed to unmarshal message: %s", err.Error())
+				continue
 			}
 
 			if message.Message != "" {
+				onError <- message.Message
 				log.Println(message.Message)
 				continue
 			}
