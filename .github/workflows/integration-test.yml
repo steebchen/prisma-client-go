@@ -17,6 +17,7 @@ jobs:
         with:
           filters: |
             go:
+              - '**/*.dockerfile'
               - '.github/workflows/**/*.yml'
               - '**/*.go'
               - '**/*.gotpl'
