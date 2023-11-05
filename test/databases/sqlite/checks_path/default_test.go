@@ -1,11 +1,15 @@
+//go:build e2e
+// +build e2e
+
+// package db is only tested in e2e mode as it might conflict when running locally
 package db
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/stretchr/testify/assert"
 )
 
 type cx = context.Context
