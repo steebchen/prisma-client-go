@@ -1,11 +1,16 @@
-package raw
+//go:build e2e
+// +build e2e
+
+// package db is only tested in e2e mode as it might conflict when running locally
+package db
 
 import (
 	"context"
+	"testing"
+
 	"github.com/steebchen/prisma-client-go/test"
 	"github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 type cx = context.Context
