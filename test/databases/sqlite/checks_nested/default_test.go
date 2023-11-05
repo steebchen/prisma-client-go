@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
-	"github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
+	db "github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
 	"github.com/stretchr/testify/assert"
 )
 

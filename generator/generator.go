@@ -2,7 +2,6 @@ package generator
 
 import (
 	"encoding/json"
-	"github.com/steebchen/prisma-client-go/logger"
 	"os"
 	"path"
 	"strings"
@@ -10,6 +9,7 @@ import (
 	"github.com/steebchen/prisma-client-go/generator/ast/dmmf"
 	"github.com/steebchen/prisma-client-go/generator/ast/transform"
 	"github.com/steebchen/prisma-client-go/generator/types"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // Root describes the generator output root.
