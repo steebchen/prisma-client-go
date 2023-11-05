@@ -3,14 +3,15 @@ package binaries
 import (
 	"compress/gzip"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/binaries/platform"
-	"github.com/steebchen/prisma-client-go/logger"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path"
 	"path/filepath"
+
+	"github.com/steebchen/prisma-client-go/binaries/platform"
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.

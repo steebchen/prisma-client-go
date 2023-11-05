@@ -2,10 +2,10 @@ package raw
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig(t *testing.T) {
