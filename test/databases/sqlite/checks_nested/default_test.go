@@ -1,4 +1,8 @@
-package raw
+//go:build e2e
+// +build e2e
+
+// package db is only tested in e2e mode as it might conflict when running locally
+package db
 
 import (
 	"context"
