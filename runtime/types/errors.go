@@ -2,6 +2,7 @@ package types
 
 import (
 	"errors"
+
 	"github.com/steebchen/prisma-client-go/engine/protocol"
 )
 

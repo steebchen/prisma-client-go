@@ -3,7 +3,6 @@ package test
 import (
 	"context"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"log"
 	"os"
 	"strings"
@@ -11,6 +10,7 @@ import (
 
 	"github.com/steebchen/prisma-client-go/cli"
 	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/test/cmd"
 	"github.com/steebchen/prisma-client-go/test/setup/mongodb"
 	"github.com/steebchen/prisma-client-go/test/setup/mysql"

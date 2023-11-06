@@ -7,13 +7,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"net/http"
 	"net/url"
 	"path"
 	"time"
 
 	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/logger"
 	"github.com/steebchen/prisma-client-go/runtime/types"
 )

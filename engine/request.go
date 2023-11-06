@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"net/http"
 	"time"
 
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/logger"
 	"github.com/steebchen/prisma-client-go/runtime/types"
 )

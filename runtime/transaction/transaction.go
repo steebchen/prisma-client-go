@@ -3,9 +3,9 @@ package transaction
 import (
 	"context"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/engine/protocol"
 
 	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/runtime/builder"
 )
 
