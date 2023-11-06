@@ -25,6 +25,10 @@ type ErrUniqueConstraint[T F] struct {
 // CheckUniqueConstraint returns on a unique constraint error or violation with error info
 // Ideally this will be replaced with Prisma-generated errors in the future
 func CheckUniqueConstraint[T F](err error) (*ErrUniqueConstraint[T], bool) {
+	if err == nil {
+		return nil, false
+	}
+
 	var ufr *protocol.UserFacingError
 	if ok := errors.As(err, &ufr); !ok {
 		return nil, false
