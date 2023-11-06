@@ -296,12 +296,15 @@ func (e *QueryEngine) spawn(file string) error {
 
 	logger.Debug.Printf("connecting to engine...")
 
-	ctx := context.Background()
-
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
 	for i := 0; i < 100; i++ {
-		body, err := e.Request(ctx, "GET", "/status", map[string]interface{}{}, false)
+		// return an error early if an engine error already happened
+		if e.lastEngineError != "" {
+			return fmt.Errorf("query engine errored: %w", fmt.Errorf(e.lastEngineError))
+		}
+
+		body, err := e.Request(context.Background(), "GET", "/status", map[string]interface{}{}, false)
 		if err != nil {
 			connectErr = err
 			logger.Debug.Printf("could not connect; retrying...")
