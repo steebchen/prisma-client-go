@@ -6,3 +6,4 @@ linters:
     - revive
     - exportloopref
     - gocritic
+    - goimports

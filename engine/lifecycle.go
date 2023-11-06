@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/steebchen/prisma-client-go/generator"
 	"log"
 	"os"
 	"os/exec"
@@ -15,10 +14,10 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
-
 	"github.com/steebchen/prisma-client-go/binaries"
 	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"github.com/steebchen/prisma-client-go/binaries/unpack"
+	"github.com/steebchen/prisma-client-go/generator"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 

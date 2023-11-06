@@ -29,8 +29,8 @@ var hasBinaryTargets = {{ $hasBinaryTargets }}
 //       panic(fmt.Errorf("could not disconnect: %w", err))
 //     }
 //   }()
-func NewClient(options ...func(config *Config)) *PrismaClient {
-	var config Config
+func NewClient(options ...func(config *PrismaConfig)) *PrismaClient {
+	var config PrismaConfig
 	for _, option := range options {
 		option(&config)
 	}
@@ -62,12 +62,12 @@ func NewClient(options ...func(config *Config)) *PrismaClient {
 	return c
 }
 
-type Config struct {
+type PrismaConfig struct {
 	datasourceURL string
 }
 
-func WithDatasourceURL(url string) func(*Config) {
-	return func(config *Config) {
+func WithDatasourceURL(url string) func(*PrismaConfig) {
+	return func(config *PrismaConfig) {
 		config.datasourceURL = url
 	}
 }

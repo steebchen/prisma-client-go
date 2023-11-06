@@ -40,6 +40,7 @@ var Databases = []Database{
 const schemaTemplate = "schema.temp.%s.prisma"
 
 func Migrate(t *testing.T, db Database, e engine.Engine, mockDB string) {
+	t.Helper()
 	schemaPath := fmt.Sprintf(schemaTemplate, db.Name())
 
 	xe := e.(*engine.QueryEngine)
@@ -60,6 +61,8 @@ func Migrate(t *testing.T, db Database, e engine.Engine, mockDB string) {
 }
 
 func Start(t *testing.T, db Database, e engine.Engine, queries []string) string {
+	t.Helper()
+
 	mockDB := db.SetupDatabase(t)
 	Migrate(t, db, e, mockDB)
 
@@ -92,6 +95,8 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 }
 
 func End(t *testing.T, db Database, e engine.Engine, mockDBName string) {
+	t.Helper()
+
 	defer Teardown(t, db, mockDBName)
 
 	if err := e.Disconnect(); err != nil {

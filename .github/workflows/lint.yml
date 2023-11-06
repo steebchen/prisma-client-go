@@ -16,6 +16,7 @@ jobs:
         with:
           filters: |
             go:
+              - '.golangci.yml'
               - '.github/workflows/**/*.yml'
               - '**/*.go'
               - '**/*.gotpl'
