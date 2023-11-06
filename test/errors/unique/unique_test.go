@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/stretchr/testify/assert"
 )
 
 type cx = context.Context
@@ -35,7 +34,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraint(err)
+			violation, ok := IsUniqueConstraintErr(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Field: User.Email.Field(),
 			//	}, violation)
@@ -58,7 +57,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraint(err)
+			violation, ok := IsUniqueConstraintErr(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Key: "User_email_key",
 			//	}, violation)
@@ -81,7 +80,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraint(err)
+			violation, ok := IsUniqueConstraintErr(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Field: User.Email.Field(),
 			//	}, violation)

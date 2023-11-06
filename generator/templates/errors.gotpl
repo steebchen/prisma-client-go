@@ -4,12 +4,12 @@ var ErrNotFound = types.ErrNotFound
 
 type ErrUniqueConstraint = types.ErrUniqueConstraint[prismaFields]
 
-// IsUniqueConstraint returns on a unique constraint error or violation with error info
+// IsUniqueConstraintErr returns on a unique constraint error or violation with error info
 // Use as follows:
 //
 //	user, err := db.User.CreateOne(...).Exec(cxt)
 //	if err != nil {
-//		if info, err := db.UniqueConstraintError(); err != nil {
+//		if info, err := db.IsUniqueConstraintErr(); err != nil {
 //			// Fields exists for Postgres and SQLite
 //			log.Printf("unique constraint on the fields: %s", info.Fields)
 //
@@ -23,6 +23,6 @@ type ErrUniqueConstraint = types.ErrUniqueConstraint[prismaFields]
 //		}
 //	}
 //
-func IsUniqueConstraint(err error) (*types.ErrUniqueConstraint[prismaFields], bool) {
+func IsUniqueConstraintErr(err error) (*types.ErrUniqueConstraint[prismaFields], bool) {
 	return types.CheckUniqueConstraint[prismaFields](err)
 }
