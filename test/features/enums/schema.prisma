@@ -14,9 +14,9 @@ model User {
   id      String @id @default(cuid()) @map("_id")
   role    Role
   roleOpt Role?
-  stuff1  Stuff
-  stuff2  Stuff
-  stuff3  Stuff
+  stuff1  Stuff?
+  stuff2  Stuff?
+  stuff3  Stuff?
 }
 
 enum Role {
