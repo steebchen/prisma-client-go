@@ -4,8 +4,9 @@ import (
 	"context"
 	"testing"
 
-	"github.com/steebchen/prisma-client-go/test"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/steebchen/prisma-client-go/test"
 )
 
 func TestConfig(t *testing.T) {
