@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -32,10 +33,10 @@ type Field struct {
 	// The Name of the field.
 	Name string
 
-	// List saves whether the fields is a list of items
+	// List saves whether the fields are a list of items
 	List bool
 
-	// WrapList saves whether the a list field should be wrapped in an object
+	// WrapList saves whether the field should be wrapped in an individual object
 	WrapList bool
 
 	// Value contains the field value. if nil, fields will contain a subselection.
@@ -198,6 +199,9 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	for _, name := range uniqueNames {
 		final = append(final, *uniques[name])
 	}
+
+	d, _ := json.MarshalIndent(final, "", "  ")
+	log.Printf("final: %s", d)
 
 	for _, f := range final {
 		if wrapList {
