@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@types/gtag.js':
-    specifier: 0.0.17
-    version: 0.0.17
+    specifier: 0.0.18
+    version: 0.0.18
   '@vercel/analytics':
     specifier: 1.1.1
     version: 1.1.1
@@ -381,8 +381,8 @@ packages:
     resolution: {integrity: sha512-VeiPZ9MMwXjO32/Xu7+OwflfmeoRwkE/qzndw42gGtgJwZopBnzy2gD//NN1+go1mADzkDcqf/KnFRSjTJ8xJA==}
     dev: false
 
-  /@types/gtag.js@0.0.17:
-    resolution: {integrity: sha512-OsSO6Yyuygr3DeeTovOY0ppLiAVHoXg4CSanO9/vzDQCV+e8pkZNE+HR2dVxGJfUbtRe2IqzC97PYuHSNUepJw==}
+  /@types/gtag.js@0.0.18:
+    resolution: {integrity: sha512-GJxnIvuXuVhKaHfsOdzGipoOoXq72y3mdcncc9h6i6E7nlz89zBEj2wrLM7bqO5Xk9Lm2B94MwdQsSwRlaPSWw==}
     dev: false
 
   /@types/hast@2.3.6:
