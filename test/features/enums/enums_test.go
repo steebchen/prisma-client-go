@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/steebchen/prisma-client-go/test"
-	"github.com/stretchr/testify/assert"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -50,7 +50,7 @@ func TestEnums(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindMany(
 				User.Role.Equals(RoleAdmin),
@@ -62,7 +62,128 @@ func TestEnums(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, actual)
+			massert.Equal(t, []UserModel{*expected}, actual)
+		},
+	}, {
+		name: "many or",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.Role.Set(RoleAdmin),
+				User.ID.Set("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleModerator),
+				User.ID.Set("456"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleUser),
+				User.ID.Set("789"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := client.User.FindMany(
+				User.Or(
+					User.And(
+						User.Role.Equals(RoleModerator),
+					),
+					User.And(
+						User.Role.Equals(RoleAdmin),
+					),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			massert.Equal(t, []UserModel{
+				{
+					InnerUser: InnerUser{
+						ID:   "123",
+						Role: RoleAdmin,
+					},
+				},
+				{
+					InnerUser: InnerUser{
+						ID:   "456",
+						Role: RoleModerator,
+					},
+				},
+			}, actual)
+		},
+	}, {
+		name: "many or",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.Role.Set(RoleAdmin),
+				User.ID.Set("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleModerator),
+				User.ID.Set("456"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleUser),
+				User.ID.Set("789"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := client.User.FindMany(
+				User.Or(
+					User.And(
+						User.Role.Equals(RoleUser),
+					),
+					User.And(
+						User.Role.Equals(RoleAdmin),
+					),
+					User.And(
+						User.Role.Equals(RoleModerator),
+					),
+				),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			massert.Equal(t, []UserModel{
+				{
+					InnerUser: InnerUser{
+						ID:   "123",
+						Role: RoleAdmin,
+					},
+				},
+				{
+					InnerUser: InnerUser{
+						ID:   "456",
+						Role: RoleModerator,
+					},
+				},
+				{
+					InnerUser: InnerUser{
+						ID:   "789",
+						Role: RoleUser,
+					},
+				},
+			}, actual)
 		},
 	}}
 	for _, tt := range tests {
