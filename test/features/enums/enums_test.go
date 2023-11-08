@@ -11,9 +11,6 @@ import (
 type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
-type cx = context.Context
-type Func func(t *testing.T, client *PrismaClient, ctx cx)
-
 func TestEnums(t *testing.T) {
 	t.Parallel()
 
