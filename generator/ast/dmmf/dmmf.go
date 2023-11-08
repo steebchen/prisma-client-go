@@ -211,8 +211,19 @@ type EnumValue struct {
 
 // Datamodel contains all types of the Prisma Datamodel.
 type Datamodel struct {
-	Models []Model `json:"models"`
-	Enums  []Enum  `json:"enums"`
+	Models []Model      `json:"models"`
+	Types  []ObjectType `json:"types"`
+	Enums  []Enum       `json:"enums"`
+}
+
+// ObjectType is a MongoDB object type
+type ObjectType struct {
+	Name          types.String `json:"name"`
+	DbName        types.String `json:"dbName"`
+	Fields        []Field      `json:"fields"`
+	PrimaryKey    string       `json:"primaryKey"`
+	UniqueFields  []string     `json:"uniqueFields"`
+	UniqueIndexes []string     `json:"uniqueIndexes"`
 }
 
 type UniqueIndex struct {

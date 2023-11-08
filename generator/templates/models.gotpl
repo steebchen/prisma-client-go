@@ -10,13 +10,12 @@
 	// Inner{{ $model.Name.GoCase }} holds the actual data
 	type Inner{{ $model.Name.GoCase }} struct {
 		{{ range $field := $model.Fields }}
-			{{- if not $field.Kind.IsRelation -}}
-				{{- if $field.IsRequired }}
-					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag $field.IsRequired }}
-				{{- else }}
-					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag $field.IsRequired }}
-				{{- end }}
-			{{- end -}}
+			{{- if eq $field.RelationName "" -}}
+				{{ $field.Name.GoCase -}}
+				{{- if $field.IsList }}[]{{ else }}{{- if not $field.IsRequired }}*{{ end }} {{ end -}}
+				{{ $field.Type.Value }}{{ if eq $field.Kind "object" }}Type{{ end -}}
+        {{ $field.Name.Tag $field.IsRequired }}
+			{{- end }}
 		{{ end }}
 	}
 
