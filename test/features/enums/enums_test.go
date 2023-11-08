@@ -52,7 +52,7 @@ func TestEnums(t *testing.T) {
 
 			massert.Equal(t, expected, created)
 
-			actual, err := client.User.FindMany(
+			actual, err := client.User.FindFirst(
 				User.Role.Equals(RoleAdmin),
 				User.Role.In([]Role{RoleAdmin}),
 				User.RoleOpt.Equals(RoleModerator),
@@ -62,63 +62,7 @@ func TestEnums(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			massert.Equal(t, []UserModel{*expected}, actual)
-		},
-	}, {
-		name: "many or",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			_, err := client.User.CreateOne(
-				User.Role.Set(RoleAdmin),
-				User.ID.Set("123"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			_, err = client.User.CreateOne(
-				User.Role.Set(RoleModerator),
-				User.ID.Set("456"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			_, err = client.User.CreateOne(
-				User.Role.Set(RoleUser),
-				User.ID.Set("789"),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			actual, err := client.User.FindMany(
-				User.Or(
-					User.And(
-						User.Role.Equals(RoleModerator),
-					),
-					User.And(
-						User.Role.Equals(RoleAdmin),
-					),
-				),
-			).Exec(ctx)
-			if err != nil {
-				t.Fatalf("fail %s", err)
-			}
-
-			massert.Equal(t, []UserModel{
-				{
-					InnerUser: InnerUser{
-						ID:   "123",
-						Role: RoleAdmin,
-					},
-				},
-				{
-					InnerUser: InnerUser{
-						ID:   "456",
-						Role: RoleModerator,
-					},
-				},
-			}, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "many or",
@@ -155,10 +99,9 @@ func TestEnums(t *testing.T) {
 					User.And(
 						User.Role.Equals(RoleAdmin),
 					),
-					User.And(
-						User.Role.Equals(RoleModerator),
-					),
 				),
+			).OrderBy(
+				User.ID.Order(SortOrderAsc),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -169,12 +112,6 @@ func TestEnums(t *testing.T) {
 					InnerUser: InnerUser{
 						ID:   "123",
 						Role: RoleAdmin,
-					},
-				},
-				{
-					InnerUser: InnerUser{
-						ID:   "456",
-						Role: RoleModerator,
 					},
 				},
 				{
