@@ -7,3 +7,7 @@ linters:
     - exportloopref
     - gocritic
     - goimports
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/steebchen/prisma-client-go

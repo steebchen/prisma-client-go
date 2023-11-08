@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+
 	"github.com/steebchen/prisma-client-go/binaries"
 	"github.com/steebchen/prisma-client-go/binaries/platform"
 	"github.com/steebchen/prisma-client-go/binaries/unpack"
