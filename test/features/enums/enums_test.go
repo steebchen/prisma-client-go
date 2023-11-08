@@ -65,7 +65,7 @@ func TestEnums(t *testing.T) {
 			massert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "many or",
+		name: "many or with and wrapper",
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			_, err := client.User.CreateOne(
 				User.Role.Set(RoleAdmin),
@@ -99,6 +99,60 @@ func TestEnums(t *testing.T) {
 					User.And(
 						User.Role.Equals(RoleAdmin),
 					),
+				),
+			).OrderBy(
+				User.ID.Order(SortOrderAsc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			massert.Equal(t, []UserModel{
+				{
+					InnerUser: InnerUser{
+						ID:   "123",
+						Role: RoleAdmin,
+					},
+				},
+				{
+					InnerUser: InnerUser{
+						ID:   "789",
+						Role: RoleUser,
+					},
+				},
+			}, actual)
+		},
+	}, {
+		name: "many or direct",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.Role.Set(RoleAdmin),
+				User.ID.Set("123"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleModerator),
+				User.ID.Set("456"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			_, err = client.User.CreateOne(
+				User.Role.Set(RoleUser),
+				User.ID.Set("789"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			actual, err := client.User.FindMany(
+				User.Or(
+					User.Role.Equals(RoleUser),
+					User.Role.Equals(RoleAdmin),
 				),
 			).OrderBy(
 				User.ID.Order(SortOrderAsc),
