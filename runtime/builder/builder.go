@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 
@@ -199,9 +198,6 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	for _, name := range uniqueNames {
 		final = append(final, *uniques[name])
 	}
-
-	d, _ := json.MarshalIndent(final, "", "  ")
-	log.Printf("final: %s", d)
 
 	for _, f := range final {
 		if wrapList {
