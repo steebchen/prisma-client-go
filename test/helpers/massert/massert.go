@@ -13,6 +13,7 @@ import (
 //
 //goland:noinspection GoUnusedExportedFunction
 func Equal(t *testing.T, expected, actual interface{}, msgAndArgs ...interface{}) {
+	t.Helper()
 	e, err := json.MarshalIndent(expected, "", "  ")
 	if err != nil {
 		t.Fatal(err)

@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -77,7 +76,7 @@ func TestLinkMany(t *testing.T) {
 				Username: "new",
 			}
 
-			assert.Equal(t, created, &UserModel{InnerUser: newUser})
+			massert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -110,8 +109,8 @@ func TestLinkMany(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
-			assert.Equal(t, 2, len(actual.Posts()))
+			massert.Equal(t, expected, actual)
+			massert.Equal(t, 2, len(actual.Posts()))
 		},
 	}, {
 		name: "link many in update",
@@ -177,7 +176,7 @@ func TestLinkMany(t *testing.T) {
 				Username: "new",
 			}
 
-			assert.Equal(t, created, &UserModel{InnerUser: newUser})
+			massert.Equal(t, created, &UserModel{InnerUser: newUser})
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals("new"),
@@ -210,8 +209,8 @@ func TestLinkMany(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
-			assert.Equal(t, 2, len(actual.Posts()))
+			massert.Equal(t, expected, actual)
+			massert.Equal(t, 2, len(actual.Posts()))
 		},
 	}}
 	for _, tt := range tests {

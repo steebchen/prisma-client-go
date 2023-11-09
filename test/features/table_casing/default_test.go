@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func TestTableCasing(t *testing.T) {
@@ -29,7 +28,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedUser, actualCreatedUser)
+		massert.Equal(t, expectedUser, actualCreatedUser)
 
 		actualFoundUser, err := client.User.FindUnique(
 			User.ID.Equals("user"),
@@ -38,7 +37,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedUser, actualFoundUser)
+		massert.Equal(t, expectedUser, actualFoundUser)
 
 		expectedEventLower := &EventLowerModel{
 			InnerEventLower: InnerEventLower{
@@ -53,7 +52,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedEventLower, actualCreatedEventLower)
+		massert.Equal(t, expectedEventLower, actualCreatedEventLower)
 
 		actualFoundEventLower, err := client.EventLower.FindUnique(
 			EventLower.ID.Equals("event"),
@@ -62,7 +61,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedEventLower, actualFoundEventLower)
+		massert.Equal(t, expectedEventLower, actualFoundEventLower)
 
 		expectedParticipant := &ParticipantUpperModel{
 			InnerParticipantUpper: InnerParticipantUpper{
@@ -81,7 +80,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedParticipant, actualCreatedParticipant)
+		massert.Equal(t, expectedParticipant, actualCreatedParticipant)
 
 		actualFoundParticipant, err := client.ParticipantUpper.FindUnique(
 			ParticipantUpper.ID.Equals("participant"),
@@ -90,6 +89,6 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedParticipant, actualFoundParticipant)
+		massert.Equal(t, expectedParticipant, actualFoundParticipant)
 	})
 }

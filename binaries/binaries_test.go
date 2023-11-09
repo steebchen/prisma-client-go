@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func tmpDir(t *testing.T) string {
@@ -66,5 +66,5 @@ func TestFetch_withCache(t *testing.T) {
 func TestFetch_relativeDir(t *testing.T) {
 	actual := FetchNative(".")
 	expected := fmt.Errorf("toDir must be absolute")
-	assert.Equal(t, expected, actual)
+	massert.Equal(t, expected, actual)
 }

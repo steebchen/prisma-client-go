@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -45,7 +46,7 @@ func TestLifecycle(t *testing.T) {
 			).Exec(ctx)
 
 			assert.NotEqual(t, err, nil)
-			assert.Equal(t, err.Error(), "request failed: client is not connected yet")
+			massert.Equal(t, err.Error(), "request failed: client is not connected yet")
 		},
 	}, {
 		name: "already disconnected",
@@ -69,7 +70,7 @@ func TestLifecycle(t *testing.T) {
 				User.ID.Set("456"),
 			).Exec(ctx)
 			assert.NotEqual(t, err, nil)
-			assert.Equal(t, err.Error(), "request failed: client is already disconnected")
+			massert.Equal(t, err.Error(), "request failed: client is already disconnected")
 		},
 	}}
 	for _, tt := range tests {

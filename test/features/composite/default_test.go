@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -18,7 +17,7 @@ func TestComposite(t *testing.T) {
 		before []string
 		run    Func
 	}{{
-		name:   "",
+		name:   "composite FirstNameMiddleNameLastName",
 		before: nil,
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			expected := &UserModel{
@@ -38,7 +37,7 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 
 			users, err := client.User.FindMany(
 				User.FirstName.Equals("a"),
@@ -47,7 +46,7 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, users)
+			massert.Equal(t, []UserModel{*expected}, users)
 
 			oneUser, err := client.User.FindUnique(
 				User.FirstNameMiddleNameLastName(
@@ -60,10 +59,10 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expected, oneUser)
+			massert.Equal(t, expected, oneUser)
 		},
 	}, {
-		name:   "",
+		name:   "composite FirstNameLastName",
 		before: nil,
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			expected := &UserModel{
@@ -83,7 +82,7 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 
 			users, err := client.User.FindMany(
 				User.FirstName.Equals("a"),
@@ -92,7 +91,7 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, users)
+			massert.Equal(t, []UserModel{*expected}, users)
 
 			oneUser, err := client.User.FindUnique(
 				User.FirstNameLastName(
@@ -104,7 +103,7 @@ func TestComposite(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expected, oneUser)
+			massert.Equal(t, expected, oneUser)
 		},
 	}}
 

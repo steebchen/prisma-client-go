@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -81,7 +80,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "order by ASC (deprecated)",
@@ -145,7 +144,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "order by DESC",
@@ -209,7 +208,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "order by many fields",
@@ -274,7 +273,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "order by DESC (deprecated)",
@@ -338,7 +337,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "first 2",
@@ -400,7 +399,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "first 2 skip",
@@ -467,7 +466,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "last 2",
@@ -535,7 +534,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

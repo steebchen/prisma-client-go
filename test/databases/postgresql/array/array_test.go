@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -49,7 +48,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "query by full items",
@@ -81,7 +80,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "query by empty items",
@@ -113,7 +112,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "query by nil items",
@@ -146,7 +145,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "query by empty var items",
@@ -179,7 +178,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "create one",
@@ -199,7 +198,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "create one empty",
@@ -219,7 +218,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "create one empty nil var",
@@ -240,7 +239,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "create one empty non-nil var",
@@ -261,7 +260,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "read filter has",
@@ -293,7 +292,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "read filter has every",
@@ -325,7 +324,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "read filter has some",
@@ -357,7 +356,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "read filter is empty",
@@ -389,7 +388,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		name: "write filter",
@@ -423,7 +422,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}, {
 		// this test ensures that all additional filters are picked out in the case, e.g. `In`
@@ -456,7 +455,7 @@ func TestArrays(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, user)
+			massert.Equal(t, expected, user)
 		},
 	}}
 	for _, tt := range tests {

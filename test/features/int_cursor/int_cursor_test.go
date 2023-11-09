@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 	"github.com/steebchen/prisma-client-go/test/setup/mysql"
 	"github.com/steebchen/prisma-client-go/test/setup/postgresql"
 	"github.com/steebchen/prisma-client-go/test/setup/sqlite"
@@ -91,7 +90,7 @@ func TestPagination(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

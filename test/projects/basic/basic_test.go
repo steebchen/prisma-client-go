@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -47,12 +46,12 @@ func TestBasic(t *testing.T) {
 			}
 
 			name, ok := actual.Name()
-			assert.Equal(t, true, ok)
-			assert.Equal(t, "John", name)
+			massert.Equal(t, true, ok)
+			massert.Equal(t, "John", name)
 
 			stuff, ok := actual.Stuff()
-			assert.Equal(t, false, ok)
-			assert.Equal(t, "", stuff)
+			massert.Equal(t, false, ok)
+			massert.Equal(t, "", stuff)
 		},
 	}, {
 		name: "marshal json",
@@ -82,7 +81,7 @@ func TestBasic(t *testing.T) {
 			}
 
 			expected := `{"id":"marshal","email":"john@example.com","username":"johndoe","name":"John"}`
-			assert.Equal(t, expected, string(actual))
+			massert.Equal(t, expected, string(actual))
 		},
 	}, {
 		name: "FindUnique",
@@ -114,7 +113,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, "findOne2", actual.ID)
+			massert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
 		name: "FindMany",
@@ -148,7 +147,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{{
+			massert.Equal(t, []UserModel{{
 				InnerUser: InnerUser{
 					ID:       "findMany1",
 					Email:    "1",
@@ -196,7 +195,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{{
+			massert.Equal(t, []UserModel{{
 				InnerUser: InnerUser{
 					ID:       "findMany1",
 					Email:    "1",
@@ -220,7 +219,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{}, actual)
+			massert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "Create",
@@ -248,14 +247,14 @@ func TestBasic(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "Create with optional values",
@@ -286,14 +285,14 @@ func TestBasic(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "Update",
@@ -333,14 +332,14 @@ func TestBasic(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, updated)
+			massert.Equal(t, expected, updated)
 
 			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "Update many",
@@ -378,7 +377,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, result.Count)
+			massert.Equal(t, 2, result.Count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -403,7 +402,7 @@ func TestBasic(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "Delete",
@@ -436,11 +435,11 @@ func TestBasic(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, deleted)
+			massert.Equal(t, expected, deleted)
 
 			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
-			assert.Equal(t, true, actual == nil)
+			massert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, true, actual == nil)
 		},
 	}, {
 		name: "Delete tx",
@@ -474,11 +473,11 @@ func TestBasic(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, query.Result())
+			massert.Equal(t, expected, query.Result())
 
 			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
-			assert.Equal(t, true, actual == nil)
+			massert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, true, actual == nil)
 		},
 	}, {
 		name: "Delete many",
@@ -514,7 +513,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 2, result.Count)
+			massert.Equal(t, 2, result.Count)
 
 			actual, err := client.User.FindMany(
 				User.Username.Equals("username"),
@@ -523,7 +522,7 @@ func TestBasic(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{}, actual)
+			massert.Equal(t, []UserModel{}, actual)
 		},
 	}, {
 		name: "NOT operation",
@@ -567,7 +566,7 @@ func TestBasic(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "OR operation",
@@ -620,7 +619,7 @@ func TestBasic(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "OR operationc complex",
@@ -715,7 +714,7 @@ func TestBasic(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "id in",
@@ -757,7 +756,7 @@ func TestBasic(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

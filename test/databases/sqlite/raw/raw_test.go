@@ -5,9 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -117,7 +116,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:  &b,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query with parameter",
@@ -183,7 +182,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:  &b,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query with multiple parameters",
@@ -249,7 +248,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:  &b,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "raw query count",
@@ -303,7 +302,7 @@ func TestRaw(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, "2", actual[0].Count)
+			massert.Equal(t, "2", actual[0].Count)
 		},
 	}, {
 		name:   "insert into",
@@ -318,7 +317,7 @@ func TestRaw(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, result.Count)
+			massert.Equal(t, 1, result.Count)
 		},
 	}, {
 		name: "update",
@@ -349,14 +348,14 @@ func TestRaw(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 1, result.Count)
+			massert.Equal(t, 1, result.Count)
 
 			result, err = client.Prisma.ExecuteRaw(`update "User" set email = "abc" where id = $1`, "non-existing").Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, 0, result.Count)
+			massert.Equal(t, 0, result.Count)
 		},
 	}, {
 		name: "raw query with time parameter",
@@ -426,7 +425,7 @@ func TestRaw(t *testing.T) {
 				BoolOpt:  &b,
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

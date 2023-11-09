@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -25,7 +24,7 @@ func TestNotFound(t *testing.T) {
 			_, err := client.User.FindFirst(
 				User.Email.Equals("john@example.com"),
 			).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "FindUnique",
@@ -33,7 +32,7 @@ func TestNotFound(t *testing.T) {
 			_, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Update",
@@ -43,7 +42,7 @@ func TestNotFound(t *testing.T) {
 			).Update(
 				User.Email.Set("asdf"),
 			).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Delete",
@@ -51,7 +50,7 @@ func TestNotFound(t *testing.T) {
 			_, err := client.User.FindUnique(
 				User.Email.Equals("john@example.com"),
 			).Delete().Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}}
 	for _, tt := range tests {

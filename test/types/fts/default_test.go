@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -73,7 +72,7 @@ func TestFullTextSearch(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "relevance",
@@ -105,7 +104,7 @@ func TestFullTextSearch(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, []UserModel{*expected}, users)
+			massert.Equal(t, []UserModel{*expected}, users)
 		},
 	}}
 	for _, tt := range tests {
