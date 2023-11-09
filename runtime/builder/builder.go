@@ -187,7 +187,7 @@ func (q Query) buildOutputs(outputs []Output) (string, error) {
 	return builder.String(), nil
 }
 
-var ErrDuplicateField = fmt.Errorf("duplicate field")
+var ErrDuplicateField = fmt.Errorf("duplicate field (https://github.com/steebchen/prisma-client-go/issues/1095)")
 
 func (q Query) buildFields(list bool, wrapList bool, fields []Field) (string, error) {
 	var builder strings.Builder
