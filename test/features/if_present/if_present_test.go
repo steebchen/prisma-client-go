@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -73,14 +72,14 @@ func TestIfPresent(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, updated)
+			massert.Equal(t, expected, updated)
 
 			actual, err := client.User.FindUnique(User.ID.Equals("update")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "update operations",
@@ -134,14 +133,14 @@ func TestIfPresent(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, updated)
+			massert.Equal(t, expected, updated)
 
 			actual, err := client.User.FindUnique(User.ID.Equals("update")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with link filled",
@@ -179,7 +178,7 @@ func TestIfPresent(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, post)
+			massert.Equal(t, expected, post)
 		},
 	}, {
 		name: "with link nil",
@@ -217,7 +216,7 @@ func TestIfPresent(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, post)
+			massert.Equal(t, expected, post)
 		},
 	}}
 	for _, tt := range tests {

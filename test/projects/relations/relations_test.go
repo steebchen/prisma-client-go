@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -66,7 +65,7 @@ func TestRelations(t *testing.T) {
 			}
 
 			expected := `{"id":"relations","email":"john@example.com","username":"johndoe","name":"John","posts":[{"id":"a","title":"common","content":"a","authorID":"relations"},{"id":"b","title":"common","content":"b","authorID":"relations"}]}`
-			assert.Equal(t, expected, string(actual))
+			massert.Equal(t, expected, string(actual))
 		},
 	}, {
 		name: "find by single relation with every and none",
@@ -139,7 +138,7 @@ func TestRelations(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "find by same field override",
@@ -228,7 +227,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "find by same field success",
@@ -338,7 +337,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "find by to-many relation",
@@ -403,7 +402,7 @@ func TestRelations(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "create and connect",
@@ -443,7 +442,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			posts, err := client.Post.FindMany(
 				Post.Title.Equals(title),
@@ -455,7 +454,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []PostModel{*expected}, posts)
+			massert.Equal(t, []PostModel{*expected}, posts)
 		},
 	}, {
 		name: "with simple",
@@ -546,7 +545,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "CreateOne with relation",
@@ -595,7 +594,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "unlink",
@@ -646,7 +645,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 
 			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
@@ -669,7 +668,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedEmpty, actual)
+			massert.Equal(t, expectedEmpty, actual)
 
 			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
@@ -680,7 +679,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expectedEmpty, actual)
+			massert.Equal(t, expectedEmpty, actual)
 		},
 	}, {
 		name: "unlink many",
@@ -766,7 +765,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedAfter, actual)
+			massert.Equal(t, expectedAfter, actual)
 
 			actual, err = client.Category.FindUnique(
 				Category.ID.Equals(categoryID),
@@ -777,7 +776,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expectedAfter, actual)
+			massert.Equal(t, expectedAfter, actual)
 		},
 	}, {
 		name: "update and fetch",
@@ -823,7 +822,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedEmpty, actual)
+			massert.Equal(t, expectedEmpty, actual)
 
 			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
@@ -854,7 +853,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 
 			actual, err = client.User.FindUnique(
 				User.ID.Equals("relations"),
@@ -865,7 +864,7 @@ func TestRelations(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with and sub query",
@@ -958,7 +957,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with and sub query order by",
@@ -1051,7 +1050,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with many to many nested",
@@ -1152,7 +1151,7 @@ func TestRelations(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "with by accessing methods with required relation",
@@ -1209,7 +1208,7 @@ func TestRelations(t *testing.T) {
 
 			author := actual.Author()
 
-			assert.Equal(t, user, author)
+			massert.Equal(t, user, author)
 
 			comments := []CommentModel{{
 				InnerComment: InnerComment{
@@ -1220,7 +1219,7 @@ func TestRelations(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, comments, actual.Comments())
+			massert.Equal(t, comments, actual.Comments())
 		},
 	}, {
 		name: "create and find with existing optional relation",
@@ -1282,8 +1281,8 @@ func TestRelations(t *testing.T) {
 
 			actualCategory, ok := actual.Category()
 
-			assert.Equal(t, expectedCategory, actualCategory)
-			assert.Equal(t, true, ok)
+			massert.Equal(t, expectedCategory, actualCategory)
+			massert.Equal(t, true, ok)
 		},
 	}, {
 		name: "create and find with non-existing optional relations",
@@ -1326,8 +1325,8 @@ func TestRelations(t *testing.T) {
 
 			actualCategory, ok := actual.Category()
 
-			assert.Equal(t, true, actualCategory == nil)
-			assert.Equal(t, false, ok)
+			massert.Equal(t, true, actualCategory == nil)
+			massert.Equal(t, false, ok)
 		},
 	}}
 	for _, tt := range tests {

@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -24,7 +23,7 @@ func TestBasic(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			_, err := client.User.FindUnique(User.Email.Equals("404")).Exec(ctx)
 
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Update not found",
@@ -35,7 +34,7 @@ func TestBasic(t *testing.T) {
 				User.Name.Set("x"),
 			).Exec(ctx)
 
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "Delete not found",
@@ -44,7 +43,7 @@ func TestBasic(t *testing.T) {
 				User.Email.Equals("404"),
 			).Delete().Exec(ctx)
 
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}}
 	for _, tt := range tests {

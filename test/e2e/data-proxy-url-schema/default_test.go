@@ -14,9 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 const id = "23230653-a467-47b7-aaf9-98d422da3d9e"
@@ -57,6 +56,6 @@ func TestE2ERemoteDataProxyURLSchema(t *testing.T) {
 		v, _ := json.MarshalIndent(actual, "", "  ")
 		log.Printf("data proxy response: %s", v)
 
-		assert.Equal(t, expected, actual)
+		massert.Equal(t, expected, actual)
 	})
 }

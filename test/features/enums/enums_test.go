@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -51,7 +50,7 @@ func TestEnums(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindMany(
 				User.Role.Equals(RoleAdmin),
@@ -63,7 +62,7 @@ func TestEnums(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, actual)
+			massert.Equal(t, []UserModel{*expected}, actual)
 		},
 	}}
 	for _, tt := range tests {

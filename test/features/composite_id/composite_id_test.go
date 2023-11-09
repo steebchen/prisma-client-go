@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -80,7 +79,7 @@ func TestCompositeID(t *testing.T) {
 					Name:         "test",
 				},
 			}
-			assert.Equal(t, expected, org)
+			massert.Equal(t, expected, org)
 		},
 	}, {
 		name: "link",
@@ -162,7 +161,7 @@ func TestCompositeID(t *testing.T) {
 					},
 				},
 			}}
-			assert.Equal(t, expected, org)
+			massert.Equal(t, expected, org)
 		},
 	}, {
 		name: "create with specific model layout",

@@ -6,9 +6,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -61,7 +60,7 @@ func TestJSON(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindFirst(
 				User.JSON.Path([]string{"attr"}),
@@ -71,7 +70,7 @@ func TestJSON(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "json filter nested",
@@ -119,7 +118,7 @@ func TestJSON(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindFirst(
 				User.JSON.Path([]string{"obj", "nested_attr"}),
@@ -129,7 +128,7 @@ func TestJSON(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

@@ -7,6 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -50,8 +51,8 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedA, createUserA.Result())
-			assert.Equal(t, expectedB, createUserB.Result())
+			massert.Equal(t, expectedA, createUserA.Result())
+			massert.Equal(t, expectedB, createUserB.Result())
 
 			// --
 
@@ -72,7 +73,7 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "transaction find many",
@@ -90,7 +91,7 @@ func TestTransactionReturns(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, &BatchResult{Count: 1}, update.Result())
+			massert.Equal(t, &BatchResult{Count: 1}, update.Result())
 
 			// --
 
@@ -106,7 +107,7 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "transaction result caching",
@@ -139,12 +140,12 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expectedA, createUserA.Result())
-			assert.Equal(t, expectedB, createUserB.Result())
-			assert.Equal(t, expectedA, createUserA.Result())
-			assert.Equal(t, expectedB, createUserB.Result())
-			assert.Equal(t, expectedA, createUserA.Result())
-			assert.Equal(t, expectedB, createUserB.Result())
+			massert.Equal(t, expectedA, createUserA.Result())
+			massert.Equal(t, expectedB, createUserB.Result())
+			massert.Equal(t, expectedA, createUserA.Result())
+			massert.Equal(t, expectedB, createUserB.Result())
+			massert.Equal(t, expectedA, createUserA.Result())
+			massert.Equal(t, expectedB, createUserB.Result())
 
 			// --
 
@@ -165,7 +166,7 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "rollback tx",
@@ -220,7 +221,7 @@ func TestTransactionReturns(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {
