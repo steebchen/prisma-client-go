@@ -27,7 +27,11 @@ func (m *Mock) Ensure(t *testing.T) {
 	}
 	for _, e := range *m.Expectations {
 		if !e.Success {
-			t.Fatalf("expectation not met for query `%s` and result `%s`, error `%s`", e.Query.Build(), e.Want, e.WantErr)
+			str, err := e.Query.Build()
+			if err != nil {
+				t.Fatalf("could not build query: %s", err)
+			}
+			t.Fatalf("expectation not met for query `%s` and result `%s`, error `%s`", str, e.Want, e.WantErr)
 		}
 	}
 }

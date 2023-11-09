@@ -17,7 +17,11 @@ func (e *Engine) Do(_ context.Context, payload interface{}, v interface{}) error
 	n := -1
 	for i, e := range expectations {
 		req := payload.(engine.GQLRequest)
-		if e.Query.Build() == req.Query {
+		str, err := e.Query.Build()
+		if err != nil {
+			return err
+		}
+		if str == req.Query {
 			n = i
 			break
 		}
