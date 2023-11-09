@@ -43,6 +43,15 @@ type QueryEngine struct {
 
 	// disconnected indicates whether the user has called Disconnect()
 	disconnected bool
+
+	// closed keeps track of query engine status
+	closed chan interface{}
+
+	// onEngineError is a listener on the query engine stderr output
+	onEngineError chan string
+
+	// lastEngineError contains the last received error
+	lastEngineError string
 }
 
 func (e *QueryEngine) Name() string {
