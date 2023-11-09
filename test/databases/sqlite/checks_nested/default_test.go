@@ -10,7 +10,7 @@ import (
 
 	"github.com/steebchen/prisma-client-go/test"
 	db "github.com/steebchen/prisma-client-go/test/databases/sqlite/checks_nested/prisma"
-	"github.com/stretchr/testify/assert"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -36,14 +36,14 @@ func TestSqliteChecksNested(t *testing.T) {
 			}
 		`},
 		run: func(t *testing.T, client *db.PrismaClient, ctx cx) {
-			assert.Equal(t, "file:custom/dev.db", db.SchemaDatasourceURL)
+			massert.Equal(t, "file:custom/dev.db", db.SchemaDatasourceURL)
 
 			users, err := client.User.FindMany().Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, 1, len(users))
+			massert.Equal(t, 1, len(users))
 		},
 	}}
 	for _, tt := range tests {

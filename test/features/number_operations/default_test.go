@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func TestTableCasing(t *testing.T) {
@@ -51,7 +50,7 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedPost, actualFoundPost)
+		massert.Equal(t, expectedPost, actualFoundPost)
 
 		actualUpdatedPost, err := client.Post.FindUnique(
 			Post.ID.Equals("a"),
@@ -60,6 +59,6 @@ func TestTableCasing(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		assert.Equal(t, expectedPost, actualUpdatedPost)
+		massert.Equal(t, expectedPost, actualUpdatedPost)
 	})
 }

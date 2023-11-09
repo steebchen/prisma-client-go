@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func TestConfig(t *testing.T) {
@@ -28,7 +27,7 @@ func TestConfig(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	assert.Equal(t, &UserModel{
+	massert.Equal(t, &UserModel{
 		InnerUser: InnerUser{
 			ID:    "persisted-1",
 			Email: "persisted@example.com",

@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -61,7 +60,7 @@ func TestCompositeUniqueRelations(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expectedParticipant, actualCreatedParticipant)
+			massert.Equal(t, expectedParticipant, actualCreatedParticipant)
 		},
 	}, {
 		name: "create normal connect",
@@ -105,7 +104,7 @@ func TestCompositeUniqueRelations(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expectedParticipant, actualCreatedParticipant)
+			massert.Equal(t, expectedParticipant, actualCreatedParticipant)
 		},
 	}, {
 		name: "find unique by named key",
@@ -156,7 +155,7 @@ func TestCompositeUniqueRelations(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			assert.Equal(t, expectedParticipant, actualFoundParticipant)
+			massert.Equal(t, expectedParticipant, actualFoundParticipant)
 		},
 	}}
 	for _, tt := range tests {

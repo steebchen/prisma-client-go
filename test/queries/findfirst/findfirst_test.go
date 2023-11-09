@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -49,7 +48,7 @@ func TestFindFirst(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, first)
+			massert.Equal(t, expected, first)
 		},
 	}, {
 		name: "return ErrNotFound",
@@ -57,7 +56,7 @@ func TestFindFirst(t *testing.T) {
 			_, err := client.User.FindFirst(
 				User.Email.Equals("john@example.com"),
 			).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}}
 	for _, tt := range tests {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func TestBool_UnmarshalJSON(t *testing.T) {
@@ -59,7 +59,7 @@ func TestBool_UnmarshalJSON(t *testing.T) {
 			if err := json.Unmarshal(tt.args.b, &v); (err != nil) != tt.wantErr {
 				t.Errorf("UnmarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 			}
-			assert.Equal(t, tt.expected, v)
+			massert.Equal(t, tt.expected, v)
 		})
 	}
 }
