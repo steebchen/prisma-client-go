@@ -5,9 +5,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -64,7 +63,7 @@ func TestTypes(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindUnique(
 				User.ID.Equals(id),
@@ -73,7 +72,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 
 			actualSlice, err := client.User.FindMany(
 				User.StrOpt.Equals(s),
@@ -82,7 +81,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, actualSlice)
+			massert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "different field casing",
@@ -125,7 +124,7 @@ func TestTypes(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actualSlice, err := client.User.FindMany(
 				User.UpperCaseTest.Equals("test1"),
@@ -137,7 +136,7 @@ func TestTypes(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{*expected}, actualSlice)
+			massert.Equal(t, []UserModel{*expected}, actualSlice)
 		},
 	}, {
 		name: "basic equals",
@@ -189,7 +188,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, users)
+			massert.Equal(t, expected, users)
 		},
 	}, {
 		name: "advanced query",
@@ -249,7 +248,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, users)
+			massert.Equal(t, expected, users)
 		},
 	}, {
 		name: "invalid query for the same field should lead to ErrNotFound",
@@ -291,7 +290,7 @@ func TestTypes(t *testing.T) {
 				User.CreatedAt.Equals(date),
 				User.UpdatedAt.Equals(date),
 			).Exec(ctx)
-			assert.Equal(t, ErrNotFound, err)
+			massert.Equal(t, ErrNotFound, err)
 		},
 	}, {
 		name: "IsNull",
@@ -353,7 +352,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "nullable dynamic nil field",
@@ -416,7 +415,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "nullable dynamic field with value",
@@ -479,7 +478,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "IN operation",
@@ -571,7 +570,7 @@ func TestTypes(t *testing.T) {
 				},
 			}}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {

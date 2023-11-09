@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 func TestTypedMockReturns(t *testing.T) {
@@ -33,8 +33,8 @@ func TestTypedMockReturns(t *testing.T) {
 	).Returns(*expected)
 
 	actual, err := do(context.Background(), client)
-	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, expected, actual)
+	massert.Equal(t, expectedErr, err)
+	massert.Equal(t, expected, actual)
 }
 
 func TestTypedMockReturnsMany(t *testing.T) {
@@ -60,8 +60,8 @@ func TestTypedMockReturnsMany(t *testing.T) {
 	).ReturnsMany(expected)
 
 	actual, err := do(context.Background(), client)
-	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, expected, actual)
+	massert.Equal(t, expectedErr, err)
+	massert.Equal(t, expected, actual)
 }
 
 func TestMockError(t *testing.T) {
@@ -83,6 +83,6 @@ func TestMockError(t *testing.T) {
 	).Errors(ErrNotFound)
 
 	actual, err := do(context.Background(), client)
-	assert.Equal(t, expectedErr, err)
-	assert.Equal(t, true, actual == nil)
+	massert.Equal(t, expectedErr, err)
+	massert.Equal(t, true, actual == nil)
 }

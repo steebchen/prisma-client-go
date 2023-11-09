@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -44,12 +43,12 @@ func TestUpsert(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "update",
+		"update",
 		// language=GraphQL
-		before: []string{`
+		[]string{`
 			mutation {
 				result: createOnePost(data: {
 					id: "upsert",
@@ -60,7 +59,7 @@ func TestUpsert(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+		func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.Post.UpsertOne(
 				Post.ID.Equals("upsert"),
 			).Create(
@@ -83,7 +82,7 @@ func TestUpsert(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "transaction",
@@ -123,7 +122,7 @@ func TestUpsert(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, query.Result())
+			massert.Equal(t, expected, query.Result())
 		},
 	}}
 	for _, tt := range tests {

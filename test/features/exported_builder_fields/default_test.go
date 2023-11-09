@@ -4,9 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-
 	"github.com/steebchen/prisma-client-go/test"
+	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
 
 type cx = context.Context
@@ -55,7 +54,7 @@ func TestExportedBuilderFields(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, "findOne2", actual.ID)
+			massert.Equal(t, "findOne2", actual.ID)
 		},
 	}, {
 		name: "FindMany",
@@ -91,7 +90,7 @@ func TestExportedBuilderFields(t *testing.T) {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, []UserModel{{
+			massert.Equal(t, []UserModel{{
 				InnerUser: InnerUser{
 					ID:       "findMany1",
 					Email:    "1",
@@ -140,14 +139,14 @@ func TestExportedBuilderFields(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, created)
+			massert.Equal(t, expected, created)
 
 			actual, err := client.User.FindUnique(User.Email.Equals("email")).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}, {
 		name: "Update",
@@ -188,14 +187,14 @@ func TestExportedBuilderFields(t *testing.T) {
 				},
 			}
 
-			assert.Equal(t, expected, updated)
+			massert.Equal(t, expected, updated)
 
 			actual, err := client.User.FindUnique(User.Email.Equals(email)).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
 			}
 
-			assert.Equal(t, expected, actual)
+			massert.Equal(t, expected, actual)
 		},
 	}}
 	for _, tt := range tests {
