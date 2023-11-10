@@ -3,8 +3,12 @@ package basic
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/steebchen/prisma-client-go/runtime/builder"
 	"github.com/steebchen/prisma-client-go/test"
 	"github.com/steebchen/prisma-client-go/test/helpers/massert"
 )
@@ -595,8 +599,12 @@ func TestBasic(t *testing.T) {
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
 			actual, err := client.User.FindMany(
 				User.Or(
-					User.Email.Equals("email1"),
-					User.ID.Equals("id2"),
+					User.And(
+						User.Email.Equals("email1"),
+					),
+					User.And(
+						User.ID.Equals("id2"),
+					),
 				),
 			).OrderBy(
 				User.ID.Order(SortOrderAsc),
@@ -622,7 +630,60 @@ func TestBasic(t *testing.T) {
 			massert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "OR operationc complex",
+		name: "OR operation",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.User.FindMany(
+				User.Or(
+					User.Email.Equals("email1"),
+					User.ID.Equals("id2"),
+				),
+			).OrderBy(
+				User.ID.Order(SortOrderAsc),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := []UserModel{{
+				InnerUser: InnerUser{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "a",
+				},
+			}, {
+				InnerUser: InnerUser{
+					ID:       "id2",
+					Email:    "email2",
+					Username: "b",
+				},
+			}}
+
+			assert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "OR operations complex with and",
 		// language=GraphQL
 		before: []string{`
 			mutation {
@@ -678,12 +739,26 @@ func TestBasic(t *testing.T) {
 					),
 					User.And(
 						User.Or(
-							User.Email.Equals("email4"),
-							User.Email.Equals("email999"),
+							User.And(
+								User.Email.Equals("email999"),
+							),
+							User.And(
+								User.Email.Equals("email4"),
+							),
+							User.And(
+								User.Email.Equals("email999"),
+							),
 						),
 						User.Or(
-							User.ID.Equals("id4"),
-							User.ID.Equals("id999"),
+							User.And(
+								User.ID.Equals("id999"),
+							),
+							User.And(
+								User.ID.Equals("id4"),
+							),
+							User.And(
+								User.ID.Equals("id999"),
+							),
 						),
 					),
 				),
@@ -715,6 +790,75 @@ func TestBasic(t *testing.T) {
 			}}
 
 			massert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "OR operations complex no wrap",
+		// language=GraphQL
+		before: []string{`
+			mutation {
+				result: createOneUser(data: {
+					id: "id1",
+					email: "email1",
+					username: "a",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id2",
+					email: "email2",
+					username: "b",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id3",
+					email: "email3",
+					username: "c",
+				}) {
+					id
+				}
+			}
+		`, `
+			mutation {
+				result: createOneUser(data: {
+					id: "id4",
+					email: "email4",
+					username: "d",
+				}) {
+					id
+				}
+			}
+		`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.FindMany(
+				User.Or(
+					User.And(
+						User.Email.Equals("email1"),
+						User.ID.Equals("id1"),
+					),
+					User.And(
+						User.Email.Equals("email2"),
+						User.ID.Equals("id2"),
+					),
+					User.And(
+						User.Or(
+							User.Email.Equals("email999"),
+							User.Email.Equals("email4"),
+							User.Email.Equals("email999"),
+						),
+					),
+				),
+			).OrderBy(
+				User.ID.Order(SortOrderAsc),
+			).Exec(ctx)
+
+			assert.Equal(t, builder.ErrDuplicateField, errors.Unwrap(err))
 		},
 	}, {
 		name: "id in",

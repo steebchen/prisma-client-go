@@ -19,17 +19,9 @@ type Param interface {
 }
 
 func (r TX) Transaction(queries ...Param) Exec {
-	requests := make([]protocol.GQLRequest, len(queries))
-	for i, query := range queries {
-		requests[i] = protocol.GQLRequest{
-			Query:     query.ExtractQuery().Build(),
-			Variables: map[string]interface{}{},
-		}
-	}
 	return Exec{
-		engine:   r.Engine,
-		requests: requests,
-		queries:  queries,
+		engine:  r.Engine,
+		queries: queries,
 	}
 }
 
@@ -40,6 +32,18 @@ type Exec struct {
 }
 
 func (r Exec) Exec(ctx context.Context) error {
+	r.requests = make([]protocol.GQLRequest, len(r.queries))
+	for i, query := range r.queries {
+		str, err := query.ExtractQuery().Build()
+		if err != nil {
+			return err
+		}
+		r.requests[i] = protocol.GQLRequest{
+			Query:     str,
+			Variables: map[string]interface{}{},
+		}
+	}
+
 	for _, q := range r.queries {
 		//goland:noinspection GoDeferInLoop
 		defer close(q.ExtractQuery().TxResult)

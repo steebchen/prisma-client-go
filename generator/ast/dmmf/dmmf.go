@@ -98,6 +98,14 @@ func (Document) Operators() []Operator {
 	}}
 }
 
+func (d Document) OperatorActions() []string {
+	var operators []string
+	for _, operator := range d.Operators() {
+		operators = append(operators, operator.Action)
+	}
+	return operators
+}
+
 // Action describes a CRUD operation.
 type Action struct {
 	// Type describes a query or a mutation

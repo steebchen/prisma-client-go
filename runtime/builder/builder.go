@@ -33,10 +33,10 @@ type Field struct {
 	// The Name of the field.
 	Name string
 
-	// List saves whether the fields is a list of items
+	// List saves whether the fields are a list of items
 	List bool
 
-	// WrapList saves whether the a list field should be wrapped in an object
+	// WrapList saves whether the field should be wrapped in an individual object
 	WrapList bool
 
 	// Value contains the field value. if nil, fields will contain a subselection.
@@ -80,39 +80,51 @@ type Query struct {
 	TxResult chan []byte
 }
 
-func (q Query) Build() string {
+func (q Query) Build() (string, error) {
 	var builder strings.Builder
 
 	builder.WriteString(q.Operation + " " + q.Name)
 	builder.WriteString("{")
 	builder.WriteString("result: ")
 
-	builder.WriteString(q.BuildInner())
+	str, err := q.BuildInner()
+	if err != nil {
+		return "", err
+	}
+	builder.WriteString(str)
 
 	builder.WriteString("}")
 
-	return builder.String()
+	return builder.String(), nil
 }
 
-func (q Query) BuildInner() string {
+func (q Query) BuildInner() (string, error) {
 	var builder strings.Builder
 
 	builder.WriteString(q.Method + q.Model)
 
 	if len(q.Inputs) > 0 {
-		builder.WriteString(q.buildInputs(q.Inputs))
+		str, err := q.buildInputs(q.Inputs)
+		if err != nil {
+			return "", err
+		}
+		builder.WriteString(str)
 	}
 
 	builder.WriteString(" ")
 
 	if len(q.Outputs) > 0 {
-		builder.WriteString(q.buildOutputs(q.Outputs))
+		str, err := q.buildOutputs(q.Outputs)
+		if err != nil {
+			return "", err
+		}
+		builder.WriteString(str)
 	}
 
-	return builder.String()
+	return builder.String(), nil
 }
 
-func (q Query) buildInputs(inputs []Input) string {
+func (q Query) buildInputs(inputs []Input) (string, error) {
 	var builder strings.Builder
 
 	builder.WriteString("(")
@@ -128,7 +140,11 @@ func (q Query) buildInputs(inputs []Input) string {
 			if i.WrapList {
 				builder.WriteString("[")
 			}
-			builder.WriteString(q.buildFields(i.WrapList, i.WrapList, i.Fields))
+			str, err := q.buildFields(i.WrapList, i.WrapList, i.Fields)
+			if err != nil {
+				return "", err
+			}
+			builder.WriteString(str)
 			if i.WrapList {
 				builder.WriteString("]")
 			}
@@ -139,10 +155,10 @@ func (q Query) buildInputs(inputs []Input) string {
 
 	builder.WriteString(")")
 
-	return builder.String()
+	return builder.String(), nil
 }
 
-func (q Query) buildOutputs(outputs []Output) string {
+func (q Query) buildOutputs(outputs []Output) (string, error) {
 	var builder strings.Builder
 
 	builder.WriteString("{")
@@ -151,20 +167,30 @@ func (q Query) buildOutputs(outputs []Output) string {
 		builder.WriteString(o.Name + " ")
 
 		if len(o.Inputs) > 0 {
-			builder.WriteString(q.buildInputs(o.Inputs))
+			str, err := q.buildInputs(o.Inputs)
+			if err != nil {
+				return "", err
+			}
+			builder.WriteString(str)
 		}
 
 		if len(o.Outputs) > 0 {
-			builder.WriteString(q.buildOutputs(o.Outputs))
+			str, err := q.buildOutputs(o.Outputs)
+			if err != nil {
+				return "", err
+			}
+			builder.WriteString(str)
 		}
 	}
 
 	builder.WriteString("}")
 
-	return builder.String()
+	return builder.String(), nil
 }
 
-func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
+var ErrDuplicateField = fmt.Errorf("duplicate field (https://github.com/steebchen/prisma-client-go/issues/1095)")
+
+func (q Query) buildFields(list bool, wrapList bool, fields []Field) (string, error) {
 	var builder strings.Builder
 
 	if !list {
@@ -201,6 +227,10 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 	}
 
 	for _, f := range final {
+		if err := checkFields(f, f.Fields); err != nil {
+			return "", err
+		}
+
 		if wrapList {
 			builder.WriteString("{")
 		}
@@ -218,7 +248,11 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		}
 
 		if f.Fields != nil {
-			builder.WriteString(q.buildFields(f.List, f.WrapList, f.Fields))
+			str, err := q.buildFields(f.List, f.WrapList, f.Fields)
+			if err != nil {
+				return "", err
+			}
+			builder.WriteString(str)
 		}
 
 		if f.Value != nil {
@@ -240,12 +274,29 @@ func (q Query) buildFields(list bool, wrapList bool, fields []Field) string {
 		builder.WriteString("}")
 	}
 
-	return builder.String()
+	return builder.String(), nil
+}
+
+func checkFields(parent Field, fields []Field) error {
+	uniqueObjectFields := make(map[string]Field)
+	for _, f := range fields {
+		if f.Value != nil && !f.List && !parent.List {
+			if _, ok := uniqueObjectFields[f.Name]; ok {
+				return fmt.Errorf("%w: %q", ErrDuplicateField, f.Name)
+			}
+			uniqueObjectFields[f.Name] = f
+		}
+	}
+	return nil
 }
 
 func (q Query) Exec(ctx context.Context, into interface{}) error {
+	str, err := q.Build()
+	if err != nil {
+		return err
+	}
 	payload := protocol.GQLRequest{
-		Query:     q.Build(),
+		Query:     str,
 		Variables: map[string]interface{}{},
 	}
 	return q.Do(ctx, payload, into)

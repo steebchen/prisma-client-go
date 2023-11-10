@@ -11,7 +11,7 @@ import (
 )
 
 type cx = context.Context
-type Func func(t *testing.T, client *PrismaClient, ctx cx)
+type Func func(t *testing.T, db test.Database, client *PrismaClient, ctx cx)
 
 func TestLifecycle(t *testing.T) {
 	t.Parallel()
@@ -22,7 +22,13 @@ func TestLifecycle(t *testing.T) {
 		run    Func
 	}{{
 		name: "connect success",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+		run: func(t *testing.T, db test.Database, client *PrismaClient, ctx cx) {
+			// manually setup testing
+			mockDBName := db.SetupDatabase(t)
+			test.Migrate(t, db, client.Engine, mockDBName)
+
+			defer test.Teardown(t, db, mockDBName)
+
 			if err := client.Connect(); err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -40,17 +46,30 @@ func TestLifecycle(t *testing.T) {
 		},
 	}, {
 		name: "connect pending",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+		run: func(t *testing.T, db test.Database, client *PrismaClient, ctx cx) {
+
+			// manually setup testing
+			mockDBName := db.SetupDatabase(t)
+			test.Migrate(t, db, client.Engine, mockDBName)
+
+			defer test.Teardown(t, db, mockDBName)
+
 			_, err := client.User.CreateOne(
 				User.ID.Set("123"),
 			).Exec(ctx)
 
 			assert.NotEqual(t, err, nil)
-			massert.Equal(t, err.Error(), "request failed: client is not connected yet")
+			massert.Equal(t, "request failed: client is not connected yet", err.Error())
 		},
 	}, {
 		name: "already disconnected",
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+		run: func(t *testing.T, db test.Database, client *PrismaClient, ctx cx) {
+			// manually setup testing
+			mockDBName := db.SetupDatabase(t)
+			test.Migrate(t, db, client.Engine, mockDBName)
+
+			defer test.Teardown(t, db, mockDBName)
+
 			if err := client.Connect(); err != nil {
 				t.Fatalf("fail %s", err)
 			}
@@ -70,7 +89,16 @@ func TestLifecycle(t *testing.T) {
 				User.ID.Set("456"),
 			).Exec(ctx)
 			assert.NotEqual(t, err, nil)
-			massert.Equal(t, err.Error(), "request failed: client is already disconnected")
+			massert.Equal(t, "request failed: client is already disconnected", err.Error())
+		},
+	}, {
+		name: "connect err on async query engine error",
+		run: func(t *testing.T, db test.Database, client *PrismaClient, ctx cx) {
+			// use a non-working db URL to force a connection error
+
+			err := client.Connect()
+
+			assert.Regexp(t, "Environment variable not found: __REPLACE__", err.Error())
 		},
 	}}
 	for _, tt := range tests {
@@ -79,12 +107,7 @@ func TestLifecycle(t *testing.T) {
 			test.RunSerial(t, []test.Database{test.MySQL, test.PostgreSQL, test.MongoDB}, func(t *testing.T, db test.Database, ctx context.Context) {
 				client := NewClient()
 
-				// manually setup testing
-				mockDBName := db.SetupDatabase(t)
-				test.Migrate(t, db, client.Engine, mockDBName)
-
-				defer test.Teardown(t, db, mockDBName)
-				tt.run(t, client, context.Background())
+				tt.run(t, db, client, context.Background())
 			})
 		})
 	}
