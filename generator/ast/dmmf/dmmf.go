@@ -14,13 +14,8 @@ const (
 	FieldKindEnum   FieldKind = "enum"
 )
 
-// IncludeInStruct shows whether to include a field in a model struct.
-func (v FieldKind) IncludeInStruct() bool {
-	return v == FieldKindScalar || v == FieldKindEnum
-}
-
-// IsRelation returns whether field is a relation
-func (v FieldKind) IsRelation() bool {
+// IsObject returns whether field is an object
+func (v FieldKind) IsObject() bool {
 	return v == FieldKindObject
 }
 
@@ -265,7 +260,7 @@ func (m Model) Actions() []string {
 func (m Model) RelationFieldsPlusOne() []Field {
 	var fields []Field
 	for _, field := range m.Fields {
-		if field.Kind.IsRelation() {
+		if field.IsRelation() {
 			fields = append(fields, field)
 		}
 	}
@@ -295,6 +290,19 @@ type Field struct {
 	RelationName types.String `json:"relationName"`
 	// HasDefaultValue
 	HasDefaultValue bool `json:"hasDefaultValue"`
+}
+
+// IncludeInStruct shows whether to include a field in a model struct.
+func (f Field) IncludeInStruct() bool {
+	return f.Kind == FieldKindScalar || f.Kind == FieldKindEnum || f.IsObjectType()
+}
+
+func (f Field) IsRelation() bool {
+	return f.RelationName != ""
+}
+
+func (f Field) IsObjectType() bool {
+	return f.Type != "" && !f.IsRelation() && f.Kind == FieldKindObject
 }
 
 func (f Field) RequiredOnCreate(key PrimaryKey) bool {

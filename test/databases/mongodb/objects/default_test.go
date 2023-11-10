@@ -20,55 +20,60 @@ func TestObjects(t *testing.T) {
 		run    Func
 	}{{
 		name: "types",
-		// language=GraphQL
-		before: []string{`
-			mutation {
-				result: createOneUser(data: {
-					id: "id1",
-					email: "email1",
-					info: {
-						age: 0,
-					},
-					infoOpt: {
-						age: 0,
-					},
-					list: {
-						create: [
-							{
-								age: 0,
-							},
-						]
-					}
-				}) {
-					id
-				}
-			}
-		`},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			user, err := client.User.FindUnique(
+			expected := &UserModel{
+				InnerUser: InnerUser{
+					ID:       "id1",
+					Email:    "email1",
+					Username: "username1",
+					Info: InfoType{
+						Age:    5,
+						AgeOpt: 3,
+					},
+					InfoOpt: &InfoType{
+						Age:    5,
+						AgeOpt: 3,
+					},
+					List: []InfoType{
+						{
+							Age:    5,
+							AgeOpt: 3,
+						},
+					},
+				},
+			}
+
+			user, err := client.User.CreateOne(
+				User.Email.Set("id1"),
+				User.Username.Set("id1"),
+				User.Info.Set(InfoType{
+					Age:    5,
+					AgeOpt: 3,
+				}),
+				User.InfoOpt.Set(InfoType{
+					Age:    5,
+					AgeOpt: 3,
+				}),
+				User.List.Set([]InfoType{{
+					Age:    5,
+					AgeOpt: 3,
+				}}),
+				User.ID.Set("id1"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			massert.Equal(t, expected, user)
+
+			user, err = client.User.FindUnique(
 				User.ID.Equals("id1"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatal(err)
 			}
 
-			massert.Equal(t, &UserModel{
-				InnerUser: InnerUser{
-					ID:    "id1",
-					Email: "email1",
-					Info: InfoType{
-						Age: 0,
-					},
-					InfoOpt: &InfoType{
-						Age: 0,
-					},
-					List: []InfoType{
-						{
-							Age: 0,
-						},
-					},
-				},
-			}, user)
+			massert.Equal(t, expected, user)
 		},
 	}}
 	for _, tt := range tests {

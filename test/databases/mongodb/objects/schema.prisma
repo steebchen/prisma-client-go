@@ -21,7 +21,8 @@ model User {
 }
 
 type Info {
-  age Int
+  age    Int
+  ageOpt Int
 }
 
 // unused relation to check for conflicts etc.
