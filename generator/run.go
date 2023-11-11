@@ -40,6 +40,10 @@ func addDefaults(input *Root) {
 func Run(input *Root) error {
 	addDefaults(input)
 
+	if input.Version != binaries.EngineVersion {
+		fmt.Printf("\nwarning: prisma CLI version mismatch detected. CLI version: %s, internal version: %s (%s); please see https://github.com/steebchen/prisma-client-go/issues/1099 for details\n\n", input.Version, binaries.EngineVersion, binaries.PrismaVersion)
+	}
+
 	if input.Generator.Config.DisableGitignore != "true" && input.Generator.Config.DisableGoBinaries != "true" {
 		logger.Debug.Printf("writing gitignore file")
 		// generate a gitignore into the folder

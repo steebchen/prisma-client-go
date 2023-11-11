@@ -14,11 +14,13 @@ import (
 
 // Root describes the generator output root.
 type Root struct {
-	Generator       Generator     `json:"generator"`
-	OtherGenerators []Generator   `json:"otherGenerators"`
-	SchemaPath      string        `json:"schemaPath"`
-	DMMF            dmmf.Document `json:"DMMF"`
-	Datasources     []Datasource  `json:"datasources"`
+	Generator       Generator   `json:"generator"`
+	OtherGenerators []Generator `json:"otherGenerators"`
+	SchemaPath      string      `json:"schemaPath"`
+	// Version contains the version hash of the Prisma engine
+	Version     string        `json:"version"`
+	DMMF        dmmf.Document `json:"DMMF"`
+	Datasources []Datasource  `json:"datasources"`
 	// Datamodel provides the raw string of the Prisma datamodel.
 	Datamodel string `json:"datamodel"`
 	// BinaryPaths (optional)
