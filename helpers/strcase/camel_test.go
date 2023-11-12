@@ -28,9 +28,10 @@ import (
 	"testing"
 )
 
-func TestToCamel(t *testing.T) {
+func toCamel(tb testing.TB) {
 	cases := [][]string{
 		{"test_case", "TestCase"},
+		{"test.case", "TestCase"},
 		{"test", "Test"},
 		{"TestCase", "TestCase"},
 		{" test  case ", "TestCase"},
@@ -39,30 +40,45 @@ func TestToCamel(t *testing.T) {
 		{"AnyKind of_string", "AnyKindOfString"},
 		{"odd-fix", "OddFix"},
 		{"numbers2And55with000", "Numbers2And55With000"},
+		{"ID", "Id"},
+		{"CONSTANT_CASE", "ConstantCase"},
 	}
 	for _, i := range cases {
 		in := i[0]
 		out := i[1]
 		result := ToCamel(in)
 		if result != out {
-			t.Error("'" + result + "' != '" + out + "'")
+			tb.Errorf("%q (%q != %q)", in, result, out)
 		}
 	}
 }
 
-func TestToLowerCamel(t *testing.T) {
+func TestToCamel(t *testing.T) {
+	toCamel(t)
+}
+
+func toLowerCamel(tb testing.TB) {
 	cases := [][]string{
 		{"foo-bar", "fooBar"},
 		{"TestCase", "testCase"},
 		{"", ""},
 		{"AnyKind of_string", "anyKindOfString"},
+		{"AnyKind.of-string", "anyKindOfString"},
+		{"ID", "id"},
+		{"some string", "someString"},
+		{" some string", "someString"},
+		{"CONSTANT_CASE", "constantCase"},
 	}
 	for _, i := range cases {
 		in := i[0]
 		out := i[1]
 		result := ToLowerCamel(in)
 		if result != out {
-			t.Error("'" + result + "' != '" + out + "'")
+			tb.Errorf("%q (%q != %q)", in, result, out)
 		}
 	}
+}
+
+func TestToLowerCamel(t *testing.T) {
+	toLowerCamel(t)
 }
