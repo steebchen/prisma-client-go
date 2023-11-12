@@ -7,24 +7,22 @@ package {{.Generator.Config.Package}}
 
 import (
 	"context"
-	"testing"
 	"os"
+	"testing"
+
+	// no-op import for go modules
+	_ "github.com/joho/godotenv"
+	_ "github.com/shopspring/decimal"
+	_ "golang.org/x/text/cases"
 
 	"github.com/steebchen/prisma-client-go/engine"
 	"github.com/steebchen/prisma-client-go/engine/mock"
-	"github.com/steebchen/prisma-client-go/runtime/types"
-	rawmodels "github.com/steebchen/prisma-client-go/runtime/types/raw"
+	"github.com/steebchen/prisma-client-go/runtime/builder"
 	"github.com/steebchen/prisma-client-go/runtime/lifecycle"
 	"github.com/steebchen/prisma-client-go/runtime/raw"
-	"github.com/steebchen/prisma-client-go/runtime/builder"
 	"github.com/steebchen/prisma-client-go/runtime/transaction"
-
-	// no-op import for go modules
-	_ "github.com/shopspring/decimal"
-	_ "github.com/iancoleman/strcase"
-	_ "github.com/takuoki/gocase"
-	_ "github.com/joho/godotenv"
-	_ "golang.org/x/text/cases"
+	"github.com/steebchen/prisma-client-go/runtime/types"
+	rawmodels "github.com/steebchen/prisma-client-go/runtime/types/raw"
 )
 
 // ignore unused os import as it may not be needed depending on engine type
