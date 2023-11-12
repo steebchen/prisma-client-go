@@ -3,9 +3,6 @@ package types
 import (
 	"fmt"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	"github.com/steebchen/prisma-client-go/helpers/gocase"
 	"github.com/steebchen/prisma-client-go/helpers/strcase"
 )
@@ -42,7 +39,7 @@ func (s String) Tag(isRequired bool) string {
 
 // PrismaGoCase transforms `relevance` into `Relevance_`
 func (s String) PrismaGoCase() string {
-	return cases.Title(language.Und, cases.NoLower).String(string(s)) + "_"
+	return strcase.ToCamel(string(s)) + "_"
 }
 
 // PrismaInternalCase transforms `relevance` into `_relevance`

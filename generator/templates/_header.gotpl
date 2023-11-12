@@ -13,7 +13,6 @@ import (
 	// no-op import for go modules
 	_ "github.com/joho/godotenv"
 	_ "github.com/shopspring/decimal"
-	_ "golang.org/x/text/cases"
 
 	"github.com/steebchen/prisma-client-go/engine"
 	"github.com/steebchen/prisma-client-go/engine/mock"
