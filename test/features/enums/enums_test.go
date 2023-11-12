@@ -28,7 +28,7 @@ func TestEnums(t *testing.T) {
 			admin := RoleAdmin
 			mod := RoleModerator
 
-			stuffCASING := StuffCASING
+			stuffCASING := StuffCasing
 			stuffDifferent := StuffDifferent
 			stuffHaHa := StuffHaHa
 			expected := &UserModel{
@@ -44,7 +44,7 @@ func TestEnums(t *testing.T) {
 
 			created, err := client.User.CreateOne(
 				User.Role.Set(RoleAdmin),
-				User.Stuff1.Set(StuffCASING),
+				User.Stuff1.Set(StuffCasing),
 				User.Stuff2.Set(StuffDifferent),
 				User.Stuff3.Set(StuffHaHa),
 				User.ID.Set("123"),
