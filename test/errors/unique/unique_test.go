@@ -35,7 +35,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraintErr(err)
+			violation, ok := IsErrUniqueConstraint(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Field: User.Email.Field(),
 			//	}, violation)
@@ -58,7 +58,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraintErr(err)
+			violation, ok := IsErrUniqueConstraint(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Key: "User_email_key",
 			//	}, violation)
@@ -81,7 +81,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraintErr(err)
+			violation, ok := IsErrUniqueConstraint(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Field: User.Email.Field(),
 			//	}, violation)
@@ -104,7 +104,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			violation, ok := IsUniqueConstraintErr(err)
+			violation, ok := IsErrUniqueConstraint(err)
 			//	assert.Equal(t, &ErrUniqueConstraint{
 			//		Key: "User_email_key",
 			//	}, violation)
@@ -121,7 +121,7 @@ func TestUniqueConstraintViolation(t *testing.T) {
 				User.Username.Set("username"),
 			).Exec(ctx)
 
-			_, ok := IsUniqueConstraintErr(err)
+			_, ok := IsErrUniqueConstraint(err)
 
 			assert.Equal(t, false, ok)
 		},

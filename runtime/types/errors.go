@@ -9,6 +9,12 @@ import (
 // ErrNotFound gets returned when a database record does not exist
 var ErrNotFound = errors.New("ErrNotFound")
 
+// IsErrNotFound is true if the error is a ErrNotFound, which gets returned when a database record does not exist
+// This can happen when you call `FindUnique` on a record, or update or delete a single record which doesn't exist.
+func IsErrNotFound(err error) bool {
+	return errors.Is(err, ErrNotFound)
+}
+
 type F interface {
 	~string
 }
