@@ -90,6 +90,29 @@ func TestUniqueConstraintViolation(t *testing.T) {
 			assert.Equal(t, true, ok)
 		},
 	}, {
+		name: "mongodb unique constraint violation",
+		dbs:  []test.Database{test.MongoDB},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			_, err := client.User.CreateOne(
+				User.Email.Set("john@example.com"),
+				User.Username.Set("username"),
+			).Exec(ctx)
+			assert.Equal(t, nil, err)
+
+			_, err = client.User.CreateOne(
+				User.Email.Set("john@example.com"),
+				User.Username.Set("username"),
+			).Exec(ctx)
+
+			violation, ok := IsUniqueConstraintErr(err)
+			//	assert.Equal(t, &ErrUniqueConstraint{
+			//		Key: "User_email_key",
+			//	}, violation)
+			assert.Equal(t, "User_email_key", violation.Key)
+
+			assert.Equal(t, true, ok)
+		},
+	}, {
 		name: "nil error should succeed",
 		dbs:  []test.Database{test.SQLite},
 		run: func(t *testing.T, client *PrismaClient, ctx cx) {
