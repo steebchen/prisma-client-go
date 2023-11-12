@@ -23,6 +23,7 @@
  * SOFTWARE.
  */
 
+// Package strcase allows converting string case to camel case
 package strcase
 
 import (
