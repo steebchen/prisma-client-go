@@ -57,15 +57,15 @@ If you want to set up Prisma CLI binaries yourself, authenticate with your own A
 in `publish.sh`.
 When using the client, you will need to override the URL with env vars whenever you run the Go client, specifically
 `PRISMA_CLI_URL` and `PRISMA_ENGINE_URL`. You can see the shape of these values
-in [binaries/binaries.go#L24-L28](https://github.com/steebchen/prisma-client-go/blob/50db21001ea041a08d1893e67df8e338a4d8a9a1/binaries/binaries.go#L24-L28).
+in [binaries/version.go#L3-L8](https://github.com/steebchen/prisma-client-go/blob/main/binaries/version.go#L3-L8).
 
 This will also print the query engine version which you will need in the next step.
 
 ### Bump the binaries in the Go client
 
-Go to `binaries/binaries.go` and adapt
-the [`PrismaVersion`](https://github.com/steebchen/prisma-client-go/blob/50db21001ea041a08d1893e67df8e338a4d8a9a1/binaries/binaries.go#L18)
-and [`EngineVersion`](https://github.com/steebchen/prisma-client-go/blob/50db21001ea041a08d1893e67df8e338a4d8a9a1/binaries/binaries.go#L22)
+Go to `binaries/version.go` and adapt
+the [`PrismaVersion`](https://github.com/steebchen/prisma-client-go/blob/main/binaries/version.go#L4)
+and [`EngineVersion`](https://github.com/steebchen/prisma-client-go/blob/main/binaries/version.go#L8)
 to the new version values.
 Push to a new branch, create a PR, and merge if tests are green (
 e.g. [#709](https://github.com/steebchen/prisma-client-go/pull/709)).

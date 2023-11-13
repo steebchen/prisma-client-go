@@ -95,8 +95,8 @@ if [[ $CI == 'true' ]]; then
 
   echo "Committing changes"
 
-  sed -i '' -e "s/const EngineVersion = \".*\"/const EngineVersion = \"$hash\"/g" binaries.go
-  sed -i '' -e "s/const PrismaVersion = \".*\"/const PrismaVersion = \"$version\"/g" binaries.go
+  sed -i '' -e "s/const EngineVersion = \".*\"/const EngineVersion = \"$hash\"/g" version.go
+  sed -i '' -e "s/const PrismaVersion = \".*\"/const PrismaVersion = \"$version\"/g" version.go
 
   # changes are picked up by GitHub actions
 fi
