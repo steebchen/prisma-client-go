@@ -100,7 +100,7 @@ func TestTypes(t *testing.T) {
 				User.UpperCaseTest.Set("test1"),
 				User.LowerCaseTest.Set("test2"),
 				User.SnakeCaseTest.Set("test3"),
-				User.WEiRdLycasEDTest.Set("test4"),
+				User.WEiRdLycasEdTest.Set("test4"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
@@ -120,7 +120,7 @@ func TestTypes(t *testing.T) {
 					UpperCaseTest:    str("test1"),
 					LowerCaseTest:    str("test2"),
 					SnakeCaseTest:    str("test3"),
-					WEiRdLycasEDTest: str("test4"),
+					WEiRdLycasEdTest: str("test4"),
 				},
 			}
 
@@ -130,7 +130,7 @@ func TestTypes(t *testing.T) {
 				User.UpperCaseTest.Equals("test1"),
 				User.LowerCaseTest.Equals("test2"),
 				User.SnakeCaseTest.Equals("test3"),
-				User.WEiRdLycasEDTest.Equals("test4"),
+				User.WEiRdLycasEdTest.Equals("test4"),
 			).Exec(ctx)
 			if err != nil {
 				t.Fatalf("fail %s", err)
