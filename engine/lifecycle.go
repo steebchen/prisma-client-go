@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/exec"
 	"path"
-	"strconv"
 	"strings"
 	"time"
 
@@ -317,9 +316,7 @@ func (e *QueryEngine) spawn(file string) error {
 			Status string `json:"status"`
 		}
 
-		// the response is a JSON in a string, so unquote it
-		unquoted, _ := strconv.Unquote(string(body))
-		if err := json.Unmarshal([]byte(unquoted), &response); err != nil {
+		if err := json.Unmarshal(body, &response); err != nil {
 			connectErr = err
 			logger.Debug.Printf("could not unmarshal response %s; retrying...", body)
 			time.Sleep(50 * time.Millisecond)
