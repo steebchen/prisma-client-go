@@ -10,6 +10,7 @@ test/**/*.json
 
 # build folder for Prisma CLI binaries
 build/
+out/
 
 schema.temp.*.prisma
 # sqlite artifacts

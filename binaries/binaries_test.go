@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path"
 	"testing"
 	"time"
 
@@ -34,7 +35,12 @@ func TestFetch_localDir(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err := FetchNative(wd); err != nil {
+	dir := path.Join(wd, "out")
+
+	//goland:noinspection GoUnhandledErrorResult
+	defer os.RemoveAll(dir)
+
+	if err := FetchNative(dir); err != nil {
 		t.Fatalf("fetchEngine failed: %s", err)
 	}
 }
