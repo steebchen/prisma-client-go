@@ -29,4 +29,10 @@ enum Stuff {
   different
   CASING
   HaHa
+  last7d
+  last30D
+  last7dAnd
+  last30DAnd
+  Slack
+  id
 }

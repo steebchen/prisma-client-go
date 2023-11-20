@@ -18,6 +18,14 @@ type Func func(t *testing.T, client *PrismaClient, ctx cx)
 func TestEnums(t *testing.T) {
 	t.Parallel()
 
+	// casing test no-ops
+	_ = StuffLast7D
+	_ = StuffLast30D
+	_ = StuffSlack
+	_ = StuffLast7DAnd
+	_ = StuffLast30Dand
+	_ = StuffID
+
 	tests := []struct {
 		name   string
 		before []string
@@ -28,7 +36,7 @@ func TestEnums(t *testing.T) {
 			admin := RoleAdmin
 			mod := RoleModerator
 
-			stuffCASING := StuffCasing
+			stuffCasing := StuffCasing
 			stuffDifferent := StuffDifferent
 			stuffHaHa := StuffHaHa
 			expected := &UserModel{
@@ -36,7 +44,7 @@ func TestEnums(t *testing.T) {
 					ID:      "123",
 					Role:    admin,
 					RoleOpt: &mod,
-					Stuff1:  &stuffCASING,
+					Stuff1:  &stuffCasing,
 					Stuff2:  &stuffDifferent,
 					Stuff3:  &stuffHaHa,
 				},
