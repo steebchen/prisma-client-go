@@ -1,0 +1,25 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("__REPLACE__")
+  schemas  = ["a", "b"]
+}
+
+generator db {
+  provider          = "go run github.com/steebchen/prisma-client-go"
+  output            = "."
+  disableGoBinaries = true
+  package           = "db"
+  previewFeatures   = ["multiSchema"]
+}
+
+model First {
+  id String @id @default(cuid()) @map("_id")
+
+  @@schema("a")
+}
+
+model Second {
+  id String @id @default(cuid()) @map("_id")
+
+  @@schema("b")
+}
