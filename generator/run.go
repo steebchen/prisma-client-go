@@ -8,7 +8,6 @@ import (
 	"go/format"
 	"os"
 	"path"
-	"runtime"
 	"strings"
 	"text/template"
 
@@ -189,14 +188,11 @@ func generateBinaries(input *Root) error {
 
 func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) error {
 	for _, name := range binaryTargets {
-		pt := runtime.GOOS
-		if strings.Contains(name, "debian") || strings.Contains(name, "rhel") || strings.Contains(name, "musl") {
-			pt = "linux"
-		}
-
 		if name == "native" {
 			name = platform.BinaryPlatformNameStatic()
 		}
+
+		info := platform.MapBinaryTarget(name)
 
 		name = TransformBinaryTarget(name)
 
@@ -206,7 +202,7 @@ func generateQueryEngineFiles(binaryTargets []string, pkg, outputDir string) err
 		to := path.Join(outputDir, filename)
 
 		// TODO check if already exists, but make sure version matches
-		if err := bindata.WriteFile(name, pkg, pt, enginePath, to); err != nil {
+		if err := bindata.WriteFile(name, pkg, enginePath, to, info); err != nil {
 			return fmt.Errorf("generate write go file: %w", err)
 		}
 
