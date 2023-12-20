@@ -1,6 +1,7 @@
 .git/
 .github/
 .idea/
+.run/
 build/
 docs/
 
@@ -16,4 +17,6 @@ schema.graphql
 **/query-engine-*
 
 Dockerfile
-*.dockerfile
+**/*.dockerfile
+
+binaries/build/
