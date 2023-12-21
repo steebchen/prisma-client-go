@@ -27,7 +27,7 @@ func indexes(m dmmf.Model) []Index {
 
 	if len(m.PrimaryKey.Fields) > 0 {
 		idx = append(idx, Index{
-			Name:         getName(concatFieldsToName(m.PrimaryKey.Fields), m.PrimaryKey.Fields),
+			Name:         convert(m.PrimaryKey.Fields),
 			InternalName: concatFieldsToName(m.PrimaryKey.Fields),
 			Fields:       m.PrimaryKey.Fields,
 		})
@@ -51,6 +51,10 @@ func getName(field string, fields []types.String) types.String {
 	if field != "" {
 		return types.String(field)
 	}
+	return convert(fields)
+}
+
+func convert(fields []types.String) types.String {
 	var name string
 	for _, f := range fields {
 		name += f.GoCase()
