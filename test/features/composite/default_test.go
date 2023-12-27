@@ -12,6 +12,13 @@ type cx = context.Context
 type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func TestComposite(t *testing.T) {
+	// no-op compile time test
+
+	User.SomethingIDAnotherIDStuff(
+		User.SomethingID.Equals(""),
+		User.AnotherIDStuff.Equals(""),
+	)
+
 	tests := []struct {
 		name   string
 		before []string

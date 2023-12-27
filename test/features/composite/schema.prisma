@@ -15,6 +15,10 @@ model User {
   middleName String
   lastName   String
 
+  somethingId    String?
+  anotherIdStuff String?
+
   @@id([firstName, lastName])
   @@unique([firstName, middleName, lastName])
+  @@unique([somethingId, anotherIdStuff])
 }
