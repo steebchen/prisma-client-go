@@ -13,10 +13,15 @@ type Func func(t *testing.T, client *PrismaClient, ctx cx)
 
 func TestComposite(t *testing.T) {
 	// no-op compile time test
-
 	User.SomethingIDAnotherIDStuff(
 		User.SomethingID.Equals(""),
 		User.AnotherIDStuff.Equals(""),
+	)
+
+	// custom name test
+	User.AnotherIDStuffSomethingID(
+		User.AnotherIDStuff.Equals(""),
+		User.SomethingID.Equals(""),
 	)
 
 	tests := []struct {

@@ -46,7 +46,7 @@ func toCamel(tb testing.TB) {
 	for _, i := range cases {
 		in := i[0]
 		out := i[1]
-		result := ToCamel(in)
+		result := ToUpperCamel(in)
 		if result != out {
 			tb.Errorf("%q (%q != %q)", in, result, out)
 		}

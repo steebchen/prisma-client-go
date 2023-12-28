@@ -74,8 +74,8 @@ func toCamelInitCase(s string, initCase bool) string {
 	return n.String()
 }
 
-// ToCamel converts a string to CamelCase
-func ToCamel(s string) string {
+// ToUpperCamel converts a string to CamelCase
+func ToUpperCamel(s string) string {
 	return toCamelInitCase(s, true)
 }
 

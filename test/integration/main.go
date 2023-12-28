@@ -1,9 +1,10 @@
+//go:generate go run github.com/steebchen/prisma-client-go generate --schema schemax.prisma
+
 package main
 
 import (
 	"context"
 	"fmt"
-
 	"integration/db"
 )
 

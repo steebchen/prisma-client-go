@@ -34,15 +34,22 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/steebchen/prisma-client-go/helpers/strcase"
 )
 
-// To returns a string converted to Go case.
-func To(s string) string {
-	return defaultConverter.To(s)
+// ToLower returns a string converted to Go upper case.
+func ToLower(s string) string {
+	return defaultConverter.To(s, false)
+}
+
+// ToUpper returns a string converted to Go lower case.
+func ToUpper(s string) string {
+	return defaultConverter.To(s, true)
 }
 
 // To returns a string converted to Go case with converter.
-func (c *Converter) To(s string) string {
+func (c *Converter) To(s string, upper bool) string {
 	for _, i := range c.initialisms {
 		// not end
 		re1 := regexp.MustCompile(fmt.Sprintf("%s([^a-z])", i.capUpper()))
@@ -52,7 +59,60 @@ func (c *Converter) To(s string) string {
 		re2 := regexp.MustCompile(fmt.Sprintf("%s$", i.capUpper()))
 		s = re2.ReplaceAllString(s, i.allUpper())
 	}
-	return s
+
+	if len(s) == 0 {
+		return s
+	}
+
+	var isAllCap = true
+	for _, i := range s {
+		if i < 'A' || i > 'Z' {
+			isAllCap = false
+		}
+	}
+
+	if strings.Contains(s, "_") || isAllCap {
+		if upper {
+			// for snake case
+			s = strcase.ToUpperCamel(s)
+		} else {
+			s = strcase.ToLowerCamel(s)
+		}
+	} else {
+		if upper {
+			s = strings.ToUpper(s[:1]) + s[1:]
+		} else {
+			// TODO!!!
+			s = strings.ToLower(s[:1]) + s[1:]
+		}
+	}
+
+	// run again for new uppercase words
+	for _, i := range c.initialisms {
+		// not end
+		re1 := regexp.MustCompile(fmt.Sprintf("%s([^a-z])", i.capUpper()))
+		s = re1.ReplaceAllString(s, i.allUpper()+"$1")
+
+		// end
+		re2 := regexp.MustCompile(fmt.Sprintf("%s$", i.capUpper()))
+		s = re2.ReplaceAllString(s, i.allUpper())
+	}
+
+	// fix casing after numbers
+	n := strings.Builder{}
+	n.Grow(len(s))
+	prevIsNumber := false
+	for _, v := range []byte(s) {
+		vIsLow := v >= 'a' && v <= 'z'
+		if prevIsNumber && vIsLow {
+			v += 'A'
+			v -= 'a'
+		}
+		prevIsNumber = v >= '0' && v <= '9'
+		n.WriteByte(v)
+	}
+
+	return n.String()
 }
 
 // Revert returns a string converted from Go case to normal case.
