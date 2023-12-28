@@ -135,7 +135,7 @@ func TestConverter_Revert(t *testing.T) {
 	}
 }
 
-// FuzzReverse runs a Fuzzing test to check if the strings
+// FuzzReverseUpper runs a Fuzzing test to check if the strings
 // before and after `To` and `Revert` match.
 // Note that there may be cases where the strings before and after
 // the `To` and `Revert` do not match for certain inputs.
@@ -143,14 +143,34 @@ func TestConverter_Revert(t *testing.T) {
 // ```cmd
 // go test -fuzz=Fuzz
 // ```
-func FuzzReverse(f *testing.F) {
-	f.Skip()
-	testcases := []string{"jsonFile", "IpAddress", "defaultDnsServer"}
+func FuzzReverseUpper(f *testing.F) {
+	testcases := []string{"JsonFile", "IpAddress", "DefaultDnsServer"}
 	for _, tc := range testcases {
 		f.Add(tc)
 	}
 	f.Fuzz(func(t *testing.T, orig string) {
 		to := gocase.ToUpper(orig)
+		rev := gocase.Revert(to)
+		if !ignoreInput(orig) && orig != rev {
+			t.Errorf("before: %q, after: %q", orig, rev)
+		}
+		if utf8.ValidString(orig) && !utf8.ValidString(rev) {
+			t.Errorf("To or Revert produced invalid UTF-8 string %q", rev)
+		}
+	})
+}
+
+// FuzzReverseLower runs a Fuzzing test to check if the strings
+// before and after `To` and `Revert` match.
+// Note that there may be cases where the strings before and after
+// the `To` and `Revert` do not match for certain inputs.
+func FuzzReverseLower(f *testing.F) {
+	testcases := []string{"jsonFile", "ipAddress", "defaultDnsServer"}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, orig string) {
+		to := gocase.ToLower(orig)
 		rev := gocase.Revert(to)
 		if !ignoreInput(orig) && orig != rev {
 			t.Errorf("before: %q, after: %q", orig, rev)

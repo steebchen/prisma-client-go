@@ -218,8 +218,6 @@ func (e *QueryEngine) GetEncodedDatasources() (string, error) {
 		return "", fmt.Errorf("marshal datasources: %w", err)
 	}
 
-	log.Printf("overriding datasources raw: %s", raw)
-
 	datasourcesBase64 := base64.URLEncoding.EncodeToString(raw)
 
 	return datasourcesBase64, nil
