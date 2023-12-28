@@ -12,8 +12,6 @@
 		{{ range $field := $model.Fields }}
 			{{- if not $field.Kind.IsRelation -}}
 				{{- if $field.IsRequired }}
-					// GoCase {{ $field.Name.GoCase }}
-					// GoLowerCase {{ $field.Name.GoLowerCase }}
 					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag $field.IsRequired }}
 				{{- else }}
 					{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }} {{ $field.Name.Tag $field.IsRequired }}
