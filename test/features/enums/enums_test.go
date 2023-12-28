@@ -23,7 +23,7 @@ func TestEnums(t *testing.T) {
 	_ = StuffLast30D
 	_ = StuffSlack
 	_ = StuffLast7DAnd
-	_ = StuffLast30Dand
+	_ = StuffLast30DAnd
 	_ = StuffID
 
 	tests := []struct {

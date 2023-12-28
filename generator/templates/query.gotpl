@@ -54,7 +54,7 @@
 
 	{{/* composite keys for FindUnique */}}
 	{{ range $unique := $model.CompoundKeys }}
-		func ({{ $nsQuery }}) {{ $unique.Name }}(
+		func ({{ $nsQuery }}) {{ $unique.Name.GoCase }}(
 			{{- range $f := $unique.Fields }}
 				_{{- $f.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $f.GoCase }}WhereParam,
 			{{ end -}}

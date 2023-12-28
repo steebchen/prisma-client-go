@@ -16,12 +16,12 @@ func (s String) String() string {
 
 // GoCase transforms strings into Go-style casing, meaning uppercase including Go casing edge cases.
 func (s String) GoCase() string {
-	return gocase.To(strcase.ToCamel(string(s)))
+	return gocase.ToUpper(string(s))
 }
 
 // GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (s String) GoLowerCase() string {
-	return gocase.To(strcase.ToLowerCamel(string(s)))
+	return gocase.ToLower(string(s))
 }
 
 // CamelCase transforms strings into camelCase casing. It is often used for json mappings.
@@ -39,7 +39,7 @@ func (s String) Tag(isRequired bool) string {
 
 // PrismaGoCase transforms `relevance` into `Relevance_`
 func (s String) PrismaGoCase() string {
-	return strcase.ToCamel(string(s)) + "_"
+	return strcase.ToUpperCamel(string(s)) + "_"
 }
 
 // PrismaInternalCase transforms `relevance` into `_relevance`
@@ -75,17 +75,17 @@ func (t Type) Value() string {
 		return v
 	}
 
-	return gocase.To(strcase.ToCamel(str))
+	return gocase.ToUpper(strcase.ToUpperCamel(str))
 }
 
 // GoCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (t Type) GoCase() string {
-	return gocase.To(strcase.ToCamel(string(t)))
+	return gocase.ToUpper(string(t))
 }
 
 // GoLowerCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.
 func (t Type) GoLowerCase() string {
-	return gocase.To(strcase.ToLowerCamel(string(t)))
+	return gocase.ToLower(string(t))
 }
 
 // CamelCase transforms strings into camelCase casing. It is often used for json mappings.
