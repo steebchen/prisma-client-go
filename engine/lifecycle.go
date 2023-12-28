@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -202,18 +201,7 @@ func (e *QueryEngine) GetEncodedDatasources() (string, error) {
 	}
 
 	for i := range datasources {
-		if env := datasources[i].URL.FromEnvVar; env != "" {
-			url := os.Getenv(env)
-			if url == "" {
-				log.Printf("WARNING: env var %s which was defined in the Prisma schema is not set", env)
-				continue
-				// return "", fmt.Errorf("env var %s which was defined in the Prisma schema is not set", env)
-			}
-			overrides = append(overrides, DatasourceOverride{
-				Name: datasources[i].Name.String(),
-				URL:  url,
-			})
-		} else {
+		if val := datasources[i].URL.Value; val != "" {
 			overrides = append(overrides, DatasourceOverride{
 				Name: datasources[i].Name.String(),
 				URL:  e.datasourceURL,
