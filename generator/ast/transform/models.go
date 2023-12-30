@@ -20,7 +20,7 @@ func (m Model) CompoundKeys() []Index {
 
 	if m.OldModel.PrimaryKey.Name != "" {
 		items = append(items, Index{
-			Name:         types.String(m.OldModel.PrimaryKey.Name.GoCase()),
+			Name:         m.OldModel.PrimaryKey.Name,
 			InternalName: m.OldModel.PrimaryKey.Name.String(),
 			Fields:       m.OldModel.PrimaryKey.Fields,
 		})
