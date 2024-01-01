@@ -23,7 +23,7 @@ A unique constraint violation happens when a query attempts to insert or update 
 ```go
 user, err := db.User.CreateOne(...).Exec(cxt)
 if err != nil {
-  if info, err := db.IsErrUniqueConstraint(); err != nil {
+  if info, err := db.IsErrUniqueConstraint(err); err != nil {
     // Fields exists for Postgres and SQLite
     log.Printf("unique constraint on the fields: %s", info.Fields)
 
