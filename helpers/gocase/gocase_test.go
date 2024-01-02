@@ -40,6 +40,7 @@ func TestConverter_ToLower(t *testing.T) {
 		{conv: dc, have: "anotherIdStuffSomethingId", want: "anotherIDStuffSomethingID"},
 		{conv: dc, have: "anotherIdStuffSomethingId", want: "anotherIDStuffSomethingID"},
 		{conv: dc, have: "another_id_stuff_something_id", want: "anotherIDStuffSomethingID"},
+		// {conv: dc, have: "APISession", want: "apiSession"},
 
 		// {conv: cc, have: "JsonFile", want: "jsonFile"},
 		// {conv: cc, have: "CsvFile", want: "csvFile"},
@@ -90,6 +91,7 @@ func TestConverter_ToUpper(t *testing.T) {
 		{conv: dc, have: "anotherIdStuffSomethingId", want: "AnotherIDStuffSomethingID"},
 		{conv: dc, have: "anotherIdStuffSomethingId", want: "AnotherIDStuffSomethingID"},
 		{conv: dc, have: "another_id_stuff_something_id", want: "AnotherIDStuffSomethingID"},
+		{conv: dc, have: "APISession", want: "APISession"},
 
 		{conv: cc, have: "JsonFile", want: "JSONFile"},
 		{conv: cc, have: "CsvFile", want: "CSVFile"},

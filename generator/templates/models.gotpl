@@ -37,7 +37,7 @@
 	type Relations{{ $model.Name.GoCase }} struct {
 		{{ range $field := $model.Fields }}
 			{{- if $field.Kind.IsRelation }}
-				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.Value }}Model {{ $field.Name.Tag false }}
+				{{ $field.Name.GoCase }} {{ if $field.IsList }}[]{{ else }}*{{ end }}{{ $field.Type.GoCase }}Model {{ $field.Name.Tag false }}
 			{{- end -}}
 		{{ end }}
 	}
@@ -46,7 +46,7 @@
 	{{- range $field := $model.Fields }}
 		{{- if or (not $field.IsRequired) ($field.Kind.IsRelation) }}
 			func (r {{ $model.Name.GoCase }}Model) {{ $field.Name.GoCase }}() (
-				{{- if $field.IsList }}value []{{ else }}value{{ end }} {{ if and $field.Kind.IsRelation (not $field.IsList) }}*{{ end }}{{ $field.Type.Value }}{{ if $field.Kind.IsRelation }}Model{{ end -}}
+				{{- if $field.IsList }}value []{{ else }}value{{ end }} {{ if and $field.Kind.IsRelation (not $field.IsList) }}*{{ end }}{{ $field.Type.GoCase }}{{ if $field.Kind.IsRelation }}Model{{ end -}}
 				{{- if or (not $field.Kind.IsRelation) (and (not $field.IsList) (not $field.IsRequired)) -}}
 					, ok bool
 				{{- end -}}
