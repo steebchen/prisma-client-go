@@ -34,6 +34,11 @@ const RFC3339Milli = types.RFC3339Milli
 
 type BatchResult = types.BatchResult
 
+type Boolean  = bool
+type String   = string
+type Int      = int
+type Float    = float64
+
 type DateTime = types.DateTime
 type JSON     = types.JSON
 type Bytes    = types.Bytes

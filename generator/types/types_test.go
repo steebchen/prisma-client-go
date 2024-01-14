@@ -18,6 +18,9 @@ func TestString_GoCase(t *testing.T) {
 	}, {
 		have: "anotherIdStuffSomethingId",
 		want: "AnotherIDStuffSomethingID",
+	}, {
+		have: "APISession",
+		want: "APISession",
 	}}
 	for _, tt := range tests {
 		t.Run(fmt.Sprintf("%s -> %s", tt.have, tt.want), func(t *testing.T) {

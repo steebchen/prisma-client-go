@@ -18,8 +18,22 @@ model User {
   somethingId    String?
   anotherIdStuff String?
 
+  apiStuff APIStuff? @relation(fields: [somethingId], references: [id])
+
   @@id([firstName, lastName])
   @@unique([firstName, middleName, lastName])
   @@unique([somethingId, anotherIdStuff])
   @@unique([anotherIdStuff, somethingId], name: "anotherIDStuffSomethingID")
+}
+
+// TODO put this somewhere else
+model APIStuff {
+  id String @id @default(uuid())
+
+  somethingId String?
+  anotherID   String?
+  idSome      String?
+  IPSome      String?
+
+  users User[]
 }

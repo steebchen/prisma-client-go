@@ -265,7 +265,7 @@
 				}
 
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
-				func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				func (r {{ $struct }}) SetIfPresent(value *{{ if $field.IsList }}[]{{ else }}{{ end }}{{ $field.Type.GoCase }}) {{ $setReturnStruct }} {
 					if value == nil {
 						return {{ $setReturnStruct }}{}
 					}
@@ -276,7 +276,7 @@
 
 			{{ if and (not $field.IsRequired) (not $field.IsList) (not $field.Prisma) }}
 				// Set the optional value of {{ $field.Name.GoCase }} dynamically
-				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.Value }}) {{ $setReturnStruct }} {
+				func (r {{ $struct }}) SetOptional(value *{{ $field.Type.GoCase }}) {{ $setReturnStruct }} {
 					if value == nil {
 						{{/* nil value of type */}}
 						var v *{{ $field.Type.Value }}
@@ -367,7 +367,7 @@
 			}
 
 			{{ if and (not $field.IsRequired) (not $field.Prisma) }}
-				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.Value }}) {{ $returnStruct }} {
+				func (r {{ $struct }}) EqualsOptional(value *{{ $field.Type.GoCase }}) {{ $returnStruct }} {
 					return {{ $returnStruct }}{
 						data: builder.Field{
 							Name:  "{{ $field.Name }}",
