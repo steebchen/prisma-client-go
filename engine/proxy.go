@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/steebchen/prisma-client-go/binaries"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/logger"
 	"github.com/steebchen/prisma-client-go/runtime/types"
 )
@@ -108,7 +109,7 @@ func (e *DataProxyEngine) Do(ctx context.Context, payload interface{}, into inte
 
 	startParse := time.Now()
 
-	var response GQLResponse
+	var response protocol.GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
 		return fmt.Errorf("json gql resopnse unmarshal: %w", err)
 	}

@@ -452,5 +452,10 @@
 				}
 			{{ end }}
 		{{ end }}
+
+		{{/* Returns static field names */}}
+		func (r {{ $struct }}) Field() {{ $model.Name.GoLowerCase }}PrismaFields {
+			return {{ $model.Name.GoLowerCase }}Field{{ $field.Name.GoCase }}
+		}
 	{{ end }}
 {{ end }}

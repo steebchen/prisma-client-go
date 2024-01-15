@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/runtime/builder"
 )
 
@@ -27,17 +28,17 @@ func (r TX) Transaction(queries ...Param) Exec {
 type Exec struct {
 	queries  []Param
 	engine   engine.Engine
-	requests []engine.GQLRequest
+	requests []protocol.GQLRequest
 }
 
 func (r Exec) Exec(ctx context.Context) error {
-	r.requests = make([]engine.GQLRequest, len(r.queries))
+	r.requests = make([]protocol.GQLRequest, len(r.queries))
 	for i, query := range r.queries {
 		str, err := query.ExtractQuery().Build()
 		if err != nil {
 			return err
 		}
-		r.requests[i] = engine.GQLRequest{
+		r.requests[i] = protocol.GQLRequest{
 			Query:     str,
 			Variables: map[string]interface{}{},
 		}
@@ -48,8 +49,8 @@ func (r Exec) Exec(ctx context.Context) error {
 		defer close(q.ExtractQuery().TxResult)
 	}
 
-	var result engine.GQLBatchResponse
-	payload := engine.GQLBatchRequest{
+	var result protocol.GQLBatchResponse
+	payload := protocol.GQLBatchRequest{
 		Batch:       r.requests,
 		Transaction: true,
 	}

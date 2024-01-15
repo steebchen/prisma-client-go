@@ -78,6 +78,7 @@ func generateClient(input *Root) error {
 		"client",
 		"enums",
 		"errors",
+		"fields",
 		"mock",
 		"models",
 		"query",

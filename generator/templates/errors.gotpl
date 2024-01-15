@@ -1,1 +1,29 @@
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
+
 var ErrNotFound = types.ErrNotFound
+var IsErrNotFound = types.IsErrNotFound
+
+type ErrUniqueConstraint = types.ErrUniqueConstraint[prismaFields]
+
+// IsErrUniqueConstraint returns on a unique constraint error or violation with error info
+// Use as follows:
+//
+//	user, err := db.User.CreateOne(...).Exec(cxt)
+//	if err != nil {
+//		if info, err := db.IsErrUniqueConstraint(err); err != nil {
+//			// Fields exists for Postgres and SQLite
+//			log.Printf("unique constraint on the fields: %s", info.Fields)
+//
+//			// you can also compare it with generated field names:
+//			if info.Fields[0] == db.User.Name.Field() {
+//				// do something
+//			}
+//
+//			// For MySQL, use the constraint key
+//			log.Printf("unique constraint on the key: %s", info.Key)
+//		}
+//	}
+//
+func IsErrUniqueConstraint(err error) (*types.ErrUniqueConstraint[prismaFields], bool) {
+	return types.CheckUniqueConstraint[prismaFields](err)
+}

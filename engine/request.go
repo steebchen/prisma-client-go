@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/logger"
 	"github.com/steebchen/prisma-client-go/runtime/types"
 )
@@ -28,18 +29,23 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 
 	startParse := time.Now()
 
-	var response GQLResponse
+	var response protocol.GQLResponse
 	if err := json.Unmarshal(body, &response); err != nil {
 		return fmt.Errorf("json gql response unmarshal: %w", err)
 	}
 
 	if len(response.Errors) > 0 {
-		first := response.Errors[0]
-		if first.RawMessage() == internalUpdateNotFoundMessage ||
-			first.RawMessage() == internalDeleteNotFoundMessage {
+		e := response.Errors[0]
+		if e.RawMessage() == internalUpdateNotFoundMessage ||
+			e.RawMessage() == internalDeleteNotFoundMessage {
 			return types.ErrNotFound
 		}
-		return fmt.Errorf("pql error: %s", first.RawMessage())
+
+		if e.UserFacingError != nil {
+			return fmt.Errorf("user facing error: %w", e.UserFacingError)
+		}
+
+		return fmt.Errorf("internal error: %s", e.RawMessage())
 	}
 
 	response.Data.Result, err = transformResponse(response.Data.Result)

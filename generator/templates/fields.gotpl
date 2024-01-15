@@ -1,0 +1,11 @@
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
+
+type prismaFields string
+
+{{ range $model := $.AST.Models }}
+	type {{ $model.Name.GoLowerCase }}PrismaFields = prismaFields
+
+	{{ range $field := $model.Fields }}
+		const {{ $model.Name.GoLowerCase }}Field{{ $field.Name.GoCase }} {{ $model.Name.GoLowerCase }}PrismaFields = "{{ $field.Name }}"
+	{{ end }}
+{{ end }}

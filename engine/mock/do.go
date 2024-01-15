@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 )
 
 func (e *Engine) Do(_ context.Context, payload interface{}, v interface{}) error {
@@ -16,7 +16,7 @@ func (e *Engine) Do(_ context.Context, payload interface{}, v interface{}) error
 
 	n := -1
 	for i, e := range expectations {
-		req := payload.(engine.GQLRequest)
+		req := payload.(protocol.GQLRequest)
 		str, err := e.Query.Build()
 		if err != nil {
 			return err

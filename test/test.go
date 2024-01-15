@@ -10,6 +10,7 @@ import (
 
 	"github.com/steebchen/prisma-client-go/cli"
 	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/test/cmd"
 	"github.com/steebchen/prisma-client-go/test/setup/mongodb"
 	"github.com/steebchen/prisma-client-go/test/setup/mysql"
@@ -71,8 +72,8 @@ func Start(t *testing.T, db Database, e engine.Engine, queries []string) string 
 	}
 
 	for _, q := range queries {
-		var response engine.GQLResponse
-		payload := engine.GQLRequest{
+		var response protocol.GQLResponse
+		payload := protocol.GQLRequest{
 			Query:     q,
 			Variables: map[string]interface{}{},
 		}

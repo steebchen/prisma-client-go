@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/steebchen/prisma-client-go/engine"
+	"github.com/steebchen/prisma-client-go/engine/protocol"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
@@ -294,7 +295,7 @@ func (q Query) Exec(ctx context.Context, into interface{}) error {
 	if err != nil {
 		return err
 	}
-	payload := engine.GQLRequest{
+	payload := protocol.GQLRequest{
 		Query:     str,
 		Variables: map[string]interface{}{},
 	}
