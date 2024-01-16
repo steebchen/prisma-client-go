@@ -29,8 +29,8 @@ dependencies:
 
 devDependencies:
   '@types/node':
-    specifier: 20.11.2
-    version: 20.11.2
+    specifier: 20.11.4
+    version: 20.11.4
   next-sitemap:
     specifier: 4.2.3
     version: 4.2.3(next@14.0.4)
@@ -425,8 +425,8 @@ packages:
     resolution: {integrity: sha512-xPSg0jm4mqgEkNhowKgZFBNtwoEwF6gJ4Dhww+GFpm3IgtNseHQZ5IqdNwnquZEoANxyDAKDRAdVo4Z72VvD/g==}
     dev: false
 
-  /@types/node@20.11.2:
-    resolution: {integrity: sha512-cZShBaVa+UO1LjWWBPmWRR4+/eY/JR/UIEcDlVsw3okjWEu+rB7/mH6X3B/L+qJVHDLjk9QW/y2upp9wp1yDXA==}
+  /@types/node@20.11.4:
+    resolution: {integrity: sha512-6I0fMH8Aoy2lOejL3s4LhyIYX34DPwY8bl5xlNjBvUEk8OHrcuzsFt+Ied4LvJihbtXPM+8zUqdydfIti86v9g==}
     dependencies:
       undici-types: 5.26.5
     dev: true
