@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@types/gtag.js": "0.0.18",
-    "@vercel/analytics": "1.1.1",
+    "@vercel/analytics": "1.1.2",
     "next": "14.0.4",
     "nextra": "2.13.1",
     "nextra-theme-docs": "2.13.1",
