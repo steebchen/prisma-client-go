@@ -29,7 +29,7 @@ jobs:
           cache: pnpm
           cache-dependency-path: ./docs/pnpm-lock.yaml
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ github.workspace }}/docs/.next/cache
           key: ${{ runner.os }}-nextjs-${{ hashFiles('docs/pnpm-lock.yaml') }}-${{ hashFiles('**/*.[jt]s', '**/*.[jt]sx', '**/*.md', '**/*.mdx') }}
