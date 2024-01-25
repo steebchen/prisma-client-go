@@ -11,7 +11,7 @@ jobs:
         with:
           go-version: '1.19'
 
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: changes
         with:
           filters: |
