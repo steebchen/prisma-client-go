@@ -26,7 +26,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}
       - name: Create Pull Request
         id: pr
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           title: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
           body: 'Upgrade prisma to `v${{ steps.publish.outputs.PRISMA_VERSION }}` with engine hash `${{ steps.publish.outputs.PRISMA_HASH }}`.'
