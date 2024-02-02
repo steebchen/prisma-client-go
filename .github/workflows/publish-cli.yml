@@ -29,7 +29,9 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           title: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
-          body: 'Upgrade prisma to `v${{ steps.publish.outputs.PRISMA_VERSION }}` with engine hash `${{ steps.publish.outputs.PRISMA_HASH }}`.'
+          body: |
+            Upgrade prisma to `v${{ steps.publish.outputs.PRISMA_VERSION }}` with engine hash `${{ steps.publish.outputs.PRISMA_HASH }}`.
+            Full release notes: [v${{ steps.publish.outputs.PRISMA_VERSION }}](https://github.com/prisma/prisma/releases/tag/${{ steps.publish.outputs.PRISMA_VERSION }}).
           commit-message: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
           token: ${{ secrets.GH_TOKEN }}
       - name: Enable auto-squash
