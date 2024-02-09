@@ -16,7 +16,7 @@ if err != nil {
 }
 ```
 
-## IsUniqueConstraintViolation
+## IsErrUniqueConstraint
 
 A unique constraint violation happens when a query attempts to insert or update a record with a value that already exists in the database, or in other words, violates a unique constraint.
 
