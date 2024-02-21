@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"sync"
 
 	"github.com/steebchen/prisma-client-go/logger"
 )
@@ -21,12 +22,16 @@ func (e *QueryEngine) streamStderr(cmd *exec.Cmd, onError chan<- string) error {
 		return fmt.Errorf("get stderr pipe: %w", err)
 	}
 
+	mu := &sync.Mutex{}
+
 	go func() {
 	outer:
 		for {
 			select {
 			case v := <-e.onEngineError:
+				mu.Lock()
 				e.lastEngineError = v
+				mu.Unlock()
 			case <-e.closed:
 				logger.Debug.Printf("query engine closed")
 				break outer
