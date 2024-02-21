@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+
+	"github.com/steebchen/prisma-client-go/logger"
 )
 
 type Messsage struct {
@@ -26,6 +28,7 @@ func (e *QueryEngine) streamStderr(cmd *exec.Cmd, onError chan<- string) error {
 			case v := <-e.onEngineError:
 				e.lastEngineError = v
 			case <-e.closed:
+				logger.Debug.Printf("query engine closed")
 				break outer
 			}
 		}
