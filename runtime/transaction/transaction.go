@@ -13,12 +13,15 @@ type TX struct {
 	Engine engine.Engine
 }
 
-type Param interface {
+// Deprecated: use Transaction instead
+type Param = Transaction
+
+type Transaction interface {
 	IsTx()
 	ExtractQuery() builder.Query
 }
 
-func (r TX) Transaction(queries ...Param) Exec {
+func (r TX) Transaction(queries ...Transaction) Exec {
 	return Exec{
 		engine:  r.Engine,
 		queries: queries,
@@ -26,7 +29,7 @@ func (r TX) Transaction(queries ...Param) Exec {
 }
 
 type Exec struct {
-	queries  []Param
+	queries  []Transaction
 	engine   engine.Engine
 	requests []protocol.GQLRequest
 }

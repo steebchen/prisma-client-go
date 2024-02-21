@@ -2,10 +2,10 @@
 
 {{ range $model := $.DMMF.Datamodel.Models }}
 	{{ range $t := $.DMMF.Types }}
-		{{ $name := print $model.Name.GoLowerCase $t }}
+		{{ $name := print $model.Name.GoCase $t }}
 		{{ $modelName := print $model.Name.GoCase "Model" }}
 
-		func New{{ $name }}TxResult() {{ $name }}TxResult {
+		func new{{ $name }}TxResult() {{ $name }}TxResult {
 			return {{ $name }}TxResult{
 				result: &transaction.Result{},
 			}
