@@ -21,10 +21,12 @@ import (
 )
 
 func (e *QueryEngine) Connect() error {
+	e.closed = make(chan interface{})
+
 	success := false
-	go func() {
+	defer func() {
 		if !success {
-			e.closed <- struct{}{}
+			close(e.closed)
 		}
 	}()
 
@@ -80,7 +82,7 @@ func (e *QueryEngine) Disconnect() error {
 		}
 	}
 
-	e.closed <- struct{}{}
+	close(e.closed)
 
 	logger.Debug.Printf("disconnected.")
 	return nil
@@ -238,7 +240,6 @@ func (e *QueryEngine) spawn(file string) error {
 	e.cmd.Stdout = os.Stdout
 
 	e.onEngineError = make(chan string)
-	e.closed = make(chan interface{})
 
 	if err := e.streamStderr(e.cmd, e.onEngineError); err != nil {
 		return fmt.Errorf("setup stream: %w", err)
