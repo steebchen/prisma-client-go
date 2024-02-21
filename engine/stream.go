@@ -26,7 +26,9 @@ func (e *QueryEngine) streamStderr(cmd *exec.Cmd, onError chan<- string) error {
 		for {
 			select {
 			case v := <-e.onEngineError:
+				e.mu.Lock()
 				e.lastEngineError = v
+				e.mu.Unlock()
 			case <-e.closed:
 				logger.Debug.Printf("query engine closed")
 				break outer

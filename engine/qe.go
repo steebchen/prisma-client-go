@@ -3,6 +3,7 @@ package engine
 import (
 	"net/http"
 	"os/exec"
+	"sync"
 )
 
 func NewQueryEngine(schema string, hasBinaryTargets bool, datasources string, datasourceURL string) *QueryEngine {
@@ -52,6 +53,8 @@ type QueryEngine struct {
 
 	// lastEngineError contains the last received error
 	lastEngineError string
+
+	mu sync.Mutex
 }
 
 func (e *QueryEngine) Name() string {
