@@ -286,10 +286,13 @@ func (e *QueryEngine) spawn(file string) error {
 	// send a basic readiness healthcheck and retry if unsuccessful
 	var connectErr error
 	for i := 0; i < 100; i++ {
+		e.mu.Lock()
 		// return an error early if an engine error already happened
 		if e.lastEngineError != "" {
+			e.mu.Unlock()
 			return fmt.Errorf("query engine errored: %w", fmt.Errorf(e.lastEngineError))
 		}
+		e.mu.Unlock()
 
 		body, err := e.Request(context.Background(), "GET", "/status", map[string]interface{}{}, false)
 		if err != nil {
