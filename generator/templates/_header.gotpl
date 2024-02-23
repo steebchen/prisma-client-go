@@ -30,7 +30,7 @@ var _ = os.DevNull
 // re-declare variables which are needed in Prisma Client Go but also should be exported
 // in the generated client
 
-type Transaction = transaction.Transaction
+type PrismaTransaction = transaction.Transaction
 
 const RFC3339Milli = types.RFC3339Milli
 
