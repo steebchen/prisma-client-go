@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -236,6 +237,10 @@ func (e *QueryEngine) spawn(file string) error {
 	e.httpURL = "http://localhost:" + port
 
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
+
+	e.cmd.SysProcAttr = &syscall.SysProcAttr{
+		Setpgid: true,
+	}
 
 	e.cmd.Stdout = os.Stdout
 
