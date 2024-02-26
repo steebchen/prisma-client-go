@@ -237,6 +237,8 @@ func (e *QueryEngine) spawn(file string) error {
 
 	e.cmd = exec.Command(file, "-p", port, "--enable-raw-queries")
 
+	e.cmd.SysProcAttr = getSysProcAttr()
+
 	e.cmd.Stdout = os.Stdout
 
 	e.onEngineError = make(chan string)
