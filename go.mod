@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/joho/godotenv v1.5.1
 	github.com/shopspring/decimal v1.3.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
