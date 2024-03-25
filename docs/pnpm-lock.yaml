@@ -1439,8 +1439,8 @@ packages:
     resolution: {integrity: sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==}
     dev: false
 
-  /katex@0.16.8:
-    resolution: {integrity: sha512-ftuDnJbcbOckGY11OO+zg3OofESlbR5DRl2cmN8HeWeeFIV7wTXvAOx8kEjZjobhA+9wh2fbKeO6cdcA9Mnovg==}
+  /katex@0.16.10:
+    resolution: {integrity: sha512-ZiqaC04tp2O5utMsl2TEZTXxa6WSC4yo0fv5ML++D3QZv/vx2Mct0mTlRx3O+uUkjfuAgOkzsCmq5MiUEsDDdA==}
     hasBin: true
     dependencies:
       commander: 8.3.0
@@ -1922,7 +1922,7 @@ packages:
     dependencies:
       '@types/katex': 0.16.3
       devlop: 1.1.0
-      katex: 0.16.8
+      katex: 0.16.10
       micromark-factory-space: 2.0.0
       micromark-util-character: 2.0.1
       micromark-util-symbol: 2.0.0
@@ -2488,7 +2488,7 @@ packages:
       github-slugger: 2.0.0
       graceful-fs: 4.2.11
       gray-matter: 4.0.3
-      katex: 0.16.8
+      katex: 0.16.10
       lodash.get: 4.4.2
       next: 14.1.4(react-dom@18.2.0)(react@18.2.0)
       next-mdx-remote: 4.4.1(react-dom@18.2.0)(react@18.2.0)
@@ -2649,7 +2649,7 @@ packages:
       '@types/katex': 0.16.3
       hast-util-from-html-isomorphic: 2.0.0
       hast-util-to-text: 4.0.0
-      katex: 0.16.8
+      katex: 0.16.10
       unist-util-visit-parents: 6.0.1
       vfile: 6.0.1
     dev: false
