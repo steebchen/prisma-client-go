@@ -8,6 +8,7 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"os"
+	"slices"
 	"testing"
 
 	// no-op import for go modules
