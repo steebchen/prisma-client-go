@@ -47,7 +47,7 @@ binary and not the whole build environment. However, you need to have some
 extra steps in place, such as copying SSL certificates.
 
 ```dockerfile
-FROM golang:1.19.5-buster as builder
+FROM golang:1.21.5-buster as builder
 
 WORKDIR /workspace
 
