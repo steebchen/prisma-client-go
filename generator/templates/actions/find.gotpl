@@ -107,6 +107,20 @@
 				return r
 			}
 
+			func (r {{ $result }}) Select(params ...{{ $model.Name.GoLowerCase }}PrismaFields) {{ $result }} {
+				var outputs []builder.Output
+
+				for _, param := range params {
+					outputs = append(outputs, builder.Output{
+						Name: string(param),
+					})
+				}
+
+				r.query.Outputs = outputs
+
+				return r
+			}
+
 			func (r {{ $result }}) Omit(params ...{{ $model.Name.GoLowerCase }}PrismaFields) {{ $result }} {
 				var outputs []builder.Output
 
