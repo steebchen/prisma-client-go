@@ -10,7 +10,7 @@
     "next": "14.2.3",
     "nextra": "2.13.1",
     "nextra-theme-docs": "2.13.1",
-    "react": "18.3.0",
+    "react": "18.3.1",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
