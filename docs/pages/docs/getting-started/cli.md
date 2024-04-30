@@ -18,7 +18,7 @@ go run github.com/steebchen/prisma-client-go db push
 # create a prisma schema from your existing database
 go run github.com/steebchen/prisma-client-go db pull
 
-# for production use, create a migration locally
+# for development use, create a migration locally
 go run github.com/steebchen/prisma-client-go migrate dev
 
 # sync your production database with your migrations
