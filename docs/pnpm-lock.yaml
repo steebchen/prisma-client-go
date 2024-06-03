@@ -6,8 +6,8 @@ settings:
 
 dependencies:
   '@types/gtag.js':
-    specifier: 0.0.19
-    version: 0.0.19
+    specifier: 0.0.20
+    version: 0.0.20
   '@vercel/speed-insights':
     specifier: 1.0.11
     version: 1.0.11(next@14.2.3)(react@18.3.1)
@@ -385,8 +385,8 @@ packages:
     resolution: {integrity: sha512-VeiPZ9MMwXjO32/Xu7+OwflfmeoRwkE/qzndw42gGtgJwZopBnzy2gD//NN1+go1mADzkDcqf/KnFRSjTJ8xJA==}
     dev: false
 
-  /@types/gtag.js@0.0.19:
-    resolution: {integrity: sha512-KHoDzrf9rSd0mooKN576PjExpdk/XRrNu4RQnmigsScSTSidwyOUe9kDrHz9UPKjiBrx2QEsSkexbJSgS0j72w==}
+  /@types/gtag.js@0.0.20:
+    resolution: {integrity: sha512-wwAbk3SA2QeU67unN7zPxjEHmPmlXwZXZvQEpbEUQuMCRGgKyE1m6XDuTUA9b6pCGb/GqJmdfMOY5LuDjJSbbg==}
     dev: false
 
   /@types/hast@2.3.6:

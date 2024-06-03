@@ -5,7 +5,7 @@
     "build": "npx next build && next-sitemap"
   },
   "dependencies": {
-    "@types/gtag.js": "0.0.19",
+    "@types/gtag.js": "0.0.20",
     "@vercel/speed-insights": "1.0.11",
     "next": "14.2.3",
     "nextra": "2.13.1",
