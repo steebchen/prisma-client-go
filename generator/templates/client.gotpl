@@ -46,7 +46,7 @@ func NewClient(options ...func(config *PrismaConfig)) *PrismaClient {
 			url = os.Getenv(schemaEnvVarName)
 			if url == "" {
 				//panic("no connection string found")
-				println("WARNING: env var which was defined in the Prisma schema is not set" + schemaEnvVarName)
+				println("WARNING: env var which was defined in the Prisma schema is not set " + schemaEnvVarName)
 			}
 		}
 	}
