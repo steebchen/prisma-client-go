@@ -24,6 +24,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-west-1
           AWS_ACCESS_KEY_ID: ${{ secrets.PRISMA_CLI_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Create Pull Request
         id: pr
         uses: peter-evans/create-pull-request@v6
