@@ -7,7 +7,7 @@
   "dependencies": {
     "@types/gtag.js": "0.0.20",
     "@vercel/speed-insights": "1.0.11",
-    "next": "14.2.3",
+    "next": "14.2.4",
     "nextra": "2.13.1",
     "nextra-theme-docs": "2.13.1",
     "react": "18.3.1",
