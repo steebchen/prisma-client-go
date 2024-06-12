@@ -9,8 +9,8 @@ dependencies:
     specifier: 0.0.20
     version: 0.0.20
   '@vercel/speed-insights':
-    specifier: 1.0.11
-    version: 1.0.11(next@14.2.4)(react@18.3.1)
+    specifier: 1.0.12
+    version: 1.0.12(next@14.2.4)(react@18.3.1)
   next:
     specifier: 14.2.4
     version: 14.2.4(react-dom@18.3.1)(react@18.3.1)
@@ -463,8 +463,8 @@ packages:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: false
 
-  /@vercel/speed-insights@1.0.11(next@14.2.4)(react@18.3.1):
-    resolution: {integrity: sha512-l9hzSNmJvb2Yqpgd/BzpiT0J0aQDdtqxOf3Xm+iW4PICxVvhY1ef7Otdx4GXI+88dVkws57qMzXiShz19gXzSQ==}
+  /@vercel/speed-insights@1.0.12(next@14.2.4)(react@18.3.1):
+    resolution: {integrity: sha512-ZGQ+a7bcfWJD2VYEp2R1LHvRAMyyaFBYytZXsfnbOMkeOvzGNVxUL7aVUvisIrTZjXTSsxG45DKX7yiw6nq2Jw==}
     requiresBuild: true
     peerDependencies:
       '@sveltejs/kit': ^1 || ^2
