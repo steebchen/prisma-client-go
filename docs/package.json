@@ -16,6 +16,6 @@
   "devDependencies": {
     "@types/node": "20.14.9",
     "next-sitemap": "4.2.3",
-    "typescript": "5.5.2"
+    "typescript": "5.5.3"
   }
 }
