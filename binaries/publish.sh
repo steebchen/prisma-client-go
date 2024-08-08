@@ -98,5 +98,5 @@ if [[ $CI == 'true' ]]; then
   sed -i '' -e "s/const EngineVersion = \".*\"/const EngineVersion = \"$hash\"/g" version.go
   sed -i '' -e "s/const PrismaVersion = \".*\"/const PrismaVersion = \"$version\"/g" version.go
 
-  # changes are picked up by GitHub actions
+  echo "trigger_pr=true" >> $GITHUB_ENV
 fi
