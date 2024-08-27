@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/steebchen/prisma-client-go/engine"
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
@@ -19,6 +20,10 @@ func (r *Result) Get(c <-chan []byte, v interface{}) error {
 		data, ok := <-c
 		if !ok {
 			return fmt.Errorf("result not fetched")
+		}
+		data, err := engine.TransformResponse(data)
+		if err != nil {
+			return fmt.Errorf("could not transform response: %w", err)
 		}
 		res = data
 		r.cache = data

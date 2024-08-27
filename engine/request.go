@@ -48,7 +48,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		return fmt.Errorf("internal error: %s", e.RawMessage())
 	}
 
-	response.Data.Result, err = transformResponse(response.Data.Result)
+	response.Data.Result, err = TransformResponse(response.Data.Result)
 	if err != nil {
 		return fmt.Errorf("transform response: %w", err)
 	}
@@ -69,7 +69,7 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 		return fmt.Errorf("request failed: %w", err)
 	}
 
-	body, err = transformResponse(body)
+	body, err = TransformResponse(body)
 	if err != nil {
 		return fmt.Errorf("transform response: %w", err)
 	}
