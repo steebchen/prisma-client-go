@@ -281,12 +281,18 @@ func checkFields(parent Field, fields []Field) error {
 	uniqueObjectFields := make(map[string]Field)
 	for _, f := range fields {
 		if f.Value != nil && !f.List && !parent.List {
+			if f.Name == "mode" {
+				continue
+			}
+
 			if _, ok := uniqueObjectFields[f.Name]; ok {
 				return fmt.Errorf("%w: %q", ErrDuplicateField, f.Name)
 			}
+
 			uniqueObjectFields[f.Name] = f
 		}
 	}
+
 	return nil
 }
 
