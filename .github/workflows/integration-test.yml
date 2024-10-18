@@ -7,6 +7,8 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-13]
 
+    name: integration-${{ contains(matrix.os, 'ubuntu') && 'ubuntu' || contains(matrix.os, 'windows') && 'windows' || contains(matrix.os, 'macos') && 'macos' }}
+
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -42,7 +44,7 @@ jobs:
         run: docker build . --build-arg IMAGE="golang:1" -f test/integration/integration.dockerfile -t integration && docker run integration
 
   integration-alpine:
-    name: "integration (alpine)"
+    name: "integration-alpine"
     runs-on: ubuntu-latest
 
     steps:
