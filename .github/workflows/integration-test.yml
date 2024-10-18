@@ -2,7 +2,6 @@ name: integration test all
 on: pull_request
 jobs:
   integration:
-    timeout-minutes: 40
     strategy:
       fail-fast: false
       matrix:
