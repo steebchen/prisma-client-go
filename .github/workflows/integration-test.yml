@@ -5,7 +5,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-12]
+        os: [ubuntu-latest, windows-latest, macos-13]
 
     runs-on: ${{ matrix.os }}
 
@@ -27,13 +27,7 @@ jobs:
       # fix for GitHub actions MacOS
       - name: Setup docker
         if: runner.os == 'macos' && steps.changes.outputs.go == 'true'
-        run: |
-          brew install docker
-          colima start
-
-          # For testcontainers to find the Colima socket
-          # https://github.com/abiosoft/colima/blob/main/docs/FAQ.md#cannot-connect-to-the-docker-daemon-at-unixvarrundockersock-is-the-docker-daemon-running
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
+        uses: douglascamata/setup-docker-macos-action@v1-alpha
 
       - uses: actions/cache@v4
         with:
@@ -65,17 +59,6 @@ jobs:
               - '**/*.mod'
               - '**/*.sum'
               - '**/*.work'
-
-      # fix for GitHub actions MacOS
-      - name: Setup docker
-        if: runner.os == 'macos' && steps.changes.outputs.go == 'true'
-        run: |
-          brew install docker
-          colima start
-
-          # For testcontainers to find the Colima socket
-          # https://github.com/abiosoft/colima/blob/main/docs/FAQ.md#cannot-connect-to-the-docker-daemon-at-unixvarrundockersock-is-the-docker-daemon-running
-          sudo ln -sf $HOME/.colima/default/docker.sock /var/run/docker.sock
 
       - uses: actions/cache@v4
         with:
