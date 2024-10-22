@@ -7,11 +7,11 @@
   "dependencies": {
     "@types/gtag.js": "0.0.20",
     "@vercel/speed-insights": "1.0.13",
-    "next": "14.2.15",
+    "next": "15.0.0",
     "nextra": "2.13.1",
     "nextra-theme-docs": "2.13.1",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react": "19.0.0-rc-65a56d0e-20241020",
+    "react-dom": "19.0.0-rc-65a56d0e-20241020"
   },
   "devDependencies": {
     "@types/node": "22.7.8",
