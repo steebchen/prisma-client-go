@@ -36,4 +36,4 @@ alias prisma="go run github.com/steebchen/prisma-client-go"
 ```
 
 Now `prisma generate` and any other command will work, and it'll just run
-1`go run github.com/steebchen/prisma-client-go generate` under the hood.
+`go run github.com/steebchen/prisma-client-go generate` under the hood.
