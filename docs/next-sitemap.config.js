@@ -4,5 +4,6 @@ module.exports = {
   generateRobotsTxt: true,
   exclude: [
     '/docs/README',
+    '*/_meta',
   ],
 }
