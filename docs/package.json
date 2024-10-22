@@ -1,21 +1,24 @@
 {
   "scripts": {
     "dev": "next dev",
+    "start": "next start",
     "test": "npm run build",
-    "build": "npx next build && next-sitemap"
+    "build": "npx next build && next-sitemap",
+    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"
   },
   "dependencies": {
-    "@types/gtag.js": "0.0.20",
-    "@vercel/speed-insights": "1.0.13",
     "next": "14.2.15",
-    "nextra": "2.13.1",
-    "nextra-theme-docs": "2.13.1",
+    "nextra": "4.0.0-app-router.11",
+    "nextra-theme-docs": "4.0.0-app-router.11",
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@types/gtag.js": "0.0.20",
     "@types/node": "22.7.8",
+    "@types/react": "18.3.11",
     "next-sitemap": "4.2.3",
+    "pagefind": "1.1.1",
     "typescript": "5.6.3"
   }
 }

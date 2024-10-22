@@ -1,4 +1,4 @@
-# Deploy
+# Deploying Best Practices
 
 ## Best practices
 
