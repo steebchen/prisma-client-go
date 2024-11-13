@@ -60,18 +60,20 @@ type Mappings struct {
 }
 
 type ModelOperation struct {
-	Model      types.String `json:"model"`
-	Aggregate  types.String `json:"aggregate"`
-	CreateOne  types.String `json:"createOne"`
-	DeleteMany types.String `json:"deleteMany"`
-	DeleteOne  types.String `json:"deleteOne"`
-	FindFirst  types.String `json:"findFirst"`
-	FindMany   types.String `json:"findMany"`
-	FindUnique types.String `json:"findUnique"`
-	GroupBy    types.String `json:"groupBy"`
-	UpdateMany types.String `json:"updateMany"`
-	UpdateOne  types.String `json:"updateOne"`
-	UpsertOne  types.String `json:"upsertOne"`
+	Model        types.String `json:"model"`
+	Aggregate    types.String `json:"aggregate"`
+	CreateOne    types.String `json:"createOne"`
+	DeleteMany   types.String `json:"deleteMany"`
+	DeleteOne    types.String `json:"deleteOne"`
+	FindFirst    types.String `json:"findFirst"`
+	FindMany     types.String `json:"findMany"`
+	FindUnique   types.String `json:"findUnique"`
+	GroupBy      types.String `json:"groupBy"`
+	UpdateMany   types.String `json:"updateMany"`
+	UpdateOne    types.String `json:"updateOne"`
+	UpsertOne    types.String `json:"upsertOne"`
+	FindRaw      types.String `json:"findRaw"`      // MongoDB only
+	AggregateRaw types.String `json:"aggregateRaw"` // MongoDB only
 }
 
 func (m *ModelOperation) Namespace() string {

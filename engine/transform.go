@@ -2,6 +2,7 @@ package engine
 
 import (
 	"encoding/json"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"strings"
 )
 
@@ -36,44 +37,20 @@ func TransformSQLResponse(data []byte) ([]byte, error) {
 	return o, nil
 }
 
-type MongoCursor struct {
-	Cursor struct {
-		FirstBatch []map[string]interface{} `json:"firstBatch"`
-	} `json:"cursor"`
-}
-
 func TransformMongoResponse(data []byte) ([]byte, error) {
-	var mongoResponse MongoCursor
-	err := json.Unmarshal(data, &mongoResponse)
-	if err != nil {
+	var result []map[string]interface{}
+
+	if err := bson.UnmarshalExtJSON(data, false, &result); err != nil {
 		return nil, err
 	}
 
-	// Extract `firstBatch` and transform it into a more readable format
-	output := make([]map[string]interface{}, 0)
-	for _, doc := range mongoResponse.Cursor.FirstBatch {
-		// Create a new map to flatten `$oid` and `$date` fields
-		flattened := make(map[string]interface{})
-		for k, v := range doc {
-			switch val := v.(type) {
-			case map[string]interface{}:
-				// Handle special cases for `$oid` and `$date` fields
-				if oid, exists := val["$oid"]; exists {
-					flattened[k] = oid
-				} else if date, exists := val["$date"]; exists {
-					flattened[k] = date
-				} else {
-					flattened[k] = val
-				}
-			default:
-				flattened[k] = val
-			}
+	for _, doc := range result {
+		if doc["id"] == nil {
+			doc["id"] = doc["_id"]
 		}
-		output = append(output, flattened)
 	}
 
-	// Marshal the transformed output back to JSON=
-	o, err := json.Marshal(output)
+	o, err := json.Marshal(result)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +64,25 @@ func TransformResponse(data []byte) ([]byte, error) {
 	switch {
 	case strings.HasPrefix(string(data), `{"columns":[`):
 		return TransformSQLResponse(data)
-	case strings.Contains(string(data), `{"cursor":`):
+
+	// https://github.com/mongodb/mongo-go-driver/blob/91abd887f6b44ab56f47e58430f57b1be1996ceb/bson/extjson_wrappers.go#L18
+	case strings.Contains(string(data), `{"$oid":`),
+		strings.Contains(string(data), `{"$date":`),
+		strings.Contains(string(data), `{"$numberInt":`),
+		strings.Contains(string(data), `{"$numberLong":`),
+		strings.Contains(string(data), `{"$symbol":`),
+		strings.Contains(string(data), `{"$numberDouble":`),
+		strings.Contains(string(data), `{"$numberDecimal":`),
+		strings.Contains(string(data), `{"$binary":`),
+		strings.Contains(string(data), `{"$code":`),
+		strings.Contains(string(data), `{"$scope":`),
+		strings.Contains(string(data), `{"$timestamp":`),
+		strings.Contains(string(data), `{"$regularExpression":`),
+		strings.Contains(string(data), `{"$dbPointer":`),
+		strings.Contains(string(data), `{"$date":`),
+		strings.Contains(string(data), `{"$minKey":`),
+		strings.Contains(string(data), `{"$maxKey":`),
+		strings.Contains(string(data), `{"$undefined":`):
 		return TransformMongoResponse(data)
 	}
 

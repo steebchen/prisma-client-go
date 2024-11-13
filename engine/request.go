@@ -53,6 +53,8 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		return fmt.Errorf("transform response: %w", err)
 	}
 
+	fmt.Println("response.Data.Result", string(response.Data.Result))
+
 	if err := json.Unmarshal(response.Data.Result, v); err != nil {
 		return fmt.Errorf("json data result unmarshal: %w", err)
 	}
