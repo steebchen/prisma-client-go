@@ -41,7 +41,7 @@
 							})
 					}
 					return v
-    }
+		}
 
 		func (r {{ $ns }}) AggregateRaw(pipeline []interface{}, options ...interface{}) {{ $result }} {
 				var v {{ $result }}
@@ -52,9 +52,9 @@
 				v.query.Model = "{{ $model.Name.String }}"
 
 				parsedPip := []interface{}{}
-        for _, p := range pipeline {
-        		parsedPip = append(parsedPip, fmt.Sprintf("%v", p))
-        }
+				for _, p := range pipeline {
+					parsedPip = append(parsedPip, fmt.Sprintf("%v", p))
+				}
 
 				v.query.Inputs = append(v.query.Inputs, builder.Input{
 					Name:  "pipeline",
