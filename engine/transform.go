@@ -79,7 +79,6 @@ func TransformResponse(data []byte) ([]byte, error) {
 		strings.Contains(string(data), `{"$timestamp":`),
 		strings.Contains(string(data), `{"$regularExpression":`),
 		strings.Contains(string(data), `{"$dbPointer":`),
-		strings.Contains(string(data), `{"$date":`),
 		strings.Contains(string(data), `{"$minKey":`),
 		strings.Contains(string(data), `{"$maxKey":`),
 		strings.Contains(string(data), `{"$undefined":`):
