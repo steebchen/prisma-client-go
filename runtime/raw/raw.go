@@ -49,6 +49,20 @@ func doRaw(engine engine.Engine, action string, query string, params ...interfac
 	return q
 }
 
+func doCommandRaw(engine engine.Engine, action string, cmd string) builder.Query {
+	q := builder.NewQuery()
+	q.Engine = engine
+	q.Operation = "mutation"
+	q.Method = action
+
+	q.Inputs = append(q.Inputs, builder.Input{
+		Name:  "command",
+		Value: cmd,
+	})
+
+	return q
+}
+
 func convertType(input interface{}) string {
 	data, err := json.Marshal(input)
 	if err != nil {

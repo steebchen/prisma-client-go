@@ -1,0 +1,88 @@
+{{- /*gotype:github.com/steebchen/prisma-client-go/generator.Root*/ -}}
+
+{{ range $model := $.DMMF.Datamodel.Models }}
+		{{ $name := $model.Name.GoLowerCase }}
+		{{ $ns := (print $name "Actions") }}
+		{{ $result := (print $name "AggregateRaw") }}
+
+		type {{ $result }} struct {
+			query builder.Query
+		}
+
+		func (r {{ $result }}) getQuery() builder.Query {
+			return r.query
+		}
+
+		func (r {{ $result }}) ExtractQuery() builder.Query {
+			return r.query
+		}
+
+		func (r {{ $result }}) with() {}
+		func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Model() {}
+		func (r {{ $result }}) {{ $model.Name.GoLowerCase }}Relation() {}
+
+		func (r {{ $ns }}) FindRaw(filter interface{}, options ...interface{}) {{ $result }} {
+					var v {{ $result }}
+					v.query = builder.NewQuery()
+					v.query.Engine = r.client
+					v.query.Method = "findRaw"
+					v.query.Operation = "query"
+					v.query.Model = "{{ $model.Name.String }}"
+
+					v.query.Inputs = append(v.query.Inputs, builder.Input{
+						Name:  "filter",
+						Value: fmt.Sprintf("%v", filter),
+					})
+
+					if len(options) > 0 {
+							v.query.Inputs = append(v.query.Inputs, builder.Input{
+								Name:  "options",
+								Value: fmt.Sprintf("%v", options[0]),
+							})
+					}
+					return v
+		}
+
+		func (r {{ $ns }}) AggregateRaw(pipeline []interface{}, options ...interface{}) {{ $result }} {
+				var v {{ $result }}
+				v.query = builder.NewQuery()
+				v.query.Engine = r.client
+				v.query.Method = "aggregateRaw"
+				v.query.Operation = "query"
+				v.query.Model = "{{ $model.Name.String }}"
+
+				parsedPip := []interface{}{}
+				for _, p := range pipeline {
+					parsedPip = append(parsedPip, fmt.Sprintf("%v", p))
+				}
+
+				v.query.Inputs = append(v.query.Inputs, builder.Input{
+					Name:  "pipeline",
+					Value: parsedPip,
+				})
+
+				if len(options) > 0 {
+						v.query.Inputs = append(v.query.Inputs, builder.Input{
+							Name:  "options",
+							Value: fmt.Sprintf("%v", options[0]),
+						})
+				}
+				return v
+		}
+
+		func (r {{ $result }}) Exec(ctx context.Context) ([]{{ $model.Name.GoCase }}Model, error) {
+				var v []{{ $model.Name.GoCase }}Model
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return nil, err
+				}
+				return v, nil
+		}
+
+		func (r {{ $result }}) ExecInner(ctx context.Context) ([]Inner{{ $model.Name.GoCase }}, error) {
+				var v []Inner{{ $model.Name.GoCase }}
+				if err := r.query.Exec(ctx, &v); err != nil {
+					return nil, err
+				}
+				return v, nil
+		}
+{{ end }}
