@@ -11,7 +11,7 @@
     "nextra": "4.0.0-app-router.11",
     "nextra-theme-docs": "4.0.0-app-router.11",
     "react": "19.0.0-rc-65a56d0e-20241020",
-    "react-dom": "19.0.0-rc-65a56d0e-20241020"
+    "react-dom": "19.0.0"
   },
   "devDependencies": {
     "@types/gtag.js": "0.0.20",
