@@ -87,10 +87,13 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 		return nil, fmt.Errorf("client is not connected yet")
 	}
 
+	e.mu.RLock()
 	if e.disconnected {
+		e.mu.RUnlock()
 		logger.Info.Printf("A query was executed after Disconnect() was called. Make sure to not send any queries after calling .Prisma.Disconnect() the client.")
 		return nil, fmt.Errorf("client is already disconnected")
 	}
+	e.mu.RUnlock()
 
 	requestBody, err := json.Marshal(payload)
 	if err != nil {
