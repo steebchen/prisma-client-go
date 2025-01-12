@@ -1,5 +1,5 @@
 name: lint all
-on: pull_request
+on: pull_request_target
 jobs:
   lint:
     name: lint
