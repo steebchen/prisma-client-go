@@ -19,7 +19,6 @@ func TestDisconnectConcurrent(t *testing.T) {
 		client := NewClient()
 		mockDBName := test.Start(t, db, client.Engine, []string{})
 
-		// Create a record
 		a := "a"
 		b := "b"
 		created, err := client.User.CreateOne(
