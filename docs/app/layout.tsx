@@ -43,27 +43,29 @@ export default async function RootLayout({ children }) {
       <body>
         <Analytics>
           <Layout
+            footer={
+              <Footer>
+                <span>
+                  All source code and content licensed under&nbsp;
+                  <a href="https://github.com/steebchen/prisma-client-go/blob/main/LICENSE" target="_blank">
+                    Apache 2.0
+                  </a>
+                </span>
+              </Footer>
+            }
+            navbar={
+              <Navbar
+                logo={<div>Go Prisma</div>}
+                chatLink="https://discord.gg/er3ZbmYHDk"
+                projectLink="https://github.com/steebchen/prisma-client-go"
+              />
+            }
             editLink="Edit this page on GitHub"
             docsRepositoryBase="https://github.com/steebchen/prisma-client-go/tree/main/docs"
             sidebar={{ defaultMenuCollapseLevel: 1 }}
             pageMap={await getPageMap()}
           >
-            <Navbar
-              logo={<div>Go Prisma</div>}
-              chatLink="https://discord.gg/er3ZbmYHDk"
-              projectLink="https://github.com/steebchen/prisma-client-go"
-            />
-
             {children}
-
-            <Footer>
-              <span>
-                All source code and content licensed under&nbsp;
-                <a href="https://github.com/steebchen/prisma-client-go/blob/main/LICENSE" target="_blank">
-                  Apache 2.0
-                </a>
-              </span>
-            </Footer>
           </Layout>
         </Analytics>
       </body>
