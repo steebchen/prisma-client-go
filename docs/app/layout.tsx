@@ -1,11 +1,8 @@
 import { Footer, Layout, Navbar } from "nextra-theme-docs";
-import { Head } from "nextra/components";
 import { getPageMap } from "nextra/page-map";
 import "nextra-theme-docs/style.css";
 import Script from "next/script";
 import Analytics from "./analytics";
-
-export const { viewport } = Head;
 
 export const metadata = {
   title: {
