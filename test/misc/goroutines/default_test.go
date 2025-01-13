@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
 
@@ -50,7 +51,10 @@ func TestDisconnectConcurrent(t *testing.T) {
 				case <-closeCh:
 					loop = false
 				default:
-					client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
+					_, err := client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
+					if err != nil {
+						panic(fmt.Errorf("find unique failed: %w", err))
+					}
 				}
 			}
 		}()
