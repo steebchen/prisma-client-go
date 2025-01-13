@@ -4,6 +4,7 @@
 :root {
   --nextra-primary-hue: 204deg;
   --nextra-primary-saturation: 100%;
+  --nextra-content-width: 90rem;
 }
 
 main {
