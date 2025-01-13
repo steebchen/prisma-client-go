@@ -50,7 +50,7 @@ func TestDisconnectConcurrent(t *testing.T) {
 				case <-closeCh:
 					loop = false
 				default:
-					client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
+					_, _ = client.User.FindUnique(User.ID.Equals(created.ID)).Exec(ctx)
 				}
 			}
 		}()
