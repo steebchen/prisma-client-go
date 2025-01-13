@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@types/react': npm:types-react@19.0.0-rc.1
-
 importers:
 
   .:
@@ -19,7 +16,7 @@ importers:
         version: 4.0.0(acorn@8.14.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3)
       nextra-theme-docs:
         specifier: 4.0.0
-        version: 4.0.0(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nextra@4.0.0(acorn@8.14.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(types-react@19.0.0-rc.1)(use-sync-external-store@1.2.2(react@19.0.0))
+        version: 4.0.0(@types/react@19.0.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nextra@4.0.0(acorn@8.14.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-sync-external-store@1.2.2(react@19.0.0))
       react:
         specifier: 19.0.0
         version: 19.0.0
@@ -34,8 +31,8 @@ importers:
         specifier: 22.10.5
         version: 22.10.5
       '@types/react':
-        specifier: npm:types-react@19.0.0-rc.1
-        version: types-react@19.0.0-rc.1
+        specifier: 19.0.0
+        version: 19.0.0
       next-sitemap:
         specifier: 4.2.3
         version: 4.2.3(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
@@ -614,6 +611,9 @@ packages:
 
   '@types/node@22.10.5':
     resolution: {integrity: sha512-F8Q+SeGimwOo86fiovQh8qiXfFEh2/ocYv7tU5pJ3EXMSSxk1Joj5wefpFK2fHTf/N6HKGSxIDBT9f3gCxXPkQ==}
+
+  '@types/react@19.0.0':
+    resolution: {integrity: sha512-MY3oPudxvMYyesqs/kW1Bh8y9VqSmf+tzqw3ae8a9DZW68pUe3zAdHeI1jc6iAysuRdACnVknHP8AhwD4/dxtg==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -1800,9 +1800,6 @@ packages:
     peerDependencies:
       typescript: '*'
 
-  types-react@19.0.0-rc.1:
-    resolution: {integrity: sha512-RshndUfqTW6K3STLPis8BtAYCGOkMbtvYsi90gmVNDZBXUyUc5juf2PE9LfS/JmOlUIRO8cWTS/1MTnmhjDqyQ==}
-
   typescript@5.7.3:
     resolution: {integrity: sha512-84MVSjMEHP+FQRPy3pX9sTVV/INIex71s9TL2Gm5FG/WG1SqXeKyZ0k7/blY/4FdOzI12CBy1vGc4og/eus0fw==}
     engines: {node: '>=14.17'}
@@ -1930,7 +1927,7 @@ packages:
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
-      '@types/react': npm:types-react@19.0.0-rc.1
+      '@types/react': '>=18.0.0'
       immer: '>=9.0.6'
       react: '>=18.0.0'
       use-sync-external-store: '>=1.2.0'
@@ -2525,6 +2522,10 @@ snapshots:
   '@types/node@22.10.5':
     dependencies:
       undici-types: 6.20.0
+
+  '@types/react@19.0.0':
+    dependencies:
+      csstype: 3.1.2
 
   '@types/trusted-types@2.0.7':
     optional: true
@@ -3796,7 +3797,7 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nextra-theme-docs@4.0.0(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nextra@4.0.0(acorn@8.14.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(types-react@19.0.0-rc.1)(use-sync-external-store@1.2.2(react@19.0.0)):
+  nextra-theme-docs@4.0.0(@types/react@19.0.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nextra@4.0.0(acorn@8.14.0)(next@15.1.4(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(typescript@5.7.3))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-sync-external-store@1.2.2(react@19.0.0)):
     dependencies:
       '@headlessui/react': 2.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       clsx: 2.1.1
@@ -3809,7 +3810,7 @@ snapshots:
       scroll-into-view-if-needed: 3.1.0
       zod: 3.24.1
       zod-validation-error: 3.4.0(zod@3.24.1)
-      zustand: 5.0.3(react@19.0.0)(types-react@19.0.0-rc.1)(use-sync-external-store@1.2.2(react@19.0.0))
+      zustand: 5.0.3(@types/react@19.0.0)(react@19.0.0)(use-sync-external-store@1.2.2(react@19.0.0))
     transitivePeerDependencies:
       - '@types/react'
       - immer
@@ -4300,10 +4301,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  types-react@19.0.0-rc.1:
-    dependencies:
-      csstype: 3.1.2
-
   typescript@5.7.3: {}
 
   ufo@1.5.4: {}
@@ -4444,9 +4441,9 @@ snapshots:
 
   zod@3.24.1: {}
 
-  zustand@5.0.3(react@19.0.0)(types-react@19.0.0-rc.1)(use-sync-external-store@1.2.2(react@19.0.0)):
+  zustand@5.0.3(@types/react@19.0.0)(react@19.0.0)(use-sync-external-store@1.2.2(react@19.0.0)):
     optionalDependencies:
-      '@types/react': types-react@19.0.0-rc.1
+      '@types/react': 19.0.0
       react: 19.0.0
       use-sync-external-store: 1.2.2(react@19.0.0)
 
