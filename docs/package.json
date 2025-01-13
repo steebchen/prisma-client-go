@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "next": "15.1.4",
-    "nextra": "4.0.0-app-router.11",
-    "nextra-theme-docs": "4.0.0-app-router.11",
+    "nextra": "4.0.0",
+    "nextra-theme-docs": "4.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
