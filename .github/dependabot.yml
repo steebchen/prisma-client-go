@@ -26,3 +26,7 @@ updates:
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+      nextra:
+        patterns:
+          - "nextra"
+          - "nextra-theme-docs"
