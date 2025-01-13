@@ -109,6 +109,42 @@
 		return v
 	}
 
+	func (r {{ $result }}) CreateOrUpdate(
+		{{/* TODO re-use */}}
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate $model.PrimaryKey -}}
+				_{{ $field.Name.GoLowerCase }} {{ $model.Name.GoCase }}WithPrisma{{ $field.Name.GoCase }}SetParam,
+			{{ end }}
+		{{- end }}
+		optional ...{{ $model.Name.GoCase }}SetParam,
+	) {{ $result }} {
+		var v {{ $result }}
+		v.query = r.query
+
+		var fields []builder.Field
+		{{ range $field := $model.Fields -}}
+			{{- if $field.RequiredOnCreate $model.PrimaryKey -}}
+				fields = append(fields, _{{ $field.Name.GoLowerCase }}.field())
+			{{ end }}
+		{{- end }}
+
+		for _, q := range optional {
+			fields = append(fields, q.field())
+		}
+
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "create",
+			Fields: fields,
+		})
+
+		v.query.Inputs = append(v.query.Inputs, builder.Input{
+			Name:   "update",
+			Fields: fields,
+		})
+
+		return v
+	}
+
 	func (r {{ $result }}) Exec(ctx context.Context) (*{{ $modelName }}, error) {
 		var v {{ $modelName }}
 		if err := r.query.Exec(ctx, &v); err != nil {

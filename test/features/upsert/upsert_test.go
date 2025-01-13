@@ -85,9 +85,68 @@ func TestUpsert(t *testing.T) {
 			massert.Equal(t, expected, actual)
 		},
 	}, {
-		name: "transaction",
-		// language=GraphQL
+		name: "CreateOrUpdate when record don't exist",
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.UpsertOne(
+				Post.ID.Equals("upsert"),
+			).CreateOrUpdate(
+				Post.Title.Set("title"),
+				Post.Views.Set(0),
+				Post.ID.Set("upsert"),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &PostModel{
+				InnerPost: InnerPost{
+					ID:    "upsert",
+					Title: "title",
+					Views: 0,
+				},
+			}
+
+			massert.Equal(t, expected, actual)
+		},
+	}, {
+		name: "CreateOrUpdate when record exists",
 		before: []string{`
+		mutation {
+			result: createOnePost(data: {
+				id: "upsert",
+				title: "title",
+				views: 0,
+			}) {
+				id
+			}
+		}
+	`},
+		run: func(t *testing.T, client *PrismaClient, ctx cx) {
+			actual, err := client.Post.UpsertOne(
+				Post.ID.Equals("upsert"),
+			).CreateOrUpdate(
+				Post.Title.Set("title"),
+				Post.Views.Set(2),
+			).Exec(ctx)
+			if err != nil {
+				t.Fatalf("fail %s", err)
+			}
+
+			expected := &PostModel{
+				InnerPost: InnerPost{
+					ID:    "upsert",
+					Title: "title",
+					Views: 2,
+				},
+			}
+
+			massert.Equal(t, expected, actual)
+		},
+	},
+		{
+			name: "transaction",
+			// language=GraphQL
+			before: []string{`
 			mutation {
 				result: createOnePost(data: {
 					id: "upsert",
@@ -98,33 +157,34 @@ func TestUpsert(t *testing.T) {
 				}
 			}
 		`},
-		run: func(t *testing.T, client *PrismaClient, ctx cx) {
-			query := client.Post.UpsertOne(
-				Post.ID.Equals("upsert"),
-			).Create(
-				Post.Title.Set("title"),
-				Post.Views.Set(0),
-				Post.ID.Set("upsert"),
-			).Update(
-				Post.Title.Set("title"),
-				Post.Views.Increment(1),
-			).Tx()
+			run: func(t *testing.T, client *PrismaClient, ctx cx) {
+				query := client.Post.UpsertOne(
+					Post.ID.Equals("upsert"),
+				).Create(
+					Post.Title.Set("title"),
+					Post.Views.Set(0),
+					Post.ID.Set("upsert"),
+				).Update(
+					Post.Title.Set("title"),
+					Post.Views.Increment(1),
+				).Tx()
 
-			if err := client.Prisma.Transaction(query).Exec(ctx); err != nil {
-				t.Fatalf("fail %s", err)
-			}
+				if err := client.Prisma.Transaction(query).Exec(ctx); err != nil {
+					t.Fatalf("fail %s", err)
+				}
 
-			expected := &PostModel{
-				InnerPost: InnerPost{
-					ID:    "upsert",
-					Title: "title",
-					Views: 1,
-				},
-			}
+				expected := &PostModel{
+					InnerPost: InnerPost{
+						ID:    "upsert",
+						Title: "title",
+						Views: 1,
+					},
+				}
 
-			massert.Equal(t, expected, query.Result())
+				massert.Equal(t, expected, query.Result())
+			},
 		},
-	}}
+	}
 	for _, tt := range tests {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
