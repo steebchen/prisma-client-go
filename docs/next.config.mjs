@@ -5,7 +5,6 @@ const withNextra = nextra({
   search: {
     codeblocks: true,
   },
-  useContentDir: true,
 });
 
 export default withNextra({
