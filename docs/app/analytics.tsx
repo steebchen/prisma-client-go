@@ -1,24 +1,26 @@
-'use client';
+"use client";
 
-import { ReactNode, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
+
+import type { ReactNode } from "react";
 
 export default function Analytics({ children }: { children: ReactNode }) {
-  const pathname = usePathname();
+	const pathname = usePathname();
 
-  useEffect(() => {
-    const handleRouteChange = (url) => {
-      gtag('event', 'page_view', {
-        page_path: url,
-      });
-    };
+	useEffect(() => {
+		const handleRouteChange = (url) => {
+			gtag("event", "page_view", {
+				page_path: url,
+			});
+		};
 
-    // Track the initial load
-    handleRouteChange(pathname);
+		// Track the initial load
+		handleRouteChange(pathname);
 
-    // Listen to changes in the pathname
-    return () => handleRouteChange(pathname);
-  }, [pathname]);
+		// Listen to changes in the pathname
+		return () => handleRouteChange(pathname);
+	}, [pathname]);
 
-  return children;
+	return children;
 }

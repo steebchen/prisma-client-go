@@ -49,3 +49,4 @@ users, err := client.User.FindMany(
 if err != nil {
   panic(err)
 }
+```
