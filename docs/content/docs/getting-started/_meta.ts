@@ -1,6 +1,6 @@
 export default {
-  "index": "",
-  "quickstart": "",
-  "advanced": "",
-  "cli": ""
-}
+	index: "",
+	quickstart: "",
+	advanced: "",
+	cli: "",
+};

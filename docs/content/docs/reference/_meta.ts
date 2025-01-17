@@ -1,6 +1,6 @@
 export default {
-  "index": "",
-  "deploy": "Deploy",
-  "client": "Client",
-  "features": "Features"
-}
+	index: "",
+	deploy: "Deploy",
+	client: "Client",
+	features: "Features",
+};

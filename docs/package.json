@@ -1,24 +1,31 @@
 {
-  "scripts": {
-    "dev": "next dev --turbopack",
-    "start": "next start",
-    "test": "npm run build",
-    "build": "npx next build && next-sitemap",
-    "postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"
-  },
-  "dependencies": {
-    "next": "15.1.5",
-    "nextra": "4.0.3",
-    "nextra-theme-docs": "4.0.3",
-    "react": "19.0.0",
-    "react-dom": "19.0.0"
-  },
-  "devDependencies": {
-    "@types/gtag.js": "0.0.20",
-    "@types/node": "22.10.7",
-    "@types/react": "19.0.7",
-    "next-sitemap": "4.2.3",
-    "pagefind": "1.3.0",
-    "typescript": "5.7.3"
-  }
+	"scripts": {
+		"dev": "next dev --turbopack",
+		"start": "next start",
+		"test": "npm run build",
+		"build": "npx next build && next-sitemap",
+		"lint": "eslint . && prettier --check .",
+		"format": "eslint --fix . && prettier --write .",
+		"postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"
+	},
+	"prettier": "@steebchen/prettier-config",
+	"dependencies": {
+		"@steebchen/lint-next": "1.7.1",
+		"next": "15.1.5",
+		"nextra": "4.0.3",
+		"nextra-theme-docs": "4.0.3",
+		"react": "19.0.0",
+		"react-dom": "19.0.0"
+	},
+	"devDependencies": {
+		"@steebchen/prettier-config": "1.0.0",
+		"@types/gtag.js": "0.0.20",
+		"@types/node": "22.10.7",
+		"@types/react": "19.0.7",
+		"eslint": "9.18.0",
+		"next-sitemap": "4.2.3",
+		"pagefind": "1.3.0",
+		"prettier": "3.4.2",
+		"typescript": "5.7.3"
+	}
 }
