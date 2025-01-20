@@ -12,8 +12,8 @@
 	"dependencies": {
 		"@steebchen/lint-next": "1.7.1",
 		"next": "15.1.5",
-		"nextra": "4.0.3",
-		"nextra-theme-docs": "4.0.3",
+		"nextra": "4.0.4",
+		"nextra-theme-docs": "4.0.4",
 		"react": "19.0.0",
 		"react-dom": "19.0.0"
 	},
