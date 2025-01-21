@@ -9,4 +9,7 @@ const withNextra = nextra({
 
 export default withNextra({
 	reactStrictMode: true,
+	images: {
+		domains: ['assets.seobotai.com'],
+	},
 });

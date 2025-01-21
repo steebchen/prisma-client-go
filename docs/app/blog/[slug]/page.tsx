@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BlogClient } from "seobot";
 
-import "../blog.css";
+import "./blog.css";
 
 import type { Metadata } from "next";
 
@@ -21,10 +21,12 @@ async function getPost(slug: string) {
 export const fetchCache = "force-no-store";
 
 export async function generateMetadata({
-	params: { slug },
+	params,
 }: {
-	params: { slug: string };
+	params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+	const { slug } = await params;
+
 	const post = await getPost(slug);
 	if (!post) return {};
 
@@ -54,16 +56,16 @@ export async function generateMetadata({
 }
 
 export default async function Article({
-	params: { slug },
+	params,
 }: {
-	params: { slug: string };
+	params: Promise<{ slug: string }>;
 }) {
+	const { slug } = await params;
+
 	const post = await getPost(slug);
 	if (!post) {
 		return notFound();
 	}
-
-	console.log("post", post); // todo remove
 
 	return (
 		<section className="mx-auto max-w-2xl px-4 md:px-8 lg:my-8 dark:text-white">
@@ -114,13 +116,14 @@ export default async function Article({
 					<span>{` ⦁ ${post.readingTime}`} min read</span>
 				) : null}
 			</div>
-			<div className="relative mt-2 flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl text-center">
+			<div
+				className="relative mt-2 flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl text-center"
+			>
 				<Image
 					src={post.image}
 					alt={post.headline}
-					layout="fill"
-					objectFit="cover"
-					className="!inset-auto"
+					fill
+					className="!inset-auto object-cover"
 				/>
 			</div>
 			<div

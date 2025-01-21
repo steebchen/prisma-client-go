@@ -3,3 +3,4 @@ node_modules/
 public/*.xml
 public/robots.txt
 _pagefind/
+.env

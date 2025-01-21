@@ -1,0 +1,206 @@
+.article {
+	-webkit-text-size-adjust: 100%;
+	line-height: 1.6;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+	font-size: 20px !important;
+	max-width: 720px;
+	margin-bottom: 96px;
+	padding: 48px 1rem;
+}
+
+#table-of-contents-list {
+	font-size: 16px;
+	width: 100%;
+	border: 1px solid #ddd;
+	padding-top: 1em;
+	padding-bottom: 1em;
+}
+
+.article a {
+	color: #f97316;
+	text-decoration: none;
+}
+
+.article ol,
+.article ul {
+	padding-left: 2em;
+	margin-bottom: 1rem;
+}
+
+.article ol li,
+.article ul li {
+	padding: 3px 2px;
+}
+
+.article ol p,
+.article ul p {
+	margin: 0;
+	display: inline;
+}
+
+.article ol {
+	list-style-type: none;
+	counter-reset: item;
+}
+
+.article ol li {
+	counter-increment: item;
+}
+
+.article ol li:before {
+	content: counters(item, ".") ". ";
+}
+
+.article ol li::marker {
+	display: none;
+}
+
+.article ul {
+	list-style: disc;
+}
+
+.article ul ul {
+	list-style: circle;
+}
+
+.article ul ul ul {
+	list-style-type: square;
+}
+
+.article h1 {
+	font-size: 2rem;
+	font-weight: 800;
+	margin-top: 1rem;
+	margin-bottom: 1rem;
+}
+
+.article h2 {
+	font-size: 1.5rem;
+	font-weight: 700;
+	margin-top: 1.8rem;
+	margin-bottom: 0.8rem;
+}
+
+.article h3 {
+	font-size: 1.2rem;
+	font-weight: 600;
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.article h4 {
+	font-size: 1rem;
+	font-weight: 600;
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
+}
+
+.article p {
+	margin-bottom: 1rem;
+}
+
+.article img {
+	max-width: 100%;
+	margin: 1em auto;
+}
+
+.article {
+	position: relative;
+}
+
+.article > .tags {
+	display: flex;
+	justify-content: start;
+	flex-wrap: wrap;
+	gap: 10px;
+	width: 100%;
+}
+
+.article .tags > a {
+	color: black;
+	background-color: #eee;
+	border-radius: 6px;
+	padding: 2px 8px;
+	font-size: 16px;
+	font-weight: 500;
+}
+
+.article hr {
+	margin-top: 1.5rem;
+	margin-bottom: 1.5rem;
+}
+
+.article pre {
+	display: grid;
+	overflow: hidden;
+	border-radius: 0.5rem;
+	font-size: 16px;
+	margin: 1.5em 0;
+}
+
+.article p > code,
+.article li > code {
+	background-color: #444;
+	border-radius: 6px;
+	padding: 0.1em 0.25em;
+	font-size: 18px;
+}
+
+table {
+	font-size: 15px;
+	border-collapse: collapse;
+	width: 100%;
+}
+
+th,
+td {
+	text-align: left;
+	padding: 8px;
+	border: 1px solid #ddd;
+}
+
+th {
+	background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+	background-color: #f2f2f2;
+}
+
+blockquote {
+	background: #f1f1f1;
+	border-left: 10px solid #777;
+	margin: 1.5em 10px;
+	padding: 0.5em 10px;
+	quotes: "\201C" "\201D" "\2018" "\2019";
+}
+
+blockquote:before {
+	color: #777;
+	content: open-quote;
+	font-size: 4em;
+	line-height: 0.1em;
+	margin-right: 0.25em;
+	vertical-align: -0.4em;
+}
+
+blockquote p {
+	display: inline;
+	font-style: italic;
+}
+
+@media (max-width: 768px) {
+	.article h1 {
+		font-size: 1.6rem;
+	}
+
+	.article h2 {
+		font-size: 1.3rem;
+	}
+
+	.article h3 {
+		font-size: 1rem;
+	}
+}

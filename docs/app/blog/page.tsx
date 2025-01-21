@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 async function getPosts(page: number) {
 	const key =
-		process.env.SEOBOTAI_KEY || "a8c58738-7b98-4597-b20a-0bb1c2fe5772";
+		process.env.SEOBOT_API_KEY || "a8c58738-7b98-4597-b20a-0bb1c2fe5772";
 
 	const client = new BlogClient(key);
 	return await client.getArticles(page, 10);
