@@ -20,7 +20,7 @@
 	"devDependencies": {
 		"@steebchen/prettier-config": "1.0.0",
 		"@types/gtag.js": "0.0.20",
-		"@types/node": "22.10.7",
+		"@types/node": "22.10.9",
 		"@types/react": "19.0.8",
 		"eslint": "9.18.0",
 		"next-sitemap": "4.2.3",
