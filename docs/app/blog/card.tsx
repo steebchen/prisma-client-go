@@ -27,7 +27,7 @@ export const ArticleCard = ({ article }: ArticleProps) => {
 			</div>
 			<Link
 				href={`/blog/${article.slug}`}
-				className="mb-3 mt-2 block font-medium"
+				className="mt-2 mb-3 block font-medium"
 			>
 				{article.headline}
 			</Link>

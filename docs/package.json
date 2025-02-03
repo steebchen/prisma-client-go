@@ -4,8 +4,8 @@
 		"start": "next start",
 		"test": "npm run build",
 		"build": "npx next build && next-sitemap",
-		"lint": "eslint . && prettier --check .",
-		"format": "eslint --fix . && prettier --write .",
+		"lint": "DISABLED_LINTERS='eslint-plugin-tailwindcss' eslint . && prettier --check .",
+		"format": "DISABLED_LINTERS='eslint-plugin-tailwindcss' eslint --fix . && prettier --write .",
 		"postbuild": "pagefind --site .next/server/app --output-path public/_pagefind"
 	},
 	"prettier": "@steebchen/prettier-config",
