@@ -15,7 +15,7 @@
 		"nextra-theme-docs": "4.0.4",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
-		"seobot": "1.2.0"
+		"seobot": "1.3.0"
 	},
 	"devDependencies": {
 		"@steebchen/lint-next": "1.15.0",
