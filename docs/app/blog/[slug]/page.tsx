@@ -116,9 +116,7 @@ export default async function Article({
 					<span>{` ⦁ ${post.readingTime}`} min read</span>
 				) : null}
 			</div>
-			<div
-				className="relative mt-2 flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl text-center"
-			>
+			<div className="relative mt-2 flex aspect-video w-full items-center justify-center overflow-hidden rounded-xl text-center">
 				<Image
 					src={post.image}
 					alt={post.headline}
