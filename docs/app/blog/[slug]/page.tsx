@@ -125,7 +125,7 @@ export default async function Article({
 				/>
 			</div>
 			<div
-				className="prose mt-8"
+				className="prose mt-8 dark:prose-invert"
 				dangerouslySetInnerHTML={{ __html: post.html }}
 			/>
 			<div className="flex w-full flex-wrap justify-start gap-2">
@@ -139,13 +139,17 @@ export default async function Article({
 					</a>
 				))}
 			</div>
+
 			{post.relatedPosts?.length ? (
 				<div>
-					<h2>Related posts</h2>
-					<ul className="text-base">
+					<h3 className="mt-8 text-lg font-bold">
+						Related posts
+					</h3>
+					<ul className="mt-4 space-y-2">
 						{post.relatedPosts.map((p: any, ix: number) => (
 							<li key={ix}>
-								<a href={`/blog/${p.slug}`}>{p.headline}</a>
+								<a href={`/blog/${p.slug}`} className="text-blue-600 hover:text-blue-500">
+									{p.headline}</a>
 							</li>
 						))}
 					</ul>
