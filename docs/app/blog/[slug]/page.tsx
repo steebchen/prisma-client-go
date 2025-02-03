@@ -121,11 +121,11 @@ export default async function Article({
 					src={post.image}
 					alt={post.headline}
 					fill
-					className="!inset-auto object-cover"
+					className="inset-auto! object-cover"
 				/>
 			</div>
 			<div
-				className="prose prose-h1:text-slate-100 prose-h2:text-slate-100 prose-h3:text-slate-100 prose-strong:text-slate-100 mt-8 dark:text-slate-100"
+				className="prose mt-8"
 				dangerouslySetInnerHTML={{ __html: post.html }}
 			/>
 			<div className="flex w-full flex-wrap justify-start gap-2">
@@ -133,7 +133,7 @@ export default async function Article({
 					<a
 						key={ix}
 						href={`/blog/tag/${t.slug}`}
-						className="rounded px-3 text-sm dark:bg-slate-700"
+						className="rounded-sm px-3 text-sm dark:bg-slate-700"
 					>
 						{t.title}
 					</a>

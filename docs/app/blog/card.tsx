@@ -40,7 +40,7 @@ export const ArticleCard = ({ article }: ArticleProps) => {
 						<a
 							key={ix}
 							href={`/blog/tag/${t.slug}`}
-							className="rounded bg-slate-800 px-2 py-1 text-xs text-slate-400"
+							className="rounded-sm bg-slate-800 px-2 py-1 text-xs text-slate-400"
 						>
 							{t.title}
 						</a>
