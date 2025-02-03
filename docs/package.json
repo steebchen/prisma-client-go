@@ -10,7 +10,6 @@
 	},
 	"prettier": "@steebchen/prettier-config",
 	"dependencies": {
-		"@steebchen/lint-next": "1.7.1",
 		"next": "15.1.5",
 		"nextra": "4.0.4",
 		"nextra-theme-docs": "4.0.4",
@@ -19,6 +18,7 @@
 		"seobot": "1.2.0"
 	},
 	"devDependencies": {
+		"@steebchen/lint-next": "1.14.0",
 		"@steebchen/prettier-config": "1.0.0",
 		"@tailwindcss/postcss": "4.0.0",
 		"@tailwindcss/typography": "0.5.16",
