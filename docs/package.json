@@ -11,8 +11,8 @@
 	"prettier": "@steebchen/prettier-config",
 	"dependencies": {
 		"next": "15.1.7",
-		"nextra": "4.2.9",
-		"nextra-theme-docs": "4.2.9",
+		"nextra": "4.2.10",
+		"nextra-theme-docs": "4.2.10",
 		"react": "19.0.0",
 		"react-dom": "19.0.0",
 		"seobot": "1.3.0"
