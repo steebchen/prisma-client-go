@@ -48,7 +48,7 @@ func (e *QueryEngine) Do(ctx context.Context, payload interface{}, v interface{}
 		return fmt.Errorf("internal error: %s", e.RawMessage())
 	}
 
-	response.Data.Result, err = transformResponse(response.Data.Result)
+	response.Data.Result, err = TransformResponse(response.Data.Result)
 	if err != nil {
 		return fmt.Errorf("transform response: %w", err)
 	}
@@ -69,7 +69,7 @@ func (e *QueryEngine) Batch(ctx context.Context, payload interface{}, v interfac
 		return fmt.Errorf("request failed: %w", err)
 	}
 
-	body, err = transformResponse(body)
+	body, err = TransformResponse(body)
 	if err != nil {
 		return fmt.Errorf("transform response: %w", err)
 	}
@@ -87,10 +87,13 @@ func (e *QueryEngine) Request(ctx context.Context, method string, path string, p
 		return nil, fmt.Errorf("client is not connected yet")
 	}
 
+	e.mu.RLock()
 	if e.disconnected {
+		e.mu.RUnlock()
 		logger.Info.Printf("A query was executed after Disconnect() was called. Make sure to not send any queries after calling .Prisma.Disconnect() the client.")
 		return nil, fmt.Errorf("client is already disconnected")
 	}
+	e.mu.RUnlock()
 
 	requestBody, err := json.Marshal(payload)
 	if err != nil {

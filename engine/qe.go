@@ -54,7 +54,7 @@ type QueryEngine struct {
 	// lastEngineError contains the last received error
 	lastEngineError string
 
-	mu sync.Mutex
+	mu sync.RWMutex
 }
 
 func (e *QueryEngine) Name() string {

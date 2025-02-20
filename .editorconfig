@@ -8,5 +8,5 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[{*.yml,*.json,*.md,**/*.md,docs/**,**/*.yml,**/*.prisma,**/*.sh}]
+[{*.yml,*.yaml,*.json,*.md,**/*.md,**/*.yml,**/*.yaml,**/*.prisma,**/*.sh}]
 indent_style = space

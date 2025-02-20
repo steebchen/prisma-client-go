@@ -8,7 +8,9 @@ package {{.Generator.Config.Package}}
 import (
 	"context"
 	"os"
+	"slices"
 	"testing"
+	"fmt"
 
 	// no-op import for go modules
 	_ "github.com/joho/godotenv"

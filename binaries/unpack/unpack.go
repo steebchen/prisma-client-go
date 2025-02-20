@@ -36,6 +36,9 @@ func Unpack(data []byte, name string, version string) {
 	}
 
 	if _, err := os.Stat(file); err == nil {
+		if err := os.Setenv(FileEnv, file); err != nil {
+			panic(err)
+		}
 		logger.Debug.Printf("query engine exists, not unpacking. %s. at %s", time.Since(start), file)
 		return
 	}

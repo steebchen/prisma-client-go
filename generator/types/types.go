@@ -75,7 +75,7 @@ func (t Type) Value() string {
 		return v
 	}
 
-	return gocase.ToUpper(strcase.ToUpperCamel(str))
+	return gocase.ToUpper(str)
 }
 
 // GoCase transforms strings into Go-style lowercase casing. It is like GoCase but used for private fields.

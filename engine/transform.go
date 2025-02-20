@@ -1,115 +1,90 @@
 package engine
 
 import (
-	"encoding/base64"
 	"encoding/json"
-	"fmt"
+	"strings"
 
-	"github.com/steebchen/prisma-client-go/logger"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-// transformResponse for raw queries
-// transforms all custom prisma types into native go types, such as
-// [{"prisma__type":"string","prisma__value":"asdf"},{"prisma__type":"null","prisma__value":null}]
-// ->
-// ["asdf", null]
-func transformResponse(data []byte) ([]byte, error) {
-	var m interface{}
-	if err := json.Unmarshal(data, &m); err != nil {
+type Input struct {
+	Columns []string        `json:"columns"`
+	Types   []string        `json:"types"`
+	Rows    [][]interface{} `json:"rows"`
+}
+
+func TransformSQLResponse(data []byte) ([]byte, error) {
+	var input Input
+	err := json.Unmarshal(data, &input)
+	if err != nil {
 		return nil, err
 	}
 
-	forEachValue(&m, func(k *string, i *int, v *interface{}) (interface{}, bool) {
-		if v == nil {
-			return nil, false
-		}
-		var n = *v
-		o, isObject := (*v).(map[string]interface{})
-		if isObject {
-			var ok bool
-			n, ok = handleObject(o)
-			if !ok {
-				return n, false
-			}
-		}
-		return n, true
-	})
+	output := make([]map[string]interface{}, 0)
 
-	out, err := json.Marshal(m)
+	for _, row := range input.Rows {
+		m := make(map[string]interface{})
+		for i, column := range input.Columns {
+			m[column] = row[i]
+		}
+		output = append(output, m)
+	}
+
+	o, err := json.Marshal(output)
 	if err != nil {
-		return nil, fmt.Errorf("transform response marshal: %w", err)
+		return nil, err
 	}
 
-	logger.Debug.Printf("transformed response: %s", out)
-
-	return out, nil
+	return o, nil
 }
 
-func handleObject(o map[string]interface{}) (interface{}, bool) {
-	if t, ok := o["prisma__type"]; ok {
-		if t == "bytes" {
-			// bytes from prisma are base64 encoded
-			bytes, ok := o["prisma__value"].(string)
-			if !ok {
-				panic("expected bytes")
-			}
-			dst := make([]byte, base64.StdEncoding.DecodedLen(len(bytes)))
-			n, err := base64.StdEncoding.Decode(dst, []byte(bytes))
-			if err != nil {
-				panic(err)
-			}
-			dst = dst[:n]
-			return dst, false
-		}
-		if t == "array" {
-			value, ok := o["prisma__value"].([]interface{})
-			if !ok {
-				panic("expected array")
-			}
-			var items []interface{}
-			for _, item := range value {
-				item, _ := handleObject(item.(map[string]interface{}))
-				items = append(items, item)
-			}
-			return items, false
-		}
-		return o["prisma__value"], false
+func TransformMongoResponse(data []byte) ([]byte, error) {
+	var result []map[string]interface{}
+
+	if err := bson.UnmarshalExtJSON(data, false, &result); err != nil {
+		return nil, err
 	}
-	return o, true
+
+	for _, doc := range result {
+		if doc["id"] == nil {
+			doc["id"] = doc["_id"]
+		}
+	}
+
+	o, err := json.Marshal(result)
+	if err != nil {
+		return nil, err
+	}
+
+	return o, nil
 }
 
-func forEachValue(obj *interface{}, handler func(*string, *int, *interface{}) (interface{}, bool)) {
-	if obj == nil {
-		return
+// TransformResponse for raw queries
+func TransformResponse(data []byte) ([]byte, error) {
+	// TODO properly detect a json response
+	switch {
+	case strings.HasPrefix(string(data), `{"columns":[`):
+		return TransformSQLResponse(data)
+
+	// https://github.com/mongodb/mongo-go-driver/blob/91abd887f6b44ab56f47e58430f57b1be1996ceb/bson/extjson_wrappers.go#L18
+	case strings.Contains(string(data), `{"$oid":`),
+		strings.Contains(string(data), `{"$date":`),
+		strings.Contains(string(data), `{"$numberInt":`),
+		strings.Contains(string(data), `{"$numberLong":`),
+		strings.Contains(string(data), `{"$symbol":`),
+		strings.Contains(string(data), `{"$numberDouble":`),
+		strings.Contains(string(data), `{"$numberDecimal":`),
+		strings.Contains(string(data), `{"$binary":`),
+		strings.Contains(string(data), `{"$code":`),
+		strings.Contains(string(data), `{"$scope":`),
+		strings.Contains(string(data), `{"$timestamp":`),
+		strings.Contains(string(data), `{"$regularExpression":`),
+		strings.Contains(string(data), `{"$dbPointer":`),
+		strings.Contains(string(data), `{"$minKey":`),
+		strings.Contains(string(data), `{"$maxKey":`),
+		strings.Contains(string(data), `{"$undefined":`):
+		return TransformMongoResponse(data)
 	}
-	var ok bool
-	var n = *obj
-	// Yield all key/value pairs for objects.
-	o, isObject := (*obj).(map[string]interface{})
-	if isObject {
-		for k := range o {
-			item := o[k]
-			o[k], ok = handler(&k, nil, &item)
-			item = o[k]
-			if ok {
-				forEachValue(&item, handler)
-			}
-		}
-		n = o
-	}
-	// Yield each index/value for arrays.
-	a, isArray := (*obj).([]interface{})
-	if isArray {
-		for i := range a {
-			item := a[i]
-			a[i], ok = handler(nil, &i, &item)
-			item = a[i]
-			if ok {
-				forEachValue(&item, handler)
-			}
-		}
-		n = a
-	}
-	*obj = n
-	// Do nothing for primitives since the handler got them.
+
+	return data, nil
 }

@@ -1,8 +1,9 @@
 package engine
 
 import (
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func Test_transformResponse(t *testing.T) {
@@ -14,75 +15,26 @@ func Test_transformResponse(t *testing.T) {
 		args args
 		want []byte
 	}{{
-		name: "replace nulls array",
+		name: "transform",
 		args: args{
-			data: []byte(`[{"prisma__type":"string","prisma__value":"asdf"},{"prisma__type":"null","prisma__value":null}]`),
+			data: []byte(`{"columns":["id","email","username","str","strOpt","date","dateOpt","int","intOpt","float","floatOpt","bool","boolOpt"],"types":["string","string","string","string","string","datetime","datetime","int","int","double","double","int","int"],"rows":[["id1","email1","a","str","strOpt","2020-01-01T00:00:00+00:00","2020-01-01T00:00:00+00:00",5,5,5.5,5.5,1,0],["id2","email2","b","str","strOpt","2020-01-01T00:00:00+00:00","2020-01-01T00:00:00+00:00",5,5,5.5,5.5,1,0]]}`),
 		},
-		want: []byte(`["asdf",null]`),
-	}, {
-		name: "replace nulls object",
-		args: args{
-			data: []byte(`[{"id":{"prisma__type":"null","prisma__value":null}}]`),
-		},
-		want: []byte(`[{"id":null}]`),
-	}, {
-		name: "replace string",
-		args: args{
-			data: []byte(`[{"id":{"prisma__type":"string","prisma__value":"asdf"}}]`),
-		},
-		want: []byte(`[{"id":"asdf"}]`),
-	}, {
-		name: "replace string with other objects",
-		args: args{
-			data: []byte(`[{"id":{"prisma__type":"string","prisma__value":"asdf"}},{"some":{"other":"object"}},{"value":5}]`),
-		},
-		want: []byte(`[{"id":"asdf"},{"some":{"other":"object"}},{"value":5}]`),
-	}, {
-		name: "native string",
-		args: args{
-			data: []byte(`"asdf"`),
-		},
-		want: []byte(`"asdf"`),
-	}, {
-		name: "native number",
-		args: args{
-			data: []byte(`5`),
-		},
-		want: []byte(`5`),
-	}, { // edge cases which are specifically handled
-		name: "bytes",
-		args: args{
-			data: []byte(`{"item":{"prisma__type":"bytes","prisma__value":"eyJzb21lIjo1fQ=="}}`),
-		},
-		want: []byte(`{"item":"eyJzb21lIjo1fQ=="}`),
-	}, {
-		name: "bytes",
-		args: args{
-			data: []byte(`[{"prisma__type":"bytes","prisma__value":"eyJzb21lIjp7ImEiOiJiIn19"}]`),
-		},
-		want: []byte(`["eyJzb21lIjp7ImEiOiJiIn19"]`),
-	}, {
-		name: "bytes",
-		args: args{
-			data: []byte(`[{"prisma__type":"bytes","prisma__value":"MTIz"}]`),
-		},
-		want: []byte(`["MTIz"]`),
-	}, {
-		name: "big",
-		args: args{
-			data: []byte(`[{"id":{"prisma__type":"string","prisma__value":"id1"},"email":{"prisma__type":"string","prisma__value":"email1"},"username":{"prisma__type":"string","prisma__value":"a"},"str":{"prisma__type":"string","prisma__value":"str"},"strOpt":{"prisma__type":"string","prisma__value":"strOpt"},"strEmpty":{"prisma__type":"null","prisma__value":null},"time":{"prisma__type":"datetime","prisma__value":"2020-01-01T00:00:00+00:00"},"timeOpt":{"prisma__type":"datetime","prisma__value":"2020-01-01T00:00:00+00:00"},"timeEmpty":{"prisma__type":"null","prisma__value":null},"int":{"prisma__type":"int","prisma__value":5},"intOpt":{"prisma__type":"int","prisma__value":5},"intEmpty":{"prisma__type":"null","prisma__value":null},"float":{"prisma__type":"double","prisma__value":5.5},"floatOpt":{"prisma__type":"double","prisma__value":5.5},"floatEmpty":{"prisma__type":"null","prisma__value":null},"bool":{"prisma__type":"bool","prisma__value":true},"boolOpt":{"prisma__type":"bool","prisma__value":false},"boolEmpty":{"prisma__type":"null","prisma__value":null},"decimal":{"prisma__type":"decimal","prisma__value":"5.5"},"decimalOpt":{"prisma__type":"decimal","prisma__value":"5.5"},"decimalEmpty":{"prisma__type":"null","prisma__value":null},"json":{"prisma__type":"json","prisma__value":{"field":"value"}},"jsonOpt":{"prisma__type":"json","prisma__value":{"field":"value"}},"jsonEmpty":{"prisma__type":"null","prisma__value":null},"bytes":{"prisma__type":"bytes","prisma__value":"eyJmaWVsZCI6InZhbHVlIn0="},"bytesOpt":{"prisma__type":"bytes","prisma__value":"eyJmaWVsZCI6InZhbHVlIn0="},"bytesEmpty":{"prisma__type":"null","prisma__value":null}},{"id":{"prisma__type":"string","prisma__value":"id2"},"email":{"prisma__type":"string","prisma__value":"email2"},"username":{"prisma__type":"string","prisma__value":"b"},"str":{"prisma__type":"string","prisma__value":"str"},"strOpt":{"prisma__type":"string","prisma__value":"strOpt"},"strEmpty":{"prisma__type":"null","prisma__value":null},"time":{"prisma__type":"datetime","prisma__value":"2020-01-01T00:00:00+00:00"},"timeOpt":{"prisma__type":"datetime","prisma__value":"2020-01-01T00:00:00+00:00"},"timeEmpty":{"prisma__type":"null","prisma__value":null},"int":{"prisma__type":"int","prisma__value":5},"intOpt":{"prisma__type":"int","prisma__value":5},"intEmpty":{"prisma__type":"null","prisma__value":null},"float":{"prisma__type":"double","prisma__value":5.5},"floatOpt":{"prisma__type":"double","prisma__value":5.5},"floatEmpty":{"prisma__type":"null","prisma__value":null},"bool":{"prisma__type":"bool","prisma__value":true},"boolOpt":{"prisma__type":"bool","prisma__value":false},"boolEmpty":{"prisma__type":"null","prisma__value":null},"decimal":{"prisma__type":"decimal","prisma__value":"5.5"},"decimalOpt":{"prisma__type":"decimal","prisma__value":"5.5"},"decimalEmpty":{"prisma__type":"null","prisma__value":null},"json":{"prisma__type":"json","prisma__value":{"field":"value"}},"jsonOpt":{"prisma__type":"json","prisma__value":{"field":"value"}},"jsonEmpty":{"prisma__type":"null","prisma__value":null},"bytes":{"prisma__type":"bytes","prisma__value":"eyJmaWVsZCI6InZhbHVlIn0="},"bytesOpt":{"prisma__type":"bytes","prisma__value":"eyJmaWVsZCI6InZhbHVlIn0="},"bytesEmpty":{"prisma__type":"null","prisma__value":null}}]`),
-		},
-		want: []byte(`[{"bool":true,"boolEmpty":null,"boolOpt":false,"bytes":"eyJmaWVsZCI6InZhbHVlIn0=","bytesEmpty":null,"bytesOpt":"eyJmaWVsZCI6InZhbHVlIn0=","decimal":"5.5","decimalEmpty":null,"decimalOpt":"5.5","email":"email1","float":5.5,"floatEmpty":null,"floatOpt":5.5,"id":"id1","int":5,"intEmpty":null,"intOpt":5,"json":{"field":"value"},"jsonEmpty":null,"jsonOpt":{"field":"value"},"str":"str","strEmpty":null,"strOpt":"strOpt","time":"2020-01-01T00:00:00+00:00","timeEmpty":null,"timeOpt":"2020-01-01T00:00:00+00:00","username":"a"},{"bool":true,"boolEmpty":null,"boolOpt":false,"bytes":"eyJmaWVsZCI6InZhbHVlIn0=","bytesEmpty":null,"bytesOpt":"eyJmaWVsZCI6InZhbHVlIn0=","decimal":"5.5","decimalEmpty":null,"decimalOpt":"5.5","email":"email2","float":5.5,"floatEmpty":null,"floatOpt":5.5,"id":"id2","int":5,"intEmpty":null,"intOpt":5,"json":{"field":"value"},"jsonEmpty":null,"jsonOpt":{"field":"value"},"str":"str","strEmpty":null,"strOpt":"strOpt","time":"2020-01-01T00:00:00+00:00","timeEmpty":null,"timeOpt":"2020-01-01T00:00:00+00:00","username":"b"}]`),
-	}}
+		want: []byte(`[{"bool":1,"boolOpt":0,"date":"2020-01-01T00:00:00+00:00","dateOpt":"2020-01-01T00:00:00+00:00","email":"email1","float":5.5,"floatOpt":5.5,"id":"id1","int":5,"intOpt":5,"str":"str","strOpt":"strOpt","username":"a"},{"bool":1,"boolOpt":0,"date":"2020-01-01T00:00:00+00:00","dateOpt":"2020-01-01T00:00:00+00:00","email":"email2","float":5.5,"floatOpt":5.5,"id":"id2","int":5,"intOpt":5,"str":"str","strOpt":"strOpt","username":"b"}]`),
+	},
+		{
+			name: "transform mongo raw response",
+			args: args{
+				data: []byte(`[{"_id":{"$oid":"67347ee4a18fa09750c1085a"},"createdAt":{"$date":"2024-11-13T10:26:44.246Z"},"firstName":"Trua Nguyen","lastName":"Van","email":"truanv@gmail"},{"_id":{"$oid":"67348094597e341917026845"},"email":"truanv@gmail","firstName":"Trua Nguyen","lastName":"Van"},{"_id":{"$oid":"673480d6597e341917026dea"},"email":"truanv@gmail","firstName":"Trua Nguyen","lastName":"Van"},{"_id":{"$oid":"67348265597e34191702904f"},"firstName":"Trua Nguyen ","lastName":"Van","email":"truanv@gmail"},{"_id":{"$oid":"6734827b597e34191702923d"},"email":"truanv@gmail","firstName":"Trua Nguyen ","lastName":"Van"}]`),
+			},
+			want: []byte(`[{"_id":"67347ee4a18fa09750c1085a","createdAt":"2024-11-13T10:26:44.246Z","email":"truanv@gmail","firstName":"Trua Nguyen","id":"67347ee4a18fa09750c1085a","lastName":"Van"},{"_id":"67348094597e341917026845","email":"truanv@gmail","firstName":"Trua Nguyen","id":"67348094597e341917026845","lastName":"Van"},{"_id":"673480d6597e341917026dea","email":"truanv@gmail","firstName":"Trua Nguyen","id":"673480d6597e341917026dea","lastName":"Van"},{"_id":"67348265597e34191702904f","email":"truanv@gmail","firstName":"Trua Nguyen ","id":"67348265597e34191702904f","lastName":"Van"},{"_id":"6734827b597e34191702923d","email":"truanv@gmail","firstName":"Trua Nguyen ","id":"6734827b597e34191702923d","lastName":"Van"}]`),
+		}}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := transformResponse(tt.args.data)
+			got, err := TransformResponse(tt.args.data)
 			if err != nil {
 				t.Fatalf("transformResponse() error = %v", err)
 			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("transformResponse() = %s, want %s", got, tt.want)
-			}
+			assert.Equal(t, string(tt.want), string(got))
 		})
 	}
 }

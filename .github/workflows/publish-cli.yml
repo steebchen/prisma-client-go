@@ -7,7 +7,7 @@ on:
 jobs:
   publish:
     name: Publish Prisma CLI
-    runs-on: macos-13-xlarge
+    runs-on: macos-14
     permissions:
       pull-requests: write
       contents: write
@@ -24,9 +24,11 @@ jobs:
           AWS_DEFAULT_REGION: eu-west-1
           AWS_ACCESS_KEY_ID: ${{ secrets.PRISMA_CLI_AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.PRISMA_CLI_AWS_SECRET_ACCESS_KEY }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
       - name: Create Pull Request
         id: pr
-        uses: peter-evans/create-pull-request@v6
+        if: env.trigger_pr == 'true' # trigger PR only if the publish script ran
+        uses: peter-evans/create-pull-request@v7
         with:
           title: 'chore(prisma): upgrade prisma to v${{ steps.publish.outputs.PRISMA_VERSION }}'
           body: |

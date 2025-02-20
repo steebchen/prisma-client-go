@@ -1,8 +1,8 @@
 package binaries
 
 // PrismaVersion is a hardcoded version of the Prisma CLI.
-const PrismaVersion = "5.11.0"
+const PrismaVersion = "6.4.0"
 
 // EngineVersion is a hardcoded version of the Prisma Engine.
 // The versions can be found under https://github.com/prisma/prisma-engines/commits/main
-const EngineVersion = "efd2449663b3d73d637ea1fd226bafbcf45b3102"
+const EngineVersion = "a9055b89e58b4b5bfb59600785423b1db3d0e75d"

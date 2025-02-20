@@ -5,18 +5,17 @@ import (
 	"time"
 )
 
+var source = rand.NewSource(time.Now().UnixNano())
+var rng = rand.New(source)
+
 var letters = []rune("abcdefghijklmnopqrstuvwxyz")
 
 func randSeq(n int) string {
 	b := make([]rune, n)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters[rng.Intn(len(letters))]
 	}
 	return string(b)
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
 }
 
 func RandomString() string {

@@ -87,6 +87,7 @@ func generateClient(input *Root) error {
 		"actions/find",
 		"actions/transaction",
 		"actions/upsert",
+		"actions/raw",
 	}
 
 	var templates []*template.Template

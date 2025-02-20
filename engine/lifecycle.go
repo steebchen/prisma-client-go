@@ -62,7 +62,9 @@ func (e *QueryEngine) Connect() error {
 }
 
 func (e *QueryEngine) Disconnect() error {
+	e.mu.Lock()
 	e.disconnected = true
+	e.mu.Unlock()
 	logger.Debug.Printf("disconnecting...")
 
 	if platform.Name() == "windows" {

@@ -107,6 +107,39 @@
 				return r
 			}
 
+			func (r {{ $result }}) Select(params ...{{ $model.Name.GoLowerCase }}PrismaFields) {{ $result }} {
+				var outputs []builder.Output
+
+				for _, param := range params {
+					outputs = append(outputs, builder.Output{
+						Name: string(param),
+					})
+				}
+
+				r.query.Outputs = outputs
+
+				return r
+			}
+
+			func (r {{ $result }}) Omit(params ...{{ $model.Name.GoLowerCase }}PrismaFields) {{ $result }} {
+				var outputs []builder.Output
+
+				var raw []string
+				for _, param := range params {
+					raw = append(raw, string(param))
+				}
+
+				for _, output := range {{ $model.Name.GoLowerCase }}Output {
+					if !slices.Contains(raw, output.Name) {
+						outputs = append(outputs, output)
+					}
+				}
+
+				r.query.Outputs = outputs
+
+				return r
+			}
+
 			{{ if $v.List }}
 				func (r {{ $result }}) OrderBy(params ...{{ $orderByParam }}) {{ $result }} {
 					var fields []builder.Field

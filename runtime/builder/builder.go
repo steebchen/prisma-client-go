@@ -12,6 +12,20 @@ import (
 	"github.com/steebchen/prisma-client-go/logger"
 )
 
+type MethodFormat string
+
+const (
+	FindRaw      MethodFormat = "findRaw"
+	AggregateRaw MethodFormat = "aggregateRaw"
+)
+
+var (
+	MethodFormatMaping = map[MethodFormat]string{
+		FindRaw:      "find%sRaw",      // find{Model}Raw
+		AggregateRaw: "aggregate%sRaw", // aggregate{Model}Raw
+	}
+)
+
 type Input struct {
 	Name     string
 	Fields   []Field
@@ -100,8 +114,14 @@ func (q Query) Build() (string, error) {
 
 func (q Query) BuildInner() (string, error) {
 	var builder strings.Builder
-
-	builder.WriteString(q.Method + q.Model)
+	switch MethodFormat(q.Method) {
+	case FindRaw:
+		builder.WriteString(fmt.Sprintf(MethodFormatMaping[FindRaw], q.Model))
+	case AggregateRaw:
+		builder.WriteString(fmt.Sprintf(MethodFormatMaping[AggregateRaw], q.Model))
+	default:
+		builder.WriteString(q.Method + q.Model)
+	}
 
 	if len(q.Inputs) > 0 {
 		str, err := q.buildInputs(q.Inputs)
@@ -129,7 +149,7 @@ func (q Query) buildInputs(inputs []Input) (string, error) {
 
 	builder.WriteString("(")
 
-	for _, i := range inputs {
+	for index, i := range inputs {
 		builder.WriteString(i.Name)
 
 		builder.WriteString(":")
@@ -150,7 +170,9 @@ func (q Query) buildInputs(inputs []Input) (string, error) {
 			}
 		}
 
-		builder.WriteString(",")
+		if index < len(inputs)-1 {
+			builder.WriteString(",")
+		}
 	}
 
 	builder.WriteString(")")

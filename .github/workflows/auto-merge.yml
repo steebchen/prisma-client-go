@@ -1,7 +1,6 @@
 name: auto-merge
 
-on:
-  pull_request_target:
+on: pull_request_target
 
 jobs:
   auto-merge:
@@ -13,20 +12,7 @@ jobs:
       repository-projects: write
       contents: write
     steps:
-      - name: "Metadata"
-        id: metadata
-        uses: dependabot/fetch-metadata@v1.6.0
+      - name: Auto Merge
+        uses: steebchen/actions/automerge@main
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: "Enable auto-squash"
-        if: steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr merge --auto --squash "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: "Approve (minor & patch)"
-        if: steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr review --approve "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}

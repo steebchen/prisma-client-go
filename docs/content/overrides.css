@@ -1,0 +1,49 @@
+/* Some overrides for the default docs template styling */
+/* Ideally we'd integrate these directly in the nextra docs starter */
+
+:root {
+	--nextra-primary-hue: 204deg;
+	--nextra-primary-saturation: 100%;
+	--nextra-content-width: 90rem;
+}
+
+main {
+	height: 100%;
+}
+
+article h1,
+article h2,
+article h3,
+article h4,
+article h5,
+article h6 {
+	margin: 1rem 0;
+}
+
+article h1 {
+	font-weight: 800 !important;
+}
+
+article h2 {
+	font-weight: 700 !important;
+	padding-bottom: 0.75rem;
+}
+
+article h3 {
+	font-weight: 600 !important;
+}
+
+.nextra-breadcrumb > div {
+	font-weight: 800 !important;
+}
+
+.nextra-breadcrumb > div:last-child {
+	/*noinspection CssUnresolvedCustomProperty*/
+	color: hsl(
+		var(--nextra-primary-hue) 100% 45% / var(--tw-text-opacity)
+	) !important;
+}
+
+.dark\:_border-primary-100\/10:is(html[class~="dark"] *) {
+	border-color: #343434 !important;
+}
