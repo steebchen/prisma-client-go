@@ -10,7 +10,7 @@
 	},
 	"prettier": "@steebchen/prettier-config",
 	"dependencies": {
-		"next": "15.1.7",
+		"next": "15.2.0",
 		"nextra": "4.2.13",
 		"nextra-theme-docs": "4.2.13",
 		"react": "19.0.0",
