@@ -23,7 +23,7 @@
 		"@tailwindcss/postcss": "4.0.12",
 		"@tailwindcss/typography": "0.5.16",
 		"@types/gtag.js": "0.0.20",
-		"@types/node": "22.13.9",
+		"@types/node": "22.13.10",
 		"@types/react": "19.0.10",
 		"eslint": "9.22.0",
 		"next-sitemap": "4.2.3",
