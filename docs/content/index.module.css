@@ -94,3 +94,7 @@ a.btnSecondary {
 	background: white;
 	color: black;
 }
+
+.link {
+	border-bottom: 1px solid black;
+}

@@ -29,6 +29,10 @@
 
 <hr>
 
+## DEPRECATION NOTICE
+
+The Prisma Go client is going to be deprecated and won't receive upgrades to Prisma v7+. Please see the [deprecation notice](https://github.com/steebchen/prisma-client-go/issues/1542).
+
 ## Description
 
 Prisma Client Go is an **auto-generated query builder** that enables **type-safe** database access and **reduces
