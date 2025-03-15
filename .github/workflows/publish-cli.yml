@@ -1,9 +1,9 @@
 name: cli
 on:
   workflow_dispatch:
-  schedule:
-    # run once per hour
-    - cron: '0 0 * * *'
+  #schedule:
+  #  # run once per hour
+  #  - cron: '0 0 * * *'
 jobs:
   publish:
     name: Publish Prisma CLI
