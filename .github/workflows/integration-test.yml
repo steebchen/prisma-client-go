@@ -30,7 +30,7 @@ jobs:
       # fix for GitHub actions MacOS
       - name: Setup docker
         if: runner.os == 'macos' && steps.changes.outputs.go == 'true'
-        uses: douglascamata/setup-docker-macos-action@v1-alpha
+        uses: douglascamata/setup-docker-macos-action@v1.0.0
 
       - uses: actions/cache@v4
         with:
