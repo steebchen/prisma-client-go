@@ -1,10 +1,9 @@
 # Advanced usage
 
-In the [quickstart](quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the
+In the [quickstart](quickstart.md), we have created a simple post model and ran a few queries. However, Prisma and the\
 Go client are designed to work with relations between models.
 
-We already created a post model, such as for a blog. Let's assume we want to add comments to a post, and connect these
-models in a way so we can rely on SQL's foreign keys and the Go client's ability to work with relations.
+We already created a post model, such as for a blog. Let's assume we want to add comments to a post, and connect these models in a way so we can rely on SQL's foreign keys and the Go client's ability to work with relations.
 
 So let's introduce a new comment model:
 
@@ -66,7 +65,7 @@ model Comment {
 
 Whenever you make changes to your model, migrate your database and re-generate your prisma code:
 
-```shell script
+```shell
 go run github.com/steebchen/prisma-client-go migrate dev --name add_comment_model
 ```
 
@@ -162,7 +161,7 @@ if err != nil {
 log.Printf("ordered comments: %+v", orderedComments)
 ```
 
-Prisma also allows you to fetch multiple things at once. Instead of doing complicated joins, you can fetch a post and a
+Prisma also allows you to fetch multiple things at once. Instead of doing complicated joins, you can fetch a post and a\
 few of their comments in just a few lines and fully type-safe:
 
 ```go
@@ -180,4 +179,4 @@ log.Printf("post: %+v", post)
 
 ## API reference
 
-To explore all query capabilities, check out the [API reference](../../docs/walkthrough).
+To explore all query capabilities, check out the [API reference](../walkthrough/).
