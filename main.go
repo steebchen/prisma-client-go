@@ -17,14 +17,14 @@ func main() {
 
 		switch args[0] {
 		case "prefetch":
-			// just run prisma -v to trigger the download
+			 just run prisma -v to trigger the download
 			if err := cli.Run([]string{"-v"}, true); err != nil {
 				panic(err)
 			}
 			os.Exit(0)
 			return
 		case "init":
-			// override default init flags
+			 override default init flags
 			args = append(args, "--generator-provider", "go run github.com/steebchen/prisma-client-go")
 			if err := cli.Run(args, true); err != nil {
 				panic(err)
@@ -33,7 +33,7 @@ func main() {
 			return
 		}
 
-		// prisma CLI
+		 prisma CLI
 		if err := cli.Run(args, true); err != nil {
 			panic(err)
 		}
@@ -41,11 +41,11 @@ func main() {
 		return
 	}
 
-	// running the prisma generator
+	 running the prisma generator
 
 	logger.Debug.Printf("invoking prisma")
 
-	// if this wasn't actually invoked by the prisma generator, print a warning and exit
+ if this wasn't actually invoked by the prisma generator, print a warning and exit
 	if os.Getenv("PRISMA_GENERATOR_INVOCATION") == "" {
 		logger.Info.Printf("This command is only meant to be invoked internally. Please run the following instead:")
 		logger.Info.Printf("`go run github.com/steebchen/prisma-client-go <command>`")
@@ -54,7 +54,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// exit when signal triggers
+	 exit when signal triggers
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
