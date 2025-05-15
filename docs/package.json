@@ -20,7 +20,7 @@
 	"devDependencies": {
 		"@steebchen/lint-next": "1.19.4",
 		"@steebchen/prettier-config": "1.4.2",
-		"@tailwindcss/postcss": "4.1.6",
+		"@tailwindcss/postcss": "4.1.7",
 		"@tailwindcss/typography": "0.5.16",
 		"@types/gtag.js": "0.0.20",
 		"@types/node": "22.15.18",
