@@ -6,7 +6,7 @@ require (
 	github.com/joho/godotenv v1.5.1
 	github.com/shopspring/decimal v1.4.0
 	github.com/stretchr/testify v1.10.0
-	go.mongodb.org/mongo-driver/v2 v2.2.0
+	go.mongodb.org/mongo-driver/v2 v2.2.1
 )
 
 require (
